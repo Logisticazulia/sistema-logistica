@@ -263,7 +263,7 @@ body {
 
 }
 /* ========================================
-   DASHBOARD - ESTILOS NUEVOS
+   DASHBOARD - ESTILOS REORGANIZADOS
    ======================================== */
 
 /* ===== Página del Dashboard ===== */
@@ -356,10 +356,15 @@ body {
 .dashboard-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 40px;
     padding-bottom: 20px;
     border-bottom: 2px solid #e1e8f0;
+}
+
+/* Título a la izquierda */
+.header-left {
+    text-align: left;
 }
 
 .dashboard-title {
@@ -374,32 +379,61 @@ body {
     font-size: 0.95rem;
 }
 
-.header-date {
-    display: flex;
+/* Fecha a la derecha (fuera del navbar azul) */
+.header-right {
+    text-align: right;
+}
+
+.date-box {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     background: var(--color-white);
     padding: 10px 18px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e1e8f0;
 }
 
 .date-icon {
     font-size: 1.2rem;
 }
 
-.header-date span {
+.date-box span {
     color: var(--color-text);
     font-size: 0.9rem;
     font-weight: 500;
 }
 
-/* ===== Grid de Módulos ===== */
+/* ===== Grid de Módulos: 3 arriba, 2 abajo centrados ===== */
 .modules-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
     margin-bottom: 40px;
+    justify-items: center;
+}
+
+/* Las primeras 3 tarjetas ocupan toda la fila */
+.module-card:nth-child(1),
+.module-card:nth-child(2),
+.module-card:nth-child(3) {
+    width: 100%;
+}
+
+/* Las últimas 2 tarjetas centradas */
+.module-card:nth-child(4),
+.module-card:nth-child(5) {
+    width: 100%;
+}
+
+/* Contenedor especial para la segunda fila (2 tarjetas centradas) */
+.modules-row-2 {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    width: 100%;
 }
 
 /* ===== Tarjetas de Módulos ===== */
@@ -414,6 +448,8 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    min-width: 280px;
+    max-width: 350px;
 }
 
 .module-card::before {
@@ -516,6 +552,17 @@ body {
 }
 
 /* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .module-card:nth-child(4),
+    .module-card:nth-child(5) {
+        grid-column: span 1;
+    }
+}
+
 @media (max-width: 768px) {
     .navbar {
         padding: 12px 15px;
@@ -526,13 +573,20 @@ body {
     }
 
     .user-email {
-        display: none; /* Ocultar email en móviles */
+        display: none;
     }
 
     .dashboard-header {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+        gap: 20px;
+    }
+
+    .header-left {
+        text-align: left;
+    }
+
+    .header-right {
+        text-align: left;
     }
 
     .dashboard-title {
@@ -544,12 +598,12 @@ body {
     }
 
     .module-card {
-        padding: 25px 20px;
+        max-width: 100%;
     }
 }
 
 @media (max-width: 480px) {
     .btn-logout .logout-text {
-        display: none; /* Solo icono en móviles muy pequeños */
+        display: none;
     }
 }
