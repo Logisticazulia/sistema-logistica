@@ -1,0 +1,216 @@
+/* ===== css/style.css ===== */
+
+/* 🎨 VARIABLES DE COLORES INSTITUCIONALES */
+:root {
+    --color-primary: #003366;      /* Azul oscuro institucional */
+    --color-secondary: #005b96;    /* Azul medio */
+    --color-accent: #e6f0f9;       /* Fondo claro */
+    --color-white: #ffffff;
+    --color-text: #333333;
+    --color-text-light: #666666;
+    --color-error: #d9534f;
+    --color-success: #28a745;
+    --shadow-card: 0 10px 25px rgba(0, 51, 102, 0.15);
+    --radius: 10px;
+}
+
+/* ===== RESET Y BASE ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--color-accent) 0%, #ffffff 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/* ===== LOGIN PAGE ===== */
+.login-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    background: var(--color-white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 420px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header del login */
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-container {
+    margin-bottom: 15px;
+}
+
+.logo {
+    width: 80px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.login-header h1 {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.login-subtitle {
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+}
+
+/* Formulario */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+}
+
+.form-input {
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.1);
+}
+
+.form-input::placeholder {
+    color: #aaa;
+}
+
+/* Mensajes */
+.form-message {
+    min-height: 20px;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.form-message.error {
+    color: var(--color-error);
+    background: #fff5f5;
+}
+
+.form-message.success {
+    color: var(--color-success);
+    background: #f0fff4;
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-primary:hover {
+    background: var(--color-secondary);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-loader {
+    display: none;
+}
+
+.btn.loading .btn-text { display: none; }
+.btn.loading .btn-loader { display: inline; }
+
+/* Footer del login */
+.login-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.link-help {
+    color: var(--color-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.link-help:hover {
+    text-decoration: underline;
+}
+
+/* Copyright */
+.copyright {
+    text-align: center;
+    padding: 20px;
+    color: var(--color-text-light);
+    font-size: 0.85rem;
+}
+
+/* ===== UTILIDADES RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 20px;
+    }
+    
+    .login-header h1 {
+        font-size: 1.3rem;
+    }
+}
