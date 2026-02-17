@@ -1,14 +1,3 @@
-/**
- * ========================================
- * SISTEMA INSTITUCIONAL - AUTENTICACIÓN
- * ========================================
- * Manejo de login/logout con Supabase
- * 
- * 🔧 CONFIGURACIÓN: Reemplaza las constantes
- *    SUPABASE_URL y SUPABASE_KEY con tus datos
- */
-
-// ==================== CONFIGURACIÓN ====================
 const SUPABASE_URL = 'https://wwrknqfyjelwbvfnfshq.supabase.co';     // Ej: https://xxxxx.supabase.co
 const SUPABASE_KEY = 'TeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cmtucWZ5amVsd2J2Zm5mc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjAzMjIsImV4cCI6MjA4NjkzNjMyMn0.C7CmscpqBo5nuNbfvZCTQ9WlVT771maF1BFdEkhkzuQ'; // Ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
