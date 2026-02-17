@@ -9,8 +9,8 @@
  */
 
 // ==================== CONFIGURACIÓN ====================
-const SUPABASE_URL = 'TU_SUPABASE_URL_AQUI';     // Ej: https://xxxxx.supabase.co
-const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY_AQUI'; // Ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+const SUPABASE_URL = 'https://wwrknqfyjelwbvfnfshq.supabase.co';     // Ej: https://xxxxx.supabase.co
+const SUPABASE_KEY = 'TeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cmtucWZ5amVsd2J2Zm5mc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjAzMjIsImV4cCI6MjA4NjkzNjMyMn0.C7CmscpqBo5nuNbfvZCTQ9WlVT771maF1BFdEkhkzuQ'; // Ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 // Inicializar cliente de Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
