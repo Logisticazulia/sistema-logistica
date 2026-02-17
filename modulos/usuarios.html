@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión de Usuarios - Sistema de Logística">
+    <meta name="theme-color" content="#003366">
+    
+    <title>Gestión de Usuarios | Sistema de Logística</title>
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema de Logística</span>
+            </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">usuario@institucion.com</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="dashboard-main" role="main">
+        
+        <!-- Header con Navegación de Migas -->
+        <header class="module-header">
+            <div class="breadcrumb">
+                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Gestión de Usuarios</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="btnNewUser">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">Nuevo Usuario</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Título del Módulo -->
+        <section class="module-title-section">
+            <h1 class="module-title">🔐 Gestión de Usuarios</h1>
+            <p class="module-subtitle">Administra los accesos, roles y permisos del sistema</p>
+        </section>
+
+        <!-- Estadísticas Rápidas -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">👥</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="totalUsers">0</span>
+                    <span class="stat-label">Total Usuarios</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="activeUsers">0</span>
+                    <span class="stat-label">Activos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⏸️</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="inactiveUsers">0</span>
+                    <span class="stat-label">Inactivos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">👑</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="adminUsers">0</span>
+                    <span class="stat-label">Administradores</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Buscador y Filtros -->
+        <section class="filters-section">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchUser" class="search-input" placeholder="Buscar por nombre o email...">
+            </div>
+            <div class="filter-box">
+                <select id="filterRole" class="filter-select">
+                    <option value="all">Todos los Roles</option>
+                    <option value="admin">Administrador</option>
+                    <option value="user">Usuario</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Tabla de Usuarios -->
+        <section class="table-section">
+            <div class="table-container">
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Los usuarios se cargarán dinámicamente -->
+                        <tr class="loading-row">
+                            <td colspan="6" class="loading-text">⏳ Cargando usuarios...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Mensaje cuando no hay usuarios -->
+        <section class="empty-state" id="emptyState" hidden>
+            <span class="empty-icon">📭</span>
+            <h3>No hay usuarios registrados</h3>
+            <p>Haz clic en "Nuevo Usuario" para agregar el primero</p>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: NUEVO/EDITAR USUARIO ================= -->
+    <div class="modal-overlay" id="userModal" hidden>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">➕ Nuevo Usuario</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form class="modal-form" id="userForm">
+                <div class="form-group">
+                    <label for="userName" class="form-label">Nombre Completo</label>
+                    <input type="text" id="userName" class="form-input" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail" class="form-label">Correo Electrónico</label>
+                    <input type="email" id="userEmail" class="form-input" placeholder="ejemplo@institucion.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword" class="form-label">Contraseña</label>
+                    <input type="password" id="userPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="userRole" class="form-label">Rol</label>
+                    <select id="userRole" class="form-input" required>
+                        <option value="user">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="userStatus" class="form-label">Estado</label>
+                    <select id="userStatus" class="form-input" required>
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="modalSubmit">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
+    <div class="modal-overlay" id="deleteModal" hidden>
+        <div class="modal-container modal-small">
+            <div class="modal-header">
+                <h2 class="modal-title">⚠️ Confirmar Eliminación</h2>
+                <button class="modal-close" id="deleteModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar al usuario <strong id="deleteUserName"></strong>?</p>
+                <p class="warning-text">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="deleteCancel">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="deleteConfirm">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../js/usuarios.js" defer></script>
+
+</body>
+</html>
