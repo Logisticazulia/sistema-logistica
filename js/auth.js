@@ -170,10 +170,10 @@ async function checkExistingSession() {
 
 loginForm.addEventListener('submit', handleLogin);
 
-recoverPasswordLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    handlePasswordRecovery();
-});
+//recoverPasswordLink.addEventListener('click', (e) => {
+   // e.preventDefault();
+   //handlePasswordRecovery();
+//});
 
 emailInput.addEventListener('input', () => {
     if (formMessage.classList.contains('error')) {
