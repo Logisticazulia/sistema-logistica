@@ -1,51 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- ================= METAETIQUETAS ESENCIALES ================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso al Sistema</title>
-    <!-- Vinculamos los estilos -->
-    <link rel="stylesheet" href="style.css">
-    <!-- Fuente moderna (opcional, Google Fonts) -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Acceso al sistema institucional - Login seguro">
+    <meta name="theme-color" content="#003366">
+    
+    <!-- ================= TÍTULO E ICONOS ================= -->
+    <title>Acceso | Sistema Institucional</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="img/logo.png">
+    
+    <!-- ================= ESTILOS ================= -->
+    <!-- Fuentes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Hoja de estilos principal -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
 
-    <div class="login-container">
-        <div class="login-card">
-            <!-- Espacio para el Logo -->
-            <div class="logo-area">
-                <!-- Puedes cambiar 'logo.png' por la URL de tu logo o una imagen local -->
-                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Logo Institucional" class="logo-img">
-                <h1>Portal Institucional</h1>
-            </div>
+<body class="login-page">
 
-            <!-- Formulario de Login -->
-            <form id="loginForm">
-                <div class="input-group">
-                    <label for="email">Correo Electrónico</label>
-                    <input type="email" id="email" placeholder="ejemplo@empresa.com" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                </div>
-
-                <button type="submit" class="btn-login">Ingresar</button>
-                
-                <p id="message" class="message"></p>
-            </form>
+    <!-- ================= CONTENEDOR PRINCIPAL ================= -->
+    <main class="login-wrapper" role="main">
+        
+        <!-- Tarjeta de Login -->
+        <article class="login-card" aria-labelledby="login-title">
             
-            <div class="footer-links">
-                <a href="#">¿Olvidaste tu contraseña?</a>
-            </div>
-        </div>
-    </div>
+            <!-- Sección: Logo y Título -->
+            <header class="login-header">
+                <div class="logo-container">
+                    <!-- 🔧 REEMPLAZA: src con tu logo real -->
+                    <img 
+                        src="img/logo.png" 
+                        alt="Logo Institucional" 
+                        class="logo"
+                        width="80" 
+                        height="80"
+                        loading="lazy"
+                    >
+                </div>
+                <h1 id="login-title">Portal Institucional</h1>
+                <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
+            </header>
 
-    <!-- Importamos la librería de Supabase desde un CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Tu lógica de Javascript -->
-    <script src="script.js"></script>
+            <!-- Sección: Formulario -->
+            <form id="loginForm" class="login-form" novalidate>
+                
+                <!-- Campo: Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        Correo Electrónico
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        class="form-input" 
+                        placeholder="ejemplo@institucion.com"
+                        required
+                        autocomplete="email"
+                        aria-required="true"
+                    >
+                </div>
+
+                <!-- Campo: Contraseña -->
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        Contraseña
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        class="form-input" 
+                        placeholder="••••••••"
+                        required
+                        autocomplete="current-password"
+                        aria-required="true"
+                        minlength="6"
+                    >
+                </div>
+
+                <!-- Mensajes de error/éxito -->
+                <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+
+                <!-- Botón de envío -->
+                <button type="submit" class="btn btn-primary btn-login" id="submitBtn">
+                    <span class="btn-text">Ingresar</span>
+                    <span class="btn-loader" hidden>Procesando...</span>
+                </button>
+
+            </form>
+
+            <!-- Sección: Enlaces adicionales -->
+            <footer class="login-footer">
+                <a href="#" class="link-help" id="recoverPassword">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </footer>
+
+        </article>
+
+        <!-- Pie de página institucional -->
+        <p class="copyright">
+            &copy; <span id="currentYear"></span> Institución. Todos los derechos reservados.
+        </p>
+
+    </main>
+
+    <!-- ================= SCRIPTS ================= -->
+    <!-- Librería de Supabase (CDN) -->
+    <script 
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
+        defer
+    ></script>
+    
+    <!-- Lógica de autenticación (archivo separado) -->
+    <script src="js/auth.js" defer></script>
+    
+    <!-- Script pequeño para elementos dinámicos -->
+    <script>
+        // Año automático en el copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
 </body>
 </html>
