@@ -260,7 +260,9 @@ body {
     color: #99a3b3;
     font-size: 0.75rem;
 }
-    /* ========================================
+
+}
+/* ========================================
    DASHBOARD - ESTILOS NUEVOS
    ======================================== */
 
@@ -550,5 +552,4 @@ body {
     .btn-logout .logout-text {
         display: none; /* Solo icono en móviles muy pequeños */
     }
-
 }
