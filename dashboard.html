@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- ================= METAETIQUETAS ESENCIALES ================= -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard - Sistema de Logística Institucional">
+    <meta name="theme-color" content="#003366">
+    
+    <!-- ================= TÍTULO E ICONOS ================= -->
+    <title>Dashboard | Sistema de Logística</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    
+    <!-- ================= ESTILOS ================= -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema de Logística</span>
+            </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">usuario@institucion.com</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="dashboard-main" role="main">
+        
+        <!-- Header del Dashboard -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">Panel de Control</h1>
+                <p class="dashboard-subtitle">Selecciona un módulo para comenzar</p>
+            </div>
+            <div class="header-date">
+                <span class="date-icon">📅</span>
+                <span id="currentDate">Cargando fecha...</span>
+            </div>
+        </header>
+
+        <!-- Grid de Módulos Principales -->
+        <section class="modules-grid">
+            
+            <!-- Módulo 1: Transporte -->
+            <a href="#" class="module-card module-transporte" data-module="transporte">
+                <div class="module-icon">🚚</div>
+                <h2 class="module-title">Transporte</h2>
+                <p class="module-description">Gestión de vehículos, rutas y asignaciones de transporte</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Módulo 2: Almacén -->
+            <a href="#" class="module-card module-almacen" data-module="almacen">
+                <div class="module-icon">📦</div>
+                <h2 class="module-title">Almacén</h2>
+                <p class="module-description">Control de inventario, entradas y salidas de materiales</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Módulo 3: Bienes Muebles -->
+            <a href="#" class="module-card module-bienes" data-module="bienes">
+                <div class="module-icon">🖥️</div>
+                <h2 class="module-title">Bienes Muebles</h2>
+                <p class="module-description">Registro y control de equipos y activos institucionales</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Módulo 4: RRHH -->
+            <a href="#" class="module-card module-rrhh" data-module="rrhh">
+                <div class="module-icon">👥</div>
+                <h2 class="module-title">RRHH</h2>
+                <p class="module-description">Gestión de personal, nómina y registros de empleados</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Módulo 5: Gestión de Usuarios -->
+            <a href="#" class="module-card module-usuarios" data-module="usuarios">
+                <div class="module-icon">🔐</div>
+                <h2 class="module-title">Gestión de Usuarios</h2>
+                <p class="module-description">Administración de accesos, roles y permisos del sistema</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+        </section>
+
+        <!-- Información del Sistema -->
+        <section class="system-info">
+            <div class="info-card">
+                <span class="info-icon">ℹ️</span>
+                <p class="info-text">Sistema v1.0 • Última actualización: <span id="lastUpdate">--/--/----</span></p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/dashboard.js" defer></script>
+
+</body>
+</html>
