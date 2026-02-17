@@ -13,21 +13,27 @@
     <link rel="apple-touch-icon" href="img/logo.png">
     
     <!-- ================= ESTILOS ================= -->
+    <!-- Fuentes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Hoja de estilos principal -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body class="login-page">
 
+    <!-- ================= CONTENEDOR PRINCIPAL ================= -->
     <main class="login-wrapper" role="main">
         
+        <!-- Tarjeta de Login -->
         <article class="login-card" aria-labelledby="login-title">
             
-            <!-- Header: Logo y Título -->
+            <!-- Sección: Logo y Título -->
             <header class="login-header">
                 <div class="logo-container">
+                    <!-- 🔧 REEMPLAZA: src con tu logo real -->
                     <img 
                         src="img/logo.png" 
                         alt="Logo Institucional" 
@@ -41,11 +47,14 @@
                 <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
             </header>
 
-            <!-- Formulario -->
+            <!-- Sección: Formulario -->
             <form id="loginForm" class="login-form" novalidate>
                 
+                <!-- Campo: Email -->
                 <div class="form-group">
-                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <label for="email" class="form-label">
+                        Correo Electrónico
+                    </label>
                     <input 
                         type="email" 
                         id="email" 
@@ -58,8 +67,11 @@
                     >
                 </div>
 
+                <!-- Campo: Contraseña -->
                 <div class="form-group">
-                    <label for="password" class="form-label">Contraseña</label>
+                    <label for="password" class="form-label">
+                        Contraseña
+                    </label>
                     <input 
                         type="password" 
                         id="password" 
@@ -73,46 +85,27 @@
                     >
                 </div>
 
+                <!-- Mensajes de error/éxito -->
                 <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
 
+                <!-- Botón de envío -->
                 <button type="submit" class="btn btn-primary btn-login" id="submitBtn">
                     <span class="btn-text">Ingresar</span>
                     <span class="btn-loader" hidden>Procesando...</span>
                 </button>
 
             </form>
-<!-- Footer: Información de Seguridad y Contacto -->
-<footer class="login-footer">
-    
-    <!-- Contenedor unificado de avisos -->
-    <div class="footer-notices">
-        
-        <!-- Mensaje de Seguridad -->
-        <div class="security-notice">
-            <span class="security-icon">🔒</span>
-            <span class="security-text">
-                <strong>Seguridad de extremo a extremo</strong><br>
-                Sistema protegido por el Cuerpo de Policía Nacional Bolivariana
-            </span>
-        </div>
 
-        <!-- Subtítulo de Uso -->
-        <p class="usage-notice">
-            📋 Solo uso institucional y de logística
-        </p>
-
-        <!-- Información de Contacto -->
-        <div class="contact-notice">
-            Para solicitar acceso comunicarse con el <strong>administrador</strong>
-        </div>
-
-    </div>
-
-</footer>
+            <!-- Sección: Enlaces adicionales -->
+            <footer class="login-footer">
+                <a href="#" class="link-help" id="recoverPassword">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </footer>
 
         </article>
 
-        <!-- Copyright -->
+        <!-- Pie de página institucional -->
         <p class="copyright">
             &copy; <span id="currentYear"></span> Institución. Todos los derechos reservados.
         </p>
@@ -120,9 +113,18 @@
     </main>
 
     <!-- ================= SCRIPTS ================= -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <!-- Librería de Supabase (CDN) -->
+    <script 
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
+        defer
+    ></script>
+    
+    <!-- Lógica de autenticación (archivo separado) -->
     <script src="js/auth.js" defer></script>
+    
+    <!-- Script pequeño para elementos dinámicos -->
     <script>
+        // Año automático en el copyright
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
 
