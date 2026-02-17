@@ -213,4 +213,51 @@ body {
     .login-header h1 {
         font-size: 1.3rem;
     }
+    /* ===== Footer del Login - Minimalista y Elegante ===== */
+
+.login-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 51, 102, 0.15); /* Borde azul muy sutil */
+}
+
+/* Badge de seguridad - Estilo elegante y discreto */
+.security-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(0, 51, 102, 0.04); /* Fondo azul muy tenue */
+    border-radius: 20px; /* Bordes totalmente redondeados */
+    border: 1px solid rgba(0, 51, 102, 0.1);
+    transition: all 0.3s ease;
+}
+
+.security-badge:hover {
+    background: rgba(0, 51, 102, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 51, 102, 0.1);
+}
+
+.security-icon {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.security-label {
+    font-size: 0.7rem;
+    color: #5a6b82; /* Gris azulado elegante */
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: lowercase;
+}
+
+/* ===== Copyright ===== */
+.copyright {
+    text-align: center;
+    padding: 15px;
+    color: #99a3b3;
+    font-size: 0.75rem;
+}
 }
