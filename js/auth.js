@@ -18,7 +18,7 @@ const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const submitBtn = document.getElementById('submitBtn');
 const formMessage = document.getElementById('formMessage');
-const recoverPasswordLink = document.getElementById('recoverPassword');
+//const recoverPasswordLink = document.getElementById('recoverPassword');
 
 // ==================== FUNCIONES DE UTILIDAD ====================
 
@@ -170,10 +170,10 @@ async function checkExistingSession() {
 
 loginForm.addEventListener('submit', handleLogin);
 
-recoverPasswordLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    handlePasswordRecovery();
-});
+//recoverPasswordLink.addEventListener('click', (e) => {
+//// e.preventDefault();
+   //// handlePasswordRecovery();
+///});
 
 emailInput.addEventListener('input', () => {
     if (formMessage.classList.contains('error')) {
