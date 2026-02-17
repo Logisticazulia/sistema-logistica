@@ -1,74 +1,75 @@
-/* ===== Footer del Login - Actualizado ===== */
+/* ===== Footer del Login - Textos Pequeños y Organizados ===== */
 
 .login-footer {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 25px;
-    border-top: 2px solid var(--color-primary); /* Borde azul institucional */
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
+}
+
+/* Contenedor unificado para todos los avisos */
+.footer-notices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
 }
 
 /* Mensaje de Seguridad */
 .security-notice {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 15px;
-    background: linear-gradient(135deg, #f0f4f8 0%, #e6f0f9 100%);
-    border-radius: 8px;
-    border-left: 4px solid var(--color-primary);
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: #555;
+    line-height: 1.4;
 }
 
 .security-icon {
-    font-size: 1.5rem;
-}
-
-.security-text {
-    font-size: 0.85rem;
-    color: var(--color-text);
-    line-height: 1.4;
-    text-align: left;
+    font-size: 1rem;
+    flex-shrink: 0;
 }
 
 .security-text strong {
     color: var(--color-primary);
+    font-weight: 600;
 }
 
 /* Aviso de Uso Institucional */
 .usage-notice {
-    font-size: 0.8rem;
-    color: var(--color-text-light);
+    font-size: 0.7rem;
+    color: #666;
     font-weight: 500;
-    padding: 8px 15px;
-    background: #fff8e1; /* Fondo amarillo suave para destacar */
-    border-radius: 6px;
-    border: 1px solid #ffe082;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 0;
+    border-top: 1px dashed #ddd;
+    border-bottom: 1px dashed #ddd;
+    margin: 4px 0;
 }
 
 /* Información de Contacto */
 .contact-notice {
-    padding: 10px 15px;
-    background: var(--color-accent);
-    border-radius: 6px;
-}
-
-.contact-text {
-    font-size: 0.8rem;
-    color: var(--color-text-light);
+    font-size: 0.7rem;
+    color: #777;
     line-height: 1.4;
 }
 
-.contact-text strong {
+.contact-notice strong {
     color: var(--color-secondary);
+    font-weight: 600;
 }
 
 /* ===== Copyright ===== */
 .copyright {
     text-align: center;
-    padding: 20px;
-    color: var(--color-text-light);
-    font-size: 0.85rem;
+    padding: 15px;
+    color: #999;
+    font-size: 0.75rem;
 }
