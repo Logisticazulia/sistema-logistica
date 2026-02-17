@@ -18,7 +18,7 @@ const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const submitBtn = document.getElementById('submitBtn');
 const formMessage = document.getElementById('formMessage');
-const recoverPasswordLink = document.getElementById('recoverPassword');
+//const recoverPasswordLink = document.getElementById('recoverPassword');
 
 // ==================== FUNCIONES DE UTILIDAD ====================
 
