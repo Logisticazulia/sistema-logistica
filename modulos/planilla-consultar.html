@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="../css/style.css">
     
     <style>
-        /* Estilos generales */
         .table-container {
             overflow-x: auto;
             margin: 20px 0;
@@ -18,7 +17,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
         .data-table thead {
@@ -28,7 +27,7 @@
 
         .data-table th,
         .data-table td {
-            padding: 10px 12px;
+            padding: 12px;
             text-align: left;
             border: 1px solid #ddd;
         }
@@ -38,18 +37,7 @@
             cursor: pointer;
         }
 
-        .badge {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-operativa { background: #d1fae5; color: #059669; }
-        .badge-inoperativa { background: #fee2e2; color: #dc2626; }
-        .badge-reparacion { background: #fef3c7; color: #d97706; }
-
-        /* Modal de ficha */
+        /* Modal Simplificado */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -69,204 +57,87 @@
 
         .modal-content {
             background: white;
-            width: 95%;
-            max-width: 1200px;
-            max-height: 95vh;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
             overflow-y: auto;
             border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
-            background: #003366;
-            color: white;
-            border-radius: 8px 8px 0 0;
+            background: #f8f9fa;
         }
 
         .modal-header h2 {
             margin: 0;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            color: #003366;
         }
 
         .modal-close {
             background: none;
             border: none;
-            color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            padding: 5px;
+            color: #666;
         }
 
         .modal-body {
-            padding: 25px;
+            padding: 20px;
         }
 
-        /* Ficha simplificada */
         .ficha-simple {
             width: 100%;
         }
 
-        .ficha-header {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-
-        .ficha-header-item {
-            text-align: center;
-        }
-
-        .ficha-header-item label {
-            display: block;
-            font-size: 0.75rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .ficha-header-item span {
-            display: block;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #003366;
-        }
-
-        .ficha-section {
-            margin-bottom: 20px;
-        }
-
-        .ficha-section h3 {
-            font-size: 1rem;
-            color: #003366;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #003366;
-        }
-
-        .ficha-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .ficha-item {
-            padding: 10px;
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-        }
-
-        .ficha-item label {
-            display: block;
-            font-size: 0.7rem;
-            color: #666;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-
-        .ficha-item span {
-            display: block;
-            font-size: 0.9rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .ficha-full {
-            grid-column: 1 / -1;
-        }
-
-        .ficha-actions {
+        .ficha-row {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
+        .ficha-row:last-child {
+            border-bottom: none;
         }
 
-        .btn-primary {
+        .ficha-label {
+            font-weight: 600;
+            color: #666;
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .ficha-value {
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-print {
             background: #003366;
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
         }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        /* Estilos para impresión */
         @media print {
             .modal-overlay {
                 position: absolute;
                 background: white;
             }
-
-            .modal-content {
-                width: 100%;
-                max-width: 100%;
-                max-height: none;
-                box-shadow: none;
-                border: none;
-            }
-
-            .modal-header {
-                background: #003366 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
             .modal-close,
-            .ficha-actions {
-                display: none !important;
+            .btn-print {
+                display: none;
             }
-
-            .ficha-header,
-            .ficha-item {
-                background: #f8f9fa !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            .ficha-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            body * {
-                visibility: hidden;
-            }
-
-            .modal-overlay *,
-            .modal-overlay * * {
-                visibility: visible;
-            }
-
-            .modal-overlay {
-                top: 0;
-                left: 0;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .ficha-header {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .ficha-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .modal-content {
+                box-shadow: none;
             }
         }
     </style>
@@ -326,14 +197,17 @@
         </div>
     </main>
 
-    <!-- Modal de Ficha -->
+    <!-- Modal Simplificado -->
     <div class="modal-overlay" id="vehicleModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">📋 Ficha del Vehículo</h2>
+                <h2 id="modalTitle">Ficha del Vehículo</h2>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalBody">
+            </div>
+            <div style="padding: 0 20px 20px;">
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
             </div>
         </div>
     </div>
