@@ -11,7 +11,7 @@
     <style>
         .consultar-header {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
             margin-bottom: 20px;
@@ -19,9 +19,10 @@
 
         .search-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 15px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .search-box {
@@ -43,28 +44,99 @@
             border-color: #005b96;
         }
 
+        .filters-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #005b96;
+        }
+
+        .btn-buscar {
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-buscar:hover {
+            background: #005b96;
+        }
+
+        .btn-limpiar {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-limpiar:hover {
+            background: #5a6268;
+        }
+
         .table-container {
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
-            overflow: hidden;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1400px;
         }
 
         .data-table thead {
             background: linear-gradient(135deg, #003366 0%, #005b96 100%);
             color: white;
+            position: sticky;
+            top: 0;
         }
 
         .data-table th {
             padding: 12px 10px;
             text-align: left;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             white-space: nowrap;
         }
 
@@ -74,13 +146,12 @@
             font-size: 0.85rem;
         }
 
-        .data-table tbody tr {
-            cursor: pointer;
-            transition: background 0.3s;
+        .data-table tbody tr:hover {
+            background: #f0f4f8;
         }
 
-        .data-table tbody tr:hover {
-            background: #e3f2fd;
+        .data-table tbody tr:nth-child(even) {
+            background: #fafbfc;
         }
 
         .badge {
@@ -94,96 +165,6 @@
         .badge-inoperativa { background: #fee2e2; color: #dc2626; }
         .badge-reparacion { background: #fef3c7; color: #d97706; }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 51, 102, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-container {
-            background: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .modal-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .modal-body {
-            padding: 25px;
-        }
-
-        .ficha-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .ficha-item {
-            background: #f8f9fa;
-            padding: 12px 15px;
-            border-radius: 6px;
-            border-left: 3px solid #005b96;
-        }
-
-        .ficha-item.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .ficha-label {
-            font-size: 0.75rem;
-            color: #666;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .ficha-value {
-            font-size: 0.95rem;
-            color: #003366;
-            font-weight: 500;
-        }
-
-        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
@@ -221,12 +202,6 @@
             cursor: not-allowed;
         }
 
-        .page-info {
-            padding: 0 10px;
-            font-size: 0.8rem;
-            color: #666;
-        }
-
         .results-info {
             display: flex;
             justify-content: space-between;
@@ -234,8 +209,17 @@
             padding: 10px 15px;
             background: #f8f9fa;
             border-radius: 6px;
-            margin-bottom: 15px;
             font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
@@ -281,8 +265,78 @@
                         type="text" 
                         id="searchInput" 
                         class="search-input" 
-                        placeholder="Buscar por placa, facsímil, marca..."
+                        placeholder="Buscar por placa, facsímil, marca o modelo..."
                     >
+                </div>
+                <button class="btn-buscar" onclick="aplicarFiltros()">
+                    🔍 Buscar
+                </button>
+                <button class="btn-limpiar" onclick="limpiarFiltros()">
+                    🧹 Limpiar Filtros
+                </button>
+            </div>
+
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filterTipo">Tipo</label>
+                    <select id="filterTipo" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="MOTO">MOTO</option>
+                        <option value="CAMIONETA">CAMIONETA</option>
+                        <option value="AUTOMOVIL">AUTOMOVIL</option>
+                        <option value="CAMION">CAMION</option>
+                        <option value="AUTOBUS">AUTOBUS</option>
+                        <option value="TRIMOVIL">TRIMOVIL</option>
+                        <option value="ESPECIAL">ESPECIAL</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterClase">Clase</label>
+                    <select id="filterClase" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todas</option>
+                        <option value="ENDURO">ENDURO</option>
+                        <option value="MOTO">MOTO</option>
+                        <option value="PICKUP">PICKUP</option>
+                        <option value="AUTOMOVIL">AUTOMOVIL</option>
+                        <option value="CAMION">CAMION</option>
+                        <option value="AUTOBUS">AUTOBUS</option>
+                        <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                        <option value="ESPECIAL">ESPECIAL</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterEstatus">Estatus</label>
+                    <select id="filterEstatus" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="OPERATIVA">OPERATIVA</option>
+                        <option value="INOPERATIVA">INOPERATIVA</option>
+                        <option value="REPARACION">REPARACION</option>
+                        <option value="DESINCOPORADA">DESINCOPORADA</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterEPM">EPM</label>
+                    <select id="filterEPM" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="MARACAIBO">MARACAIBO</option>
+                        <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+                        <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+                        <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
+                        <option value="NO">NO</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterEPP">EPP</label>
+                    <select id="filterEPP" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="ESTACION POLICIAL">ESTACION POLICIAL</option>
+                        <option value="E.P.">E.P.</option>
+                        <option value="NO">NO</option>
+                    </select>
                 </div>
             </div>
 
@@ -307,6 +361,8 @@
                         <th>S/Carrocería</th>
                         <th>S/Motor</th>
                         <th>Estatus</th>
+                        <th>EPM</th>
+                        <th>EPP</th>
                     </tr>
                 </thead>
                 <tbody id="vehiclesTableBody">
@@ -317,20 +373,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Modal Ficha -->
-    <div class="modal-overlay" id="vehicleModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2 id="modalTitle">Ficha del Vehículo</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="ficha-grid" id="fichaContent">
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
