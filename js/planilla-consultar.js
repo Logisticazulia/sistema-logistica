@@ -4,15 +4,6 @@
 
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 
-const searchInput = document.getElementById('searchInput');
-const searchTypeRadios = document.querySelectorAll('input[name="searchType"]');
-const vehiclesTableBody = document.getElementById('vehiclesTableBody');
-const resultsCount = document.getElementById('resultsCount');
-const lastUpdate = document.getElementById('lastUpdate');
-const fichaOverlay = document.getElementById('fichaOverlay');
-const fichaTitle = document.getElementById('fichaTitle');
-const fichaBody = document.getElementById('fichaBody');
-
 let allVehicles = [];
 let filteredVehicles = [];
 
@@ -28,15 +19,17 @@ async function loadVehicles() {
 
         allVehicles = data || [];
         filteredVehicles = [...allVehicles];
-        renderTable(filteredVehicles);
+        
+        populateFilters();
+        renderTable();
         updateResultsCount();
         updateLastUpdate();
         
     } catch (error) {
         console.error('Error cargando vehículos:', error);
-        vehiclesTableBody.innerHTML = `
+        document.getElementById('vehiclesTableBody').innerHTML = `
             <tr>
-                <td colspan="13" style="text-align: center; color: #dc2626;">
+                <td colspan="20" style="text-align: center; color: #dc2626;">
                     Error al cargar los datos: ${error.message}
                 </td>
             </tr>
@@ -44,21 +37,46 @@ async function loadVehicles() {
     }
 }
 
+// Llenar filtros
+function populateFilters() {
+    const marcas = [...new Set(allVehicles.map(v => v.marca).filter(Boolean))].sort();
+    const tipos = [...new Set(allVehicles.map(v => v.tipo).filter(Boolean))].sort();
+    
+    const filterMarca = document.getElementById('filterMarca');
+    const filterTipo = document.getElementById('filterTipo');
+    
+    marcas.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m;
+        option.textContent = m;
+        filterMarca.appendChild(option);
+    });
+    
+    tipos.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t;
+        option.textContent = t;
+        filterTipo.appendChild(option);
+    });
+}
+
 // Renderizar tabla
-function renderTable(vehicles) {
-    if (vehicles.length === 0) {
-        vehiclesTableBody.innerHTML = `
+function renderTable() {
+    const tbody = document.getElementById('vehiclesTableBody');
+    
+    if (filteredVehicles.length === 0) {
+        tbody.innerHTML = `
             <tr>
-                <td colspan="13" style="text-align: center; color: #666;">
+                <td colspan="20" style="text-align: center; color: #666;">
                     No se encontraron vehículos
                 </td>
             </tr>
         `;
         return;
     }
-
-    vehiclesTableBody.innerHTML = vehicles.map((v, index) => `
-        <tr onclick="openFicha(${index})">
+    
+    tbody.innerHTML = filteredVehicles.map(v => `
+        <tr>
             <td>${v.placa || 'N/A'}</td>
             <td>${v.facsimil || 'N/A'}</td>
             <td>${v.marca || 'N/A'}</td>
@@ -69,114 +87,90 @@ function renderTable(vehicles) {
             <td>${v.color || 'N/A'}</td>
             <td>${v.s_carroceria || 'N/A'}</td>
             <td>${v.s_motor || 'N/A'}</td>
+            <td>${v.n_identificacion || 'N/A'}</td>
             <td>${v.situacion || 'N/A'}</td>
             <td>${v.unidad_administrativa || 'N/A'}</td>
-            <td>${v.estatus || 'N/A'}</td>
+            <td>${v.redip || 'N/A'}</td>
+            <td>${v.ccpe || 'N/A'}</td>
+            <td>${v.epm || 'N/A'}</td>
+            <td>${v.epp || 'N/A'}</td>
+            <td>${v.ubicacion_fisica || 'N/A'}</td>
+            <td>${v.asignacion || 'N/A'}</td>
+            <td>${getEstatusBadge(v.estatus)}</td>
         </tr>
     `).join('');
+}
+
+// Badge de estatus
+function getEstatusBadge(estatus) {
+    if (!estatus) return '<span class="badge">N/A</span>';
+    
+    const e = estatus.toUpperCase();
+    let className = '';
+    
+    if (e.includes('OPERATIVA') && !e.includes('INOPERATIVA')) className = 'badge-operativa';
+    else if (e.includes('INOPERATIVA')) className = 'badge-inoperativa';
+    else if (e.includes('REPARACION')) className = 'badge-reparacion';
+    
+    return `<span class="badge ${className}">${estatus}</span>`;
 }
 
 // Actualizar contador
 function updateResultsCount() {
     const count = filteredVehicles.length;
-    resultsCount.textContent = `${count} vehículo${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+    document.getElementById('resultsCount').textContent = `${count} vehículo${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
 }
 
 // Actualizar fecha
 function updateLastUpdate() {
     const now = new Date();
-    lastUpdate.textContent = `Actualizado: ${now.toLocaleTimeString('es-VE')}`;
+    document.getElementById('lastUpdate').textContent = `Actualizado: ${now.toLocaleTimeString('es-VE')}`;
 }
 
-// Buscar vehículos
-function buscarVehiculos() {
-    const searchTerm = searchInput.value.trim().toUpperCase();
+// Búsqueda por placa o facsímil
+function searchVehicles() {
+    const searchTerm = document.getElementById('searchInput').value.trim().toUpperCase();
     const searchType = document.querySelector('input[name="searchType"]:checked').value;
-
+    
     if (!searchTerm) {
-        filteredVehicles = [...allVehicles];
-    } else {
-        filteredVehicles = allVehicles.filter(v => {
-            if (searchType === 'placa') {
-                return v.placa && v.placa.toUpperCase().includes(searchTerm);
-            } else if (searchType === 'facsimil') {
-                return v.facsimil && v.facsimil.toUpperCase().includes(searchTerm);
-            }
-            return false;
-        });
+        applyFilters();
+        return;
     }
+    
+    let searched = allVehicles.filter(v => {
+        const placa = (v.placa || '').toUpperCase();
+        const facsimil = (v.facsimil || '').toUpperCase();
+        
+        if (searchType === 'placa') {
+            return placa.includes(searchTerm);
+        } else if (searchType === 'facsimil') {
+            return facsimil.includes(searchTerm);
+        } else {
+            return placa.includes(searchTerm) || facsimil.includes(searchTerm);
+        }
+    });
+    
+    filteredVehicles = searched;
+    applyFilters();
+}
 
-    renderTable(filteredVehicles);
+// Aplicar filtros
+function applyFilters() {
+    const filterMarca = document.getElementById('filterMarca').value;
+    const filterTipo = document.getElementById('filterTipo').value;
+    const filterSituacion = document.getElementById('filterSituacion').value;
+    const filterEstatus = document.getElementById('filterEstatus').value;
+    
+    filteredVehicles = allVehicles.filter(v => {
+        return (!filterMarca || v.marca === filterMarca) &&
+               (!filterTipo || v.tipo === filterTipo) &&
+               (!filterSituacion || (v.situacion && v.situacion.includes(filterSituacion))) &&
+               (!filterEstatus || (v.estatus && v.estatus.includes(filterEstatus)));
+    });
+    
+    renderTable();
     updateResultsCount();
 }
-
-// Abrir ficha
-function openFicha(index) {
-    const vehicle = filteredVehicles[index];
-    if (!vehicle) return;
-
-    fichaTitle.textContent = `Ficha: ${vehicle.placa || vehicle.facsimil || 'S/N'}`;
-    
-    fichaBody.innerHTML = `
-        <div class="ficha-grid">
-            ${createFichaItem('Placa', vehicle.placa)}
-            ${createFichaItem('Facsímil', vehicle.facsimil)}
-            ${createFichaItem('Marca', vehicle.marca)}
-            ${createFichaItem('Modelo', vehicle.modelo)}
-            ${createFichaItem('Tipo', vehicle.tipo)}
-            ${createFichaItem('Clase', vehicle.clase)}
-            ${createFichaItem('Año', vehicle.ano)}
-            ${createFichaItem('Color', vehicle.color)}
-            ${createFichaItem('S/Carrocería', vehicle.s_carroceria)}
-            ${createFichaItem('S/Motor', vehicle.s_motor)}
-            ${createFichaItem('N/Identificación', vehicle.n_identificacion)}
-            ${createFichaItem('Situación', vehicle.situacion)}
-            ${createFichaItem('Unidad Administrativa', vehicle.unidad_administrativa)}
-            ${createFichaItem('REDIP', vehicle.redip)}
-            ${createFichaItem('CCPE', vehicle.ccpe)}
-            ${createFichaItem('EPM', vehicle.epm)}
-            ${createFichaItem('EPP', vehicle.epp)}
-            ${createFichaItem('Ubicación Física', vehicle.ubicacion_fisica)}
-            ${createFichaItem('Asignación', vehicle.asignacion)}
-            ${createFichaItem('Estatus', vehicle.estatus)}
-            ${createFichaItem('Certificado Origen', vehicle.certificado_origen)}
-            ${createFichaItem('Fecha Inspección', vehicle.fecha_inspeccion)}
-            ${createFichaItem('N/Trámite', vehicle.n_tramite)}
-            ${createFichaItem('Ubicación Título', vehicle.ubicacion_titulo)}
-            ${createFichaItem('Observación', vehicle.observacion, true)}
-            ${createFichaItem('Observación Extra', vehicle.observacion_extra, true)}
-        </div>
-    `;
-
-    fichaOverlay.classList.add('active');
-}
-
-// Crear item de ficha
-function createFichaItem(label, value, isLarge = false) {
-    return `
-        <div class="ficha-item ${isLarge ? 'ficha-full' : ''}">
-            <div class="ficha-item-label">${label}</div>
-            <div class="ficha-item-value">${value || 'N/A'}</div>
-        </div>
-    `;
-}
-
-// Cerrar ficha
-function closeFicha() {
-    fichaOverlay.classList.remove('active');
-}
-
-// Imprimir ficha
-function printFicha() {
-    window.print();
-}
-
-// Event Listeners
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        buscarVehiculos();
-    }
-});
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
