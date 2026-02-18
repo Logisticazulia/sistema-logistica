@@ -13,124 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
-    
-    <!-- Estilos específicos de Planilla -->
-    <style>
-        /* Grid de 4 botones principales */
-        .planilla-buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .planilla-btn {
-            background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-decoration: none;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.15);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            border: 2px solid transparent;
-        }
-
-        .planilla-btn:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 51, 102, 0.25);
-            border-color: #0077b6;
-        }
-
-        .planilla-btn-icon {
-            font-size: 3rem;
-            display: block;
-        }
-
-        .planilla-btn-title {
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            text-align: center;
-            margin: 0;
-        }
-
-        /* Sección de contenido dinámico */
-        .planilla-content-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-            margin-top: 30px;
-            display: none;
-        }
-
-        .planilla-content-section.active {
-            display: block;
-        }
-
-        /* Tabla de vehículos */
-        .table-section {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table thead {
-            background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            color: white;
-        }
-
-        .data-table th {
-            padding: 15px 20px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .data-table td {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e8eef5;
-            font-size: 0.9rem;
-        }
-
-        .data-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* Botón volver */
-        .btn-volver {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .planilla-buttons-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .planilla-buttons-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 
 <body class="dashboard-page">
@@ -164,7 +46,7 @@
                 <span class="breadcrumb-separator">/</span>
                 <span class="breadcrumb-current">Planilla de Vehículos</span>
             </div>
-            <button class="btn btn-secondary btn-sm btn-volver" onclick="window.location.href='transporte.html'">
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
                 ← Volver a Transporte
             </button>
         </header>
@@ -172,240 +54,44 @@
         <!-- Título del Módulo -->
         <section class="module-title-section">
             <h1 class="module-title">📋 Planilla de Datos de Vehículos</h1>
-            <p class="module-subtitle">Gestión completa del registro de vehículos del parque automotor</p>
+            <p class="module-subtitle">Seleccione una opción para gestionar el registro de vehículos</p>
         </section>
 
-        <!-- 4 Botones Principales -->
-        <section class="planilla-buttons-grid">
+        <!-- 4 Botones Estilo Dashboard -->
+        <section class="modules-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 30px;">
             
             <!-- Botón 1: Consultar -->
-            <a href="#" class="planilla-btn" onclick="showSection('consultar'); return false;">
-                <span class="planilla-btn-icon">🔍</span>
-                <h3 class="planilla-btn-title">Consultar</h3>
+            <a href="planilla-consultar.html" class="module-card" style="border-left-color: #0077b6;">
+                <div class="module-icon" style="color: #0077b6;">🔍</div>
+                <h2 class="module-title">Consultar Vehículos</h2>
+                <p class="module-description">Búsqueda y visualización de todos los vehículos registrados en el sistema</p>
+                <div class="module-arrow">→</div>
             </a>
 
             <!-- Botón 2: Registrar -->
-            <a href="#" class="planilla-btn" onclick="showSection('registrar'); return false;">
-                <span class="planilla-btn-icon">➕</span>
-                <h3 class="planilla-btn-title">Registrar</h3>
+            <a href="planilla-registrar.html" class="module-card" style="border-left-color: #2a9d8f;">
+                <div class="module-icon" style="color: #2a9d8f;">➕</div>
+                <h2 class="module-title">Registrar Vehículo</h2>
+                <p class="module-description">Ingreso de nuevos vehículos al parque automotor institucional</p>
+                <div class="module-arrow">→</div>
             </a>
 
             <!-- Botón 3: Modificar -->
-            <a href="#" class="planilla-btn" onclick="showSection('modificar'); return false;">
-                <span class="planilla-btn-icon">✏️</span>
-                <h3 class="planilla-btn-title">Modificar</h3>
+            <a href="planilla-modificar.html" class="module-card" style="border-left-color: #e9c46a;">
+                <div class="module-icon" style="color: #e9c46a;">✏️</div>
+                <h2 class="module-title">Modificar Vehículo</h2>
+                <p class="module-description">Actualización y edición de datos de vehículos existentes</p>
+                <div class="module-arrow">→</div>
             </a>
 
             <!-- Botón 4: Partes Generales -->
-            <a href="#" class="planilla-btn" onclick="showSection('partes'); return false;">
-                <span class="planilla-btn-icon">📄</span>
-                <h3 class="planilla-btn-title">Partes Generales</h3>
+            <a href="planilla-partes.html" class="module-card" style="border-left-color: #e76f51;">
+                <div class="module-icon" style="color: #e76f51;">📄</div>
+                <h2 class="module-title">Partes Generales</h2>
+                <p class="module-description">Gestión de partes, incidencias y novedades de los vehículos</p>
+                <div class="module-arrow">→</div>
             </a>
 
-        </section>
-
-        <!-- Sección: Consultar -->
-        <section id="section-consultar" class="planilla-content-section">
-            <h2 class="section-subtitle">🔍 Consultar Vehículos</h2>
-            
-            <div class="filters-section">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="searchConsultar" class="search-input" placeholder="Buscar por placa, marca o modelo...">
-                </div>
-            </div>
-
-            <div class="table-section">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Placa</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Año</th>
-                                <th>Tipo</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="consultarTableBody">
-                            <tr>
-                                <td><strong>AB-123-CD</strong></td>
-                                <td>Toyota</td>
-                                <td>Hilux</td>
-                                <td>2022</td>
-                                <td>Camioneta</td>
-                                <td><span class="badge badge-disponible">Disponible</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-view">👁️ Ver</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>EF-456-GH</strong></td>
-                                <td>Nissan</td>
-                                <td>Frontier</td>
-                                <td>2021</td>
-                                <td>Camioneta</td>
-                                <td><span class="badge badge-asignado">Asignado</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-view">👁️ Ver</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección: Registrar -->
-        <section id="section-registrar" class="planilla-content-section">
-            <h2 class="section-subtitle">➕ Registrar Nuevo Vehículo</h2>
-            
-            <form class="modal-form" style="max-width: 800px;">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Placa</label>
-                        <input type="text" class="form-input" placeholder="AB-123-CD" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Marca</label>
-                        <input type="text" class="form-input" placeholder="Toyota" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Modelo</label>
-                        <input type="text" class="form-input" placeholder="Hilux" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Año</label>
-                        <input type="number" class="form-input" placeholder="2022" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Color</label>
-                        <input type="text" class="form-input" placeholder="Blanco" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tipo</label>
-                        <select class="form-input" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="Camioneta">Camioneta</option>
-                            <option value="Automóvil">Automóvil</option>
-                            <option value="Moto">Moto</option>
-                            <option value="Camión">Camión</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Kilometraje</label>
-                        <input type="number" class="form-input" placeholder="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Estado</label>
-                        <select class="form-input" required>
-                            <option value="disponible">Disponible</option>
-                            <option value="asignado">Asignado</option>
-                            <option value="mantenimiento">Mantenimiento</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="hideAllSections()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Registrar Vehículo</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- Sección: Modificar -->
-        <section id="section-modificar" class="planilla-content-section">
-            <h2 class="section-subtitle">✏️ Modificar Vehículo</h2>
-            
-            <div class="filters-section">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" class="search-input" placeholder="Buscar vehículo a modificar...">
-                </div>
-            </div>
-
-            <div class="table-section">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Placa</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Año</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>AB-123-CD</strong></td>
-                                <td>Toyota</td>
-                                <td>Hilux</td>
-                                <td>2022</td>
-                                <td><span class="badge badge-disponible">Disponible</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-edit">✏️ Editar</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección: Partes Generales -->
-        <section id="section-partes" class="planilla-content-section">
-            <h2 class="section-subtitle">📄 Partes Generales</h2>
-            
-            <div class="table-section">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>N° Parte</th>
-                                <th>Vehículo</th>
-                                <th>Tipo de Parte</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>PTE-2025-001</td>
-                                <td>AB-123-CD</td>
-                                <td>Mantenimiento Preventivo</td>
-                                <td>15/01/2025</td>
-                                <td><span class="badge badge-active">Activo</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-view">👁️ Ver</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" style="margin-top: 20px;">
-                <span class="btn-icon">➕</span>
-                <span class="btn-text">Nuevo Parte General</span>
-            </button>
         </section>
 
     </main>
@@ -413,28 +99,6 @@
     <!-- ================= SCRIPTS ================= -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/planilla.js" defer></script>
-    
-    <!-- Script para mostrar/ocultar secciones -->
-    <script>
-        function showSection(sectionId) {
-            // Ocultar todas las secciones
-            hideAllSections();
-            
-            // Mostrar la seleccionada
-            const section = document.getElementById('section-' + sectionId);
-            if (section) {
-                section.classList.add('active');
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        function hideAllSections() {
-            const sections = document.querySelectorAll('.planilla-content-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-        }
-    </script>
 
 </body>
 </html>
