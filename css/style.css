@@ -1132,10 +1132,9 @@ body {
         width: 95%;
     }
 /* ========================================
-   SOLUCIÓN DEFINITIVA: MODALES OCULTOS
+   🔥 SOLUCIÓN DEFINITIVA: MODALES
    ======================================== */
 
-/* Regla 1: Si tiene el atributo hidden, NUNCA mostrarse */
 div.modal-overlay[hidden] {
     display: none !important;
     visibility: hidden !important;
@@ -1143,15 +1142,168 @@ div.modal-overlay[hidden] {
     pointer-events: none !important;
 }
 
-/* Regla 2: Por defecto, todos los modales inician en none */
 div.modal-overlay {
     display: none !important;
 }
 
-/* Regla 3: Solo mostrarse si tiene la clase .active Y no tiene hidden */
 div.modal-overlay.active:not([hidden]) {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
     z-index: 9999 !important;
 }
+
+/* Estilos base de modales (si no los tienes) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 51, 102, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-container {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.modal-small {
+    max-width: 400px;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e8eef5;
+}
+
+.modal-title {
+    color: #003366;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: #666;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-form {
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #003366;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #005b96;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #e8eef5;
+}
+
+.warning-text {
+    color: #dc2626;
+    margin-top: 10px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #003366;
+    color: white;
+}
+
+.btn-secondary {
+    background: #e8eef5;
+    color: #333;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-admin { background: #fee2e2; color: #dc2626; }
+.badge-user { background: #dbeafe; color: #2563eb; }
+.badge-active { background: #d1fae5; color: #059669; }
+.badge-inactive { background: #f3f4f6; color: #6b7280; }
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-edit { background: #dbeafe; color: #2563eb; }
+.btn-delete { background: #fee2e2; color: #dc2626; }
