@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Consulta de Vehículos - Sistema de Logística">
+    <meta name="description" content="Consulta de Vehículos - Sistema de Logística CPNB">
     <meta name="theme-color" content="#003366">
     
-    <title>Consulta de Vehículos | Sistema de Logística</title>
+    <title>Planilla de Vehículos | Sistema de Logística</title>
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="../css/style.css">
     
     <style>
-        
         .consultar-header {
             background: white;
             padding: 25px;
@@ -111,7 +110,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1500px;
+            min-width: 2000px;
         }
 
         .data-table thead {
@@ -129,6 +128,11 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             white-space: nowrap;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .data-table th:last-child {
+            border-right: none;
         }
 
         .data-table td {
@@ -149,7 +153,7 @@
             background: #f0f4f8;
         }
 
-        .badge-situacion {
+        .badge {
             display: inline-block;
             padding: 5px 12px;
             border-radius: 20px;
@@ -197,10 +201,10 @@
             opacity: 0.5;
         }
 
-        .btn-refresh {
-            background: white;
-            color: var(--color-primary);
-            border: 2px solid var(--color-primary);
+        .export-btn {
+            background: #28a745;
+            color: white;
+            border: none;
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
@@ -208,20 +212,11 @@
             transition: all 0.3s;
         }
 
-        .btn-refresh:hover {
-            background: var(--color-primary);
-            color: white;
+        .export-btn:hover {
+            background: #218838;
         }
 
         @media (max-width: 768px) {
-            .table-container {
-                overflow-x: auto;
-            }
-            
-            .data-table {
-                min-width: 1500px;
-            }
-            
             .search-container {
                 flex-direction: column;
             }
@@ -229,200 +224,16 @@
             .search-box {
                 min-width: 100%;
             }
+            
+            .data-table {
+                font-size: 0.75rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+            }
         }
-    /* TABLA CON SCROLL HORIZONTAL */
-    .table-container {
-        overflow-x: auto;
-        max-width: 100%;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 2000px; /* Forzar ancho para todas las columnas */
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 8px 10px;
-        text-align: left;
-        border-bottom: 1px solid #e8eef5;
-        font-size: 0.75rem; /* Texto más pequeño */
-        white-space: nowrap;
-    }
-
-    .data-table th {
-        background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-        color: white;
-        font-weight: 600;
-        position: sticky;
-        top: 0;
-    }
-
-    .data-table tbody tr:hover {
-        background: #f8f9fa;
-        cursor: pointer;
-    }
-
-    .data-table tbody tr.selected {
-        background: #e3f2fd;
-    }
-
-    .placa-clickable {
-        color: #005b96;
-        font-weight: 700;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-
-    /* MODAL DE DETALLES */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 51, 102, 0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
-
-    .modal-content {
-        background: white;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 800px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 25px;
-        border-bottom: 2px solid #003366;
-        background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-        color: white;
-        border-radius: 12px 12px 0 0;
-    }
-
-    .modal-header h2 {
-        margin: 0;
-        font-size: 1.3rem;
-    }
-
-    .modal-close {
-        background: none;
-        border: none;
-        font-size: 2rem;
-        color: white;
-        cursor: pointer;
-        line-height: 1;
-    }
-
-    .modal-body {
-        padding: 25px;
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        padding: 20px 25px;
-        border-top: 1px solid #e8eef5;
-        background: #f8f9fa;
-        border-radius: 0 0 12px 12px;
-    }
-
-    /* GRID DE DETALLES */
-    .details-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-
-    .detail-item {
-        background: #f8f9fa;
-        padding: 12px 15px;
-        border-radius: 8px;
-        border-left: 4px solid #005b96;
-    }
-
-    .detail-label {
-        font-size: 0.75rem;
-        color: #666;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 5px;
-    }
-
-    .detail-value {
-        font-size: 0.95rem;
-        color: #003366;
-        font-weight: 500;
-        word-break: break-word;
-    }
-
-    .detail-full-width {
-        grid-column: 1 / -1;
-    }
-
-    .badge-situacion {
-        display: inline-block;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .badge-operativa { background: #d1fae5; color: #059669; }
-    .badge-inoperativa { background: #fee2e2; color: #dc2626; }
-    .badge-reparacion { background: #fef3c7; color: #d97706; }
-    .badge-desincorporada { background: #e5e7eb; color: #6b7280; }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .btn-primary {
-        background: #003366;
-        color: white;
-    }
-
-    .btn-secondary {
-        background: #e8eef5;
-        color: #003366;
-    }
-
-    @media print {
-        .modal-overlay {
-            position: absolute;
-            background: white;
-        }
-        .modal-content {
-            box-shadow: none;
-            max-height: none;
-        }
-        .modal-footer {
-            display: none;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .details-grid {
-            grid-template-columns: 1fr;
-        }
-    }
     </style>
 </head>
 
@@ -456,8 +267,8 @@
         </header>
 
         <section class="module-title-section">
-            <h1 class="module-title">📋 Consulta de Vehículos</h1>
-            <p class="module-subtitle">Búsqueda y visualización del parque automotor institucional</p>
+            <h1 class="module-title">📋 Planilla de Vehículos</h1>
+            <p class="module-subtitle">Consulta completa del parque automotor - CPNB Zulia</p>
         </section>
 
         <div class="consultar-header">
@@ -468,26 +279,26 @@
                         type="text" 
                         id="searchInput" 
                         class="search-input" 
-                        placeholder="Buscar por placa o facsímil..."
+                        placeholder="Buscar por placa, facsímil, marca o modelo..."
                         autocomplete="off"
                     >
                 </div>
                 <div class="search-type">
                     <label>
-                        <input type="radio" name="searchType" value="placa" checked>
+                        <input type="radio" name="searchType" value="all" checked>
+                        <span>🔎 Todo</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="searchType" value="placa">
                         <span>🚗 Placa</span>
                     </label>
                     <label>
                         <input type="radio" name="searchType" value="facsimil">
                         <span>📄 Facsímil</span>
                     </label>
-                    <label>
-                        <input type="radio" name="searchType" value="all">
-                        <span>🔎 Todo</span>
-                    </label>
                 </div>
-                <button class="btn-refresh" onclick="loadVehicles()">
-                    🔄 Actualizar
+                <button class="export-btn" onclick="exportToCSV()">
+                    📥 Exportar CSV
                 </button>
             </div>
 
@@ -512,7 +323,6 @@
                 <thead>
                     <tr>
                         <th>Placa</th>
-                        <th>Facsímil</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Tipo</th>
@@ -521,7 +331,8 @@
                         <th>Color</th>
                         <th>S/Carrocería</th>
                         <th>S/Motor</th>
-                        <th>Nº Ident.</th>
+                        <th>Facsímil</th>
+                        <th>N/Ident.</th>
                         <th>Situación</th>
                         <th>Unidad Admin.</th>
                         <th>REDIP</th>
@@ -531,6 +342,12 @@
                         <th>Ubicación Física</th>
                         <th>Asignación</th>
                         <th>Estatus</th>
+                        <th>Cert. Origen</th>
+                        <th>Fec. Inspección</th>
+                        <th>N/Trámite</th>
+                        <th>Ubic. Título</th>
+                        <th>Observación</th>
+                        <th>Obs. Extra</th>
                     </tr>
                 </thead>
                 <tbody id="vehiclesTableBody">
@@ -540,25 +357,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
     <script src="../js/planilla-consultar.js"></script>
-    <!-- MODAL DE DETALLES COMPLETOS -->
-<div id="vehicleModal" class="modal-overlay" hidden>
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>📋 Ficha Completa del Vehículo</h2>
-            <button class="modal-close" onclick="closeVehicleModal()">&times;</button>
-        </div>
-        <div class="modal-body" id="vehicleDetails">
-            <!-- Los datos se cargarán aquí -->
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeVehicleModal()">Cerrar</button>
-            <button class="btn btn-primary" onclick="printVehicleDetails()">🖨️ Imprimir</button>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/planilla-consultar.js"></script>
 </body>
 </html>
