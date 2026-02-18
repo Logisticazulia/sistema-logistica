@@ -1131,27 +1131,23 @@ body {
     .modal-container {
         width: 95%;
     }
-    /* ===== MODALES - Corrección del atributo hidden ===== */
+/* ========================================
+   CORRECCIÓN CRÍTICA: MODALES
+   ======================================== */
 
-/* Por defecto, los modales ocultos NO deben mostrarse */
+/* Forzar que los modales con 'hidden' NO se muestren */
 .modal-overlay[hidden] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-/* Cuando el modal está visible (sin hidden), usar flex */
+/* Solo mostrar cuando NO tenga hidden */
+.modal-overlay {
+    display: none;
+}
+
 .modal-overlay:not([hidden]) {
-    display: flex;
-}
-
-/* El resto de estilos del modal se mantienen */
-.modal-container {
-    background: var(--color-white);
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: modalSlideIn 0.3s ease;
-}
+    display: flex !important;
 }
