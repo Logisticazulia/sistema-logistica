@@ -137,65 +137,86 @@
 
     </main>
 
-    <!-- ================= MODAL: NUEVO/EDITAR USUARIO ================= -->
-    <div class="modal-overlay" id="userModal" hidden>
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">➕ Nuevo Usuario</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
-            </div>
-            <form class="modal-form" id="userForm">
-                <div class="form-group">
-                    <label for="userName" class="form-label">Nombre Completo</label>
-                    <input type="text" id="userName" name="userName" class="form-input" placeholder="Ej: Juan Pérez" required>
-                </div>
-                <div class="form-group">
-                    <label for="userEmailForm" class="form-label">Correo Electrónico</label>
-                    <input type="email" id="userEmailForm" name="userEmail" class="form-input" placeholder="ejemplo@institucion.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="userPassword" class="form-label">Contraseña</label>
-                    <input type="password" id="userPassword" name="userPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="6" required>
-                </div>
-                <div class="form-group">
-                    <label for="userRole" class="form-label">Rol</label>
-                    <select id="userRole" name="userRole" class="form-input" required>
-                        <option value="user">Usuario</option>
-                        <option value="admin">Administrador</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="userStatus" class="form-label">Estado</label>
-                    <select id="userStatus" name="userStatus" class="form-input" required>
-                        <option value="active">Activo</option>
-                        <option value="inactive">Inactivo</option>
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="modalSubmit">Guardar Usuario</button>
-                </div>
-            </form>
+<!-- ================= MODAL: NUEVO/EDITAR USUARIO ================= -->
+<div class="modal-overlay" id="userModal" hidden style="display: none !important; visibility: hidden !important;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">➕ Nuevo Usuario</h2>
+            <button class="modal-close" id="modalClose">&times;</button>
         </div>
-    </div>
-
-    <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
-    <div class="modal-overlay" id="deleteModal" hidden>
-        <div class="modal-container modal-small">
-            <div class="modal-header">
-                <h2 class="modal-title">⚠️ Confirmar Eliminación</h2>
-                <button class="modal-close" id="deleteModalClose">&times;</button>
+        <form class="modal-form" id="userForm">
+            <div class="form-group">
+                <label for="userName" class="form-label">Nombre Completo</label>
+                <input type="text" id="userName" name="userName" class="form-input" placeholder="Ej: Juan Pérez" required>
             </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar al usuario <strong id="deleteUserName"></strong>?</p>
-                <p class="warning-text">Esta acción no se puede deshacer.</p>
+            <div class="form-group">
+                <label for="userEmailForm" class="form-label">Correo Electrónico</label>
+                <input type="email" id="userEmailForm" name="userEmail" class="form-input" placeholder="ejemplo@institucion.com" required>
+            </div>
+            <div class="form-group">
+                <label for="userPassword" class="form-label">Contraseña</label>
+                <input type="password" id="userPassword" name="userPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="6" required>
+            </div>
+            <div class="form-group">
+                <label for="userRole" class="form-label">Rol</label>
+                <select id="userRole" name="userRole" class="form-input" required>
+                    <option value="user">Usuario</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="userStatus" class="form-label">Estado</label>
+                <select id="userStatus" name="userStatus" class="form-input" required>
+                    <option value="active">Activo</option>
+                    <option value="inactive">Inactivo</option>
+                </select>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" id="deleteCancel">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="deleteConfirm">Eliminar</button>
+                <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="modalSubmit">Guardar Usuario</button>
             </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
+<div class="modal-overlay" id="deleteModal" hidden style="display: none !important; visibility: hidden !important;">
+    <div class="modal-container modal-small">
+        <div class="modal-header">
+            <h2 class="modal-title">⚠️ Confirmar Eliminación</h2>
+            <button class="modal-close" id="deleteModalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar al usuario <strong id="deleteUserName"></strong>?</p>
+            <p class="warning-text">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="deleteCancel">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="deleteConfirm">Eliminar</button>
         </div>
     </div>
+</div>
+
+<!-- ================= SCRIPT DE EMERGENCIA ================= -->
+<script>
+    // Forzar modales ocultos inmediatamente
+    (function() {
+        var userModal = document.getElementById('userModal');
+        var deleteModal = document.getElementById('deleteModal');
+        
+        if (userModal) {
+            userModal.style.display = 'none';
+            userModal.setAttribute('hidden', '');
+        }
+        
+        if (deleteModal) {
+            deleteModal.style.display = 'none';
+            deleteModal.setAttribute('hidden', '');
+        }
+        
+        console.log('✅ Modales forzados a OCULTOS al cargar');
+    })();
+</script>
 
     <!-- ================= SCRIPTS ================= -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
