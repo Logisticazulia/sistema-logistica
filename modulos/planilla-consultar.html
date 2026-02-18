@@ -11,7 +11,7 @@
     <style>
         .consultar-header {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
             margin-bottom: 20px;
@@ -19,7 +19,7 @@
 
         .search-container {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 15px;
             flex-wrap: wrap;
             align-items: center;
@@ -55,7 +55,7 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-            min-width: 150px;
+            min-width: 200px;
         }
 
         .filter-group label {
@@ -87,7 +87,7 @@
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
         .btn-buscar:hover {
@@ -103,7 +103,7 @@
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
         .btn-limpiar:hover {
@@ -114,9 +114,8 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+            overflow: hidden;
             overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
         }
 
         .data-table {
@@ -146,15 +145,25 @@
             font-size: 0.85rem;
         }
 
+        .data-table tbody tr {
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
         .data-table tbody tr:hover {
-            background: #f0f4f8;
+            background: #e3f2fd;
         }
 
         .data-table tbody tr:nth-child(even) {
             background: #fafbfc;
         }
 
+        .data-table tbody tr:nth-child(even):hover {
+            background: #e3f2fd;
+        }
+
         .badge {
+            display: inline-block;
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.7rem;
@@ -164,6 +173,7 @@
         .badge-operativa { background: #d1fae5; color: #059669; }
         .badge-inoperativa { background: #fee2e2; color: #dc2626; }
         .badge-reparacion { background: #fef3c7; color: #d97706; }
+        .badge-desincorporada { background: #e5e7eb; color: #6b7280; }
 
         .pagination {
             display: flex;
@@ -202,14 +212,10 @@
             cursor: not-allowed;
         }
 
-        .results-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            font-size: 0.85rem;
+        .page-info {
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #666;
         }
 
         @media (max-width: 768px) {
@@ -265,7 +271,7 @@
                         type="text" 
                         id="searchInput" 
                         class="search-input" 
-                        placeholder="Buscar por placa, facsímil, marca o modelo..."
+                        placeholder="Buscar por placa o facsímil..."
                     >
                 </div>
                 <button class="btn-buscar" onclick="aplicarFiltros()">
@@ -280,115 +286,107 @@
                 <div class="filter-group">
                     <label for="filterTipo">Tipo</label>
                     <select id="filterTipo" class="filter-select" onchange="aplicarFiltros()">
-                        <option value="">Todos</option>
-                        <option value="MOTO">MOTO</option>
-                        <option value="CAMIONETA">CAMIONETA</option>
-                        <option value="AUTOMOVIL">AUTOMOVIL</option>
-                        <option value="CAMION">CAMION</option>
-                        <option value="AUTOBUS">AUTOBUS</option>
-                        <option value="TRIMOVIL">TRIMOVIL</option>
-                        <option value="ESPECIAL">ESPECIAL</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterClase">Clase</label>
-                    <select id="filterClase" class="filter-select" onchange="aplicarFiltros()">
-                        <option value="">Todas</option>
-                        <option value="ENDURO">ENDURO</option>
+                        <option value="">Todos los Tipos</option>
                         <option value="MOTO">MOTO</option>
                         <option value="PICKUP">PICKUP</option>
                         <option value="AUTOMOVIL">AUTOMOVIL</option>
+                        <option value="BUS">BUS</option>
                         <option value="CAMION">CAMION</option>
-                        <option value="AUTOBUS">AUTOBUS</option>
+                        <option value="TRIMOVIL">TRIMOVIL</option>
                         <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
                         <option value="ESPECIAL">ESPECIAL</option>
+                        <option value="SPORT WAGON">SPORT WAGON</option>
+                        <option value="VAM">VAM</option>
+                        <option value="MACHITO">MACHITO</option>
+                        <option value="MINIBUS">MINIBUS</option>
+                        <option value="ENDURO">ENDURO</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label for="filterEstatus">Estatus</label>
                     <select id="filterEstatus" class="filter-select" onchange="aplicarFiltros()">
-                        <option value="">Todos</option>
+                        <option value="">Todos los Estatus</option>
                         <option value="OPERATIVA">OPERATIVA</option>
                         <option value="INOPERATIVA">INOPERATIVA</option>
-                        <option value="REPARACION">REPARACION</option>
                         <option value="DESINCOPORADA">DESINCOPORADA</option>
+                        <option value="REPARACION">REPARACION</option>
+                        <option value="TALLER">TALLER</option>
+                        <option value="DONACION">DONACION</option>
+                        <option value="COMODATO">COMODATO</option>
+                        <option value="PROCESO DE DESINCORPORACIÓN">PROCESO DE DESINCORPORACIÓN</option>
+                        <option value="DENUNCIADA">DENUNCIADA</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label for="filterEPM">EPM</label>
-               <select id="filterEPP" class="filter-select">
-    <option value="">Todos los EPP</option>
-    <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
-    <option value="RAUL LEONI">RAUL LEONI</option>
-    <option value="LOS CORTIJO">LOS CORTIJO</option>
-    <option value="E.P SUMAQUE">E.P SUMAQUE</option>
-    <option value="LA CONCEPCION">LA CONCEPCION</option>
-    <option value="E.P. LA CAÑADA DE URDANETA">E.P. LA CAÑADA DE URDANETA</option>
-    <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-    <option value="E.P. SAN FRANCISCO">E.P. SAN FRANCISCO</option>
-    <option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option>
-    <option value="E.P. LUIS HURTADO HIGUERA">E.P. LUIS HURTADO HIGUERA</option>
-    <option value="DOMITILA FLORES">DOMITILA FLORES</option>
-    <option value="E.P. DOMITILA FLORES">E.P. DOMITILA FLORES</option>
-    <option value="EL BAJO">EL BAJO</option>
-    <option value="E.P. EL BAJO">E.P. EL BAJO</option>
-    <option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option>
-    <option value="E.P. FRANCISCO E BUSTAMANTE">E.P. FRANCISCO E BUSTAMANTE</option>
-    <option value="MANUEL DAGNINO">MANUEL DAGNINO</option>
-    <option value="E.P. MANUEL DAGNINO">E.P. MANUEL DAGNINO</option>
-    <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
-    <option value="E.P. OLEGARIO VILLALOBOS">E.P. OLEGARIO VILLALOBOS</option>
-    <option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option>
-    <option value="E.P. CARACCIOLO PARRA">E.P. CARACCIOLO PARRA</option>
-    <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
-    <option value="E.P. CHIQUINQUIRA">E.P. CHIQUINQUIRA</option>
-    <option value="COQUIVACOA">COQUIVACOA</option>
-    <option value="E.P. COQUIVACOA">E.P. COQUIVACOA</option>
-    <option value="MACHIQUE">MACHIQUE</option>
-    <option value="E.P. MACHIQUE">E.P. MACHIQUE</option>
-    <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
-    <option value="E.P. ANTONIO BORJAS ROMERO">E.P. ANTONIO BORJAS ROMERO</option>
-    <option value="JUANA DE AVILA">JUANA DE AVILA</option>
-    <option value="E.P. JUANA DE AVILA">E.P. JUANA DE AVILA</option>
-    <option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option>
-    <option value="E.P. IDELFONSO VASQUEZ">E.P. IDELFONSO VASQUEZ</option>
-    <option value="SAN ISIDRO">SAN ISIDRO</option>
-    <option value="E.P. SAN ISIDRO">E.P. SAN ISIDRO</option>
-    <option value="CACIQUE MARA">CACIQUE MARA</option>
-    <option value="E.P. CACIQUE MARA">E.P. CACIQUE MARA</option>
-    <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
-    <option value="E.P. CRISTO DE ARANZA">E.P. CRISTO DE ARANZA</option>
-    <option value="ANDRES BELLO KM56">ANDRES BELLO KM56</option>
-    <option value="E.P. ANDRES BELLO KM56">E.P. ANDRES BELLO KM56</option>
-    <option value="ANDRES BELLO KM57">ANDRES BELLO KM57</option>
-    <option value="E.P. ANDRES BELLO KM57">E.P. ANDRES BELLO KM57</option>
-    <option value="CECILIO ACOSTA">CECILIO ACOSTA</option>
-    <option value="E.P. CECILIO ACOSTA">E.P. CECILIO ACOSTA</option>
-    <option value="POTRERITO">POTRERITO</option>
-    <option value="E.P. POTRERITO">E.P. POTRERITO</option>
-    <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
-    <option value="E.P. ANTONIO BORJAS ROMERO">E.P. ANTONIO BORJAS ROMERO</option>
-    <option value="NO">NO</option>
-</select>
+                    <select id="filterEPM" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todos los EPM</option>
+                        <option value="MARACAIBO">MARACAIBO</option>
+                        <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+                        <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
+                        <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+                        <option value="LACAÑADA DE URDANETA">LACAÑADA DE URDANETA</option>
+                        <option value="NO">NO</option>
+                    </select>
                 </div>
 
                 <div class="filter-group">
                     <label for="filterEPP">EPP</label>
                     <select id="filterEPP" class="filter-select" onchange="aplicarFiltros()">
-                        <option value="">Todos</option>
-                        <option value="ESTACION POLICIAL">ESTACION POLICIAL</option>
-                        <option value="E.P.">E.P.</option>
-                        <option value="NO">NO</option>
+                        <option value="">Todos los EPP</option>
+                        <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
+                        <option value="RAUL LEONI">RAUL LEONI</option>
+                        <option value="LOS CORTIJO">LOS CORTIJO</option>
+                        <option value="E.P SUMAQUE">E.P SUMAQUE</option>
+                        <option value="E.P. LOS CORTIJO">E.P. LOS CORTIJO</option>
+                        <option value="CCPEM">CCPEM</option>
+                        <option value="SEDE COMUNAL">SEDE COMUNAL</option>
+                        <option value="DESTACAMENTO 71">DESTACAMENTO 71</option>
+                        <option value="E.P.M LA CONCEPCION">E.P.M LA CONCEPCION</option>
+                        <option value="LA CONCEPCION">LA CONCEPCION</option>
+                        <option value="E.P. LA CAÑADA DE URDANETA">E.P. LA CAÑADA DE URDANETA</option>
+                        <option value="SAN JOSE DE POTRERITO">SAN JOSE DE POTRERITO</option>
+                        <option value="E.P. SAN FRANCISCO">E.P. SAN FRANCISCO</option>
+                        <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+                        <option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option>
+                        <option value="E.P. LUIS HURTADO HIGUERA">E.P. LUIS HURTADO HIGUERA</option>
+                        <option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option>
+                        <option value="E.P. CARACCIOLO PARRA">E.P. CARACCIOLO PARRA</option>
+                        <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
+                        <option value="E.P. CHIQUINQUIRA">E.P. CHIQUINQUIRA</option>
+                        <option value="COQUIVACOA">COQUIVACOA</option>
+                        <option value="E.P. COQUIVACOA">E.P. COQUIVACOA</option>
+                        <option value="DOMITILA FLORES">DOMITILA FLORES</option>
+                        <option value="E.P. DOMITILA FLORES">E.P. DOMITILA FLORES</option>
+                        <option value="EL BAJO">EL BAJO</option>
+                        <option value="E.P. EL BAJO">E.P. EL BAJO</option>
+                        <option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option>
+                        <option value="E.P. FRANCISCO E BUSTAMANTE">E.P. FRANCISCO E BUSTAMANTE</option>
+                        <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
+                        <option value="E.P. OLEGARIO VILLALOBOS">E.P. OLEGARIO VILLALOBOS</option>
+                        <option value="ANDRES BELLO KM56">ANDRES BELLO KM56</option>
+                        <option value="E.P. ANDRES BELLO KM56">E.P. ANDRES BELLO KM56</option>
+                        <option value="ANDRES BELLO KM57">ANDRES BELLO KM57</option>
+                        <option value="E.P. ANDRES BELLO KM57">E.P. ANDRES BELLO KM57</option>
+                        <option value="JUANA DE AVILA">JUANA DE AVILA</option>
+                        <option value="E.P. JUANA DE AVILA">E.P. JUANA DE AVILA</option>
+                        <option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option>
+                        <option value="E.P. IDELFONSO VASQUEZ">E.P. IDELFONSO VASQUEZ</option>
+                        <option value="SAN ISIDRO">SAN ISIDRO</option>
+                        <option value="E.P. SAN ISIDRO">E.P. SAN ISIDRO</option>
+                        <option value="CACIQUE MARA">CACIQUE MARA</option>
+                        <option value="E.P. CACIQUE MARA">E.P. CACIQUE MARA</option>
+                        <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
+                        <option value="E.P. CRISTO DE ARANZA">E.P. CRISTO DE ARANZA</option>
                     </select>
                 </div>
             </div>
 
             <div class="results-info">
-                <span id="resultsCount">0 vehículos encontrados</span>
-                <span id="pageInfo">Página 1 de 1</span>
+                <span id="resultsCount">Cargando...</span>
+                <span id="pageInfo"></span>
             </div>
         </div>
 
@@ -407,8 +405,6 @@
                         <th>S/Carrocería</th>
                         <th>S/Motor</th>
                         <th>Estatus</th>
-                        <th>EPM</th>
-                        <th>EPP</th>
                     </tr>
                 </thead>
                 <tbody id="vehiclesTableBody">
