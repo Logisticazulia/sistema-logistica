@@ -199,7 +199,8 @@ function openNewUserModal() {
     modalTitle.textContent = '➕ Nuevo Usuario';
     userForm.reset();
     userPasswordInput.required = true;
-    userModal.hidden = false;
+   userModal.classList.remove('active');
+    
 }
 
 /**
