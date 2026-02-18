@@ -1135,7 +1135,6 @@ body {
    CORRECCIÓN CRÍTICA: MODALES
    ======================================== */
 
-/* Forzar que los modales con 'hidden' NO se muestren */
 .modal-overlay[hidden] {
     display: none !important;
     visibility: hidden !important;
@@ -1143,7 +1142,6 @@ body {
     pointer-events: none !important;
 }
 
-/* Solo mostrar cuando NO tenga hidden */
 .modal-overlay {
     display: none;
 }
