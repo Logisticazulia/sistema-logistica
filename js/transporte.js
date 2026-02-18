@@ -5,8 +5,8 @@
  */
 
 // ==================== CONFIGURACIÓN ====================
-const SUPABASE_URL = 'TU_SUPABASE_URL_AQUI';
-const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY_AQUI';
+const SUPABASE_URL = 'https://wwrknqfyjelwbvfnfshq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cmtucWZ5amVsd2J2Zm5mc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjAzMjIsImV4cCI6MjA4NjkzNjMyMn0.C7CmscpqBo5nuNbfvZCTQ9WlVT771maF1BFdEkhkzuQ';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -24,19 +24,18 @@ const modalTitle = document.getElementById('modalTitle');
 const modalBody = document.getElementById('modalBody');
 const modalClose = document.getElementById('modalClose');
 
-// Estadísticas
 const totalVehiclesEl = document.getElementById('totalVehicles');
 const availableVehiclesEl = document.getElementById('availableVehicles');
 const maintenanceVehiclesEl = document.getElementById('maintenanceVehicles');
 const assignedVehiclesEl = document.getElementById('assignedVehicles');
 
-// Datos de ejemplo
 let vehiclesData = [];
 
 // ==================== SEGURIDAD ====================
 
 async function checkSession() {
-    const {  { session }, error } = await supabaseClient.auth.getSession();
+    // ✅ CORREGIDO: Agregar 'data:' en la destructuración
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
     
     if (!session || error) {
         window.location.href = LOGIN_URL;
@@ -54,7 +53,6 @@ async function handleLogout() {
 // ==================== CARGA DE DATOS ====================
 
 function loadVehiclesData() {
-    // Datos de ejemplo para demostración
     vehiclesData = [
         {
             id: '1',
@@ -144,7 +142,7 @@ function closeSection() {
     sectionContent.innerHTML = '';
 }
 
-// ==================== SECCIÓN 1: PLANILLA DE DATOS ====================
+// ==================== SECCIÓN 1: PLANILLA ====================
 
 function showPlanillaSection() {
     sectionTitle.textContent = '📋 Planilla de Datos de Vehículos';
@@ -183,7 +181,6 @@ function showPlanillaSection() {
         </div>
     `;
     
-    // Agregar listener de búsqueda
     const searchInput = document.getElementById('searchVehicle');
     if (searchInput) {
         searchInput.addEventListener('input', filterVehicles);
@@ -788,14 +785,14 @@ function viewInspeccion() {
             </div>
             <h4>Lista de Verificación</h4>
             <div class="checklist-result">
-                <div class="check-item ✅">✅ Carrocería</div>
-                <div class="check-item ✅">✅ Pintura</div>
-                <div class="check-item ✅">✅ Vidrios</div>
-                <div class="check-item ✅">✅ Luces</div>
-                <div class="check-item ✅">✅ Frenos</div>
-                <div class="check-item ✅">✅ Neumáticos</div>
-                <div class="check-item ✅">✅ Motor</div>
-                <div class="check-item ✅">✅ Documentación</div>
+                <div class="check-item">✅ Carrocería</div>
+                <div class="check-item">✅ Pintura</div>
+                <div class="check-item">✅ Vidrios</div>
+                <div class="check-item">✅ Luces</div>
+                <div class="check-item">✅ Frenos</div>
+                <div class="check-item">✅ Neumáticos</div>
+                <div class="check-item">✅ Motor</div>
+                <div class="check-item">✅ Documentación</div>
             </div>
             <p><strong>Resultado:</strong> <span class="badge badge-active">APROBADO</span></p>
             <p><strong>Observaciones:</strong> Sin novedades. Vehículo en óptimas condiciones.</p>
@@ -830,7 +827,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadVehiclesData();
     
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
-    
     if (modalClose) modalClose.addEventListener('click', closeModal);
     
     if (formModal) {
