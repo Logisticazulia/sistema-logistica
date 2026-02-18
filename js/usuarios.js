@@ -89,17 +89,13 @@ async function handleLogout() {
 // ==================== FUNCIONES DE USUARIOS ====================
 
 /**
- * Carga todos los usuarios desde Supabase
+ * Carga todos los usuarios (datos de ejemplo)
  */
 async function loadUsers() {
     try {
-        // Nota: Supabase Auth no permite listar usuarios desde el frontend directamente
-        // En producción, usarías una Edge Function o tabla de perfiles
-        
-        // Simulamos datos para demostración (reemplazar con llamada real)
         const { data: { session } } = await supabaseClient.auth.getSession();
         
-        // Datos de ejemplo (en producción vendrían de una tabla de perfiles)
+        // Datos de ejemplo para demostración
         allUsers = [
             {
                 id: '1',
@@ -108,8 +104,23 @@ async function loadUsers() {
                 role: 'admin',
                 status: 'active',
                 created_at: new Date().toISOString()
+            },
+            {
+                id: '2',
+                name: 'Juan Pérez',
+                email: 'juan.perez@institucion.com',
+                role: 'user',
+                status: 'active',
+                created_at: new Date('2025-01-10').toISOString()
+            },
+            {
+                id: '3',
+                name: 'María González',
+                email: 'maria.gonzalez@institucion.com',
+                role: 'user',
+                status: 'inactive',
+                created_at: new Date('2025-01-08').toISOString()
             }
-            // Agrega más usuarios de ejemplo según necesites
         ];
         
         renderUsers(allUsers);
@@ -130,12 +141,16 @@ async function loadUsers() {
  */
 function renderUsers(users) {
     if (users.length === 0) {
-        usersTableBody.parentElement.hidden = true;
+        if (usersTableBody.parentElement) {
+            usersTableBody.parentElement.hidden = true;
+        }
         emptyState.hidden = false;
         return;
     }
     
-    usersTableBody.parentElement.hidden = false;
+    if (usersTableBody.parentElement) {
+        usersTableBody.parentElement.hidden = false;
+    }
     emptyState.hidden = true;
     
     usersTableBody.innerHTML = users.map(user => `
@@ -199,8 +214,8 @@ function openNewUserModal() {
     modalTitle.textContent = '➕ Nuevo Usuario';
     userForm.reset();
     userPasswordInput.required = true;
-   userModal.classList.remove('active');
-    
+    userPasswordInput.placeholder = 'Mínimo 6 caracteres';
+    userModal.hidden = false;
 }
 
 /**
@@ -235,16 +250,15 @@ function confirmDelete(userId, userName) {
 /**
  * Elimina un usuario
  */
-async function deleteUser() {
+function deleteUser() {
     if (!userToDelete) return;
     
     try {
-        // En producción: await supabaseClient.auth.admin.deleteUser(userToDelete);
         allUsers = allUsers.filter(u => u.id !== userToDelete);
         renderUsers(allUsers);
         updateStats();
         
-        deleteModal.hidden = false;
+        deleteModal.hidden = true;
         alert('✅ Usuario eliminado correctamente');
         
     } catch (error) {
@@ -258,7 +272,7 @@ async function deleteUser() {
 /**
  * Guarda un usuario (nuevo o editado)
  */
-async function saveUser(e) {
+function saveUser(e) {
     e.preventDefault();
     
     const userData = {
@@ -271,16 +285,12 @@ async function saveUser(e) {
     
     try {
         if (editingUserId) {
-            // Editar usuario existente
-            // En producción: actualizar en Supabase
             const index = allUsers.findIndex(u => u.id === editingUserId);
             if (index !== -1) {
                 allUsers[index] = { ...allUsers[index], ...userData };
             }
             alert('✅ Usuario actualizado correctamente');
         } else {
-            // Crear nuevo usuario
-            // En producción: await supabaseClient.auth.signUp({...})
             const newUser = {
                 id: Date.now().toString(),
                 ...userData,
@@ -309,38 +319,78 @@ function formatDate(dateString) {
     return date.toLocaleDateString('es-ES');
 }
 
+/**
+ * Cierra todos los modales
+ */
+function closeAllModals() {
+    userModal.hidden = true;
+    deleteModal.hidden = true;
+}
+
 // ==================== EVENT LISTENERS ====================
 
 // Cerrar sesión
-logoutBtn.addEventListener('click', handleLogout);
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+}
 
 // Nuevo usuario
-btnNewUser.addEventListener('click', openNewUserModal);
+if (btnNewUser) {
+    btnNewUser.addEventListener('click', openNewUserModal);
+}
 
-// Cerrar modales
-modalClose.addEventListener('click', () => userModal.hidden = true);
-modalCancel.addEventListener('click', () => userModal.hidden = true);
-deleteModalClose.addEventListener('click', () => deleteModal.hidden = true);
-deleteCancel.addEventListener('click', () => deleteModal.hidden = true);
+// Cerrar modales - Botones
+if (modalClose) {
+    modalClose.addEventListener('click', () => { userModal.hidden = true; });
+}
+
+if (modalCancel) {
+    modalCancel.addEventListener('click', () => { userModal.hidden = true; });
+}
+
+if (deleteModalClose) {
+    deleteModalClose.addEventListener('click', () => { deleteModal.hidden = true; });
+}
+
+if (deleteCancel) {
+    deleteCancel.addEventListener('click', () => { deleteModal.hidden = true; });
+}
 
 // Guardar usuario
-userForm.addEventListener('submit', saveUser);
+if (userForm) {
+    userForm.addEventListener('submit', saveUser);
+}
 
 // Confirmar eliminación
-deleteConfirm.addEventListener('click', deleteUser);
+if (deleteConfirm) {
+    deleteConfirm.addEventListener('click', deleteUser);
+}
 
 // Filtros
-searchInput.addEventListener('input', filterUsers);
-filterRole.addEventListener('change', filterUsers);
+if (searchInput) {
+    searchInput.addEventListener('input', filterUsers);
+}
+
+if (filterRole) {
+    filterRole.addEventListener('change', filterUsers);
+}
 
 // Cerrar modal al hacer clic fuera
-userModal.addEventListener('click', (e) => {
-    if (e.target === userModal) userModal.hidden = true;
-});
+if (userModal) {
+    userModal.addEventListener('click', (e) => {
+        if (e.target === userModal) {
+            userModal.hidden = true;
+        }
+    });
+}
 
-deleteModal.addEventListener('click', (e) => {
-    if (e.target === deleteModal) deleteModal.hidden = true;
-});
+if (deleteModal) {
+    deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+            deleteModal.hidden = true;
+        }
+    });
+}
 
 // ==================== INICIALIZACIÓN ====================
 
