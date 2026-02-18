@@ -1,13 +1,13 @@
 /**
  * ========================================
  * CONSULTA DE VEHÍCULOS - PLANILLA
- * Búsqueda por Placa, Facsímil y más
+ * Conecta con la tabla 'vehiculos' en Supabase
  * ========================================
  */
 
 // ==================== CONFIGURACIÓN ====================
-const SUPABASE_URL = 'https://wwrknqfyjelwbvfnfshq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cmtucWZ5amVsd2J2Zm5mc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjAzMjIsImV4cCI6MjA4NjkzNjMyMn0.C7CmscpqBo5nuNbfvZCTQ9WlVT771maF1BFdEkhkzuQ';
+const SUPABASE_URL = 'TU_SUPABASE_URL_AQUI';
+const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY_AQUI';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -55,13 +55,14 @@ async function loadVehicles() {
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
-            .order('numero', { ascending: true });
+            .order('placa', { ascending: true });
 
         if (error) throw error;
 
         allVehicles = data || [];
         displayVehicles(allVehicles);
         updateResultsCount(allVehicles.length);
+        updateLastUpdate();
         
     } catch (error) {
         console.error('Error cargando vehículos:', error);
@@ -88,30 +89,28 @@ function displayVehicles(vehicles) {
     vehiclesTable.hidden = false;
     noResultsState.hidden = true;
 
-    vehiclesTableBody.innerHTML = vehicles.map(vehicle => `
+    vehiclesTableBody.innerHTML = vehicles.map(v => `
         <tr>
-            <td><strong>${vehicle.numero || 'N/A'}</strong></td>
-            <td><strong>${vehicle.placa || 'N/A'}</strong></td>
-            <td>${vehicle.facsimil || 'N/A'}</td>
-            <td>${vehicle.marca || 'N/A'}</td>
-            <td>${vehicle.modelo || 'N/A'}</td>
-            <td>${vehicle.tipo || 'N/A'}</td>
-            <td>${vehicle.clase || 'N/A'}</td>
-            <td>${vehicle.ano || 'N/A'}</td>
-            <td>${vehicle.color || 'N/A'}</td>
-            <td>${vehicle.s_carroceria || 'N/A'}</td>
-            <td>${vehicle.s_motor || 'N/A'}</td>
-            <td>${vehicle.n_identificacion || 'N/A'}</td>
-            <td>${getSituacionBadge(vehicle.situacion)}</td>
-            <td>${vehicle.unidad_administrativa || 'N/A'}</td>
-            <td>${vehicle.redip || 'N/A'}</td>
-            <td>${vehicle.ccpe || 'N/A'}</td>
-            <td>${vehicle.epm || 'N/A'}</td>
-            <td>${vehicle.epp || 'N/A'}</td>
-            <td>${vehicle.ubicacion_fisica || 'N/A'}</td>
-            <td>${formatDate(vehicle.fecha_asignacion)}</td>
-            <td>${getEstatusBadge(vehicle.estatus)}</td>
-            <td title="${vehicle.observacion || 'Sin observaciones'}">${truncateText(vehicle.observacion, 30)}</td>
+            <td><strong>${v.placa || 'N/A'}</strong></td>
+            <td>${v.facsimil || 'N/A'}</td>
+            <td>${v.marca || 'N/A'}</td>
+            <td>${v.modelo || 'N/A'}</td>
+            <td>${v.tipo || 'N/A'}</td>
+            <td>${v.clase || 'N/A'}</td>
+            <td>${v.ano || 'N/A'}</td>
+            <td>${v.color || 'N/A'}</td>
+            <td>${v.s_carroceria || 'N/A'}</td>
+            <td>${v.s_motor || 'N/A'}</td>
+            <td>${v.n_identificacion || 'N/A'}</td>
+            <td>${getSituacionBadge(v.situacion)}</td>
+            <td>${v.unidad_administrativa || 'N/A'}</td>
+            <td>${v.redip || 'N/A'}</td>
+            <td>${v.ccpe || 'N/A'}</td>
+            <td>${v.epm || 'N/A'}</td>
+            <td>${v.epp || 'N/A'}</td>
+            <td>${v.ubicacion_fisica || 'N/A'}</td>
+            <td>${v.asignacion || 'N/A'}</td>
+            <td>${getEstatusBadge(v.estatus)}</td>
         </tr>
     `).join('');
 }
@@ -128,8 +127,6 @@ function getSituacionBadge(situacion) {
         className = 'badge-inoperativa';
     } else if (situacionLower.includes('reparacion') || situacionLower.includes('taller')) {
         className = 'badge-reparacion';
-    } else if (situacionLower.includes('taller')) {
-        className = 'badge-taller';
     }
     
     return `<span class="badge-situacion ${className}">${situacion}</span>`;
@@ -148,22 +145,14 @@ function getEstatusBadge(estatus) {
     return `<span class="badge-situacion ${className}">${estatus}</span>`;
 }
 
-function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-VE');
-}
-
-function truncateText(text, maxLength) {
-    if (!text) return 'N/A';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-}
-
 function updateResultsCount(count) {
     const text = count === 1 ? '1 vehículo encontrado' : `${count} vehículos encontrados`;
     resultsCount.textContent = text;
-    lastUpdate.textContent = `Actualizado: ${new Date().toLocaleTimeString('es-VE')}`;
+}
+
+function updateLastUpdate() {
+    const now = new Date();
+    lastUpdate.textContent = `Actualizado: ${now.toLocaleTimeString('es-VE')}`;
 }
 
 // ==================== BÚSQUEDA ====================
@@ -197,10 +186,7 @@ function searchVehicles() {
         default:
             filtered = allVehicles.filter(v => 
                 (v.placa && v.placa.toLowerCase().includes(searchTerm)) ||
-                (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm)) ||
-                (v.marca && v.marca.toLowerCase().includes(searchTerm)) ||
-                (v.modelo && v.modelo.toLowerCase().includes(searchTerm)) ||
-                (v.n_identificacion && v.n_identificacion.toLowerCase().includes(searchTerm))
+                (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm))
             );
             break;
     }
@@ -209,89 +195,13 @@ function searchVehicles() {
     updateResultsCount(filtered.length);
 }
 
-// ==================== EXPORTAR CSV ====================
-
-function exportToCSV() {
-    if (allVehicles.length === 0) {
-        alert('No hay datos para exportar');
-        return;
-    }
-
-    const headers = [
-        'Nº', 'Marca', 'Modelo', 'Tipo', 'Clase', 'Año', 'Color',
-        'S/Carrocería', 'S/Motor', 'Placa', 'Facsímil', 'Nº Identificación',
-        'Situación', 'Unidad Administrativa', 'REDIP', 'CCPE', 'EPM', 'EPP',
-        'Ubicación Física', 'Fecha Asignación', 'Estatus', 'Observación',
-        'Certificado Origen', 'Fecha Inspección', 'Nº Trámite', 'Ubicación Título'
-    ];
-
-    const rows = allVehicles.map(v => [
-        v.numero || '',
-        v.marca || '',
-        v.modelo || '',
-        v.tipo || '',
-        v.clase || '',
-        v.ano || '',
-        v.color || '',
-        v.s_carroceria || '',
-        v.s_motor || '',
-        v.placa || '',
-        v.facsimil || '',
-        v.n_identificacion || '',
-        v.situacion || '',
-        v.unidad_administrativa || '',
-        v.redip || '',
-        v.ccpe || '',
-        v.epm || '',
-        v.epp || '',
-        v.ubicacion_fisica || '',
-        v.fecha_asignacion || '',
-        v.estatus || '',
-        v.observacion || '',
-        v.certificado_origen || '',
-        v.fecha_inspeccion || '',
-        v.n_tramite || '',
-        v.ubicacion_titulo || ''
-    ]);
-
-    const csvContent = [
-        headers.join(';'),
-        ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
-    ].join('\n');
-
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `vehiculos_cpnb_zulia_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
 // ==================== EVENT LISTENERS ====================
 
-searchInput.addEventListener('input', debounce(searchVehicles, 300));
+searchInput.addEventListener('input', searchVehicles);
 
 document.querySelectorAll('input[name="searchType"]').forEach(radio => {
     radio.addEventListener('change', searchVehicles);
 });
-
-// Función debounce para optimizar la búsqueda
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
 
 // ==================== INICIALIZACIÓN ====================
 
