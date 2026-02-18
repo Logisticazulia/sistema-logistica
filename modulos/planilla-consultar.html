@@ -347,5 +347,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/planilla-consultar.js"></script>
+    <!-- MODAL DE DETALLES COMPLETOS -->
+<div id="vehicleModal" class="modal-overlay" hidden>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📋 Ficha Completa del Vehículo</h2>
+            <button class="modal-close" onclick="closeVehicleModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="vehicleDetails">
+            <!-- Los datos se cargarán aquí -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeVehicleModal()">Cerrar</button>
+            <button class="btn btn-primary" onclick="printVehicleDetails()">🖨️ Imprimir</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/planilla-consultar.js"></script>
 </body>
 </html>
