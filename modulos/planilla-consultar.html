@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Consulta de Vehículos - Sistema de Logística CPNB">
+    <meta name="description" content="Consulta de Vehículos - Sistema de Logística">
     <meta name="theme-color" content="#003366">
     
     <title>Consulta de Vehículos | Sistema de Logística</title>
@@ -128,18 +128,12 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             white-space: nowrap;
-            border-right: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .data-table th:last-child {
-            border-right: none;
         }
 
         .data-table td {
             padding: 12px;
             border-bottom: 1px solid #e8eef5;
             font-size: 0.85rem;
-            white-space: nowrap;
         }
 
         .data-table tbody tr:hover {
@@ -183,11 +177,6 @@
             color: #6b7280;
         }
 
-        .badge-taller {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
         .loading {
             text-align: center;
             padding: 40px;
@@ -207,28 +196,37 @@
             opacity: 0.5;
         }
 
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        .btn-refresh {
+            background: white;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-refresh:hover {
+            background: var(--color-primary);
+            color: white;
         }
 
         @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            .data-table {
+                min-width: 1500px;
+            }
+            
             .search-container {
                 flex-direction: column;
             }
             
             .search-box {
                 min-width: 100%;
-            }
-            
-            .data-table {
-                font-size: 0.75rem;
-            }
-            
-            .data-table th,
-            .data-table td {
-                padding: 8px 6px;
             }
         }
     </style>
@@ -254,8 +252,6 @@
             <div class="breadcrumb">
                 <a href="../dashboard.html">🏠 Dashboard</a>
                 <span>/</span>
-                <a href="transporte.html">Transporte</a>
-                <span>/</span>
                 <a href="planilla.html">Planilla</a>
                 <span>/</span>
                 <span>Consultar</span>
@@ -267,7 +263,7 @@
 
         <section class="module-title-section">
             <h1 class="module-title">📋 Consulta de Vehículos</h1>
-            <p class="module-subtitle">Registro completo del parque automotor institucional - CPNB Zulia</p>
+            <p class="module-subtitle">Búsqueda y visualización del parque automotor institucional</p>
         </section>
 
         <div class="consultar-header">
@@ -278,32 +274,26 @@
                         type="text" 
                         id="searchInput" 
                         class="search-input" 
-                        placeholder="Buscar por placa, facsímil, marca o modelo..."
+                        placeholder="Buscar por placa o facsímil..."
                         autocomplete="off"
                     >
                 </div>
                 <div class="search-type">
                     <label>
-                        <input type="radio" name="searchType" value="all" checked>
-                        <span>🔎 Todo</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="searchType" value="placa">
+                        <input type="radio" name="searchType" value="placa" checked>
                         <span>🚗 Placa</span>
                     </label>
                     <label>
                         <input type="radio" name="searchType" value="facsimil">
                         <span>📄 Facsímil</span>
                     </label>
+                    <label>
+                        <input type="radio" name="searchType" value="all">
+                        <span>🔎 Todo</span>
+                    </label>
                 </div>
-            </div>
-
-            <div class="export-buttons">
-                <button class="btn btn-primary" onclick="exportToCSV()">
-                    <span>📥</span> Exportar CSV
-                </button>
-                <button class="btn btn-secondary" onclick="window.location.reload()">
-                    <span>🔄</span> Actualizar
+                <button class="btn-refresh" onclick="loadVehicles()">
+                    🔄 Actualizar
                 </button>
             </div>
 
@@ -321,13 +311,12 @@
             <div id="noResultsState" class="no-results" hidden>
                 <div class="no-results-icon">📭</div>
                 <h3>No se encontraron vehículos</h3>
-                <p>Intente con otros términos de búsqueda</p>
+                <p>Intenta con otros términos de búsqueda</p>
             </div>
 
             <table class="data-table" id="vehiclesTable" hidden>
                 <thead>
                     <tr>
-                        <th>Nº</th>
                         <th>Placa</th>
                         <th>Facsímil</th>
                         <th>Marca</th>
@@ -346,13 +335,11 @@
                         <th>EPM</th>
                         <th>EPP</th>
                         <th>Ubicación Física</th>
-                        <th>Fec. Asignación</th>
+                        <th>Asignación</th>
                         <th>Estatus</th>
-                        <th>Obs.</th>
                     </tr>
                 </thead>
                 <tbody id="vehiclesTableBody">
-                    <!-- Los datos se cargarán dinámicamente -->
                 </tbody>
             </table>
         </div>
