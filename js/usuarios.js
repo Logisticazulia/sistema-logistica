@@ -206,21 +206,19 @@ function filterUsers() {
     renderUsers(filtered);
 }
 
-/**
- * Abre el modal para nuevo usuario
- */
+// 1. Abre el modal para nuevo usuario
 function openNewUserModal() {
     editingUserId = null;
     modalTitle.textContent = '➕ Nuevo Usuario';
     userForm.reset();
     userPasswordInput.required = true;
     userPasswordInput.placeholder = 'Mínimo 6 caracteres';
+    
     userModal.hidden = false;
+    userModal.classList.add('active'); // ✅ IMPORTANTE
 }
 
-/**
- * Abre el modal para editar usuario
- */
+// 2. Abre el modal para editar usuario
 function editUser(userId) {
     const user = allUsers.find(u => u.id === userId);
     if (!user) return;
@@ -236,162 +234,48 @@ function editUser(userId) {
     userPasswordInput.placeholder = 'Dejar vacío para mantener la actual';
     
     userModal.hidden = false;
+    userModal.classList.add('active'); // ✅ IMPORTANTE
 }
 
-/**
- * Confirma eliminación de usuario
- */
+// 3. Confirma eliminación de usuario
 function confirmDelete(userId, userName) {
     userToDelete = userId;
     deleteUserName.textContent = userName;
+    
     deleteModal.hidden = false;
+    deleteModal.classList.add('active'); // ✅ IMPORTANTE
 }
 
-/**
- * Elimina un usuario
- */
-function deleteUser() {
-    if (!userToDelete) return;
-    
-    try {
-        allUsers = allUsers.filter(u => u.id !== userToDelete);
-        renderUsers(allUsers);
-        updateStats();
-        
-        deleteModal.hidden = true;
-        alert('✅ Usuario eliminado correctamente');
-        
-    } catch (error) {
-        console.error('Error eliminando usuario:', error);
-        alert('❌ Error al eliminar usuario: ' + error.message);
-    }
-    
-    userToDelete = null;
+// 4. Función para cerrar modales
+function closeModal(modal) {
+    if (!modal) return;
+    modal.hidden = true;
+    modal.classList.remove('active');
 }
 
-/**
- * Guarda un usuario (nuevo o editado)
- */
-function saveUser(e) {
-    e.preventDefault();
-    
-    const userData = {
-        name: userNameInput.value.trim(),
-        email: userEmailInput.value.trim(),
-        role: userRoleInput.value,
-        status: userStatusInput.value,
-        password: userPasswordInput.value
-    };
-    
-    try {
-        if (editingUserId) {
-            const index = allUsers.findIndex(u => u.id === editingUserId);
-            if (index !== -1) {
-                allUsers[index] = { ...allUsers[index], ...userData };
-            }
-            alert('✅ Usuario actualizado correctamente');
-        } else {
-            const newUser = {
-                id: Date.now().toString(),
-                ...userData,
-                created_at: new Date().toISOString()
-            };
-            allUsers.push(newUser);
-            alert('✅ Usuario creado correctamente');
-        }
-        
-        userModal.hidden = true;
-        renderUsers(allUsers);
-        updateStats();
-        
-    } catch (error) {
-        console.error('Error guardando usuario:', error);
-        alert('❌ Error al guardar usuario: ' + error.message);
-    }
-}
-
-/**
- * Formatea fecha para mostrar
- */
-function formatDate(dateString) {
-    if (!dateString) return '--/--/----';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES');
-}
-
-/**
- * Cierra todos los modales
- */
-function closeAllModals() {
-    userModal.hidden = true;
-    deleteModal.hidden = true;
-}
-
-// ==================== EVENT LISTENERS ====================
-
-// Cerrar sesión
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', handleLogout);
-}
-
-// Nuevo usuario
-if (btnNewUser) {
-    btnNewUser.addEventListener('click', openNewUserModal);
-}
-
-// Cerrar modales - Botones
+// 5. Event Listeners de cierre (actualiza los que tengas)
 if (modalClose) {
-    modalClose.addEventListener('click', () => { userModal.hidden = true; });
+    modalClose.addEventListener('click', () => closeModal(userModal));
 }
-
 if (modalCancel) {
-    modalCancel.addEventListener('click', () => { userModal.hidden = true; });
+    modalCancel.addEventListener('click', () => closeModal(userModal));
 }
-
 if (deleteModalClose) {
-    deleteModalClose.addEventListener('click', () => { deleteModal.hidden = true; });
+    deleteModalClose.addEventListener('click', () => closeModal(deleteModal));
 }
-
 if (deleteCancel) {
-    deleteCancel.addEventListener('click', () => { deleteModal.hidden = true; });
+    deleteCancel.addEventListener('click', () => closeModal(deleteModal));
 }
-
-// Guardar usuario
-if (userForm) {
-    userForm.addEventListener('submit', saveUser);
-}
-
-// Confirmar eliminación
-if (deleteConfirm) {
-    deleteConfirm.addEventListener('click', deleteUser);
-}
-
-// Filtros
-if (searchInput) {
-    searchInput.addEventListener('input', filterUsers);
-}
-
-if (filterRole) {
-    filterRole.addEventListener('change', filterUsers);
-}
-
-// Cerrar modal al hacer clic fuera
 if (userModal) {
     userModal.addEventListener('click', (e) => {
-        if (e.target === userModal) {
-            userModal.hidden = true;
-        }
+        if (e.target === userModal) closeModal(userModal);
     });
 }
-
 if (deleteModal) {
     deleteModal.addEventListener('click', (e) => {
-        if (e.target === deleteModal) {
-            deleteModal.hidden = true;
-        }
+        if (e.target === deleteModal) closeModal(deleteModal);
     });
 }
-
 // ==================== INICIALIZACIÓN ====================
 
 document.addEventListener('DOMContentLoaded', () => {
