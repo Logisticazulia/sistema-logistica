@@ -1,46 +1,109 @@
 /**
+ * ========================================
  * PLANILLA DE CONSULTA DE VEHÍCULOS
+ * Conexión con Supabase - Tabla: vehiculos
+ * ========================================
  */
 
-const SUPABASE_URL = 'https://wwrknqfyjelwbvfnfshq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cmtucWZ5amVsd2J2Zm5mc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjAzMjIsImV4cCI6MjA4NjkzNjMyMn0.C7CmscpqBo5nuNbfvZCTQ9WlVT771maF1BFdEkhkzuQ';
+// ==================== CONFIGURACIÓN ====================
+// Usando variables globales desde config.js
+const SUPABASE_URL = window.SUPABASE_URL || 'TU_SUPABASE_URL_AQUI';
+const SUPABASE_KEY = window.SUPABASE_KEY || 'TU_SUPABASE_ANON_KEY_AQUI';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const searchInput = document.getElementById('searchInput');
+const LOGIN_URL = 'https://logisticazulia.github.io/sistema-logistica/index.html';
+
+// ==================== REFERENCIAS AL DOM ====================
+const userEmailElement = document.getElementById('userEmail');
+const logoutBtn = document.getElementById('logoutBtn');
 const vehiclesTableBody = document.getElementById('vehiclesTableBody');
-const loadingState = document.getElementById('loadingState');
-const noResultsState = document.getElementById('noResultsState');
+const searchInput = document.getElementById('searchInput');
+const searchTypeRadios = document.querySelectorAll('input[name="searchType"]');
 const resultsCount = document.getElementById('resultsCount');
 const lastUpdate = document.getElementById('lastUpdate');
+const loadingState = document.getElementById('loadingState');
+const noResultsState = document.getElementById('noResultsState');
+const vehiclesTable = document.getElementById('vehiclesTable');
 
+// Estado global
 let allVehicles = [];
 
-// Cargar vehículos al iniciar
+// ==================== SEGURIDAD ====================
+
+async function checkSession() {
+    try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (!session || error) {
+            console.log('❌ No hay sesión activa');
+            // Opcional: redirigir al login
+            // window.location.href = LOGIN_URL;
+            return false;
+        }
+        
+        userEmailElement.textContent = session.user.email;
+        console.log('✅ Sesión activa para:', session.user.email);
+        return true;
+    } catch (error) {
+        console.error('Error verificando sesión:', error);
+        return false;
+    }
+}
+
+async function handleLogout() {
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+        
+        if (error) {
+            alert('Error al cerrar sesión: ' + error.message);
+            return;
+        }
+        
+        console.log('✅ Sesión cerrada correctamente');
+        window.location.href = LOGIN_URL;
+    } catch (error) {
+        console.error('Error en logout:', error);
+        alert('Ocurrió un error al cerrar sesión');
+    }
+}
+
+// ==================== CARGA DE DATOS ====================
+
 async function loadVehicles() {
     try {
         loadingState.hidden = false;
-        vehiclesTableBody.parentElement.hidden = true;
+        vehiclesTable.hidden = true;
         noResultsState.hidden = true;
+
+        console.log('🔄 Cargando vehículos desde Supabase...');
 
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .order('placa', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+            throw error;
+        }
 
         allVehicles = data || [];
+        
+        console.log(`✅ ${allVehicles.length} vehículos cargados`);
+        
         displayVehicles(allVehicles);
         updateResultsCount(allVehicles.length);
         updateLastUpdate();
         
     } catch (error) {
-        console.error('Error cargando vehículos:', error);
+        console.error('❌ Error cargando vehículos:', error);
         loadingState.innerHTML = `
             <div style="color: #dc2626;">
-                ❌ Error al cargar los datos<br>
-                <small>${error.message}</small>
+                <h3>❌ Error al cargar los datos</h3>
+                <p>${error.message}</p>
+                <button onclick="loadVehicles()" style="margin-top: 10px; padding: 10px 20px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🔄 Reintentar
+                </button>
             </div>
         `;
     } finally {
@@ -48,20 +111,21 @@ async function loadVehicles() {
     }
 }
 
-// Mostrar vehículos en la tabla
+// ==================== MOSTRAR DATOS ====================
+
 function displayVehicles(vehicles) {
     if (vehicles.length === 0) {
-        vehiclesTableBody.parentElement.hidden = true;
+        vehiclesTable.hidden = true;
         noResultsState.hidden = false;
         return;
     }
 
-    vehiclesTableBody.parentElement.hidden = false;
+    vehiclesTable.hidden = false;
     noResultsState.hidden = true;
 
     vehiclesTableBody.innerHTML = vehicles.map(v => `
-        <tr onclick="openVehicleModal('${v.placa || 'SIN_PLACA'}')">
-            <td><span class="placa-clickable">${v.placa || 'N/A'}</span></td>
+        <tr>
+            <td><strong>${v.placa || 'N/A'}</strong></td>
             <td>${v.marca || 'N/A'}</td>
             <td>${v.modelo || 'N/A'}</td>
             <td>${v.tipo || 'N/A'}</td>
@@ -79,143 +143,20 @@ function displayVehicles(vehicles) {
             <td>${v.epm || 'N/A'}</td>
             <td>${v.epp || 'N/A'}</td>
             <td>${v.ubicacion_fisica || 'N/A'}</td>
-            <td>${v.asignacion || 'N/A'}</td>
+            <td>${formatDate(v.asignacion)}</td>
             <td>${getEstatusBadge(v.estatus)}</td>
+            <td>${v.certificado_origen || 'N/A'}</td>
+            <td>${formatDate(v.fecha_inspeccion)}</td>
+            <td>${v.n_tramite || 'N/A'}</td>
+            <td>${v.ubicacion_titulo || 'N/A'}</td>
+            <td title="${v.observacion || 'Sin observaciones'}">${truncateText(v.observacion, 50)}</td>
+            <td>${v.observacion_extra || 'N/A'}</td>
         </tr>
     `).join('');
 }
 
-// Abrir modal con detalles completos
-function openVehicleModal(placa) {
-    const vehicle = allVehicles.find(v => v.placa === placa);
-    if (!vehicle) return;
-
-    const detailsHtml = `
-        <div class="details-grid">
-            <div class="detail-item">
-                <div class="detail-label">🚗 Placa</div>
-                <div class="detail-value">${vehicle.placa || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📋 Facsímil</div>
-                <div class="detail-value">${vehicle.facsimil || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🏷️ Marca</div>
-                <div class="detail-value">${vehicle.marca || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🚙 Modelo</div>
-                <div class="detail-value">${vehicle.modelo || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📌 Tipo</div>
-                <div class="detail-value">${vehicle.tipo || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📝 Clase</div>
-                <div class="detail-value">${vehicle.clase || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📅 Año</div>
-                <div class="detail-value">${vehicle.ano || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🎨 Color</div>
-                <div class="detail-value">${vehicle.color || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🔢 S/Carrocería</div>
-                <div class="detail-value">${vehicle.s_carroceria || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">⚙️ S/Motor</div>
-                <div class="detail-value">${vehicle.s_motor || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🆔 N/Identificación</div>
-                <div class="detail-value">${vehicle.n_identificacion || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📊 Situación</div>
-                <div class="detail-value">${getSituacionBadge(vehicle.situacion)}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🏢 Unidad Administrativa</div>
-                <div class="detail-value">${vehicle.unidad_administrativa || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📍 REDIP</div>
-                <div class="detail-value">${vehicle.redip || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📍 CCPE</div>
-                <div class="detail-value">${vehicle.ccpe || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📍 EPM</div>
-                <div class="detail-value">${vehicle.epm || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📍 EPP</div>
-                <div class="detail-value">${vehicle.epp || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🗺️ Ubicación Física</div>
-                <div class="detail-value">${vehicle.ubicacion_fisica || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📅 Fecha Asignación</div>
-                <div class="detail-value">${vehicle.asignacion || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">✅ Estatus</div>
-                <div class="detail-value">${getEstatusBadge(vehicle.estatus)}</div>
-            </div>
-            <div class="detail-item detail-full-width">
-                <div class="detail-label">📝 Observación</div>
-                <div class="detail-value">${vehicle.observacion || 'Sin observaciones'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📄 Certificado Origen</div>
-                <div class="detail-value">${vehicle.certificado_origen || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">🔍 Fecha Inspección</div>
-                <div class="detail-value">${vehicle.fecha_inspeccion || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📋 N/Trámite</div>
-                <div class="detail-value">${vehicle.n_tramite || 'N/A'}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">📁 Ubicación Título</div>
-                <div class="detail-value">${vehicle.ubicacion_titulo || 'N/A'}</div>
-            </div>
-            <div class="detail-item detail-full-width">
-                <div class="detail-label">📝 Observación Extra</div>
-                <div class="detail-value">${vehicle.observacion_extra || 'Sin observaciones'}</div>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('vehicleDetails').innerHTML = detailsHtml;
-    document.getElementById('vehicleModal').hidden = false;
-}
-
-// Cerrar modal
-function closeVehicleModal() {
-    document.getElementById('vehicleModal').hidden = true;
-}
-
-// Imprimir ficha
-function printVehicleDetails() {
-    window.print();
-}
-
-// Badge de situación
 function getSituacionBadge(situacion) {
-    if (!situacion) return '<span class="badge-situacion badge-desincorporada">N/A</span>';
+    if (!situacion) return '<span class="badge badge-desincorporada">N/A</span>';
     
     const situacionLower = situacion.toLowerCase();
     let className = 'badge-desincorporada';
@@ -226,14 +167,15 @@ function getSituacionBadge(situacion) {
         className = 'badge-inoperativa';
     } else if (situacionLower.includes('reparacion') || situacionLower.includes('taller')) {
         className = 'badge-reparacion';
+    } else if (situacionLower.includes('desincorporada')) {
+        className = 'badge-desincorporada';
     }
     
-    return `<span class="badge-situacion ${className}">${situacion}</span>`;
+    return `<span class="badge badge-${className}">${situacion}</span>`;
 }
 
-// Badge de estatus
 function getEstatusBadge(estatus) {
-    if (!estatus) return '<span class="badge-situacion badge-desincorporada">N/A</span>';
+    if (!estatus) return '<span class="badge badge-desincorporada">N/A</span>';
     
     const estatusLower = estatus.toLowerCase();
     let className = 'badge-desincorporada';
@@ -242,44 +184,177 @@ function getEstatusBadge(estatus) {
     else if (estatusLower.includes('inoperativa')) className = 'badge-inoperativa';
     else if (estatusLower.includes('desincorporada')) className = 'badge-desincorporada';
     
-    return `<span class="badge-situacion ${className}">${estatus}</span>`;
+    return `<span class="badge badge-${className}">${estatus}</span>`;
 }
 
-// Contar resultados
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-VE');
+    } catch {
+        return dateString;
+    }
+}
+
+function truncateText(text, maxLength) {
+    if (!text) return 'N/A';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
 function updateResultsCount(count) {
     const text = count === 1 ? '1 vehículo encontrado' : `${count} vehículos encontrados`;
     resultsCount.textContent = text;
 }
 
-// Actualizar fecha
 function updateLastUpdate() {
     const now = new Date();
     lastUpdate.textContent = `Actualizado: ${now.toLocaleTimeString('es-VE')}`;
 }
 
-// Búsqueda
+// ==================== BÚSQUEDA ====================
+
 function searchVehicles() {
     const searchTerm = searchInput.value.trim().toLowerCase();
-    
+    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+
     if (!searchTerm) {
         displayVehicles(allVehicles);
         updateResultsCount(allVehicles.length);
         return;
     }
 
-    const filtered = allVehicles.filter(v => 
-        (v.placa && v.placa.toLowerCase().includes(searchTerm)) ||
-        (v.marca && v.marca.toLowerCase().includes(searchTerm)) ||
-        (v.modelo && v.modelo.toLowerCase().includes(searchTerm)) ||
-        (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm))
-    );
-    
+    let filtered = [];
+
+    switch (searchType) {
+        case 'placa':
+            filtered = allVehicles.filter(v => 
+                v.placa && v.placa.toLowerCase().includes(searchTerm)
+            );
+            break;
+        
+        case 'facsimil':
+            filtered = allVehicles.filter(v => 
+                v.facsimil && v.facsimil.toLowerCase().includes(searchTerm)
+            );
+            break;
+        
+        case 'all':
+        default:
+            filtered = allVehicles.filter(v => 
+                (v.placa && v.placa.toLowerCase().includes(searchTerm)) ||
+                (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm)) ||
+                (v.marca && v.marca.toLowerCase().includes(searchTerm)) ||
+                (v.modelo && v.modelo.toLowerCase().includes(searchTerm)) ||
+                (v.n_identificacion && v.n_identificacion.toLowerCase().includes(searchTerm))
+            );
+            break;
+    }
+
     displayVehicles(filtered);
     updateResultsCount(filtered.length);
 }
 
-// Event Listeners
-searchInput.addEventListener('input', searchVehicles);
+// ==================== EXPORTAR ====================
 
-// Inicializar
-document.addEventListener('DOMContentLoaded', loadVehicles);
+function exportToCSV() {
+    if (allVehicles.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+    }
+
+    const headers = [
+        'Placa', 'Marca', 'Modelo', 'Tipo', 'Clase', 'Año', 'Color',
+        'S/Carrocería', 'S/Motor', 'Facsímil', 'N/Identificación',
+        'Situación', 'Unidad Administrativa', 'REDIP', 'CCPE', 'EPM', 'EPP',
+        'Ubicación Física', 'Asignación', 'Estatus', 'Certificado Origen',
+        'Fecha Inspección', 'N/Trámite', 'Ubicación Título', 'Observación', 'Observación Extra'
+    ];
+
+    const rows = allVehicles.map(v => [
+        v.placa || '',
+        v.marca || '',
+        v.modelo || '',
+        v.tipo || '',
+        v.clase || '',
+        v.ano || '',
+        v.color || '',
+        v.s_carroceria || '',
+        v.s_motor || '',
+        v.facsimil || '',
+        v.n_identificacion || '',
+        v.situacion || '',
+        v.unidad_administrativa || '',
+        v.redip || '',
+        v.ccpe || '',
+        v.epm || '',
+        v.epp || '',
+        v.ubicacion_fisica || '',
+        v.asignacion || '',
+        v.estatus || '',
+        v.certificado_origen || '',
+        v.fecha_inspeccion || '',
+        v.n_tramite || '',
+        v.ubicacion_titulo || '',
+        v.observacion || '',
+        v.observacion_extra || ''
+    ]);
+
+    const csvContent = [
+        headers.join(';'),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `vehiculos_cpnb_zulia_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ==================== EVENT LISTENERS ====================
+
+searchInput.addEventListener('input', debounce(searchVehicles, 300));
+
+searchTypeRadios.forEach(radio => {
+    radio.addEventListener('change', searchVehicles);
+});
+
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+}
+
+// Función debounce para optimizar la búsqueda
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// ==================== INICIALIZACIÓN ====================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Planilla de Consulta inicializada');
+    
+    // Verificar sesión
+    await checkSession();
+    
+    // Cargar vehículos
+    await loadVehicles();
+    
+    // Hacer exportToCSV disponible globalmente
+    window.exportToCSV = exportToCSV;
+});
