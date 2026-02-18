@@ -1132,20 +1132,26 @@ body {
         width: 95%;
     }
 /* ========================================
-   CORRECCIÓN CRÍTICA: MODALES
+   SOLUCIÓN DEFINITIVA: MODALES OCULTOS
    ======================================== */
 
-.modal-overlay[hidden] {
+/* Regla 1: Si tiene el atributo hidden, NUNCA mostrarse */
+div.modal-overlay[hidden] {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
 
-.modal-overlay {
-    display: none;
+/* Regla 2: Por defecto, todos los modales inician en none */
+div.modal-overlay {
+    display: none !important;
 }
 
-.modal-overlay:not([hidden]) {
+/* Regla 3: Solo mostrarse si tiene la clase .active Y no tiene hidden */
+div.modal-overlay.active:not([hidden]) {
     display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
 }
