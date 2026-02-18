@@ -110,7 +110,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 2000px;
+            min-width: 1200px;
         }
 
         .data-table thead {
@@ -124,7 +124,7 @@
             padding: 15px 12px;
             text-align: left;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             white-space: nowrap;
@@ -133,12 +133,16 @@
         .data-table td {
             padding: 12px;
             border-bottom: 1px solid #e8eef5;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr {
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
         .data-table tbody tr:hover {
-            background: #f8f9fa;
-            cursor: pointer;
+            background: #e3f2fd;
         }
 
         .data-table tbody tr:nth-child(even) {
@@ -146,7 +150,7 @@
         }
 
         .data-table tbody tr:nth-child(even):hover {
-            background: #f0f4f8;
+            background: #e3f2fd;
         }
 
         .badge {
@@ -197,7 +201,7 @@
             opacity: 0.5;
         }
 
-        /* Modal Simplificado */
+        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -219,7 +223,7 @@
             background: white;
             border-radius: 12px;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -233,6 +237,8 @@
             background: linear-gradient(135deg, #003366 0%, #005b96 100%);
             color: white;
             border-radius: 12px 12px 0 0;
+            position: sticky;
+            top: 0;
         }
 
         .modal-header h2 {
@@ -268,9 +274,9 @@
 
         .ficha-item {
             background: #f8f9fa;
-            padding: 12px 15px;
+            padding: 15px;
             border-radius: 8px;
-            border-left: 3px solid #005b96;
+            border-left: 4px solid #005b96;
         }
 
         .ficha-label {
@@ -292,6 +298,19 @@
             grid-column: 1 / -1;
         }
 
+        .ficha-section {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e8eef5;
+        }
+
+        .ficha-section h3 {
+            color: #003366;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
         @media (max-width: 768px) {
             .search-container {
                 flex-direction: column;
@@ -302,7 +321,7 @@
             }
             
             .data-table {
-                font-size: 0.75rem;
+                font-size: 0.8rem;
             }
             
             .data-table th,
@@ -347,8 +366,8 @@
         </header>
 
         <section class="module-title-section">
-            <h1 class="module-title">📋 Consulta de Vehículos</h1>
-            <p class="module-subtitle">Búsqueda y visualización del parque automotor institucional</p>
+            <h1 class="module-title">🚗 Consulta de Vehículos</h1>
+            <p class="module-subtitle">Haga clic en un vehículo para ver toda la información</p>
         </section>
 
         <div class="consultar-header">
@@ -359,7 +378,7 @@
                         type="text" 
                         id="searchInput" 
                         class="search-input" 
-                        placeholder="Buscar por placa, facsímil, marca o modelo..."
+                        placeholder="Buscar por placa, marca, modelo..."
                         autocomplete="off"
                     >
                 </div>
@@ -371,10 +390,6 @@
                     <label>
                         <input type="radio" name="searchType" value="placa">
                         <span>🚗 Placa</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="searchType" value="facsimil">
-                        <span>📄 Facsímil</span>
                     </label>
                 </div>
             </div>
@@ -409,15 +424,6 @@
                         <th>Color</th>
                         <th>S/Carrocería</th>
                         <th>S/Motor</th>
-                        <th>N/Ident.</th>
-                        <th>Situación</th>
-                        <th>Unidad Admin.</th>
-                        <th>REDIP</th>
-                        <th>CCPE</th>
-                        <th>EPM</th>
-                        <th>EPP</th>
-                        <th>Ubicación Física</th>
-                        <th>Asignación</th>
                         <th>Estatus</th>
                     </tr>
                 </thead>
@@ -427,11 +433,11 @@
         </div>
     </main>
 
-    <!-- Modal de Ficha Simplificada -->
+    <!-- Modal Ficha Completa -->
     <div class="modal-overlay" id="vehicleModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">📋 Ficha del Vehículo</h2>
+                <h2 id="modalTitle">🚗 Ficha del Vehículo</h2>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalBody">
