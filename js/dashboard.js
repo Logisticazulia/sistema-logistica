@@ -78,36 +78,6 @@ function updateDate() {
     lastUpdateElement.textContent = new Date().toLocaleDateString('es-ES');
 }
 
-/**
- * Maneja el clic en los módulos
- */
-function handleModuleClick(e) {
-    e.preventDefault();
-    
-    const moduleCard = e.currentTarget;
-    const moduleName = moduleCard.getAttribute('data-module');
-    
-    // Efecto visual de clic
-    moduleCard.style.transform = 'scale(0.98)';
-    setTimeout(() => {
-        moduleCard.style.transform = '';
-    }, 150);
-    
-    // Mensaje temporal (luego crearás las páginas de cada módulo)
-    alert(`🚀 Módulo: ${moduleName.toUpperCase()}\n\nEsta sección está en desarrollo.\nPróximamente disponible.`);
-    
-    // Cuando crees las páginas de cada módulo, usa:
-    // window.location.href = `modulos/${moduleName}.html`;
-}
-
-/**
- * Agrega event listeners a los módulos
- */
-function initModuleListeners() {
-    moduleCards.forEach(card => {
-        card.addEventListener('click', handleModuleClick);
-    });
-}
 
 // ==================== INICIALIZACIÓN ====================
 
