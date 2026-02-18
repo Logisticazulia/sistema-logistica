@@ -84,7 +84,7 @@ function updateDate() {
 document.addEventListener('DOMContentLoaded', () => {
     checkSession();
     updateDate();
-    initModuleListeners();
+   // initModuleListeners();
     console.log('✅ Dashboard inicializado correctamente');
 });
 
