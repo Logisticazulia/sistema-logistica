@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Módulo de Transporte - Sistema de Logística">
+    <meta name="theme-color" content="#003366">
+    
+    <title>Transporte | Sistema de Logística</title>
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema de Logística</span>
+            </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">usuario@institucion.com</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="dashboard-main" role="main">
+        
+        <!-- Header con Navegación de Migas -->
+        <header class="module-header">
+            <div class="breadcrumb">
+                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Transporte</span>
+            </div>
+        </header>
+
+        <!-- Título del Módulo -->
+        <section class="module-title-section">
+            <h1 class="module-title">🚚 Módulo de Transporte</h1>
+            <p class="module-subtitle">Gestión de vehículos, rutas y documentación del parque automotor</p>
+        </section>
+
+        <!-- Estadísticas Rápidas -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">🚗</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="totalVehicles">0</span>
+                    <span class="stat-label">Total Vehículos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="availableVehicles">0</span>
+                    <span class="stat-label">Disponibles</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🔧</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="maintenanceVehicles">0</span>
+                    <span class="stat-label">En Mantenimiento</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📋</span>
+                <div class="stat-content">
+                    <span class="stat-number" id="assignedVehicles">0</span>
+                    <span class="stat-label">Asignados</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 Botones Principales del Módulo -->
+        <section class="transporte-modules-grid">
+            
+            <!-- Botón 1: Planilla de Datos de Vehículos -->
+            <div class="transporte-card" onclick="openSection('planilla')">
+                <div class="transporte-icon">📋</div>
+                <h3 class="transporte-title">Planilla de Datos de Vehículos</h3>
+                <p class="transporte-description">Registro y consulta de información general de todos los vehículos del parque automotor</p>
+                <div class="transporte-arrow">→</div>
+            </div>
+
+            <!-- Botón 2: Ficha Técnica -->
+            <div class="transporte-card" onclick="openSection('ficha')">
+                <div class="transporte-icon">🔧</div>
+                <h3 class="transporte-title">Ficha Técnica</h3>
+                <p class="transporte-description">Especificaciones técnicas, características y datos mecánicos de cada unidad</p>
+                <div class="transporte-arrow">→</div>
+            </div>
+
+            <!-- Botón 3: Acta de Asignación -->
+            <div class="transporte-card" onclick="openSection('acta')">
+                <div class="transporte-icon">📝</div>
+                <h3 class="transporte-title">Acta de Asignación</h3>
+                <p class="transporte-description">Documentos de asignación de vehículos a personal o departamentos</p>
+                <div class="transporte-arrow">→</div>
+            </div>
+
+            <!-- Botón 4: Inspección de PVR Individual -->
+            <div class="transporte-card" onclick="openSection('inspeccion')">
+                <div class="transporte-icon">🔍</div>
+                <h3 class="transporte-title">Inspección de PVR Individual</h3>
+                <p class="transporte-description">Inspección física vehicular individual (PVR) de cada unidad del parque</p>
+                <div class="transporte-arrow">→</div>
+            </div>
+
+        </section>
+
+        <!-- Sección Dinámica (Se muestra al seleccionar una opción) -->
+        <section class="dynamic-section" id="dynamicSection" hidden>
+            <div class="section-header">
+                <button class="btn btn-secondary" onclick="closeSection()">← Volver</button>
+                <h2 class="section-title" id="sectionTitle">Título de Sección</h2>
+            </div>
+            <div class="section-content" id="sectionContent">
+                <!-- Contenido dinámico se carga aquí -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: FORMULARIO DINÁMICO ================= -->
+    <div class="modal-overlay" id="formModal" hidden style="display: none !important; visibility: hidden !important;">
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Título del Modal</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido del formulario dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../js/transporte.js" defer></script>
+
+</body>
+</html>
