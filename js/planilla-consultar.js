@@ -1,6 +1,6 @@
 /**
  * CONSULTA DE VEHÍCULOS - PLANILLA
- * VERSIÓN CORREGIDA
+ * VERSIÓN CON BÚSQUEDA Y EXPORTACIÓN
  */
 
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
@@ -11,7 +11,7 @@ let currentPage = 1;
 const itemsPerPage = 20;
 
 // Referencias a elementos del DOM
-let filterTipo, filterClase, filterSituacion, filterEstatus, filterUnidad, filterEPM, filterEPP;
+let filterTipo, filterClase, filterSituacion, filterEstatus, filterEPM, filterEPP, searchInput;
 
 // Obtener referencias a elementos del DOM
 function getDOMElements() {
@@ -19,9 +19,9 @@ function getDOMElements() {
     filterClase = document.getElementById('filterClase');
     filterSituacion = document.getElementById('filterSituacion');
     filterEstatus = document.getElementById('filterEstatus');
-    filterUnidad = document.getElementById('filterUnidad');
     filterEPM = document.getElementById('filterEPM');
     filterEPP = document.getElementById('filterEPP');
+    searchInput = document.getElementById('searchInput');
 }
 
 // Cargar vehículos
@@ -43,9 +43,6 @@ async function cargarVehiculos() {
         allVehicles = data || [];
         filteredVehicles = [...allVehicles];
         
-        // Poblar filtros dinámicamente
-        populateFilters();
-        
         // Aplicar filtros iniciales
         aplicarFiltros();
         
@@ -61,74 +58,43 @@ async function cargarVehiculos() {
     }
 }
 
-// Poblar filtros con valores únicos de la base de datos
-function populateFilters() {
-    // Poblar Unidad Administrativa
-    if (filterUnidad) {
-        const unidadValues = [...new Set(allVehicles.map(v => v.unidad_administrativa).filter(Boolean))].sort();
-        console.log('Unidades Administrativas encontradas:', unidadValues.length);
-        
-        unidadValues.forEach(value => {
-            const option = document.createElement('option');
-            option.value = value.trim().toUpperCase();
-            option.textContent = value.trim();
-            filterUnidad.appendChild(option);
-        });
-    }
-    
-    // Poblar EPP si está vacío
-    if (filterEPP && filterEPP.options.length <= 1) {
-        const eppValues = [...new Set(allVehicles.map(v => v.epp).filter(Boolean))].sort();
-        eppValues.forEach(value => {
-            const option = document.createElement('option');
-            option.value = value.trim().toUpperCase();
-            option.textContent = value.trim();
-            filterEPP.appendChild(option);
-        });
-    }
+// Buscar vehículos
+function buscarVehiculos() {
+    aplicarFiltros();
 }
 
-// Aplicar filtros - LÓGICA CORREGIDA
+// Aplicar filtros
 function aplicarFiltros() {
     if (!filterTipo) getDOMElements();
     
-    // Obtener valores de los filtros (trim y uppercase para comparación exacta)
+    // Obtener valor de búsqueda
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
     const filterTipoValue = filterTipo ? filterTipo.value.trim().toUpperCase() : '';
     const filterClaseValue = filterClase ? filterClase.value.trim().toUpperCase() : '';
     const filterSituacionValue = filterSituacion ? filterSituacion.value.trim().toUpperCase() : '';
     const filterEstatusValue = filterEstatus ? filterEstatus.value.trim().toUpperCase() : '';
-    const filterUnidadValue = filterUnidad ? filterUnidad.value.trim().toUpperCase() : '';
     const filterEPMValue = filterEPM ? filterEPM.value.trim().toUpperCase() : '';
     const filterEPPValue = filterEPP ? filterEPP.value.trim().toUpperCase() : '';
 
-    console.log('Filtros aplicados:', {
-        tipo: filterTipoValue || 'TODOS',
-        clase: filterClaseValue || 'TODAS',
-        situacion: filterSituacionValue || 'TODAS',
-        estatus: filterEstatusValue || 'TODOS',
-        unidad: filterUnidadValue || 'TODAS',
-        epm: filterEPMValue || 'TODOS',
-        epp: filterEPPValue || 'TODOS'
-    });
-
-    // Filtrar vehículos - CADA FILTRO ES INDEPENDIENTE
     filteredVehicles = allVehicles.filter(v => {
-        // Cada condición debe cumplirse SI el filtro tiene valor
-        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.trim().toUpperCase() === filterTipoValue);
-        const matchesClase = !filterClaseValue || (v.clase && v.clase.trim().toUpperCase() === filterClaseValue);
-        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.trim().toUpperCase() === filterSituacionValue);
-        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.trim().toUpperCase() === filterEstatusValue);
-        const matchesUnidad = !filterUnidadValue || (v.unidad_administrativa && v.unidad_administrativa.trim().toUpperCase() === filterUnidadValue);
-        const matchesEPM = !filterEPMValue || (v.epm && v.epm.trim().toUpperCase() === filterEPMValue);
-        const matchesEPP = !filterEPPValue || (v.epp && v.epp.trim().toUpperCase() === filterEPPValue);
+        // Búsqueda general
+        const matchesSearch = !searchTerm || 
+            (v.placa && v.placa.toLowerCase().includes(searchTerm)) ||
+            (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm)) ||
+            (v.marca && v.marca.toLowerCase().includes(searchTerm)) ||
+            (v.modelo && v.modelo.toLowerCase().includes(searchTerm));
         
-        // TODAS las condiciones activas deben cumplirse
-        return matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesUnidad && matchesEPM && matchesEPP;
+        // Filtros individuales
+        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue));
+        const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue));
+        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.toUpperCase().includes(filterSituacionValue));
+        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.toUpperCase().includes(filterEstatusValue));
+        const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue));
+        const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue));
+        
+        return matchesSearch && matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesEPM && matchesEPP;
     });
 
-    console.log(`Vehículos filtrados: ${filteredVehicles.length} de ${allVehicles.length}`);
-    
-    // Resetear a página 1
     currentPage = 1;
     renderTable();
     renderPagination();
@@ -136,15 +102,78 @@ function aplicarFiltros() {
 
 // Limpiar filtros
 function limpiarFiltros() {
+    if (searchInput) searchInput.value = '';
     if (filterTipo) filterTipo.value = '';
     if (filterClase) filterClase.value = '';
     if (filterSituacion) filterSituacion.value = '';
     if (filterEstatus) filterEstatus.value = '';
-    if (filterUnidad) filterUnidad.value = '';
     if (filterEPM) filterEPM.value = '';
     if (filterEPP) filterEPP.value = '';
     
     aplicarFiltros();
+}
+
+// Exportar a Excel
+function exportarExcel() {
+    if (filteredVehicles.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+    }
+
+    // Crear contenido CSV
+    const headers = [
+        'Placa', 'Facsímil', 'Marca', 'Modelo', 'Tipo', 'Clase', 'Año', 'Color',
+        'S/Carrocería', 'S/Motor', 'N/Identificación', 'Situación', 'Unidad Administrativa',
+        'REDIP', 'CCPE', 'EPM', 'EPP', 'Ubicación Física', 'Asignación', 'Estatus',
+        'Observación', 'Certificado Origen', 'Fecha Inspección', 'N/Trámite', 'Ubicación Título'
+    ];
+
+    const rows = filteredVehicles.map(v => [
+        v.placa || '',
+        v.facsimil || '',
+        v.marca || '',
+        v.modelo || '',
+        v.tipo || '',
+        v.clase || '',
+        v.ano || '',
+        v.color || '',
+        v.s_carroceria || '',
+        v.s_motor || '',
+        v.n_identificacion || '',
+        v.situacion || '',
+        v.unidad_administrativa || '',
+        v.redip || '',
+        v.ccpe || '',
+        v.epm || '',
+        v.epp || '',
+        v.ubicacion_fisica || '',
+        v.asignacion || '',
+        v.estatus || '',
+        v.observacion || '',
+        v.certificado_origen || '',
+        v.fecha_inspeccion || '',
+        v.n_tramite || '',
+        v.ubicacion_titulo || ''
+    ]);
+
+    // Crear CSV
+    const csvContent = [
+        headers.join(';'),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
+    ].join('\n');
+
+    // Crear blob y descargar
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `vehiculos_filtrados_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Renderizar tabla
@@ -263,7 +292,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterClase) filterClase.addEventListener('change', aplicarFiltros);
     if (filterSituacion) filterSituacion.addEventListener('change', aplicarFiltros);
     if (filterEstatus) filterEstatus.addEventListener('change', aplicarFiltros);
-    if (filterUnidad) filterUnidad.addEventListener('change', aplicarFiltros);
     if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
     if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
+    
+    // Permitir buscar con Enter
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                buscarVehiculos();
+            }
+        });
+    }
 });
