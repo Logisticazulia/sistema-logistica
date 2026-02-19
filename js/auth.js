@@ -1,137 +1,194 @@
 /**
  * ========================================
- * AUTH.JS - Lógica de Autenticación con Supabase
+ * SISTEMA INSTITUCIONAL - AUTENTICACIÓN
  * ========================================
+ * Manejo de login/logout con Supabase
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Verificar que Supabase esté disponible
-  if (typeof window.supabase === 'undefined') {
-    console.error('❌ Supabase no está cargado. Verifica el CDN.');
-    return;
-  }
+// ==================== CONFIGURACIÓN ====================
+const SUPABASE_URL = 'https://wwrknqfyjelwbvfnfshq.supabase.co';     
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cmtucWZ5amVsd2J2Zm5mc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjAzMjIsImV4cCI6MjA4NjkzNjMyMn0.C7CmscpqBo5nuNbfvZCTQ9WlVT771maF1BFdEkhkzuQ'; 
 
-  // Inicializar cliente de Supabase usando config.js
-  const supabaseUrl = window.SUPABASE_URL;
-  const supabaseKey = window.SUPABASE_KEY;
-  
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Faltan credenciales de Supabase en config.js');
-    return;
-  }
+// ✅ CORRECCIÓN: Usamos 'supabaseClient' para evitar conflictos con la librería
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-  console.log('✅ Cliente Supabase inicializado');
+// ==================== REFERENCIAS AL DOM ====================
+const loginForm = document.getElementById('loginForm');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const submitBtn = document.getElementById('submitBtn');
+const formMessage = document.getElementById('formMessage');
+//const recoverPasswordLink = document.getElementById('recoverPassword');
 
-  // Referencias al formulario
-  const loginForm = document.getElementById('loginForm');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const formMessage = document.getElementById('formMessage');
-  const submitBtn = document.getElementById('submitBtn');
-  const btnText = submitBtn.querySelector('.btn-text');
-  const btnLoader = submitBtn.querySelector('.btn-loader');
+// ==================== FUNCIONES DE UTILIDAD ====================
 
-  // Función para mostrar mensajes
-  const showMessage = (message, type = 'error') => {
-    if (!formMessage) return;
+function showMessage(message, type = 'info') {
     formMessage.textContent = message;
-    formMessage.className = `form-message ${type} show`;
-    // Ocultar mensaje después de 5 segundos
-    setTimeout(() => {
-      formMessage.classList.remove('show');
-    }, 5000);
-  };
-
-  // Función para activar/desactivar estado de carga
-  const setLoading = (loading) => {
-    if (loading) {
-      btnText.hidden = true;
-      btnLoader.hidden = false;
-      submitBtn.disabled = true;
-    } else {
-      btnText.hidden = false;
-      btnLoader.hidden = true;
-      submitBtn.disabled = false;
+    formMessage.className = 'form-message';
+    
+    if (type === 'error') {
+        formMessage.classList.add('error');
+    } else if (type === 'success') {
+        formMessage.classList.add('success');
     }
-  };
+}
 
-  // Manejar envío del formulario
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+function setLoading(isLoading) {
+    if (isLoading) {
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+    } else {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+    }
+}
 
-      // Validaciones básicas
-      if (!email || !password) {
-        showMessage('Por favor, completa todos los campos', 'error');
-        return;
-      }
+function validateForm() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
-      if (password.length < 6) {
+    if (!email) {
+        showMessage('Por favor ingresa tu correo electrónico', 'error');
+        emailInput.focus();
+        return false;
+    }
+
+    if (!password) {
+        showMessage('Por favor ingresa tu contraseña', 'error');
+        passwordInput.focus();
+        return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showMessage('Por favor ingresa un correo electrónico válido', 'error');
+        emailInput.focus();
+        return false;
+    }
+
+    if (password.length < 6) {
         showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+        passwordInput.focus();
+        return false;
+    }
+
+    return true;
+}
+
+function clearForm() {
+    emailInput.value = '';
+    passwordInput.value = '';
+    formMessage.textContent = '';
+    formMessage.className = 'form-message';
+}
+
+// ==================== LÓGICA DE AUTENTICACIÓN ====================
+
+async function handleLogin(e) {
+    e.preventDefault();
+
+    if (!validateForm()) {
         return;
-      }
+    }
 
-      setLoading(true);
-      showMessage('', 'success'); // Limpiar mensajes previos
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
-      try {
-        // Intentar iniciar sesión con Supabase Auth
-        const { data, error } = await _supabase.auth.signInWithPassword({
-          email,
-          password
+    setLoading(true);
+    showMessage('Verificando credenciales...', 'info');
+
+    try {
+        // ✅ CORRECCIÓN: Usamos 'supabaseClient' en lugar de 'supabase'
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password,
         });
 
-        if (error) throw error;
-
-        // Login exitoso
-        console.log('✅ Usuario autenticado:', data.user);
-        showMessage('✅ Inicio de sesión exitoso. Redirigiendo...', 'success');
-        
-        // Guardar sesión si es necesario
-        if (data.user) {
-          localStorage.setItem('user_email', data.user.email);
+        if (error) {
+            console.error('Error de autenticación:', error);
+            
+            if (error.message.includes('Invalid login credentials')) {
+                showMessage('Correo o contraseña incorrectos', 'error');
+            } else if (error.message.includes('Email not confirmed')) {
+                showMessage('Por favor verifica tu correo electrónico', 'error');
+            } else {
+                showMessage('Error al iniciar sesión. Intenta nuevamente', 'error');
+            }
+            setLoading(false);
+            return;
         }
+
+        console.log('Usuario autenticado:', data.user);
+        showMessage('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
         
-        // Redirigir al dashboard (ajusta la ruta según tu estructura)
         setTimeout(() => {
-          window.location.href = 'dashboard.html'; // o '/sistema-logistica/dashboard.html'
+            window.location.href = 'dashboard.html';
         }, 1500);
 
-      } catch (err) {
-        console.error('❌ Error de autenticación:', err);
-        
-        // Mensajes amigables según el tipo de error
-        let mensaje = 'Error al iniciar sesión. Verifica tus credenciales.';
-        
-        if (err.message?.includes('Invalid login credentials')) {
-          mensaje = 'Correo o contraseña incorrectos.';
-        } else if (err.message?.includes('Email not confirmed')) {
-          mensaje = 'Por favor, confirma tu correo electrónico antes de continuar.';
-        }
-        
-        showMessage(mensaje, 'error');
-      } finally {
-        setLoading(false);
-      }
-    });
-  }
-
-  // Verificar sesión activa al cargar la página (opcional)
-  const checkSession = async () => {
-    try {
-      const { data: { session } } = await _supabase.auth.getSession();
-      if (session?.user) {
-        console.log('✅ Sesión activa detectada');
-        // window.location.href = 'dashboard.html'; // Descomenta si quieres redirección automática
-      }
     } catch (error) {
-      console.warn('⚠️ No se pudo verificar la sesión:', error);
+        console.error('Error inesperado:', error);
+        showMessage('Ocurrió un error inesperado. Intenta nuevamente', 'error');
+        setLoading(false);
     }
-  };
-  
-  checkSession();
+}
+
+async function handlePasswordRecovery() {
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+        showMessage('Ingresa tu correo para recuperar la contraseña', 'error');
+        emailInput.focus();
+        return;
+    }
+
+    try {
+        // ✅ CORRECCIÓN: Usamos 'supabaseClient'
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/dashboard.html',
+        });
+
+        if (error) {
+            showMessage('Error al enviar correo de recuperación', 'error');
+        } else {
+            showMessage('Se envió un correo con instrucciones de recuperación', 'success');
+        }
+    } catch (error) {
+        showMessage('Ocurrió un error. Intenta nuevamente', 'error');
+    }
+}
+
+async function checkExistingSession() {
+    // ✅ CORRECCIÓN: Usamos 'supabaseClient'
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    if (session) {
+        window.location.href = 'dashboard.html';
+    }
+}
+
+// ==================== EVENT LISTENERS ====================
+
+loginForm.addEventListener('submit', handleLogin);
+
+//recoverPasswordLink.addEventListener('click', (e) => {
+   // e.preventDefault();
+   //handlePasswordRecovery();
+//});
+
+emailInput.addEventListener('input', () => {
+    if (formMessage.classList.contains('error')) {
+        showMessage('', 'info');
+    }
 });
+
+passwordInput.addEventListener('input', () => {
+    if (formMessage.classList.contains('error')) {
+        showMessage('', 'info');
+    }
+});
+
+// ==================== INICIALIZACIÓN ====================
+
+document.addEventListener('DOMContentLoaded', checkExistingSession);
+
+console.log('✅ Sistema de autenticación inicializado');
