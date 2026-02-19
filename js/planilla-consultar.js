@@ -450,6 +450,10 @@ document.addEventListener('DOMContentLoaded', () => {
     getDOMElements();
     cargarVehiculos();
     setupSearchEnter();
+       const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', cerrarSesion);
+    }
     
     // Event listeners para filtros
     if (filterTipo) filterTipo.addEventListener('change', aplicarFiltros);
@@ -485,5 +489,29 @@ async function mostrarUsuarioAutenticado() {
         }
     } catch (err) {
         console.error('Error mostrando usuario:', err);
+    }
+}
+// Función para cerrar sesión
+async function cerrarSesion() {
+    try {
+        console.log('Cerrando sesión...');
+        
+        // Cerrar sesión en Supabase
+        const { error } = await supabaseClient.auth.signOut();
+        
+        if (error) {
+            console.error('Error al cerrar sesión:', error);
+            throw error;
+        }
+        
+        // Limpiar datos locales si es necesario
+        localStorage.removeItem('user_session'); // si usas localStorage
+        
+        // Redirigir al login (ajusta la ruta según tu estructura)
+        window.location.href = '../login.html';
+        
+    } catch (error) {
+        console.error('Error en cerrarSesion:', error);
+        alert('Error al cerrar sesión. Intente nuevamente.');
     }
 }
