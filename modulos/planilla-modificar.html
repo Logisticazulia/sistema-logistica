@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modificar Vehículo | Sistema de Logística</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ================= ESTILOS GENERALES ================= */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 0;
+}
+/* ================= CONTENEDOR PRINCIPAL ================= */
+.form-container {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+  margin: 20px auto;
+  max-width: 1400px;
+}
+/* ================= BUSCADOR ================= */
+.search-container {
+  background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.search-group {
+  flex: 1;
+  min-width: 200px;
+}
+.search-group label {
+  display: block;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.95);
+  transition: all 0.3s;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+}
+.btn-search {
+  background: #f59e0b;
+  color: white;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+.btn-search:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+}
+.btn-search:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+/* ================= GRID PRINCIPAL - 4 COLUMNAS ================= */
+.form-main-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+/* ================= SECCIONES DEL FORMULARIO ================= */
+.form-section {
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 15px;
+  border-top: 4px solid;
+}
+.form-section.identificacion { border-color: #005b96; }
+.form-section.caracteristicas { border-color: #2a9d8f; }
+.form-section.seriales { border-color: #e9c46a; }
+.form-section.ubicacion { border-color: #e76f51; }
+.form-section.documentacion { border-color: #9b5de5; }
+.form-section.observaciones { border-color: #f15bb5; }
+/* ================= HEADER DE SECCIÓN ================= */
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8eef5;
+}
+.form-section-icon {
+  font-size: 1.3rem;
+}
+.form-section-title {
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+/* ================= GRID DE CAMPOS ================= */
+.form-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.form-section.full-width .form-fields-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+/* ================= GRUPOS DE CAMPOS ================= */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-group label {
+  font-size: 0.7rem;
+  color: #555;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.form-group label .required {
+  color: #dc2626;
+}
+.form-input, .form-select, .form-textarea {
+  padding: 8px 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.3s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #005b96;
+  box-shadow: 0 0 0 2px rgba(0, 91, 150, 0.1);
+}
+.form-input:disabled, .form-select:disabled, .form-textarea:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 50px;
+}
+/* ================= BOTONES DE ACCIÓN ================= */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 2px solid #e8eef5;
+}
+.btn {
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+  border: none;
+}
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+.btn-secondary:hover {
+  background: #5a6268;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+  color: white;
+  box-shadow: 0 3px 10px rgba(0, 51, 102, 0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 51, 102, 0.4);
+}
+.btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+/* ================= ALERTAS ================= */
+.alert {
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.alert-success {
+  background: #d1fae5;
+  color: #059669;
+  border: 1px solid #059669;
+}
+.alert-error {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+.alert-info {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+}
+/* ================= ESTADO DEL FORMULARIO ================= */
+.form-disabled .form-input,
+.form-disabled .form-select,
+.form-disabled .form-textarea {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.form-disabled .btn-primary {
+  display: none;
+}
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .form-main-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .search-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-group {
+    min-width: 100%;
+  }
+  .form-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-section.full-width .form-fields-grid,
+  .form-fields-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    flex-direction: column;
+  }
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* ================= LOADER ================= */
+.btn-loader { display: none; }
+.loading .btn-text { display: none; }
+.loading .btn-loader { display: inline; }
+.searching .btn-search-text { display: none; }
+.searching .btn-search-loader { display: inline; }
+</style>
+</head>
+<body class="dashboard-page">
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+      <span class="nav-title">Sistema de Logística</span>
+    </div>
+    <div class="nav-user">
+      <span class="user-email" id="userEmail">Cargando...</span>
+      <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main">
+  <header class="module-header">
+    <div class="breadcrumb">
+      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="planilla.html" class="breadcrumb-link">Planilla</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">Modificar</span>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
+      ← Volver
+    </button>
+  </header>
+  
+  <section class="module-title-section">
+    <h1 class="module-title">✏️ Modificar Vehículo</h1>
+    <p class="module-subtitle">Busque y edite la información de un vehículo registrado</p>
+  </section>
+  
+  <div class="form-container">
+    <!-- Alertas -->
+    <div id="alertSuccess" class="alert alert-success">
+      <span>✅</span>
+      <span id="successMessage">Vehículo actualizado exitosamente</span>
+    </div>
+    <div id="alertError" class="alert alert-error">
+      <span>❌</span>
+      <span id="errorMessage">Error al actualizar el vehículo</span>
+    </div>
+    <div id="alertInfo" class="alert alert-info">
+      <span>ℹ️</span>
+      <span id="infoMessage">Busque un vehículo para comenzar</span>
+    </div>
+
+    <!-- ================= BUSCADOR DE VEHÍCULO ================= -->
+    <div class="search-container">
+      <div class="search-group">
+        <label for="searchId">ID del Vehículo</label>
+        <input type="number" id="searchId" class="search-input" placeholder="Ej: 1517" min="1">
+      </div>
+      <div class="search-group">
+        <label for="searchPlaca">Placa (opcional)</label>
+        <input type="text" id="searchPlaca" class="search-input" placeholder="Ej: AB123CD" maxlength="10">
+      </div>
+      <button type="button" class="btn-search" id="btnSearch">
+        <span class="btn-search-text">🔍 Buscar Vehículo</span>
+        <span class="btn-search-loader">⏳ Buscando...</span>
+      </button>
+    </div>
+
+    <!-- ================= FORMULARIO DE EDICIÓN ================= -->
+    <form id="vehicleForm" novalidate class="form-disabled">
+      <!-- Campo oculto para el ID -->
+      <input type="hidden" id="vehicleId" name="id">
+      
+      <!-- GRID PRINCIPAL - 4 COLUMNAS -->
+      <div class="form-main-grid">
+        <!-- COLUMNA 1: IDENTIFICACIÓN 🔵 -->
+        <div class="form-section identificacion">
+          <div class="form-section-header">
+            <span class="form-section-icon">🔖</span>
+            <h2 class="form-section-title">Identificación</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>Placa <span class="required">*</span></label>
+              <input type="text" id="placa" name="placa" class="form-input" placeholder="AB123CD" required disabled>
+            </div>
+            <div class="form-group">
+              <label>Facsímil</label>
+              <input type="text" id="facsimil" name="facsimil" class="form-input" placeholder="123456" disabled>
+            </div>
+            <div class="form-group">
+              <label>N° Identificación</label>
+              <input type="text" id="n_identificacion" name="n_identificacion" class="form-input" placeholder="M-001" disabled>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA 2: CARACTERÍSTICAS 🟢 -->
+        <div class="form-section caracteristicas">
+          <div class="form-section-header">
+            <span class="form-section-icon">🚗</span>
+            <h2 class="form-section-title">Características</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>Marca <span class="required">*</span></label>
+              <input type="text" id="marca" name="marca" class="form-input" placeholder="TOYOTA" required disabled>
+            </div>
+            <div class="form-group">
+              <label>Modelo <span class="required">*</span></label>
+              <input type="text" id="modelo" name="modelo" class="form-input" placeholder="HILUX" required disabled>
+            </div>
+            <div class="form-group">
+              <label>Tipo <span class="required">*</span></label>
+              <select id="tipo" name="tipo" class="form-select" required disabled>
+                <option value="">Seleccione...</option>
+                <option value="AUTOMOVIL">AUTOMOVIL</option>
+                <option value="BUS">BUS</option>
+                <option value="CAMION">CAMION</option>
+                <option value="ENDURO">ENDURO</option>
+                <option value="ESPECIAL">ESPECIAL</option>
+                <option value="MACHITO">MACHITO</option>
+                <option value="MINIBUS">MINIBUS</option>
+                <option value="MOTO">MOTO</option>
+                <option value="PICKUP">PICKUP</option>
+                <option value="SPORTWAGON">SPORTWAGON</option>
+                <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                <option value="TRIMOVIL">TRIMOVIL</option>
+                <option value="VAM">VAM</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Clase <span class="required">*</span></label>
+              <select id="clase" name="clase" class="form-select" required disabled>
+                <option value="">Seleccione...</option>
+                <option value="AUTOBUS">AUTOBUS</option>
+                <option value="AUTOMOVIL">AUTOMOVIL</option>
+                <option value="BLINDADO">BLINDADO</option>
+                <option value="CAMION">CAMION</option>
+                <option value="CAMIONETA">CAMIONETA</option>
+                <option value="ESPECIAL">ESPECIAL</option>
+                <option value="MOTO">MOTO</option>
+                <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Año</label>
+              <input type="number" id="ano" name="ano" class="form-input" placeholder="2023" min="1900" max="2030" disabled>
+            </div>
+            <div class="form-group">
+              <label>Color</label>
+              <input type="text" id="color" name="color" class="form-input" placeholder="BLANCO" disabled>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA 3: SERIALES 🟡 -->
+        <div class="form-section seriales">
+          <div class="form-section-header">
+            <span class="form-section-icon">🔢</span>
+            <h2 class="form-section-title">Seriales</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>S/Carrocería</label>
+              <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN" disabled>
+            </div>
+            <div class="form-group">
+              <label>S/Motor</label>
+              <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial" disabled>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA 4: ESTATUS 🔴 -->
+        <div class="form-section ubicacion">
+          <div class="form-section-header">
+            <span class="form-section-icon">📊</span>
+            <h2 class="form-section-title">Estatus</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>Situación</label>
+              <select id="situacion" name="situacion" class="form-select" disabled>
+                <option value="">Seleccione...</option>
+                <option value="OPERATIVA">OPERATIVA</option>
+                <option value="INOPERATIVA">INOPERATIVA</option>
+                <option value="REPARACION">REPARACION</option>
+                <option value="TALLER">TALLER</option>
+                <option value="DESINCORPORADA">DESINCORPORADA</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Estatus</label>
+              <select id="estatus" name="estatus" class="form-select" disabled>
+                <option value="">Seleccione...</option>
+                <option value="OPERATIVA">OPERATIVA</option>
+                <option value="INOPERATIVA">INOPERATIVA</option>
+                <option value="DESINCORPORADA">DESINCORPORADA</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILA 2: UBICACIÓN (FULL WIDTH) 🔴 -->
+        <div class="form-section ubicacion full-width">
+          <div class="form-section-header">
+            <span class="form-section-icon">📍</span>
+            <h2 class="form-section-title">Ubicación y Asignación</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>Unidad Administrativa</label>
+              <input type="text" id="unidad_administrativa" name="unidad_administrativa" class="form-input" placeholder="Ej: DIP" disabled>
+            </div>
+            <div class="form-group">
+              <label>Ubicación Física</label>
+              <input type="text" id="ubicacion_fisica" name="ubicacion_fisica" class="form-input" placeholder="Ej: CCPEM" disabled>
+            </div>
+            <div class="form-group">
+              <label>Asignación</label>
+              <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje" disabled>
+            </div>
+            <div class="form-group">
+              <label>REDIP</label>
+              <input type="text" id="redip" name="redip" class="form-input" placeholder="OCCIDENTAL" disabled>
+            </div>
+            <div class="form-group">
+              <label>CCPE</label>
+              <input type="text" id="ccpe" name="ccpe" class="form-input" placeholder="ZULIA" disabled>
+            </div>
+            <div class="form-group">
+              <label>EPM</label>
+              <select id="epm" name="epm" class="form-select" disabled>
+                <option value="">Seleccione...</option>
+                <option value="NO">NO</option>
+                <option value="MARACAIBO">MARACAIBO</option>
+                <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+                <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>EPP</label>
+              <input type="text" id="epp" name="epp" class="form-input" placeholder="E.P. CENTRAL" disabled>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILA 3: DOCUMENTACIÓN 🟣 -->
+        <div class="form-section documentacion full-width">
+          <div class="form-section-header">
+            <span class="form-section-icon">📄</span>
+            <h2 class="form-section-title">Documentación</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>Certificado de Origen</label>
+              <input type="text" id="certificado_origen" name="certificado_origen" class="form-input" disabled>
+            </div>
+            <div class="form-group">
+              <label>Fecha Inspección</label>
+              <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input" disabled>
+            </div>
+            <div class="form-group">
+              <label>N° Trámite</label>
+              <input type="text" id="n_tramite" name="n_tramite" class="form-input" disabled>
+            </div>
+            <div class="form-group">
+              <label>Ubicación Título</label>
+              <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Archivo" disabled>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILA 4: OBSERVACIONES 🩷 -->
+        <div class="form-section observaciones full-width">
+          <div class="form-section-header">
+            <span class="form-section-icon">📝</span>
+            <h2 class="form-section-title">Observaciones</h2>
+          </div>
+          <div class="form-fields-grid">
+            <div class="form-group">
+              <label>Observación General</label>
+              <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales..." disabled></textarea>
+            </div>
+            <div class="form-group">
+              <label>Observación Extra</label>
+              <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Info complementaria..." disabled></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" id="btnCancel" disabled>
+          ❌ Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" id="btnEdit">
+          ✏️ Editar Información
+        </button>
+        <button type="submit" class="btn btn-primary" id="btnSubmit" style="display: none;">
+          <span class="btn-text">💾 Guardar Cambios</span>
+          <span class="btn-loader">⏳ Guardando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/planilla-modificar.js" defer></script>
+</body>
+</html>
