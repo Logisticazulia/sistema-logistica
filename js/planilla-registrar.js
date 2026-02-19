@@ -28,7 +28,7 @@ async function mostrarUsuarioAutenticado() {
         
         if (session?.user?.email) {
             // Muestra solo el nombre antes del @
-            userEmail.textContent = session.user.email.split('@')[0];
+           userEmail.textContent = session.user.email;
         } else if (session?.user?.user_metadata?.full_name) {
             // Fallback: usa el nombre completo si existe
             userEmail.textContent = session.user.user_metadata.full_name;
