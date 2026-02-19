@@ -1,6 +1,6 @@
 /**
  * CONSULTA DE VEHÍCULOS - PLANILLA
- * VERSIÓN CON BÚSQUEDA Y EXPORTACIÓN
+ * VERSIÓN COMPLETA CON TODOS LOS FILTROS
  */
 
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
@@ -11,7 +11,7 @@ let currentPage = 1;
 const itemsPerPage = 20;
 
 // Referencias a elementos del DOM
-let filterTipo, filterClase, filterSituacion, filterEstatus, filterEPM, filterEPP, searchInput;
+let filterTipo, filterClase, filterSituacion, filterEstatus, filterUnidad, filterEPM, filterEPP, searchInput;
 
 // Obtener referencias a elementos del DOM
 function getDOMElements() {
@@ -19,6 +19,7 @@ function getDOMElements() {
     filterClase = document.getElementById('filterClase');
     filterSituacion = document.getElementById('filterSituacion');
     filterEstatus = document.getElementById('filterEstatus');
+    filterUnidad = document.getElementById('filterUnidad');
     filterEPM = document.getElementById('filterEPM');
     filterEPP = document.getElementById('filterEPP');
     searchInput = document.getElementById('searchInput');
@@ -43,7 +44,6 @@ async function cargarVehiculos() {
         allVehicles = data || [];
         filteredVehicles = [...allVehicles];
         
-        // Aplicar filtros iniciales
         aplicarFiltros();
         
     } catch (error) {
@@ -67,32 +67,31 @@ function buscarVehiculos() {
 function aplicarFiltros() {
     if (!filterTipo) getDOMElements();
     
-    // Obtener valor de búsqueda
     const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
     const filterTipoValue = filterTipo ? filterTipo.value.trim().toUpperCase() : '';
     const filterClaseValue = filterClase ? filterClase.value.trim().toUpperCase() : '';
     const filterSituacionValue = filterSituacion ? filterSituacion.value.trim().toUpperCase() : '';
     const filterEstatusValue = filterEstatus ? filterEstatus.value.trim().toUpperCase() : '';
+    const filterUnidadValue = filterUnidad ? filterUnidad.value.trim().toUpperCase() : '';
     const filterEPMValue = filterEPM ? filterEPM.value.trim().toUpperCase() : '';
     const filterEPPValue = filterEPP ? filterEPP.value.trim().toUpperCase() : '';
 
     filteredVehicles = allVehicles.filter(v => {
-        // Búsqueda general
         const matchesSearch = !searchTerm || 
             (v.placa && v.placa.toLowerCase().includes(searchTerm)) ||
             (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm)) ||
             (v.marca && v.marca.toLowerCase().includes(searchTerm)) ||
             (v.modelo && v.modelo.toLowerCase().includes(searchTerm));
         
-        // Filtros individuales
         const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue));
         const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue));
         const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.toUpperCase().includes(filterSituacionValue));
         const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.toUpperCase().includes(filterEstatusValue));
+        const matchesUnidad = !filterUnidadValue || (v.unidad_administrativa && v.unidad_administrativa.toUpperCase().includes(filterUnidadValue));
         const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue));
         const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue));
         
-        return matchesSearch && matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesEPM && matchesEPP;
+        return matchesSearch && matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesUnidad && matchesEPM && matchesEPP;
     });
 
     currentPage = 1;
@@ -107,6 +106,7 @@ function limpiarFiltros() {
     if (filterClase) filterClase.value = '';
     if (filterSituacion) filterSituacion.value = '';
     if (filterEstatus) filterEstatus.value = '';
+    if (filterUnidad) filterUnidad.value = '';
     if (filterEPM) filterEPM.value = '';
     if (filterEPP) filterEPP.value = '';
     
@@ -120,7 +120,6 @@ function exportarExcel() {
         return;
     }
 
-    // Crear contenido CSV
     const headers = [
         'Placa', 'Facsímil', 'Marca', 'Modelo', 'Tipo', 'Clase', 'Año', 'Color',
         'S/Carrocería', 'S/Motor', 'N/Identificación', 'Situación', 'Unidad Administrativa',
@@ -156,13 +155,11 @@ function exportarExcel() {
         v.ubicacion_titulo || ''
     ]);
 
-    // Crear CSV
     const csvContent = [
         headers.join(';'),
         ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
     ].join('\n');
 
-    // Crear blob y descargar
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -287,15 +284,14 @@ document.addEventListener('DOMContentLoaded', () => {
     getDOMElements();
     cargarVehiculos();
     
-    // Event listeners para filtros
     if (filterTipo) filterTipo.addEventListener('change', aplicarFiltros);
     if (filterClase) filterClase.addEventListener('change', aplicarFiltros);
     if (filterSituacion) filterSituacion.addEventListener('change', aplicarFiltros);
     if (filterEstatus) filterEstatus.addEventListener('change', aplicarFiltros);
+    if (filterUnidad) filterUnidad.addEventListener('change', aplicarFiltros);
     if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
     if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
     
-    // Permitir buscar con Enter
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
