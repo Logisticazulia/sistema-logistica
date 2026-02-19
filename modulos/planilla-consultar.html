@@ -183,21 +183,6 @@
                 grid-template-columns: 1fr;
             }
         }
-        .nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.nav-logo {
-    object-fit: contain;
-}
-        .nav-logo-large {
-    width: 50px !important;
-    height: 50px !important;
-    object-fit: contain;
-}
-
     </style>
 </head>
 
@@ -205,11 +190,10 @@
 
     <nav class="navbar">
         <div class="nav-container">
-           <div class="nav-brand">
-    <img src="../img/logo.png" alt="Logo Principal" class="nav-logo" width="35" height="35">
-    <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-    <span class="nav-title">Sistema de Logística</span>
-</div>
+            <div class="nav-brand">
+                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema de Logística</span>
+            </div>
             <div class="nav-user">
                 <span class="user-email" id="userEmail">usuario@institucion.com</span>
                 <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
@@ -400,37 +384,16 @@
                     </select>
                 </div>
 
-               <div class="filter-group">
-    <label for="filterEPP">EPP</label>
-    <select id="filterEPP" class="filter-select">
-        <option value="">Todos</option>
-        <option value="NO">NO</option>
-        <option value="ESTACION POLICIAL">ESTACION POLICIAL</option>
-        <option value="E.P.">E.P.</option>
-        <option value="ANDRES BELLO">ANDRES BELLO</option>
-        <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
-        <option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option>
-        <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
-        <option value="COQUIVACOA">COQUIVACOA</option>
-        <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
-        <option value="DOMITILA FLORES">DOMITILA FLORES</option>
-        <option value="EL BAJO">EL BAJO</option>
-        <option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option>
-        <option value="FRANCISCO OCHOA">FRANCISCO OCHOA</option>
-        <option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option>
-        <option value="JUANA DE AVILA">JUANA DE AVILA</option>
-        <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-        <option value="LA CONCEPCION">LA CONCEPCION</option>
-        <option value="LOS CORTIJO">LOS CORTIJO</option>
-        <option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option>
-        <option value="MANUEL DAGNINO">MANUEL DAGNINO</option>
-        <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
-        <option value="RAUL LEONI">RAUL LEONI</option>
-        <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-        <option value="SAN JOSE DE POTRERITO">SAN JOSE DE POTRERITO</option>
-        <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
-    </select>
-</div>
+                <div class="filter-group">
+                    <label for="filterEPP">EPP</label>
+                    <select id="filterEPP" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="ESTACION POLICIAL">ESTACION POLICIAL</option>
+                        <option value="E.P.">E.P.</option>
+                        <option value="NO">NO</option>
+                    </select>
+                </div>
+
                 <button class="btn-limpiar" onclick="limpiarFiltros()">🧹 Limpiar Filtros</button>
             </div>
 
