@@ -18,9 +18,9 @@
         }
 
         .filters-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 15px;
         }
 
@@ -28,13 +28,13 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-            min-width: 150px;
         }
 
         .filter-group label {
             font-size: 0.75rem;
             color: #666;
-            font-weight: 500;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         .filter-select {
@@ -43,6 +43,7 @@
             border-radius: 6px;
             font-size: 0.85rem;
             background: white;
+            cursor: pointer;
         }
 
         .filter-select:focus {
@@ -58,6 +59,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
+            font-weight: 500;
             align-self: flex-end;
         }
 
@@ -166,12 +168,6 @@
             cursor: not-allowed;
         }
 
-        .page-info {
-            padding: 0 10px;
-            font-size: 0.8rem;
-            color: #666;
-        }
-
         .results-info {
             display: flex;
             justify-content: space-between;
@@ -179,16 +175,12 @@
             padding: 10px 15px;
             background: #f8f9fa;
             border-radius: 6px;
-            margin-bottom: 15px;
+            font-size: 0.85rem;
         }
 
         @media (max-width: 768px) {
             .filters-row {
-                flex-direction: column;
-            }
-            
-            .filter-group {
-                min-width: 100%;
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -229,94 +221,116 @@
         </section>
 
         <div class="consultar-header">
-   <div class="filters-row">
-    <div class="filter-group">
-        <label for="filterClase">Clase</label>
-        <select id="filterClase" class="filter-select">
-            <option value="">Todas</option>
-            <option value="AUTOBUS">AUTOBUS</option>
-            <option value="AUTOMOVIL">AUTOMOVIL</option>
-            <option value="BLINDADO">BLINDADO</option>
-            <option value="CAMION">CAMION</option>
-            <option value="CAMIONETA">CAMIONETA</option>
-            <option value="ESPECIAL">ESPECIAL</option>
-            <option value="MOTO">MOTO</option>
-            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-        </select>
-    </div>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="filterTipo">Tipo</label>
+                    <select id="filterTipo" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="AUTOMOVIL">AUTOMOVIL</option>
+                        <option value="BUS">BUS</option>
+                        <option value="CAMION">CAMION</option>
+                        <option value="ENDURO">ENDURO</option>
+                        <option value="ESPECIAL">ESPECIAL</option>
+                        <option value="MACHITO">MACHITO</option>
+                        <option value="MINIBUS">MINIBUS</option>
+                        <option value="MOTO">MOTO</option>
+                        <option value="PICKUP">PICKUP</option>
+                        <option value="SPORTWAGON">SPORTWAGON</option>
+                        <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                        <option value="TRIMOVIL">TRIMOVIL</option>
+                        <option value="VAM">VAM</option>
+                    </select>
+                </div>
 
-    <div class="filter-group">
-        <label for="filterSituacion">Situación</label>
-        <select id="filterSituacion" class="filter-select">
-            <option value="">Todas</option>
-            <option value="OPERATIVA">OPERATIVA</option>
-            <option value="INOPERATIVA">INOPERATIVA</option>
-            <option value="COMODATO">COMODATO</option>
-            <option value="DENUNCIADA">DENUNCIADA</option>
-            <option value="DESINCORPORADA">DESINCORPORADA</option>
-            <option value="DONACION">DONACION</option>
-            <option value="REPARACION">REPARACION</option>
-            <option value="TALLER">TALLER</option>
-            <option value="DONACION POR MOTIVO DE LA CANCELACION DE LA POLICIA MUNICIPAL DE MIRANDA">DONACION POR MOTIVO DE LA CANCELACION DE LA POLICIA MUNICIPAL DE MIRANDA</option>
-        </select>
-    </div>
+                <div class="filter-group">
+                    <label for="filterClase">Clase</label>
+                    <select id="filterClase" class="filter-select">
+                        <option value="">Todas</option>
+                        <option value="AUTOBUS">AUTOBUS</option>
+                        <option value="AUTOMOVIL">AUTOMOVIL</option>
+                        <option value="BLINDADO">BLINDADO</option>
+                        <option value="CAMION">CAMION</option>
+                        <option value="CAMIONETA">CAMIONETA</option>
+                        <option value="ESPECIAL">ESPECIAL</option>
+                        <option value="MOTO">MOTO</option>
+                        <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                    </select>
+                </div>
 
-    <div class="filter-group">
-        <label for="filterEstatus">Estatus</label>
-        <select id="filterEstatus" class="filter-select">
-            <option value="">Todos</option>
-            <option value="OPERATIVA">OPERATIVA</option>
-            <option value="INOPERATIVA">INOPERATIVA</option>
-            <option value="DESINCORPORADA">DESINCORPORADA</option>
-        </select>
-    </div>
+                <div class="filter-group">
+                    <label for="filterSituacion">Situación</label>
+                    <select id="filterSituacion" class="filter-select">
+                        <option value="">Todas</option>
+                        <option value="COMODATO">COMODATO</option>
+                        <option value="DENUNCIADA">DENUNCIADA</option>
+                        <option value="DESINCORPORADA">DESINCORPORADA</option>
+                        <option value="DONACION">DONACION</option>
+                        <option value="DONACION POR MOTIVO DE LA CANCELACION DE LA POLICIA MUNICIPAL DE MIRANDA">DONACION POR MOTIVO DE LA CANCELACION DE LA POLICIA MUNICIPAL DE MIRANDA</option>
+                        <option value="INOPERATIVA">INOPERATIVA</option>
+                        <option value="OPERATIVA">OPERATIVA</option>
+                        <option value="PROCESO DE DESINCORPORACIÓN">PROCESO DE DESINCORPORACIÓN</option>
+                        <option value="REPARACION">REPARACION</option>
+                        <option value="TALLER">TALLER</option>
+                    </select>
+                </div>
 
-    <div class="filter-group">
-        <label for="filterEPM">EPM</label>
-        <select id="filterEPM" class="filter-select">
-            <option value="">Todos</option>
-            <option value="NO">NO</option>
-            <option value="MARACAIBO">MARACAIBO</option>
-            <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-            <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
-            <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-        </select>
-    </div>
+                <div class="filter-group">
+                    <label for="filterEstatus">Estatus</label>
+                    <select id="filterEstatus" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="DESINCORPORADA">DESINCORPORADA</option>
+                        <option value="INOPERATIVA">INOPERATIVA</option>
+                        <option value="OPERATIVA">OPERATIVA</option>
+                    </select>
+                </div>
 
-    <div class="filter-group">
-        <label for="filterEPP">EPP</label>
-        <select id="filterEPP" class="filter-select">
-            <option value="">Todos</option>
-            <option value="NO">NO</option>
-            <option value="ESTACION POLICIAL">ESTACION POLICIAL</option>
-            <option value="E.P.">E.P.</option>
-            <option value="ANDRES BELLO">ANDRES BELLO</option>
-            <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
-            <option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option>
-            <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
-            <option value="COQUIVACOA">COQUIVACOA</option>
-            <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
-            <option value="DOMITILA FLORES">DOMITILA FLORES</option>
-            <option value="EL BAJO">EL BAJO</option>
-            <option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option>
-            <option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option>
-            <option value="FRANCISCO OCHOA">FRANCISCO OCHOA</option>
-            <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-            <option value="JUANA DE AVILA">JUANA DE AVILA</option>
-            <option value="LA CONCEPCION">LA CONCEPCION</option>
-            <option value="LOS CORTIJO">LOS CORTIJO</option>
-            <option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option>
-            <option value="MANUEL DAGNINO">MANUEL DAGNINO</option>
-            <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
-            <option value="RAUL LEONI">RAUL LEONI</option>
-            <option value="SAN JOSE DE POTRERITO">SAN JOSE DE POTRERITO</option>
-            <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-            <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
-        </select>
-    </div>
-
-    <button class="btn-limpiar" onclick="limpiarFiltros()">🧹 Limpiar Filtros</button>
+                <div class="filter-group">
+                    <label for="filterEPM">EPM</label>
+                    <select id="filterEPM" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
+                        <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+                        <option value="LACAÑADA DE URDANETA">LACAÑADA DE URDANETA</option>
+                        <option value="MARACAIBO">MARACAIBO</option>
+                        <option value="NO">NO</option>
+                        <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+                    </select>
+                </div>
+<div class="filter-group">
+    <label for="filterEPP">EPP</label>
+    <select id="filterEPP" class="filter-select">
+        <option value="">Todos</option>
+        <option value="NO">NO</option>
+        <option value="ESTACION POLICIAL">ESTACION POLICIAL</option>
+        <option value="E.P.">E.P.</option>
+        <option value="ANDRES BELLO">ANDRES BELLO</option>
+        <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
+        <option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option>
+        <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
+        <option value="COQUIVACOA">COQUIVACOA</option>
+        <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
+        <option value="DOMITILA FLORES">DOMITILA FLORES</option>
+        <option value="EL BAJO">EL BAJO</option>
+        <option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option>
+        <option value="FRANCISCO OCHOA">FRANCISCO OCHOA</option>
+        <option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option>
+        <option value="JUANA DE AVILA">JUANA DE AVILA</option>
+        <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+        <option value="LA CONCEPCION">LA CONCEPCION</option>
+        <option value="LOS CORTIJO">LOS CORTIJO</option>
+        <option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option>
+        <option value="MANUEL DAGNINO">MANUEL DAGNINO</option>
+        <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
+        <option value="RAUL LEONI">RAUL LEONI</option>
+        <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+        <option value="SAN JOSE DE POTRERITO">SAN JOSE DE POTRERITO</option>
+        <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
+    </select>
 </div>
+
+                <button class="btn-limpiar" onclick="limpiarFiltros()">🧹 Limpiar Filtros</button>
+            </div>
+
             <div class="results-info">
                 <span id="resultsCount">Cargando...</span>
                 <span id="pageInfo"></span>
