@@ -3,8 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Registro de Vehículos - Sistema de Logística">
+<meta name="theme-color" content="#003366">
 <title>Registrar Vehículo | Sistema de Logística</title>
 <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../css/style.css">
 <style>
@@ -106,7 +110,6 @@
 .btn-secondary:hover {
     background: #5a6268;
 }
-/* Mensajes de alerta */
 .alert {
     padding: 15px 20px;
     border-radius: 6px;
@@ -126,7 +129,6 @@
     color: #dc2626;
     border: 1px solid #dc2626;
 }
-/* Loader */
 .btn-loader {
     display: none;
 }
@@ -156,7 +158,7 @@
             <span class="nav-title">Sistema de Logística</span>
         </div>
         <div class="nav-user">
-            <span class="user-email" id="userEmail">usuario@institucion.com</span>
+            <span class="user-email" id="userEmail">Cargando...</span>
             <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
         </div>
     </div>
@@ -398,8 +400,9 @@
     </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../../js/config.js"></script>
-<script src="../../js/planilla-registrar.js"></script>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../../js/config.js" defer></script>
+<script src="../../js/planilla-registrar.js" defer></script>
 </body>
 </html>
