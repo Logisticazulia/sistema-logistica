@@ -49,11 +49,3 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
     console.log('✅ Transporte - Página principal cargada');
 });
-<!-- Botones con permisos -->
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-    await RBAC.init();
-    RBAC.mostrarInfoUsuario();
-    RBAC.ocultarSinPermiso();
-});
-</script>
