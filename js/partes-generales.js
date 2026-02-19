@@ -3,28 +3,47 @@
  * Muestra gráficos y estadísticas del parque automotor
  */
 
+// NO declarar supabase nuevamente - usar la global de config.js
+// const supabase = window.supabase.createClient(...); ← ESTO CAUSA EL ERROR
+
 // Variables globales
-let supabase;
 let chartEstatus, chartTipos, chartUnidades, chartAnos;
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // Inicializar Supabase
-        supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-        
-        // Cargar datos
-        await cargarDatos();
-        
-        // Establecer fecha del reporte
-        document.getElementById('fechaReporte').textContent = new Date().toLocaleString('es-VE');
-        
-    } catch (error) {
-        console.error('Error al inicializar:', error);
-    }
-});
+// ================= ELEMENTOS DEL DOM =================
+const userEmail = document.getElementById('userEmail');
+const logoutBtn = document.getElementById('logoutBtn');
 
-// Cargar datos y generar estadísticas
+// ================= VERIFICAR SESIÓN =================
+async function verificarSesion() {
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error || !session) {
+            window.location.href = '../index.html';
+            return false;
+        }
+        
+        userEmail.textContent = session.user.email.split('@')[0];
+        return true;
+    } catch (err) {
+        console.error('Error verificando sesión:', err);
+        window.location.href = '../index.html';
+        return false;
+    }
+}
+
+// ================= CERRAR SESIÓN =================
+async function cerrarSesion() {
+    try {
+        await supabase.auth.signOut();
+        window.location.href = '../index.html';
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        window.location.href = '../index.html';
+    }
+}
+
+// ================= CARGAR DATOS =================
 async function cargarDatos() {
     try {
         // Obtener todos los vehículos
@@ -49,7 +68,7 @@ async function cargarDatos() {
     }
 }
 
-// Calcular estadísticas principales
+// ================= CALCULAR ESTADÍSTICAS =================
 function calcularEstadisticas(vehiculos) {
     const total = vehiculos.length;
     
@@ -76,9 +95,12 @@ function calcularEstadisticas(vehiculos) {
     document.getElementById('porcentajeInoperativos').textContent = `${pctInoperativos}% del total`;
     document.getElementById('porcentajeMantenimiento').textContent = `${pctMantenimiento}% del total`;
     document.getElementById('porcentajeAsignados').textContent = `${pctAsignados}% del total`;
+    
+    // Actualizar total general
+    document.getElementById('totalVehiculos').textContent = total;
 }
 
-// Generar gráficos
+// ================= GENERAR GRÁFICOS =================
 function generarGraficos(vehiculos) {
     // Destruir gráficos existentes si los hay
     if (chartEstatus) chartEstatus.destroy();
@@ -236,7 +258,7 @@ function generarGraficos(vehiculos) {
     });
 }
 
-// Generar tabla de resumen por unidad
+// ================= GENERAR TABLA DE RESUMEN =================
 function generarTablaResumen(vehiculos) {
     const unidadesData = {};
     
@@ -288,12 +310,12 @@ function generarTablaResumen(vehiculos) {
         });
 }
 
-// Imprimir reporte
+// ================= IMPRIMIR REPORTE =================
 function imprimirReporte() {
     window.print();
 }
 
-// Exportar a PDF
+// ================= EXPORTAR A PDF =================
 async function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('l', 'mm', 'a4'); // Horizontal
@@ -352,3 +374,23 @@ async function exportarPDF() {
         btnPdf.disabled = false;
     }
 }
+
+// ================= INICIALIZAR =================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Inicializando Partes Generales...');
+    
+    // Verificar sesión
+    const sesionValida = await verificarSesion();
+    if (!sesionValida) return;
+    
+    // Establecer fecha del reporte
+    document.getElementById('fechaReporte').textContent = new Date().toLocaleString('es-VE');
+    
+    // Cargar datos
+    await cargarDatos();
+    
+    // Event listeners
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', cerrarSesion);
+    }
+});
