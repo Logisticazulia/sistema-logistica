@@ -505,13 +505,16 @@ async function cerrarSesion() {
         }
         
         // Limpiar datos locales si es necesario
-        localStorage.removeItem('user_session'); // si usas localStorage
+        localStorage.clear();
+        sessionStorage.clear();
         
-        // Redirigir al login (ajusta la ruta según tu estructura)
-        window.location.href = '../login.html';
+        // 🔁 Redirigir al login (index.html en la raíz)
+        // Ajusta la ruta según la ubicación real de planilla-consultar.html
+        window.location.href = '../index.html';
         
     } catch (error) {
         console.error('Error en cerrarSesion:', error);
-        alert('Error al cerrar sesión. Intente nuevamente.');
+        // Forzar redirección incluso con error
+        window.location.href = '../index.html';
     }
 }
