@@ -10,12 +10,13 @@ let currentPage = 1;
 const itemsPerPage = 20;
 
 // Referencias a elementos del DOM
-let filterTipo, filterClase, filterEstatus, filterEPM, filterEPP;
+let filterTipo, filterClase, filterSituacion, filterEstatus, filterEPM, filterEPP;
 
-// Referencias a elementos del DOM
+// Obtener referencias a elementos del DOM
 function getDOMElements() {
     filterTipo = document.getElementById('filterTipo');
     filterClase = document.getElementById('filterClase');
+    filterSituacion = document.getElementById('filterSituacion');
     filterEstatus = document.getElementById('filterEstatus');
     filterEPM = document.getElementById('filterEPM');
     filterEPP = document.getElementById('filterEPP');
@@ -34,6 +35,9 @@ async function cargarVehiculos() {
         allVehicles = data || [];
         filteredVehicles = [...allVehicles];
         
+        // Poblar filtro EPP con valores únicos
+        populateEPPFilter();
+        
         aplicarFiltros();
         
     } catch (error) {
@@ -48,25 +52,39 @@ async function cargarVehiculos() {
     }
 }
 
+// Poblar filtro EPP con valores únicos de la base de datos
+function populateEPPFilter() {
+    const eppValues = [...new Set(allVehicles.map(v => v.epp).filter(Boolean))].sort();
+    const filterEPPSelect = document.getElementById('filterEPP');
+    
+    eppValues.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        filterEPPSelect.appendChild(option);
+    });
+}
+
 // Aplicar filtros
 function aplicarFiltros() {
-    // Obtener elementos del DOM si no existen
     if (!filterTipo) getDOMElements();
     
-    const filterTipoValue = filterTipo ? filterTipo.value : '';
-    const filterClaseValue = filterClase ? filterClase.value : '';
-    const filterEstatusValue = filterEstatus ? filterEstatus.value : '';
-    const filterEPMValue = filterEPM ? filterEPM.value : '';
-    const filterEPPValue = filterEPP ? filterEPP.value : '';
+    const filterTipoValue = filterTipo ? filterTipo.value.trim().toUpperCase() : '';
+    const filterClaseValue = filterClase ? filterClase.value.trim().toUpperCase() : '';
+    const filterSituacionValue = filterSituacion ? filterSituacion.value.trim().toUpperCase() : '';
+    const filterEstatusValue = filterEstatus ? filterEstatus.value.trim().toUpperCase() : '';
+    const filterEPMValue = filterEPM ? filterEPM.value.trim().toUpperCase() : '';
+    const filterEPPValue = filterEPP ? filterEPP.value.trim().toUpperCase() : '';
 
     filteredVehicles = allVehicles.filter(v => {
-        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue.toUpperCase()));
-        const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue.toUpperCase()));
-        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.toUpperCase().includes(filterEstatusValue.toUpperCase()));
-        const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue.toUpperCase()));
-        const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue.toUpperCase()));
+        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue));
+        const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue));
+        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.toUpperCase().includes(filterSituacionValue));
+        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.toUpperCase().includes(filterEstatusValue));
+        const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue));
+        const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue));
         
-        return matchesTipo && matchesClase && matchesEstatus && matchesEPM && matchesEPP;
+        return matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesEPM && matchesEPP;
     });
 
     currentPage = 1;
@@ -78,6 +96,7 @@ function aplicarFiltros() {
 function limpiarFiltros() {
     if (filterTipo) filterTipo.value = '';
     if (filterClase) filterClase.value = '';
+    if (filterSituacion) filterSituacion.value = '';
     if (filterEstatus) filterEstatus.value = '';
     if (filterEPM) filterEPM.value = '';
     if (filterEPP) filterEPP.value = '';
@@ -198,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listeners para filtros
     if (filterTipo) filterTipo.addEventListener('change', aplicarFiltros);
     if (filterClase) filterClase.addEventListener('change', aplicarFiltros);
+    if (filterSituacion) filterSituacion.addEventListener('change', aplicarFiltros);
     if (filterEstatus) filterEstatus.addEventListener('change', aplicarFiltros);
     if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
     if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
