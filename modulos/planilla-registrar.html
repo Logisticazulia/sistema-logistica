@@ -3,175 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Registro de Vehículos - Sistema de Logística">
-<meta name="theme-color" content="#003366">
 <title>Registrar Vehículo | Sistema de Logística</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
 /* ================= ESTILOS GENERALES ================= */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: 'Roboto', sans-serif;
     background: #f5f7fa;
-    color: #333;
-    line-height: 1.6;
+    margin: 0;
+    padding: 0;
 }
 
-/* ================= FORMULARIO PRINCIPAL ================= */
+/* ================= CONTENEDOR PRINCIPAL ================= */
 .form-container {
     background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 51, 102, 0.1);
-    margin: 30px auto;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+    margin: 20px auto;
     max-width: 1400px;
 }
 
-/* ================= GRID PRINCIPAL - 3 COLUMNAS ================= */
+/* ================= GRID PRINCIPAL - 4 COLUMNAS ================= */
 .form-main-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
 }
 
 /* ================= SECCIONES DEL FORMULARIO ================= */
 .form-section {
     background: #fafbfc;
-    border: 1px solid #e8eef5;
-    border-radius: 10px;
-    padding: 20px;
-    transition: box-shadow 0.3s;
+    border-radius: 8px;
+    padding: 15px;
+    border-top: 4px solid;
 }
 
-.form-section:hover {
-    box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-}
+.form-section.identificacion { border-color: #005b96; }
+.form-section.caracteristicas { border-color: #2a9d8f; }
+.form-section.seriales { border-color: #e9c46a; }
+.form-section.ubicacion { border-color: #e76f51; }
+.form-section.documentacion { border-color: #9b5de5; }
+.form-section.observaciones { border-color: #f15bb5; }
 
+/* ================= HEADER DE SECCIÓN ================= */
 .form-section-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #005b96;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e8eef5;
 }
 
 .form-section-icon {
-    font-size: 1.5rem;
-    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.3rem;
 }
 
 .form-section-title {
-    font-size: 1rem;
-    color: #003366;
+    font-size: 0.85rem;
+    color: #333;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
-/* ================= GRID INTERNO DE CAMPOS ================= */
+/* ================= GRID DE CAMPOS ================= */
 .form-fields-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 10px;
 }
 
 .form-section.full-width .form-fields-grid {
     grid-template-columns: repeat(4, 1fr);
 }
 
-.form-section.wide .form-fields-grid {
-    grid-template-columns: repeat(3, 1fr);
-}
-
 /* ================= GRUPOS DE CAMPOS ================= */
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .form-group label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #555;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
 }
 
 .form-group label .required {
     color: #dc2626;
-    margin-left: 3px;
 }
 
 .form-input, .form-select, .form-textarea {
-    padding: 10px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 8px 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.8rem;
     font-family: 'Roboto', sans-serif;
-    background: white;
     transition: all 0.3s;
-}
-
-.form-input:hover, .form-select:hover, .form-textarea:hover {
-    border-color: #005b96;
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
     outline: none;
     border-color: #005b96;
-    box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.1);
+    box-shadow: 0 0 0 2px rgba(0, 91, 150, 0.1);
 }
 
 .form-textarea {
     resize: vertical;
-    min-height: 70px;
-}
-
-/* ================= SECCIÓN DE OBSERVACIONES - FULL WIDTH ================= */
-.observations-section {
-    grid-column: 1 / -1;
-    background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
-    border: 1px solid #ffc107;
-}
-
-.observations-section .form-fields-grid {
-    grid-template-columns: repeat(2, 1fr);
+    min-height: 50px;
 }
 
 /* ================= BOTONES DE ACCIÓN ================= */
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    padding-top: 25px;
+    gap: 12px;
+    padding-top: 20px;
+    margin-top: 20px;
     border-top: 2px solid #e8eef5;
-    margin-top: 25px;
 }
 
 .btn {
-    padding: 12px 30px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    padding: 10px 25px;
+    border-radius: 6px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.3s;
     border: none;
 }
@@ -183,41 +148,29 @@ body {
 
 .btn-secondary:hover {
     background: #5a6268;
-    transform: translateY(-2px);
 }
 
 .btn-primary {
     background: linear-gradient(135deg, #003366 0%, #005b96 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 51, 102, 0.3);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 51, 102, 0.4);
+    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.4);
 }
 
 /* ================= ALERTAS ================= */
 .alert {
-    padding: 15px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin-bottom: 15px;
     display: none;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    font-size: 0.85rem;
     font-weight: 500;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .alert-success {
@@ -237,34 +190,14 @@ body {
     .form-main-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
-    .form-section.full-width .form-fields-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .form-main-grid {
         grid-template-columns: 1fr;
     }
     
     .form-section.full-width .form-fields-grid,
-    .form-section.wide .form-fields-grid,
-    .form-fields-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .observations-section .form-fields-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .form-container {
-        padding: 20px;
-        margin: 15px;
-    }
-    
     .form-fields-grid {
         grid-template-columns: 1fr;
     }
@@ -280,17 +213,9 @@ body {
 }
 
 /* ================= LOADER ================= */
-.btn-loader {
-    display: none;
-}
-
-.loading .btn-text {
-    display: none;
-}
-
-.loading .btn-loader {
-    display: inline;
-}
+.btn-loader { display: none; }
+.loading .btn-text { display: none; }
+.loading .btn-loader { display: inline; }
 </style>
 </head>
 <body class="dashboard-page">
@@ -311,7 +236,6 @@ body {
 
 <!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main">
-    <!-- Header -->
     <header class="module-header">
         <div class="breadcrumb">
             <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
@@ -325,13 +249,11 @@ body {
         </button>
     </header>
 
-    <!-- Título -->
     <section class="module-title-section">
         <h1 class="module-title">➕ Registrar Nuevo Vehículo</h1>
-        <p class="module-subtitle">Complete todos los campos para ingresar un nuevo vehículo al sistema</p>
+        <p class="module-subtitle">Complete los campos para ingresar un nuevo vehículo</p>
     </section>
 
-    <!-- Formulario -->
     <div class="form-container">
         <!-- Alertas -->
         <div id="alertSuccess" class="alert alert-success">
@@ -344,11 +266,11 @@ body {
         </div>
 
         <form id="vehicleForm" novalidate>
-            <!-- GRID PRINCIPAL - 3 COLUMNAS -->
+            <!-- GRID PRINCIPAL - 4 COLUMNAS -->
             <div class="form-main-grid">
                 
-                <!-- COLUMNA 1: IDENTIFICACIÓN -->
-                <div class="form-section">
+                <!-- COLUMNA 1: IDENTIFICACIÓN 🔵 -->
+                <div class="form-section identificacion">
                     <div class="form-section-header">
                         <span class="form-section-icon">🔖</span>
                         <h2 class="form-section-title">Identificación</h2>
@@ -369,8 +291,8 @@ body {
                     </div>
                 </div>
 
-                <!-- COLUMNA 2: CARACTERÍSTICAS -->
-                <div class="form-section wide">
+                <!-- COLUMNA 2: CARACTERÍSTICAS 🟢 -->
+                <div class="form-section caracteristicas">
                     <div class="form-section-header">
                         <span class="form-section-icon">🚗</span>
                         <h2 class="form-section-title">Características</h2>
@@ -428,8 +350,8 @@ body {
                     </div>
                 </div>
 
-                <!-- COLUMNA 3: SERIALES -->
-                <div class="form-section">
+                <!-- COLUMNA 3: SERIALES 🟡 -->
+                <div class="form-section seriales">
                     <div class="form-section-header">
                         <span class="form-section-icon">🔢</span>
                         <h2 class="form-section-title">Seriales</h2>
@@ -437,20 +359,20 @@ body {
                     <div class="form-fields-grid">
                         <div class="form-group">
                             <label>S/Carrocería</label>
-                            <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN/Chasis">
+                            <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN">
                         </div>
                         <div class="form-group">
                             <label>S/Motor</label>
-                            <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial motor">
+                            <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial">
                         </div>
                     </div>
                 </div>
 
-                <!-- FILA 2: UBICACIÓN (FULL WIDTH - 4 COLUMNAS) -->
-                <div class="form-section full-width">
+                <!-- COLUMNA 4: ESTATUS 🔴 -->
+                <div class="form-section ubicacion">
                     <div class="form-section-header">
-                        <span class="form-section-icon">📍</span>
-                        <h2 class="form-section-title">Ubicación y Asignación</h2>
+                        <span class="form-section-icon">📊</span>
+                        <h2 class="form-section-title">Estatus</h2>
                     </div>
                     <div class="form-fields-grid">
                         <div class="form-group">
@@ -462,8 +384,6 @@ body {
                                 <option value="REPARACION">REPARACION</option>
                                 <option value="TALLER">TALLER</option>
                                 <option value="DESINCORPORADA">DESINCORPORADA</option>
-                                <option value="COMODATO">COMODATO</option>
-                                <option value="DONACION">DONACION</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -475,6 +395,16 @@ body {
                                 <option value="DESINCORPORADA">DESINCORPORADA</option>
                             </select>
                         </div>
+                    </div>
+                </div>
+
+                <!-- FILA 2: UBICACIÓN (FULL WIDTH) 🔴 -->
+                <div class="form-section ubicacion full-width">
+                    <div class="form-section-header">
+                        <span class="form-section-icon">📍</span>
+                        <h2 class="form-section-title">Ubicación y Asignación</h2>
+                    </div>
+                    <div class="form-fields-grid">
                         <div class="form-group">
                             <label>Unidad Administrativa</label>
                             <input type="text" id="unidad_administrativa" name="unidad_administrativa" class="form-input" placeholder="Ej: DIP">
@@ -489,11 +419,11 @@ body {
                         </div>
                         <div class="form-group">
                             <label>REDIP</label>
-                            <input type="text" id="redip" name="redip" class="form-input" placeholder="Ej: OCCIDENTAL">
+                            <input type="text" id="redip" name="redip" class="form-input" placeholder="OCCIDENTAL">
                         </div>
                         <div class="form-group">
                             <label>CCPE</label>
-                            <input type="text" id="ccpe" name="ccpe" class="form-input" placeholder="Ej: ZULIA">
+                            <input type="text" id="ccpe" name="ccpe" class="form-input" placeholder="ZULIA">
                         </div>
                         <div class="form-group">
                             <label>EPM</label>
@@ -503,18 +433,17 @@ body {
                                 <option value="MARACAIBO">MARACAIBO</option>
                                 <option value="SAN FRANCISCO">SAN FRANCISCO</option>
                                 <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-                                <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>EPP</label>
-                            <input type="text" id="epp" name="epp" class="form-input" placeholder="Ej: E.P. CENTRAL">
+                            <input type="text" id="epp" name="epp" class="form-input" placeholder="E.P. CENTRAL">
                         </div>
                     </div>
                 </div>
 
-                <!-- FILA 3: DOCUMENTACIÓN (FULL WIDTH - 4 COLUMNAS) -->
-                <div class="form-section full-width">
+                <!-- FILA 3: DOCUMENTACIÓN 🟣 -->
+                <div class="form-section documentacion full-width">
                     <div class="form-section-header">
                         <span class="form-section-icon">📄</span>
                         <h2 class="form-section-title">Documentación</h2>
@@ -534,13 +463,13 @@ body {
                         </div>
                         <div class="form-group">
                             <label>Ubicación Título</label>
-                            <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Ej: Archivo">
+                            <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Archivo">
                         </div>
                     </div>
                 </div>
 
-                <!-- FILA 4: OBSERVACIONES (FULL WIDTH) -->
-                <div class="form-section observations-section">
+                <!-- FILA 4: OBSERVACIONES 🩷 -->
+                <div class="form-section observaciones full-width">
                     <div class="form-section-header">
                         <span class="form-section-icon">📝</span>
                         <h2 class="form-section-title">Observaciones</h2>
@@ -548,11 +477,11 @@ body {
                     <div class="form-fields-grid">
                         <div class="form-group">
                             <label>Observación General</label>
-                            <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales del vehículo..."></textarea>
+                            <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales..."></textarea>
                         </div>
                         <div class="form-group">
                             <label>Observación Extra</label>
-                            <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Información complementaria..."></textarea>
+                            <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Info complementaria..."></textarea>
                         </div>
                     </div>
                 </div>
