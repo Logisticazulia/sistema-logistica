@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Usuarios | Sistema de Logística</title>
+<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+/* ================= ESTILOS GENERALES ================= */
+.gestion-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 51, 102, 0.1);
+    margin: 20px auto;
+    max-width: 1400px;
+}
+
+/* ================= PESTAÑAS ================= */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e8eef5;
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    padding: 12px 25px;
+    border: none;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+    color: white;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #e8eef5;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ================= TABLA DE USUARIOS ================= */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.users-table th,
+.users-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e8eef5;
+}
+
+.users-table th {
+    background: #f8f9fa;
+    color: #003366;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.users-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* ================= BADGES DE ROL ================= */
+.role-badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-admin { background: #fee2e2; color: #dc2626; }
+.role-moderador { background: #fef3c7; color: #d97706; }
+.role-consultor { background: #d1fae5; color: #059669; }
+
+/* ================= PERMISOS GRID ================= */
+.permisos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.permiso-card {
+    background: #f8f9fa;
+    border: 2px solid #e8eef5;
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.permiso-card:hover {
+    border-color: #005b96;
+    box-shadow: 0 4px 15px rgba(0, 51, 102, 0.1);
+}
+
+.permiso-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #005b96;
+}
+
+.permiso-icon {
+    font-size: 1.5rem;
+}
+
+.permiso-title {
+    font-size: 1rem;
+    color: #003366;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.permiso-botones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.permiso-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e8eef5;
+}
+
+.permiso-item-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.permiso-item-icon {
+    font-size: 1.2rem;
+}
+
+.permiso-item-name {
+    font-size: 0.85rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* ================= TOGGLE SWITCH ================= */
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #005b96;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* ================= BOTONES DE ACCIÓN ================= */
+.btn-action {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+}
+
+.btn-edit {
+    background: #005b96;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #003366;
+}
+
+.btn-delete {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #b91c1c;
+}
+
+.btn-add {
+    background: #059669;
+    color: white;
+    padding: 12px 25px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.btn-add:hover {
+    background: #047857;
+}
+
+/* ================= MODAL ================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e8eef5;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-close:hover {
+    color: #dc2626;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* ================= ALERTAS ================= */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #059669;
+    border: 1px solid #059669;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #dc2626;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .permisos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabs-container {
+        flex-wrap: wrap;
+    }
+}
+</style>
+</head>
+<body class="dashboard-page">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <img src="../../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+            <span class="nav-title">Sistema de Logística</span>
+        </div>
+        <div class="nav-user">
+            <span class="user-email" id="userEmail">Cargando...</span>
+            <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+        </div>
+    </div>
+</nav>
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main">
+    <header class="module-header">
+        <div class="breadcrumb">
+            <a href="../../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="../../modulos/transporte.html" class="breadcrumb-link">Transporte</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Gestión de Usuarios</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='../../dashboard.html'">
+            ← Volver
+        </button>
+    </header>
+
+    <section class="module-title-section">
+        <h1 class="module-title">👥 Gestión de Usuarios y Permisos</h1>
+        <p class="module-subtitle">Administra usuarios, roles y permisos de acceso al sistema</p>
+    </section>
+
+    <div class="gestion-container">
+        <!-- Alertas -->
+        <div id="alertSuccess" class="alert alert-success">
+            <span>✅</span>
+            <span id="successMessage">Operación exitosa</span>
+        </div>
+        <div id="alertError" class="alert alert-error">
+            <span>❌</span>
+            <span id="errorMessage">Error en la operación</span>
+        </div>
+
+        <!-- Pestañas -->
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="showTab('usuarios')">👥 Usuarios</button>
+            <button class="tab-btn" onclick="showTab('permisos')">🔐 Permisos por Rol</button>
+            <button class="tab-btn" onclick="showTab('roles')">👑 Roles</button>
+        </div>
+
+        <!-- Pestaña: Usuarios -->
+        <div id="tab-usuarios" class="tab-content active">
+            <button class="btn btn-action btn-add" onclick="openModal('usuario')">
+                ➕ Nuevo Usuario
+            </button>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usuariosTableBody">
+                    <!-- Se llena dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pestaña: Permisos -->
+        <div id="tab-permisos" class="tab-content">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="selectRolPermisos">Seleccionar Rol</label>
+                    <select id="selectRolPermisos" class="form-input" onchange="cargarPermisosRol()">
+                        <option value="">Seleccione un rol...</option>
+                        <option value="administrador">Administrador</option>
+                        <option value="moderador">Moderador</option>
+                        <option value="consultor">Consultor</option>
+                    </select>
+                </div>
+            </div>
+            <div id="permisosContainer" class="permisos-grid">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Pestaña: Roles -->
+        <div id="tab-roles" class="tab-content">
+            <button class="btn btn-action btn-add" onclick="openModal('rol')">
+                ➕ Nuevo Rol
+            </button>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Usuarios</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="rolesTableBody">
+                    <!-- Se llena dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- ================= MODAL USUARIO ================= -->
+<div id="modalUsuario" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalUsuarioTitle">Nuevo Usuario</h2>
+            <button class="modal-close" onclick="closeModal('usuario')">&times;</button>
+        </div>
+        <form id="formUsuario">
+            <input type="hidden" id="usuarioId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="usuarioEmail">Email *</label>
+                    <input type="email" id="usuarioEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="usuarioNombre">Nombre</label>
+                    <input type="text" id="usuarioNombre" class="form-input">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="usuarioRol">Rol *</label>
+                    <select id="usuarioRol" class="form-input" required>
+                        <option value="">Seleccione...</option>
+                        <option value="administrador">Administrador</option>
+                        <option value="moderador">Moderador</option>
+                        <option value="consultor">Consultor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="usuarioPassword">Contraseña *</label>
+                    <input type="password" id="usuarioPassword" class="form-input" placeholder="Mínimo 6 caracteres">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="usuarioActivo">Estado</label>
+                    <select id="usuarioActivo" class="form-input">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('usuario')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../../js/config.js" defer></script>
+<script src="../../js/gestion-usuarios.js" defer></script>
+</body>
+</html>
