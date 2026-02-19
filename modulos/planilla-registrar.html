@@ -20,11 +20,17 @@
     box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
     margin-bottom: 30px;
 }
+/* Layout horizontal de secciones */
+.form-sections-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
 }
 .form-group {
     display: flex;
@@ -32,7 +38,7 @@
     gap: 8px;
 }
 .form-group label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #333;
     font-weight: 600;
     text-transform: uppercase;
@@ -41,10 +47,10 @@
     color: #dc2626;
 }
 .form-input, .form-select, .form-textarea {
-    padding: 12px;
+    padding: 10px 12px;
     border: 2px solid #ddd;
     border-radius: 6px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-family: 'Roboto', sans-serif;
     transition: border-color 0.3s;
 }
@@ -54,27 +60,32 @@
 }
 .form-textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 70px;
 }
 .form-section {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #e8eef5;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e8eef5;
 }
 .form-section-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #003366;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #005b96;
 }
 .form-actions {
     display: flex;
     gap: 15px;
     justify-content: flex-end;
-    margin-top: 30px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 2px solid #e8eef5;
 }
 .btn-primary {
     background: linear-gradient(135deg, #003366 0%, #005b96 100%);
@@ -110,6 +121,7 @@
 .btn-secondary:hover {
     background: #5a6268;
 }
+/* Mensajes de alerta */
 .alert {
     padding: 15px 20px;
     border-radius: 6px;
@@ -129,12 +141,19 @@
     color: #dc2626;
     border: 1px solid #dc2626;
 }
+/* Loader */
 .btn-loader {
     display: none;
 }
 .loading .btn-text { display: none; }
 .loading .btn-loader { display: inline; }
 
+/* Responsive - Una columna en móviles */
+@media (max-width: 1024px) {
+    .form-sections-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
@@ -196,193 +215,205 @@
         </div>
 
         <form id="vehicleForm" novalidate>
-            <!-- Sección 1: Identificación -->
-            <div class="form-section">
-                <h2 class="form-section-title">🔖 Identificación del Vehículo</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="placa">Placa <span>*</span></label>
-                        <input type="text" id="placa" name="placa" class="form-input" placeholder="Ej: AB123CD" required>
+            <!-- Wrapper para layout horizontal -->
+            <div class="form-sections-wrapper">
+                
+                <!-- COLUMNA IZQUIERDA -->
+                <div class="form-column">
+                    <!-- Sección 1: Identificación -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">🔖 Identificación</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="placa">Placa <span>*</span></label>
+                                <input type="text" id="placa" name="placa" class="form-input" placeholder="Ej: AB123CD" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="facsimil">Facsímil</label>
+                                <input type="text" id="facsimil" name="facsimil" class="form-input" placeholder="Ej: 123456">
+                            </div>
+                            <div class="form-group">
+                                <label for="n_identificacion">N° Identificación</label>
+                                <input type="text" id="n_identificacion" name="n_identificacion" class="form-input" placeholder="Ej: M-001">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="facsimil">Facsímil</label>
-                        <input type="text" id="facsimil" name="facsimil" class="form-input" placeholder="Ej: 123456">
-                    </div>
-                    <div class="form-group">
-                        <label for="n_identificacion">N° Identificación</label>
-                        <input type="text" id="n_identificacion" name="n_identificacion" class="form-input" placeholder="Ej: M-001">
-                    </div>
-                </div>
-            </div>
 
-            <!-- Sección 2: Características -->
-            <div class="form-section">
-                <h2 class="form-section-title">🚗 Características</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="marca">Marca <span>*</span></label>
-                        <input type="text" id="marca" name="marca" class="form-input" placeholder="Ej: TOYOTA" required>
+                    <!-- Sección 2: Características -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">🚗 Características</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="marca">Marca <span>*</span></label>
+                                <input type="text" id="marca" name="marca" class="form-input" placeholder="Ej: TOYOTA" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modelo">Modelo <span>*</span></label>
+                                <input type="text" id="modelo" name="modelo" class="form-input" placeholder="Ej: HILUX" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipo">Tipo <span>*</span></label>
+                                <select id="tipo" name="tipo" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="AUTOMOVIL">AUTOMOVIL</option>
+                                    <option value="BUS">BUS</option>
+                                    <option value="CAMION">CAMION</option>
+                                    <option value="ENDURO">ENDURO</option>
+                                    <option value="ESPECIAL">ESPECIAL</option>
+                                    <option value="MACHITO">MACHITO</option>
+                                    <option value="MINIBUS">MINIBUS</option>
+                                    <option value="MOTO">MOTO</option>
+                                    <option value="PICKUP">PICKUP</option>
+                                    <option value="SPORTWAGON">SPORTWAGON</option>
+                                    <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                                    <option value="TRIMOVIL">TRIMOVIL</option>
+                                    <option value="VAM">VAM</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="clase">Clase <span>*</span></label>
+                                <select id="clase" name="clase" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="AUTOBUS">AUTOBUS</option>
+                                    <option value="AUTOMOVIL">AUTOMOVIL</option>
+                                    <option value="BLINDADO">BLINDADO</option>
+                                    <option value="CAMION">CAMION</option>
+                                    <option value="CAMIONETA">CAMIONETA</option>
+                                    <option value="ESPECIAL">ESPECIAL</option>
+                                    <option value="MOTO">MOTO</option>
+                                    <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ano">Año</label>
+                                <input type="number" id="ano" name="ano" class="form-input" placeholder="Ej: 2023" min="1900" max="2030">
+                            </div>
+                            <div class="form-group">
+                                <label for="color">Color</label>
+                                <input type="text" id="color" name="color" class="form-input" placeholder="Ej: BLANCO">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="modelo">Modelo <span>*</span></label>
-                        <input type="text" id="modelo" name="modelo" class="form-input" placeholder="Ej: HILUX" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipo">Tipo <span>*</span></label>
-                        <select id="tipo" name="tipo" class="form-select" required>
-                            <option value="">Seleccione...</option>
-                            <option value="AUTOMOVIL">AUTOMOVIL</option>
-                            <option value="BUS">BUS</option>
-                            <option value="CAMION">CAMION</option>
-                            <option value="ENDURO">ENDURO</option>
-                            <option value="ESPECIAL">ESPECIAL</option>
-                            <option value="MACHITO">MACHITO</option>
-                            <option value="MINIBUS">MINIBUS</option>
-                            <option value="MOTO">MOTO</option>
-                            <option value="PICKUP">PICKUP</option>
-                            <option value="SPORTWAGON">SPORTWAGON</option>
-                            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-                            <option value="TRIMOVIL">TRIMOVIL</option>
-                            <option value="VAM">VAM</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="clase">Clase <span>*</span></label>
-                        <select id="clase" name="clase" class="form-select" required>
-                            <option value="">Seleccione...</option>
-                            <option value="AUTOBUS">AUTOBUS</option>
-                            <option value="AUTOMOVIL">AUTOMOVIL</option>
-                            <option value="BLINDADO">BLINDADO</option>
-                            <option value="CAMION">CAMION</option>
-                            <option value="CAMIONETA">CAMIONETA</option>
-                            <option value="ESPECIAL">ESPECIAL</option>
-                            <option value="MOTO">MOTO</option>
-                            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="ano">Año</label>
-                        <input type="number" id="ano" name="ano" class="form-input" placeholder="Ej: 2023" min="1900" max="2030">
-                    </div>
-                    <div class="form-group">
-                        <label for="color">Color</label>
-                        <input type="text" id="color" name="color" class="form-input" placeholder="Ej: BLANCO">
-                    </div>
-                </div>
-            </div>
 
-            <!-- Sección 3: Seriales -->
-            <div class="form-section">
-                <h2 class="form-section-title">🔢 Seriales</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="s_carroceria">S/Carrocería</label>
-                        <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN/Chasis">
-                    </div>
-                    <div class="form-group">
-                        <label for="s_motor">S/Motor</label>
-                        <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial del motor">
+                    <!-- Sección 3: Seriales -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">🔢 Seriales</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="s_carroceria">S/Carrocería</label>
+                                <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN/Chasis">
+                            </div>
+                            <div class="form-group">
+                                <label for="s_motor">S/Motor</label>
+                                <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial del motor">
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Sección 4: Ubicación y Asignación -->
-            <div class="form-section">
-                <h2 class="form-section-title">📍 Ubicación y Asignación</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="situacion">Situación</label>
-                        <select id="situacion" name="situacion" class="form-select">
-                            <option value="">Seleccione...</option>
-                            <option value="OPERATIVA">OPERATIVA</option>
-                            <option value="INOPERATIVA">INOPERATIVA</option>
-                            <option value="REPARACION">REPARACION</option>
-                            <option value="TALLER">TALLER</option>
-                            <option value="DESINCORPORADA">DESINCORPORADA</option>
-                            <option value="COMODATO">COMODATO</option>
-                            <option value="DONACION">DONACION</option>
-                        </select>
+                <!-- COLUMNA DERECHA -->
+                <div class="form-column">
+                    <!-- Sección 4: Ubicación y Asignación -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">📍 Ubicación</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="situacion">Situación</label>
+                                <select id="situacion" name="situacion" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="OPERATIVA">OPERATIVA</option>
+                                    <option value="INOPERATIVA">INOPERATIVA</option>
+                                    <option value="REPARACION">REPARACION</option>
+                                    <option value="TALLER">TALLER</option>
+                                    <option value="DESINCORPORADA">DESINCORPORADA</option>
+                                    <option value="COMODATO">COMODATO</option>
+                                    <option value="DONACION">DONACION</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="estatus">Estatus</label>
+                                <select id="estatus" name="estatus" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="OPERATIVA">OPERATIVA</option>
+                                    <option value="INOPERATIVA">INOPERATIVA</option>
+                                    <option value="DESINCORPORADA">DESINCORPORADA</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="unidad_administrativa">Unidad</label>
+                                <input type="text" id="unidad_administrativa" name="unidad_administrativa" class="form-input" placeholder="Ej: DIP">
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacion_fisica">Ubicación Física</label>
+                                <input type="text" id="ubicacion_fisica" name="ubicacion_fisica" class="form-input" placeholder="Ej: CCPEM">
+                            </div>
+                            <div class="form-group">
+                                <label for="asignacion">Asignación</label>
+                                <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje">
+                            </div>
+                            <div class="form-group">
+                                <label for="redip">REDIP</label>
+                                <input type="text" id="redip" name="redip" class="form-input" placeholder="Ej: OCCIDENTAL">
+                            </div>
+                            <div class="form-group">
+                                <label for="ccpe">CCPE</label>
+                                <input type="text" id="ccpe" name="ccpe" class="form-input" placeholder="Ej: ZULIA">
+                            </div>
+                            <div class="form-group">
+                                <label for="epm">EPM</label>
+                                <select id="epm" name="epm" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="NO">NO</option>
+                                    <option value="MARACAIBO">MARACAIBO</option>
+                                    <option value="SAN FRANCISCO">SAN FRANCISCO</option>
+                                    <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+                                    <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="epp">EPP</label>
+                                <input type="text" id="epp" name="epp" class="form-input" placeholder="Ej: E.P. CENTRAL">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="estatus">Estatus</label>
-                        <select id="estatus" name="estatus" class="form-select">
-                            <option value="">Seleccione...</option>
-                            <option value="OPERATIVA">OPERATIVA</option>
-                            <option value="INOPERATIVA">INOPERATIVA</option>
-                            <option value="DESINCORPORADA">DESINCORPORADA</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="unidad_administrativa">Unidad Administrativa</label>
-                        <input type="text" id="unidad_administrativa" name="unidad_administrativa" class="form-input" placeholder="Ej: DIP">
-                    </div>
-                    <div class="form-group">
-                        <label for="ubicacion_fisica">Ubicación Física</label>
-                        <input type="text" id="ubicacion_fisica" name="ubicacion_fisica" class="form-input" placeholder="Ej: CCPEM">
-                    </div>
-                    <div class="form-group">
-                        <label for="asignacion">Asignación</label>
-                        <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje">
-                    </div>
-                    <div class="form-group">
-                        <label for="redip">REDIP</label>
-                        <input type="text" id="redip" name="redip" class="form-input" placeholder="Ej: OCCIDENTAL">
-                    </div>
-                    <div class="form-group">
-                        <label for="ccpe">CCPE</label>
-                        <input type="text" id="ccpe" name="ccpe" class="form-input" placeholder="Ej: ZULIA">
-                    </div>
-                    <div class="form-group">
-                        <label for="epm">EPM</label>
-                        <select id="epm" name="epm" class="form-select">
-                            <option value="">Seleccione...</option>
-                            <option value="NO">NO</option>
-                            <option value="MARACAIBO">MARACAIBO</option>
-                            <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-                            <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-                            <option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="epp">EPP</label>
-                        <input type="text" id="epp" name="epp" class="form-input" placeholder="Ej: E.P. CENTRAL">
-                    </div>
-                </div>
-            </div>
 
-            <!-- Sección 5: Documentación -->
-            <div class="form-section">
-                <h2 class="form-section-title">📄 Documentación</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="certificado_origen">Certificado de Origen</label>
-                        <input type="text" id="certificado_origen" name="certificado_origen" class="form-input">
+                    <!-- Sección 5: Documentación -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">📄 Documentación</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="certificado_origen">Certificado Origen</label>
+                                <input type="text" id="certificado_origen" name="certificado_origen" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_inspeccion">Fecha Inspección</label>
+                                <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="n_tramite">N° Trámite</label>
+                                <input type="text" id="n_tramite" name="n_tramite" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacion_titulo">Ubicación Título</label>
+                                <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Ej: Archivo">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="fecha_inspeccion">Fecha Inspección</label>
-                        <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="n_tramite">N° Trámite</label>
-                        <input type="text" id="n_tramite" name="n_tramite" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="ubicacion_titulo">Ubicación Título</label>
-                        <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Ej: Archivo">
-                    </div>
-                </div>
-            </div>
 
-            <!-- Sección 6: Observaciones -->
-            <div class="form-section" style="border-bottom: none;">
-                <h2 class="form-section-title">📝 Observaciones</h2>
-                <div class="form-group">
-                    <label for="observacion">Observación General</label>
-                    <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales del vehículo..."></textarea>
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="observacion_extra">Observación Extra</label>
-                    <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Información complementaria..."></textarea>
+                    <!-- Sección 6: Observaciones -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">📝 Observaciones</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="observacion">Observación General</label>
+                                <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="observacion_extra">Observación Extra</label>
+                                <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Info complementaria..."></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
