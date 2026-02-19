@@ -1,5 +1,6 @@
 /**
  * CONSULTA DE VEHÍCULOS - PLANILLA
+ * VERSIÓN CORREGIDA
  */
 
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
@@ -10,7 +11,7 @@ let currentPage = 1;
 const itemsPerPage = 20;
 
 // Referencias a elementos del DOM
-let filterTipo, filterClase, filterSituacion, filterEstatus, filterEPM, filterEPP;
+let filterTipo, filterClase, filterSituacion, filterEstatus, filterUnidad, filterEPM, filterEPP;
 
 // Obtener referencias a elementos del DOM
 function getDOMElements() {
@@ -18,6 +19,7 @@ function getDOMElements() {
     filterClase = document.getElementById('filterClase');
     filterSituacion = document.getElementById('filterSituacion');
     filterEstatus = document.getElementById('filterEstatus');
+    filterUnidad = document.getElementById('filterUnidad');
     filterEPM = document.getElementById('filterEPM');
     filterEPP = document.getElementById('filterEPP');
 }
@@ -25,19 +27,26 @@ function getDOMElements() {
 // Cargar vehículos
 async function cargarVehiculos() {
     try {
+        console.log('Cargando vehículos desde Supabase...');
+        
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .order('marca', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error al cargar:', error);
+            throw error;
+        }
 
+        console.log(`Vehículos cargados: ${data ? data.length : 0}`);
         allVehicles = data || [];
         filteredVehicles = [...allVehicles];
         
-        // Poblar filtro EPP con valores únicos
-        populateEPPFilter();
+        // Poblar filtros dinámicamente
+        populateFilters();
         
+        // Aplicar filtros iniciales
         aplicarFiltros();
         
     } catch (error) {
@@ -52,71 +61,86 @@ async function cargarVehiculos() {
     }
 }
 
-// Poblar filtro EPP con valores únicos de la base de datos
-function populateEPPFilter() {
-    const eppValues = [...new Set(allVehicles.map(v => v.epp).filter(Boolean))].sort();
-    const filterEPPSelect = document.getElementById('filterEPP');
+// Poblar filtros con valores únicos de la base de datos
+function populateFilters() {
+    // Poblar Unidad Administrativa
+    if (filterUnidad) {
+        const unidadValues = [...new Set(allVehicles.map(v => v.unidad_administrativa).filter(Boolean))].sort();
+        console.log('Unidades Administrativas encontradas:', unidadValues.length);
+        
+        unidadValues.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value.trim().toUpperCase();
+            option.textContent = value.trim();
+            filterUnidad.appendChild(option);
+        });
+    }
     
-    eppValues.forEach(value => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = value;
-        filterEPPSelect.appendChild(option);
-    });
+    // Poblar EPP si está vacío
+    if (filterEPP && filterEPP.options.length <= 1) {
+        const eppValues = [...new Set(allVehicles.map(v => v.epp).filter(Boolean))].sort();
+        eppValues.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value.trim().toUpperCase();
+            option.textContent = value.trim();
+            filterEPP.appendChild(option);
+        });
+    }
 }
 
-// Aplicar filtros
+// Aplicar filtros - LÓGICA CORREGIDA
 function aplicarFiltros() {
-    // Obtener elementos del DOM si no existen
     if (!filterTipo) getDOMElements();
     
+    // Obtener valores de los filtros (trim y uppercase para comparación exacta)
     const filterTipoValue = filterTipo ? filterTipo.value.trim().toUpperCase() : '';
     const filterClaseValue = filterClase ? filterClase.value.trim().toUpperCase() : '';
     const filterSituacionValue = filterSituacion ? filterSituacion.value.trim().toUpperCase() : '';
     const filterEstatusValue = filterEstatus ? filterEstatus.value.trim().toUpperCase() : '';
+    const filterUnidadValue = filterUnidad ? filterUnidad.value.trim().toUpperCase() : '';
     const filterEPMValue = filterEPM ? filterEPM.value.trim().toUpperCase() : '';
     const filterEPPValue = filterEPP ? filterEPP.value.trim().toUpperCase() : '';
 
     console.log('Filtros aplicados:', {
-        tipo: filterTipoValue,
-        clase: filterClaseValue,
-        situacion: filterSituacionValue,
-        estatus: filterEstatusValue,
-        epm: filterEPMValue,
-        epp: filterEPPValue
+        tipo: filterTipoValue || 'TODOS',
+        clase: filterClaseValue || 'TODAS',
+        situacion: filterSituacionValue || 'TODAS',
+        estatus: filterEstatusValue || 'TODOS',
+        unidad: filterUnidadValue || 'TODAS',
+        epm: filterEPMValue || 'TODOS',
+        epp: filterEPPValue || 'TODOS'
     });
 
+    // Filtrar vehículos - CADA FILTRO ES INDEPENDIENTE
     filteredVehicles = allVehicles.filter(v => {
-        // Verificar cada filtro individualmente
-        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue));
-        const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue));
-        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.toUpperCase().includes(filterSituacionValue));
-        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.toUpperCase().includes(filterEstatusValue));
-        const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue));
-        const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue));
+        // Cada condición debe cumplirse SI el filtro tiene valor
+        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.trim().toUpperCase() === filterTipoValue);
+        const matchesClase = !filterClaseValue || (v.clase && v.clase.trim().toUpperCase() === filterClaseValue);
+        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.trim().toUpperCase() === filterSituacionValue);
+        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.trim().toUpperCase() === filterEstatusValue);
+        const matchesUnidad = !filterUnidadValue || (v.unidad_administrativa && v.unidad_administrativa.trim().toUpperCase() === filterUnidadValue);
+        const matchesEPM = !filterEPMValue || (v.epm && v.epm.trim().toUpperCase() === filterEPMValue);
+        const matchesEPP = !filterEPPValue || (v.epp && v.epp.trim().toUpperCase() === filterEPPValue);
         
-        // TODOS los filtros activos deben coincidir
-        const result = matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesEPM && matchesEPP;
-        
-        if (filterEstatusValue && v.estatus) {
-            console.log(`Vehículo ${v.placa}: estatus="${v.estatus}", filtro="${filterEstatusValue}", coincide=${matchesEstatus}`);
-        }
-        
-        return result;
+        // TODAS las condiciones activas deben cumplirse
+        return matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesUnidad && matchesEPM && matchesEPP;
     });
 
-    console.log(`Total filtrados: ${filteredVehicles.length} de ${allVehicles.length}`);
+    console.log(`Vehículos filtrados: ${filteredVehicles.length} de ${allVehicles.length}`);
     
+    // Resetear a página 1
     currentPage = 1;
     renderTable();
     renderPagination();
 }
+
 // Limpiar filtros
 function limpiarFiltros() {
     if (filterTipo) filterTipo.value = '';
     if (filterClase) filterClase.value = '';
     if (filterSituacion) filterSituacion.value = '';
     if (filterEstatus) filterEstatus.value = '';
+    if (filterUnidad) filterUnidad.value = '';
     if (filterEPM) filterEPM.value = '';
     if (filterEPP) filterEPP.value = '';
     
@@ -230,6 +254,7 @@ function getEstatusBadge(estatus) {
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Inicializando consulta de vehículos...');
     getDOMElements();
     cargarVehiculos();
     
@@ -238,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterClase) filterClase.addEventListener('change', aplicarFiltros);
     if (filterSituacion) filterSituacion.addEventListener('change', aplicarFiltros);
     if (filterEstatus) filterEstatus.addEventListener('change', aplicarFiltros);
+    if (filterUnidad) filterUnidad.addEventListener('change', aplicarFiltros);
     if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
     if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
 });
