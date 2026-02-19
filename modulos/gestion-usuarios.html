@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestión de Usuarios | Sistema de Logística</title>
-<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../css/style.css">
 <style>
 /* ================= ESTILOS GENERALES ================= */
 .gestion-container {
@@ -25,6 +25,7 @@
     margin-bottom: 25px;
     border-bottom: 2px solid #e8eef5;
     padding-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -36,6 +37,7 @@
     font-weight: 600;
     color: #666;
     transition: all 0.3s;
+    font-size: 0.9rem;
 }
 
 .tab-btn.active {
@@ -53,6 +55,12 @@
 
 .tab-content.active {
     display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ================= TABLA DE USUARIOS ================= */
@@ -60,6 +68,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    overflow-x: auto;
 }
 
 .users-table th,
@@ -73,7 +82,7 @@
     background: #f8f9fa;
     color: #003366;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
 }
 
@@ -88,11 +97,26 @@
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
+    display: inline-block;
 }
 
-.role-admin { background: #fee2e2; color: #dc2626; }
-.role-moderador { background: #fef3c7; color: #d97706; }
-.role-consultor { background: #d1fae5; color: #059669; }
+.role-administrador { 
+    background: #fee2e2; 
+    color: #dc2626; 
+    border: 1px solid #dc2626;
+}
+
+.role-moderador { 
+    background: #fef3c7; 
+    color: #d97706; 
+    border: 1px solid #d97706;
+}
+
+.role-consultor { 
+    background: #d1fae5; 
+    color: #059669; 
+    border: 1px solid #059669;
+}
 
 /* ================= PERMISOS GRID ================= */
 .permisos-grid {
@@ -220,7 +244,7 @@ input:checked + .toggle-slider:before {
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 5px;
     transition: all 0.3s;
@@ -245,15 +269,24 @@ input:checked + .toggle-slider:before {
 }
 
 .btn-add {
-    background: #059669;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
     color: white;
     padding: 12px 25px;
     font-size: 0.9rem;
     margin-bottom: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(5, 150, 105, 0.3);
 }
 
 .btn-add:hover {
-    background: #047857;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.4);
 }
 
 /* ================= MODAL ================= */
@@ -266,6 +299,7 @@ input:checked + .toggle-slider:before {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
+    overflow-y: auto;
 }
 
 .modal-content {
@@ -292,23 +326,58 @@ input:checked + .toggle-slider:before {
     border-bottom: 2px solid #e8eef5;
 }
 
+.modal-header h2 {
+    color: #003366;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
 .modal-close {
     background: none;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
     color: #666;
+    line-height: 1;
 }
 
 .modal-close:hover {
     color: #dc2626;
 }
 
+/* ================= FORMULARIOS ================= */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
     margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.form-input, .form-select {
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'Roboto', sans-serif;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #005b96;
 }
 
 /* ================= ALERTAS ================= */
@@ -320,6 +389,12 @@ input:checked + .toggle-slider:before {
     align-items: center;
     gap: 10px;
     font-weight: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .alert-success {
@@ -345,8 +420,38 @@ input:checked + .toggle-slider:before {
     }
     
     .tabs-container {
-        flex-wrap: wrap;
+        flex-direction: column;
     }
+    
+    .tab-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .users-table {
+        font-size: 0.85rem;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 8px 10px;
+    }
+}
+
+/* ================= LOADING ================= */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #005b96;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 </style>
 </head>
@@ -356,7 +461,7 @@ input:checked + .toggle-slider:before {
 <nav class="navbar">
     <div class="nav-container">
         <div class="nav-brand">
-            <img src="../../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+            <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
             <span class="nav-title">Sistema de Logística</span>
         </div>
         <div class="nav-user">
@@ -370,13 +475,11 @@ input:checked + .toggle-slider:before {
 <main class="dashboard-main">
     <header class="module-header">
         <div class="breadcrumb">
-            <a href="../../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-            <span class="breadcrumb-separator">/</span>
-            <a href="../../modulos/transporte.html" class="breadcrumb-link">Transporte</a>
+            <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
             <span class="breadcrumb-separator">/</span>
             <span class="breadcrumb-current">Gestión de Usuarios</span>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="window.location.href='../../dashboard.html'">
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='../dashboard.html'">
             ← Volver
         </button>
     </header>
@@ -406,23 +509,30 @@ input:checked + .toggle-slider:before {
 
         <!-- Pestaña: Usuarios -->
         <div id="tab-usuarios" class="tab-content active">
-            <button class="btn btn-action btn-add" onclick="openModal('usuario')">
+            <button class="btn-add" onclick="openModal('usuario')">
                 ➕ Nuevo Usuario
             </button>
-            <table class="users-table">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Nombre</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="usuariosTableBody">
-                    <!-- Se llena dinámicamente -->
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Nombre</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuariosTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px;">
+                                <div class="loading-spinner"></div>
+                                <p style="margin-top: 10px; color: #666;">Cargando usuarios...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Pestaña: Permisos -->
@@ -430,7 +540,7 @@ input:checked + .toggle-slider:before {
             <div class="form-row">
                 <div class="form-group">
                     <label for="selectRolPermisos">Seleccionar Rol</label>
-                    <select id="selectRolPermisos" class="form-input" onchange="cargarPermisosRol()">
+                    <select id="selectRolPermisos" class="form-select" onchange="cargarPermisosRol()">
                         <option value="">Seleccione un rol...</option>
                         <option value="administrador">Administrador</option>
                         <option value="moderador">Moderador</option>
@@ -439,28 +549,37 @@ input:checked + .toggle-slider:before {
                 </div>
             </div>
             <div id="permisosContainer" class="permisos-grid">
-                <!-- Se llena dinámicamente -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                    Seleccione un rol para configurar sus permisos
+                </div>
             </div>
         </div>
 
         <!-- Pestaña: Roles -->
         <div id="tab-roles" class="tab-content">
-            <button class="btn btn-action btn-add" onclick="openModal('rol')">
+            <button class="btn-add" onclick="openModal('rol')">
                 ➕ Nuevo Rol
             </button>
-            <table class="users-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Usuarios</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="rolesTableBody">
-                    <!-- Se llena dinámicamente -->
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Usuarios</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px;">
+                                <div class="loading-spinner"></div>
+                                <p style="margin-top: 10px; color: #666;">Cargando roles...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </main>
@@ -477,17 +596,17 @@ input:checked + .toggle-slider:before {
             <div class="form-row">
                 <div class="form-group">
                     <label for="usuarioEmail">Email *</label>
-                    <input type="email" id="usuarioEmail" class="form-input" required>
+                    <input type="email" id="usuarioEmail" class="form-input" required placeholder="usuario@institucion.com">
                 </div>
                 <div class="form-group">
                     <label for="usuarioNombre">Nombre</label>
-                    <input type="text" id="usuarioNombre" class="form-input">
+                    <input type="text" id="usuarioNombre" class="form-input" placeholder="Nombre completo">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="usuarioRol">Rol *</label>
-                    <select id="usuarioRol" class="form-input" required>
+                    <select id="usuarioRol" class="form-select" required>
                         <option value="">Seleccione...</option>
                         <option value="administrador">Administrador</option>
                         <option value="moderador">Moderador</option>
@@ -496,21 +615,21 @@ input:checked + .toggle-slider:before {
                 </div>
                 <div class="form-group">
                     <label for="usuarioPassword">Contraseña *</label>
-                    <input type="password" id="usuarioPassword" class="form-input" placeholder="Mínimo 6 caracteres">
+                    <input type="password" id="usuarioPassword" class="form-input" placeholder="Mínimo 6 caracteres" minlength="6">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="usuarioActivo">Estado</label>
-                    <select id="usuarioActivo" class="form-input">
+                    <select id="usuarioActivo" class="form-select">
                         <option value="true">Activo</option>
                         <option value="false">Inactivo</option>
                     </select>
                 </div>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('usuario')">Cancelar</button>
-                <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                <button type="button" class="btn-action" style="background: #6c757d; color: white;" onclick="closeModal('usuario')">Cancelar</button>
+                <button type="submit" class="btn-action btn-edit">💾 Guardar</button>
             </div>
         </form>
     </div>
@@ -518,7 +637,7 @@ input:checked + .toggle-slider:before {
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="../../js/config.js" defer></script>
-<script src="../../js/gestion-usuarios.js" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/gestion-usuarios.js" defer></script>
 </body>
 </html>
