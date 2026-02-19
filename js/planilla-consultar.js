@@ -67,6 +67,7 @@ function populateEPPFilter() {
 
 // Aplicar filtros
 function aplicarFiltros() {
+    // Obtener elementos del DOM si no existen
     if (!filterTipo) getDOMElements();
     
     const filterTipoValue = filterTipo ? filterTipo.value.trim().toUpperCase() : '';
@@ -76,7 +77,17 @@ function aplicarFiltros() {
     const filterEPMValue = filterEPM ? filterEPM.value.trim().toUpperCase() : '';
     const filterEPPValue = filterEPP ? filterEPP.value.trim().toUpperCase() : '';
 
+    console.log('Filtros aplicados:', {
+        tipo: filterTipoValue,
+        clase: filterClaseValue,
+        situacion: filterSituacionValue,
+        estatus: filterEstatusValue,
+        epm: filterEPMValue,
+        epp: filterEPPValue
+    });
+
     filteredVehicles = allVehicles.filter(v => {
+        // Verificar cada filtro individualmente
         const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue));
         const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue));
         const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.toUpperCase().includes(filterSituacionValue));
@@ -84,14 +95,22 @@ function aplicarFiltros() {
         const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue));
         const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue));
         
-        return matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesEPM && matchesEPP;
+        // TODOS los filtros activos deben coincidir
+        const result = matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesEPM && matchesEPP;
+        
+        if (filterEstatusValue && v.estatus) {
+            console.log(`Vehículo ${v.placa}: estatus="${v.estatus}", filtro="${filterEstatusValue}", coincide=${matchesEstatus}`);
+        }
+        
+        return result;
     });
 
+    console.log(`Total filtrados: ${filteredVehicles.length} de ${allVehicles.length}`);
+    
     currentPage = 1;
     renderTable();
     renderPagination();
 }
-
 // Limpiar filtros
 function limpiarFiltros() {
     if (filterTipo) filterTipo.value = '';
