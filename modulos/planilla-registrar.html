@@ -191,49 +191,13 @@ body {
     padding-right: 35px;
 }
 
-/* ================= ALERTAS ================= */
-.alert {
-    padding: 16px 22px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.92rem;
-    font-weight: 500;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.alert-success {
-    background: #d1fae5;
-    color: #059669;
-    border: 1px solid #059669;
-}
-
-.alert-error {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #dc2626;
-}
-
 /* ================= BOTONES DE ACCIÓN ================= */
 .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 18px;
     padding-top: 28px;
-    margin-top: 10px;
+    margin-top: 28px;
     border-top: 2px solid #e8eef5;
     flex-wrap: wrap;
 }
@@ -270,6 +234,41 @@ body {
 .btn-primary:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45);
+}
+
+/* ================= ALERTAS ================= */
+.alert {
+    padding: 16px 22px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #059669;
+    border: 1px solid #059669;
+}
+.alert-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #dc2626;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -397,6 +396,15 @@ body {
 <p class="module-subtitle">Complete los campos para ingresar un nuevo vehículo</p>
 </section>
 <div class="form-container">
+<!-- Alertas -->
+<div id="alertSuccess" class="alert alert-success">
+<span>✅</span>
+<span id="successMessage">Vehículo registrado exitosamente</span>
+</div>
+<div id="alertError" class="alert alert-error">
+<span>❌</span>
+<span id="errorMessage">Error al registrar el vehículo</span>
+</div>
 <form id="vehicleForm" novalidate>
 
 <!-- ================= FILA 1: SERIALES + ESTATUS ================= -->
@@ -722,17 +730,7 @@ body {
 </div>
 </div>
 
-<!-- ================= ALERTAS (MOVIDAS AQUÍ - DEBAJO DE OBSERVACIONES) ================= -->
-<div id="alertSuccess" class="alert alert-success">
-<span>✅</span>
-<span id="successMessage">Vehículo registrado exitosamente</span>
-</div>
-<div id="alertError" class="alert alert-error">
-<span>❌</span>
-<span id="errorMessage">Error al registrar el vehículo</span>
-</div>
-
-<!-- ================= BOTONES DE ACCIÓN ================= -->
+<!-- BOTONES DE ACCIÓN -->
 <div class="form-actions">
 <button type="button" class="btn btn-secondary" onclick="window.location.href='planilla.html'">
 ❌ Cancelar
@@ -742,7 +740,6 @@ body {
 <span class="btn-loader">⏳ Guardando...</span>
 </button>
 </div>
-
 </form>
 </div>
 </main>
