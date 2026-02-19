@@ -34,21 +34,21 @@ body {
     max-width: 1440px;
 }
 
-/* ================= BUSCADOR ================= */
+/* ================= BUSCADOR UNIVERSAL ================= */
 .search-container {
     background: linear-gradient(135deg, #003366 0%, #005b96 100%);
     padding: 25px;
     border-radius: 10px;
     margin-bottom: 25px;
     display: flex;
-    gap: 20px;
+    gap: 15px;
     align-items: flex-end;
     flex-wrap: wrap;
 }
 
 .search-group {
     flex: 1;
-    min-width: 200px;
+    min-width: 300px;
 }
 
 .search-group label {
@@ -78,6 +78,10 @@ body {
     box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
 }
 
+.search-input::placeholder {
+    color: #666;
+}
+
 .btn-search {
     background: #f59e0b;
     color: white;
@@ -92,6 +96,7 @@ body {
     gap: 8px;
     transition: all 0.3s;
     font-family: 'Roboto', sans-serif;
+    white-space: nowrap;
 }
 
 .btn-search:hover {
@@ -104,6 +109,13 @@ body {
     background: #9ca3af;
     cursor: not-allowed;
     transform: none;
+}
+
+.search-hint {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.8rem;
+    margin-top: 8px;
+    display: block;
 }
 
 /* ================= FILAS DEL FORMULARIO ================= */
@@ -263,7 +275,7 @@ body {
 .form-select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 35px;
@@ -369,15 +381,6 @@ body {
     background: #dbeafe;
     color: #1e40af;
     border: 1px solid #3b82f6;
-}
-
-/* ================= ESTADO DEL FORMULARIO ================= */
-.form-disabled .form-input,
-.form-disabled .form-select,
-.form-disabled .form-textarea {
-    background: #f3f4f6;
-    color: #6b7280;
-    cursor: not-allowed;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -531,18 +534,19 @@ body {
         </div>
         <div id="alertInfo" class="alert alert-info">
             <span>ℹ️</span>
-            <span id="infoMessage">Ingrese el ID o Placa del vehículo que desea modificar</span>
+            <span id="infoMessage">Ingrese Placa, ID, Facsímil o Serial para buscar</span>
         </div>
 
-        <!-- ================= BUSCADOR DE VEHÍCULO ================= -->
+        <!-- ================= BUSCADOR UNIVERSAL ================= -->
         <div class="search-container">
             <div class="search-group">
-                <label for="searchId">ID del Vehículo</label>
-                <input type="number" id="searchId" class="search-input" placeholder="Ej: 1517" min="1">
-            </div>
-            <div class="search-group">
-                <label for="searchPlaca">Placa (opcional)</label>
-                <input type="text" id="searchPlaca" class="search-input" placeholder="Ej: AB123CD" maxlength="10">
+                <label for="searchUniversal">🔍 Búsqueda Universal</label>
+                <input 
+                    type="text" 
+                    id="searchUniversal" 
+                    class="search-input" 
+                    placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
+                <span class="search-hint">Busca por: Placa, ID, Facsímil, S/Carrocería o S/Motor</span>
             </div>
             <button type="button" class="btn-search" id="btnSearch">
                 <span class="btn-search-text">🔍 Buscar Vehículo</span>
