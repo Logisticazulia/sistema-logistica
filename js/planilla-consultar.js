@@ -459,3 +459,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
     if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
 });
+// Mostrar usuario autenticado
+async function mostrarUsuarioAutenticado() {
+    try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (error) {
+            console.error('Error obteniendo sesión:', error);
+            return;
+        }
+        
+        const userEmail = document.getElementById('userEmail');
+        
+        if (session?.user?.email) {
+            // Mostrar solo la parte antes del @ si es muy largo
+            const email = session.user.email;
+            const nombreMostrar = email.length > 25 
+                ? email.split('@')[0].substring(0, 22) + '...' 
+                : email;
+            userEmail.textContent = nombreMostrar;
+            userEmail.title = email; // Tooltip con email completo
+        } else {
+            userEmail.textContent = 'Invitado';
+        }
+    } catch (err) {
+        console.error('Error mostrando usuario:', err);
+    }
+}
