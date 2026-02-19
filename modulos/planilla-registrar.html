@@ -63,7 +63,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Colores por sección */
 .form-section.seriales { border-color: #e9c46a; }
 .form-section.estatus { border-color: #e76f51; }
 .form-section.identificacion { border-color: #005b96; }
@@ -72,7 +71,6 @@ body {
 .form-section.documentacion { border-color: #9b5de5; }
 .form-section.observaciones { border-color: #f15bb5; }
 
-/* Clase para secciones que ocupan todo el ancho */
 .form-section.full-width {
     grid-column: 1 / -1;
 }
@@ -98,7 +96,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Iconos con fondo coloreado */
 .form-section.seriales .form-section-icon { background: rgba(233, 196, 106, 0.2); }
 .form-section.estatus .form-section-icon { background: rgba(231, 111, 81, 0.2); }
 .form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
@@ -123,7 +120,6 @@ body {
     gap: 18px;
 }
 
-/* Ajuste para secciones full-width: más columnas */
 .form-section.full-width .form-fields-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 22px;
@@ -189,7 +185,7 @@ body {
 .form-select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 35px;
@@ -276,7 +272,6 @@ body {
 }
 
 /* ================= RESPONSIVE ================= */
-/* Tablets y pantallas medianas */
 @media (max-width: 1200px) {
     .form-row {
         grid-template-columns: 1fr;
@@ -291,7 +286,6 @@ body {
     }
 }
 
-/* Móviles */
 @media (max-width: 768px) {
     .form-container {
         margin: 12px;
@@ -330,7 +324,6 @@ body {
     }
 }
 
-/* Pantallas muy pequeñas */
 @media (max-width: 480px) {
     .form-container {
         padding: 15px;
@@ -352,7 +345,7 @@ body {
 .loading .btn-text { display: none; }
 .loading .btn-loader { display: inline; }
 
-/* ================= SCROLLBAR PERSONALIZADO ================= */
+/* ================= SCROLLBAR ================= */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -555,8 +548,132 @@ body {
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>Unidad Administrativa</label>
-<input type="text" id="unidad_administrativa" name="unidad_administrativa" class="form-input" placeholder="Ej: DIP">
+<label>Unidad Administrativa <span class="required">*</span></label>
+<select id="unidad_administrativa" name="unidad_administrativa" class="form-select" required>
+<option value="">Seleccione...</option>
+<option value="NO">NO</option>
+<option value="DIRECCION">DIRECCION</option>
+<option value="OPERACIONES">OPERACIONES</option>
+<option value="SALA SITUACIONAL">SALA SITUACIONAL</option>
+<option value="GESTION HUMANA">GESTION HUMANA</option>
+<option value="CAPTACION Y SELECCIÓN">CAPTACION Y SELECCIÓN</option>
+<option value="GESTION COMUNICACIONAL">GESTION COMUNICACIONAL</option>
+<option value="CUADRANTES DE PAZ">CUADRANTES DE PAZ</option>
+<option value="RESGUARDO DE INSTALACIONES">RESGUARDO DE INSTALACIONES</option>
+<option value="PARQUE DE ARMAS">PARQUE DE ARMAS</option>
+<option value="TECNOLOGIA">TECNOLOGIA</option>
+<option value="ASESORIA">ASESORIA</option>
+<option value="ALEGACION">ALEGACION</option>
+<option value="SERVICIOS GENERALES">SERVICIOS GENERALES</option>
+<option value="LOGISTICA">LOGISTICA</option>
+<option value="ATENCION Y PROTECCION A LA VICTIMA">ATENCION Y PROTECCION A LA VICTIMA</option>
+<option value="DERECHOS HUMANOS">DERECHOS HUMANOS</option>
+<option value="UENNA">UENNA</option>
+<option value="OAVDAP">OAVDAP</option>
+<option value="EQUIDAD">EQUIDAD</option>
+<option value="BIENESTAR SOCIAL">BIENESTAR SOCIAL</option>
+<option value="CULTURA">CULTURA</option>
+<option value="SERVICIO MEDICO">SERVICIO MEDICO</option>
+<option value="REDIP">REDIP</option>
+<option value="PROTECCION A LA MUJER">PROTECCION A LA MUJER</option>
+<option value="PROTECCION PUEBLOS INDIGENAS">PROTECCION PUEBLOS INDIGENAS</option>
+<option value="COMPLEJO EDUCATIVO">COMPLEJO EDUCATIVO</option>
+<option value="VEN 911/SIIPOL">VEN 911/SIIPOL</option>
+<option value="ICAP">ICAP</option>
+<option value="ORDP">ORDP</option>
+<option value="AMBIENTAL">AMBIENTAL</option>
+<option value="VIGILANCIA Y PATRULLAJE/CUPAZ">VIGILANCIA Y PATRULLAJE/CUPAZ</option>
+<option value="HOSPITALARIO">HOSPITALARIO</option>
+<option value="TURISTICA">TURISTICA</option>
+<option value="DIPLOMATICA">DIPLOMATICA</option>
+<option value="AEROPORTUARIA">AEROPORTUARIA</option>
+<option value="POLICIA RURAL">POLICIA RURAL</option>
+<option value="ORDEN PUBLICO">ORDEN PUBLICO</option>
+<option value="COMUNAL">COMUNAL</option>
+<option value="TRANSITO">TRANSITO</option>
+<option value="MIGRACION">MIGRACION</option>
+<option value="FERROVIARIA (METRO)">FERROVIARIA (METRO)</option>
+<option value="ACUATICOS">ACUATICOS</option>
+<option value="PENITENCIARIA">PENITENCIARIA</option>
+<option value="PATRULLAJE VEHICULAR">PATRULLAJE VEHICULAR</option>
+<option value="BRIGADA MOTORIZADA">BRIGADA MOTORIZADA</option>
+<option value="UNIVERSIDAD LUZ">UNIVERSIDAD LUZ</option>
+<option value="POLICIAL JUDICIAL">POLICIAL JUDICIAL</option>
+<option value="EDUCACION">EDUCACION</option>
+</select>
+</div>
+<div class="form-group">
+<label>REDIP</label>
+<select id="redip" name="redip" class="form-select">
+<option value="">Seleccione...</option>
+<option value="LOS ANDES">LOS ANDES</option>
+<option value="CAPITAL">CAPITAL</option>
+<option value="CENTRAL">CENTRAL</option>
+<option value="OCCIDENTAL">OCCIDENTAL</option>
+<option value="ORIENTAL">ORIENTAL</option>
+<option value="LOS LLANOS">LOS LLANOS</option>
+<option value="GUAYANA">GUAYANA</option>
+<option value="MARÍTIMA E INSULAR">MARÍTIMA E INSULAR</option>
+</select>
+</div>
+<div class="form-group">
+<label>CCPE</label>
+<select id="ccpe" name="ccpe" class="form-select">
+<option value="">Seleccione...</option>
+<option value="CCP METROPOLITANO">CCP METROPOLITANO</option>
+<option value="CCP COL">CCP COL</option>
+<option value="CCP GUAJIRA">CCP GUAJIRA</option>
+<option value="CCPE SUR DEL LAGO">CCPE SUR DEL LAGO</option>
+</select>
+</div>
+<div class="form-group">
+<label>EPM</label>
+<select id="epm" name="epm" class="form-select">
+<option value="">Seleccione...</option>
+<option value="MARACAIBO">MARACAIBO</option>
+<option value="SAN FRANCISCO">SAN FRANCISCO</option>
+<option value="JESUS ENRIQUE LOSSADA">JESUS ENRIQUE LOSSADA</option>
+<option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+</select>
+</div>
+<div class="form-group">
+<label>EPP</label>
+<select id="epp" name="epp" class="form-select">
+<option value="">Seleccione...</option>
+<option value="MARACAIBO">MARACAIBO</option>
+<option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
+<option value="LUIS HURTADO">LUIS HURTADO</option>
+<option value="DAGNINO">DAGNINO</option>
+<option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
+<option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
+<option value="FRANCISCO EUGENIO">FRANCISCO EUGENIO</option>
+<option value="CARACCIOLO">CARACCIOLO</option>
+<option value="IDELFONSO">IDELFONSO</option>
+<option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
+<option value="COQUIVACOA-ZAPARA">COQUIVACOA-ZAPARA</option>
+<option value="RAUL LEONI">RAUL LEONI</option>
+<option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
+<option value="JUANA DE AVILA">JUANA DE AVILA</option>
+<option value="SAN ISIDRO">SAN ISIDRO</option>
+<option value="CASIQUE MARA">CASIQUE MARA</option>
+<option value="SAN FRANCISCO">SAN FRANCISCO</option>
+<option value="EL BAJO">EL BAJO</option>
+<option value="DOMITILA">DOMITILA</option>
+<option value="CORTIJOS">CORTIJOS</option>
+<option value="LA CAÑADA">LA CAÑADA</option>
+<option value="POTRERITO">POTRERITO</option>
+<option value="ANDRES BELLO">ANDRES BELLO</option>
+<option value="ESTACION POLICIAL JESUS E. LOSADA">ESTACION POLICIAL JESUS E. LOSADA</option>
+<option value="DCDO">DCDO</option>
+<option value="DCD">DCD</option>
+<option value="DIP">DIP</option>
+<option value="GARANTIA">GARANTIA</option>
+<option value="DIE">DIE</option>
+<option value="K-9">K-9</option>
+<option value="HURTO Y ROBO">HURTO Y ROBO</option>
+<option value="MOTORIZADA">MOTORIZADA</option>
+<option value="DCSE">DCSE</option>
+</select>
 </div>
 <div class="form-group">
 <label>Ubicación Física</label>
@@ -565,28 +682,6 @@ body {
 <div class="form-group">
 <label>Asignación</label>
 <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje">
-</div>
-<div class="form-group">
-<label>REDIP</label>
-<input type="text" id="redip" name="redip" class="form-input" placeholder="OCCIDENTAL">
-</div>
-<div class="form-group">
-<label>CCPE</label>
-<input type="text" id="ccpe" name="ccpe" class="form-input" placeholder="ZULIA">
-</div>
-<div class="form-group">
-<label>EPM</label>
-<select id="epm" name="epm" class="form-select">
-<option value="">Seleccione...</option>
-<option value="NO">NO</option>
-<option value="MARACAIBO">MARACAIBO</option>
-<option value="SAN FRANCISCO">SAN FRANCISCO</option>
-<option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-</select>
-</div>
-<div class="form-group">
-<label>EPP</label>
-<input type="text" id="epp" name="epp" class="form-input" placeholder="E.P. CENTRAL">
 </div>
 </div>
 </div>
