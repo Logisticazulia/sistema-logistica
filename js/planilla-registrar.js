@@ -15,14 +15,29 @@ const userEmail = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
 // Mostrar usuario autenticado
+// Mostrar usuario autenticado
 async function mostrarUsuarioAutenticado() {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (error) {
+            console.error('Error de sesión:', error);
+            userEmail.textContent = 'Invitado';
+            return;
+        }
+        
         if (session?.user?.email) {
+            // Muestra solo el nombre antes del @
             userEmail.textContent = session.user.email.split('@')[0];
+        } else if (session?.user?.user_metadata?.full_name) {
+            // Fallback: usa el nombre completo si existe
+            userEmail.textContent = session.user.user_metadata.full_name;
+        } else {
+            userEmail.textContent = 'Usuario';
         }
     } catch (err) {
         console.error('Error obteniendo sesión:', err);
+        userEmail.textContent = 'Invitado';
     }
 }
 
