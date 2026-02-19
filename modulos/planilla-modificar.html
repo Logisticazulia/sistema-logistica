@@ -34,7 +34,7 @@ body {
     max-width: 1440px;
 }
 
-/* ================= BUSCADOR UNIVERSAL ================= */
+/* ================= BUSCADOR ================= */
 .search-container {
     background: linear-gradient(135deg, #003366 0%, #005b96 100%);
     padding: 25px;
@@ -42,13 +42,15 @@ body {
     margin-bottom: 25px;
     display: flex;
     gap: 15px;
-    align-items: flex-end;
+    align-items: flex-end;  /* ← ESTO ALINEA LOS ELEMENTOS ABAJO */
     flex-wrap: wrap;
 }
 
 .search-group {
     flex: 1;
-    min-width: 300px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
 }
 
 .search-group label {
@@ -70,16 +72,13 @@ body {
     background: rgba(255,255,255,0.95);
     transition: all 0.3s;
     font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;  /* ← IMPORTANTE PARA EVITAR DESBORDAMIENTO */
 }
 
 .search-input:focus {
     outline: none;
     border-color: #fff;
     box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
-}
-
-.search-input::placeholder {
-    color: #666;
 }
 
 .btn-search {
@@ -97,6 +96,8 @@ body {
     transition: all 0.3s;
     font-family: 'Roboto', sans-serif;
     white-space: nowrap;
+    height: fit-content;  /* ← AJUSTA LA ALTURA AL CONTENIDO */
+    margin-bottom: 0;  /* ← SIN MARGEN INFERIOR */
 }
 
 .btn-search:hover {
