@@ -34,12 +34,17 @@ body {
     max-width: 1440px;
 }
 
-/* ================= GRID PRINCIPAL - 4 COLUMNAS ================= */
-.form-main-grid {
+/* ================= FILAS DEL FORMULARIO ================= */
+.form-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 25px;
     width: 100%;
+    margin-bottom: 25px;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
 }
 
 /* ================= SECCIONES DEL FORMULARIO ================= */
@@ -49,17 +54,20 @@ body {
     padding: 22px;
     border-top: 5px solid;
     min-width: 0;
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    height: 100%;
 }
 
 .form-section:hover {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
 }
 
-.form-section.identificacion { border-color: #005b96; }
-.form-section.caracteristicas { border-color: #2a9d8f; }
+/* Colores por sección */
 .form-section.seriales { border-color: #e9c46a; }
 .form-section.estatus { border-color: #e76f51; }
+.form-section.identificacion { border-color: #005b96; }
+.form-section.caracteristicas { border-color: #2a9d8f; }
 .form-section.ubicacion { border-color: #e76f51; }
 .form-section.documentacion { border-color: #9b5de5; }
 .form-section.observaciones { border-color: #f15bb5; }
@@ -84,19 +92,20 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: rgba(0, 91, 150, 0.1);
-    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
-.form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.15); }
-.form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.15); }
-.form-section.seriales .form-section-icon { background: rgba(233, 196, 106, 0.15); }
-.form-section.estatus .form-section-icon,
-.form-section.ubicacion .form-section-icon { background: rgba(231, 111, 81, 0.15); }
-.form-section.documentacion .form-section-icon { background: rgba(155, 93, 229, 0.15); }
-.form-section.observaciones .form-section-icon { background: rgba(241, 91, 181, 0.15); }
+/* Iconos con fondo coloreado */
+.form-section.seriales .form-section-icon { background: rgba(233, 196, 106, 0.2); }
+.form-section.estatus .form-section-icon { background: rgba(231, 111, 81, 0.2); }
+.form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
+.form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.2); }
+.form-section.ubicacion .form-section-icon { background: rgba(231, 111, 81, 0.2); }
+.form-section.documentacion .form-section-icon { background: rgba(155, 93, 229, 0.2); }
+.form-section.observaciones .form-section-icon { background: rgba(241, 91, 181, 0.2); }
 
 .form-section-title {
     font-size: 0.95rem;
@@ -269,8 +278,8 @@ body {
 /* ================= RESPONSIVE ================= */
 /* Tablets y pantallas medianas */
 @media (max-width: 1200px) {
-    .form-main-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .form-row {
+        grid-template-columns: 1fr;
         gap: 20px;
     }
     .form-section.full-width .form-fields-grid {
@@ -288,11 +297,6 @@ body {
         margin: 12px;
         padding: 18px;
         border-radius: 10px;
-    }
-    
-    .form-main-grid {
-        grid-template-columns: 1fr;
-        gap: 18px;
     }
     
     .form-section.full-width .form-fields-grid,
@@ -409,9 +413,60 @@ body {
 <span id="errorMessage">Error al registrar el vehículo</span>
 </div>
 <form id="vehicleForm" novalidate>
-<!-- GRID PRINCIPAL - 4 COLUMNAS -->
-<div class="form-main-grid">
-<!-- COLUMNA 1: IDENTIFICACIÓN 🔵 -->
+
+<!-- ================= FILA 1: SERIALES + ESTATUS ================= -->
+<div class="form-row">
+<!-- SERIALES 🟡 -->
+<div class="form-section seriales">
+<div class="form-section-header">
+<span class="form-section-icon">🔢</span>
+<h2 class="form-section-title">Seriales</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>S/Carrocería</label>
+<input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN">
+</div>
+<div class="form-group">
+<label>S/Motor</label>
+<input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial">
+</div>
+</div>
+</div>
+<!-- ESTATUS 🔴 -->
+<div class="form-section estatus">
+<div class="form-section-header">
+<span class="form-section-icon">📊</span>
+<h2 class="form-section-title">Estatus</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Situación</label>
+<select id="situacion" name="situacion" class="form-select">
+<option value="">Seleccione...</option>
+<option value="OPERATIVA">OPERATIVA</option>
+<option value="INOPERATIVA">INOPERATIVA</option>
+<option value="REPARACION">REPARACION</option>
+<option value="TALLER">TALLER</option>
+<option value="DESINCORPORADA">DESINCORPORADA</option>
+</select>
+</div>
+<div class="form-group">
+<label>Estatus</label>
+<select id="estatus" name="estatus" class="form-select">
+<option value="">Seleccione...</option>
+<option value="OPERATIVA">OPERATIVA</option>
+<option value="INOPERATIVA">INOPERATIVA</option>
+<option value="DESINCORPORADA">DESINCORPORADA</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ================= FILA 2: IDENTIFICACIÓN + CARACTERÍSTICAS ================= -->
+<div class="form-row">
+<!-- IDENTIFICACIÓN 🔵 -->
 <div class="form-section identificacion">
 <div class="form-section-header">
 <span class="form-section-icon">🔖</span>
@@ -432,7 +487,7 @@ body {
 </div>
 </div>
 </div>
-<!-- COLUMNA 2: CARACTERÍSTICAS 🟢 -->
+<!-- CARACTERÍSTICAS 🟢 -->
 <div class="form-section caracteristicas">
 <div class="form-section-header">
 <span class="form-section-icon">🚗</span>
@@ -490,53 +545,9 @@ body {
 </div>
 </div>
 </div>
-<!-- COLUMNA 3: SERIALES 🟡 -->
-<div class="form-section seriales">
-<div class="form-section-header">
-<span class="form-section-icon">🔢</span>
-<h2 class="form-section-title">Seriales</h2>
 </div>
-<div class="form-fields-grid">
-<div class="form-group">
-<label>S/Carrocería</label>
-<input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN">
-</div>
-<div class="form-group">
-<label>S/Motor</label>
-<input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial">
-</div>
-</div>
-</div>
-<!-- COLUMNA 4: ESTATUS 🔴 -->
-<div class="form-section estatus">
-<div class="form-section-header">
-<span class="form-section-icon">📊</span>
-<h2 class="form-section-title">Estatus</h2>
-</div>
-<div class="form-fields-grid">
-<div class="form-group">
-<label>Situación</label>
-<select id="situacion" name="situacion" class="form-select">
-<option value="">Seleccione...</option>
-<option value="OPERATIVA">OPERATIVA</option>
-<option value="INOPERATIVA">INOPERATIVA</option>
-<option value="REPARACION">REPARACION</option>
-<option value="TALLER">TALLER</option>
-<option value="DESINCORPORADA">DESINCORPORADA</option>
-</select>
-</div>
-<div class="form-group">
-<label>Estatus</label>
-<select id="estatus" name="estatus" class="form-select">
-<option value="">Seleccione...</option>
-<option value="OPERATIVA">OPERATIVA</option>
-<option value="INOPERATIVA">INOPERATIVA</option>
-<option value="DESINCORPORADA">DESINCORPORADA</option>
-</select>
-</div>
-</div>
-</div>
-<!-- FILA 2: UBICACIÓN Y ASIGNACIÓN (FULL WIDTH) 🔴 -->
+
+<!-- ================= FILA 3: UBICACIÓN Y ASIGNACIÓN (FULL WIDTH) ================= -->
 <div class="form-section ubicacion full-width">
 <div class="form-section-header">
 <span class="form-section-icon">📍</span>
@@ -579,7 +590,8 @@ body {
 </div>
 </div>
 </div>
-<!-- FILA 3: DOCUMENTACIÓN (FULL WIDTH) 🟣 -->
+
+<!-- ================= FILA 4: DOCUMENTACIÓN (FULL WIDTH) ================= -->
 <div class="form-section documentacion full-width">
 <div class="form-section-header">
 <span class="form-section-icon">📄</span>
@@ -604,7 +616,8 @@ body {
 </div>
 </div>
 </div>
-<!-- FILA 4: OBSERVACIONES (FULL WIDTH) 🩷 -->
+
+<!-- ================= FILA 5: OBSERVACIONES (FULL WIDTH) ================= -->
 <div class="form-section observaciones full-width">
 <div class="form-section-header">
 <span class="form-section-icon">📝</span>
@@ -621,7 +634,7 @@ body {
 </div>
 </div>
 </div>
-</div>
+
 <!-- BOTONES DE ACCIÓN -->
 <div class="form-actions">
 <button type="button" class="btn btn-secondary" onclick="window.location.href='planilla.html'">
