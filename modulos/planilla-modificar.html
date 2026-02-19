@@ -10,144 +10,128 @@
 <style>
 /* ================= RESET Y BASE ================= */
 *, *::before, *::after {
-    box-sizing: border-box;
+box-sizing: border-box;
 }
-
 body {
-    font-family: 'Roboto', sans-serif;
-    background: #f5f7fa;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    color: #333;
-    line-height: 1.5;
+font-family: 'Roboto', sans-serif;
+background: #f5f7fa;
+margin: 0;
+padding: 0;
+overflow-x: hidden;
+color: #333;
+line-height: 1.5;
 }
-
 /* ================= CONTENEDOR PRINCIPAL ================= */
 .form-container {
-    background: white;
-    padding: 35px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12);
-    margin: 25px auto;
-    width: 100%;
-    max-width: 1440px;
+background: white;
+padding: 35px;
+border-radius: 12px;
+box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12);
+margin: 25px auto;
+width: 100%;
+max-width: 1440px;
 }
-
 /* ================= BUSCADOR ================= */
 .search-container {
-    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-    padding: 25px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    display: flex;
-    gap: 15px;
-    align-items: flex-end;  /* ← ESTO ALINEA LOS ELEMENTOS ABAJO */
-    flex-wrap: wrap;
+background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+padding: 25px;
+border-radius: 10px;
+margin-bottom: 25px;
+display: flex;
+gap: 15px;
+align-items: flex-end;
+flex-wrap: wrap;
 }
-
 .search-group {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
+flex: 1;
+min-width: 250px;
+display: flex;
+flex-direction: column;
 }
-
 .search-group label {
-    display: block;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+display: block;
+color: white;
+font-size: 0.85rem;
+font-weight: 600;
+margin-bottom: 8px;
+text-transform: uppercase;
+letter-spacing: 0.5px;
 }
-
 .search-input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 7px;
-    font-size: 0.95rem;
-    background: rgba(255,255,255,0.95);
-    transition: all 0.3s;
-    font-family: 'Roboto', sans-serif;
-    box-sizing: border-box;  /* ← IMPORTANTE PARA EVITAR DESBORDAMIENTO */
+width: 100%;
+padding: 12px 15px;
+border: 2px solid rgba(255,255,255,0.3);
+border-radius: 7px;
+font-size: 0.95rem;
+background: rgba(255,255,255,0.95);
+transition: all 0.3s;
+font-family: 'Roboto', sans-serif;
 }
-
 .search-input:focus {
-    outline: none;
-    border-color: #fff;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+outline: none;
+border-color: #fff;
+box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
 }
-
 .btn-search {
-    background: #f59e0b;
-    color: white;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 7px;
-    font-weight: 600;
-    font-size: 0.92rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s;
-    font-family: 'Roboto', sans-serif;
-    white-space: nowrap;
-    height: fit-content;  /* ← AJUSTA LA ALTURA AL CONTENIDO */
-    margin-bottom: 0;  /* ← SIN MARGEN INFERIOR */
+background: #f59e0b;
+color: white;
+padding: 12px 30px;
+border: none;
+border-radius: 7px;
+font-weight: 600;
+font-size: 0.92rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 8px;
+transition: all 0.3s;
+font-family: 'Roboto', sans-serif;
+white-space: nowrap;
+height: fit-content;
+margin-bottom: 0;
+align-self: flex-end;
 }
-
 .btn-search:hover {
-    background: #d97706;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+background: #d97706;
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
-
 .btn-search:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    transform: none;
+background: #9ca3af;
+cursor: not-allowed;
+transform: none;
 }
-
 .search-hint {
-    color: rgba(255,255,255,0.8);
-    font-size: 0.8rem;
-    margin-top: 8px;
-    display: block;
+color: rgba(255,255,255,0.8);
+font-size: 0.8rem;
+margin-top: 8px;
+display: block;
 }
-
 /* ================= FILAS DEL FORMULARIO ================= */
 .form-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px;
-    width: 100%;
-    margin-bottom: 25px;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 25px;
+width: 100%;
+margin-bottom: 25px;
 }
-
 .form-row:last-child {
-    margin-bottom: 0;
+margin-bottom: 0;
 }
-
 /* ================= SECCIONES DEL FORMULARIO ================= */
 .form-section {
-    background: #fafbfc;
-    border-radius: 10px;
-    padding: 22px;
-    border-top: 5px solid;
-    min-width: 0;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    height: 100%;
+background: #fafbfc;
+border-radius: 10px;
+padding: 22px;
+border-top: 5px solid;
+min-width: 0;
+transition: box-shadow 0.3s ease, transform 0.3s ease;
+height: 100%;
 }
-
 .form-section:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+transform: translateY(-2px);
 }
-
 .form-section.seriales { border-color: #e9c46a; }
 .form-section.estatus { border-color: #e76f51; }
 .form-section.identificacion { border-color: #005b96; }
@@ -155,32 +139,28 @@ body {
 .form-section.ubicacion { border-color: #e76f51; }
 .form-section.documentacion { border-color: #9b5de5; }
 .form-section.observaciones { border-color: #f15bb5; }
-
 .form-section.full-width {
-    grid-column: 1 / -1;
+grid-column: 1 / -1;
 }
-
 /* ================= HEADER DE SECCIÓN ================= */
 .form-section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #e8eef5;
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 18px;
+padding-bottom: 12px;
+border-bottom: 2px solid #e8eef5;
 }
-
 .form-section-icon {
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    flex-shrink: 0;
+font-size: 1.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 36px;
+height: 36px;
+border-radius: 8px;
+flex-shrink: 0;
 }
-
 .form-section.seriales .form-section-icon { background: rgba(233, 196, 106, 0.2); }
 .form-section.estatus .form-section-icon { background: rgba(231, 111, 81, 0.2); }
 .form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
@@ -188,719 +168,672 @@ body {
 .form-section.ubicacion .form-section-icon { background: rgba(231, 111, 81, 0.2); }
 .form-section.documentacion .form-section-icon { background: rgba(155, 93, 229, 0.2); }
 .form-section.observaciones .form-section-icon { background: rgba(241, 91, 181, 0.2); }
-
 .form-section-title {
-    font-size: 0.95rem;
-    color: #1a1a2e;
-    font-weight: 700;
-    text-transform: uppercase;
-    margin: 0;
-    letter-spacing: 0.8px;
+font-size: 0.95rem;
+color: #1a1a2e;
+font-weight: 700;
+text-transform: uppercase;
+margin: 0;
+letter-spacing: 0.8px;
 }
-
 /* ================= GRID DE CAMPOS ================= */
 .form-fields-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 18px;
 }
-
 .form-section.full-width .form-fields-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 22px;
+grid-template-columns: repeat(4, 1fr);
+gap: 22px;
 }
-
 /* ================= GRUPOS DE CAMPOS ================= */
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
+display: flex;
+flex-direction: column;
+gap: 8px;
+min-width: 0;
 }
-
 .form-group label {
-    font-size: 0.78rem;
-    color: #4a5568;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+font-size: 0.78rem;
+color: #4a5568;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+white-space: nowrap;
 }
-
 .form-group label .required {
-    color: #dc2626;
-    margin-left: 3px;
+color: #dc2626;
+margin-left: 3px;
 }
-
 /* ================= INPUTS ================= */
 .form-input, .form-select, .form-textarea {
-    width: 100%;
-    max-width: 100%;
-    padding: 11px 14px;
-    border: 2px solid #e2e8f0;
-    border-radius: 7px;
-    font-size: 0.92rem;
-    font-family: 'Roboto', sans-serif;
-    transition: all 0.25s ease;
-    background: white;
-    color: #2d3748;
+width: 100%;
+max-width: 100%;
+padding: 11px 14px;
+border: 2px solid #e2e8f0;
+border-radius: 7px;
+font-size: 0.92rem;
+font-family: 'Roboto', sans-serif;
+transition: all 0.25s ease;
+background: white;
+color: #2d3748;
 }
-
 .form-input:hover, .form-select:hover, .form-textarea:hover {
-    border-color: #cbd5e0;
+border-color: #cbd5e0;
 }
-
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: #005b96;
-    box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12);
-    background: #fff;
+outline: none;
+border-color: #005b96;
+box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12);
+background: #fff;
 }
-
 .form-input::placeholder, .form-textarea::placeholder {
-    color: #a0aec0;
+color: #a0aec0;
 }
-
 .form-input:disabled, .form-select:disabled, .form-textarea:disabled {
-    background: #f3f4f6;
-    color: #6b7280;
-    cursor: not-allowed;
+background: #f3f4f6;
+color: #6b7280;
+cursor: not-allowed;
 }
-
 .form-textarea {
-    resize: vertical;
-    min-height: 70px;
-    line-height: 1.5;
+resize: vertical;
+min-height: 70px;
+line-height: 1.5;
 }
-
 .form-select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 35px;
+cursor: pointer;
+appearance: none;
+background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+background-repeat: no-repeat;
+background-position: right 12px center;
+padding-right: 35px;
 }
-
 /* ================= BOTONES DE ACCIÓN ================= */
 .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 18px;
-    padding-top: 28px;
-    margin-top: 28px;
-    border-top: 2px solid #e8eef5;
-    flex-wrap: wrap;
+display: flex;
+justify-content: flex-end;
+gap: 18px;
+padding-top: 28px;
+margin-top: 28px;
+border-top: 2px solid #e8eef5;
+flex-wrap: wrap;
 }
-
 .btn {
-    padding: 13px 32px;
-    border-radius: 8px;
-    font-size: 0.92rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    border: none;
-    white-space: nowrap;
+padding: 13px 32px;
+border-radius: 8px;
+font-size: 0.92rem;
+font-weight: 600;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 10px;
+transition: all 0.3s ease;
+border: none;
+white-space: nowrap;
 }
-
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+background: #6c757d;
+color: white;
 }
 .btn-secondary:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+background: #5a6268;
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
 }
-
 .btn-primary {
-    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 51, 102, 0.35);
+background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+color: white;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.35);
 }
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45);
+transform: translateY(-3px);
+box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45);
 }
-
 .btn-primary:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+background: #9ca3af;
+cursor: not-allowed;
+transform: none;
+box-shadow: none;
 }
-
 .btn-warning {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+color: white;
+box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
 }
 .btn-warning:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.45);
+transform: translateY(-3px);
+box-shadow: 0 8px 25px rgba(245, 158, 11, 0.45);
 }
-
 /* ================= ALERTAS ================= */
 .alert {
-    padding: 16px 22px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.92rem;
-    font-weight: 500;
-    animation: slideDown 0.3s ease;
+padding: 16px 22px;
+border-radius: 8px;
+margin-bottom: 25px;
+display: none;
+align-items: center;
+gap: 12px;
+font-size: 0.92rem;
+font-weight: 500;
+animation: slideDown 0.3s ease;
 }
-
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+from {
+opacity: 0;
+transform: translateY(-10px);
 }
-
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
 .alert-success {
-    background: #d1fae5;
-    color: #059669;
-    border: 1px solid #059669;
+background: #d1fae5;
+color: #059669;
+border: 1px solid #059669;
 }
 .alert-error {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #dc2626;
+background: #fee2e2;
+color: #dc2626;
+border: 1px solid #dc2626;
 }
 .alert-info {
-    background: #dbeafe;
-    color: #1e40af;
-    border: 1px solid #3b82f6;
+background: #dbeafe;
+color: #1e40af;
+border: 1px solid #3b82f6;
 }
-
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1200px) {
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    .form-section.full-width .form-fields-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .form-container {
-        padding: 25px;
-        margin: 20px;
-    }
+.form-row {
+grid-template-columns: 1fr;
+gap: 20px;
 }
-
+.form-section.full-width .form-fields-grid {
+grid-template-columns: repeat(2, 1fr);
+}
+.form-container {
+padding: 25px;
+margin: 20px;
+}
+}
 @media (max-width: 768px) {
-    .form-container {
-        margin: 12px;
-        padding: 18px;
-        border-radius: 10px;
-    }
-    
-    .search-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .search-group {
-        min-width: 100%;
-    }
-    
-    .form-section.full-width .form-fields-grid,
-    .form-fields-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .btn {
-        width: 100%;
-        justify-content: center;
-        padding: 14px 28px;
-    }
-    
-    .form-section {
-        padding: 18px;
-    }
-    
-    .form-section-header {
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-    }
-    
-    .form-section-title {
-        font-size: 0.88rem;
-    }
+.form-container {
+margin: 12px;
+padding: 18px;
+border-radius: 10px;
 }
-
+.search-container {
+flex-direction: column;
+align-items: stretch;
+}
+.search-group {
+min-width: 100%;
+}
+.btn-search {
+width: 100%;
+justify-content: center;
+}
+.form-section.full-width .form-fields-grid,
+.form-fields-grid {
+grid-template-columns: 1fr;
+gap: 15px;
+}
+.form-actions {
+flex-direction: column;
+gap: 12px;
+}
+.btn {
+width: 100%;
+justify-content: center;
+padding: 14px 28px;
+}
+.form-section {
+padding: 18px;
+}
+.form-section-header {
+margin-bottom: 15px;
+padding-bottom: 10px;
+}
+.form-section-title {
+font-size: 0.88rem;
+}
+}
 @media (max-width: 480px) {
-    .form-container {
-        padding: 15px;
-        margin: 8px;
-    }
-    
-    .form-input, .form-select, .form-textarea {
-        padding: 10px 12px;
-        font-size: 0.88rem;
-    }
-    
-    .form-group label {
-        font-size: 0.72rem;
-    }
+.form-container {
+padding: 15px;
+margin: 8px;
 }
-
+.form-input, .form-select, .form-textarea {
+padding: 10px 12px;
+font-size: 0.88rem;
+}
+.form-group label {
+font-size: 0.72rem;
+}
+}
 /* ================= LOADER ================= */
 .btn-loader { display: none; }
 .loading .btn-text { display: none; }
 .loading .btn-loader { display: inline; }
 .searching .btn-search-text { display: none; }
 .searching .btn-search-loader { display: inline; }
-
 /* ================= SCROLLBAR ================= */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+width: 8px;
+height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+background: #f1f1f1;
+border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
+background: #c1c1c1;
+border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #a1a1a1;
+background: #a1a1a1;
 }
 </style>
 </head>
 <body class="dashboard-page">
 <!-- ================= NAVBAR ================= -->
 <nav class="navbar">
-    <div class="nav-container">
-        <div class="nav-brand">
-            <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-            <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-            <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
-        </div>
-        <div class="nav-user">
-            <span class="user-email" id="userEmail">Cargando...</span>
-            <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
-        </div>
-    </div>
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">Cargando...</span>
+<button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+</div>
+</div>
 </nav>
-
 <!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main">
-    <header class="module-header">
-        <div class="breadcrumb">
-            <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-            <span class="breadcrumb-separator">/</span>
-            <a href="planilla.html" class="breadcrumb-link">Planilla</a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Modificar</span>
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
-            ← Volver
-        </button>
-    </header>
-    
-    <section class="module-title-section">
-        <h1 class="module-title">✏️ Modificar Vehículo</h1>
-        <p class="module-subtitle">Busque y edite la información de un vehículo registrado</p>
-    </section>
-    
-    <div class="form-container">
-        <!-- Alertas -->
-        <div id="alertSuccess" class="alert alert-success">
-            <span>✅</span>
-            <span id="successMessage">Vehículo actualizado exitosamente</span>
-        </div>
-        <div id="alertError" class="alert alert-error">
-            <span>❌</span>
-            <span id="errorMessage">Error al actualizar el vehículo</span>
-        </div>
-        <div id="alertInfo" class="alert alert-info">
-            <span>ℹ️</span>
-            <span id="infoMessage">Ingrese Placa, ID, Facsímil o Serial para buscar</span>
-        </div>
-
-        <!-- ================= BUSCADOR UNIVERSAL ================= -->
-        <div class="search-container">
-            <div class="search-group">
-                <label for="searchUniversal">🔍 Búsqueda Universal</label>
-                <input 
-                    type="text" 
-                    id="searchUniversal" 
-                    class="search-input" 
-                    placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
-                <span class="search-hint">Busca por: Placa, ID, Facsímil, S/Carrocería o S/Motor</span>
-            </div>
-            <button type="button" class="btn-search" id="btnSearch">
-                <span class="btn-search-text">🔍 Buscar Vehículo</span>
-                <span class="btn-search-loader">⏳ Buscando...</span>
-            </button>
-        </div>
-
-        <form id="vehicleForm" novalidate class="form-disabled">
-            <!-- Campo oculto para el ID -->
-            <input type="hidden" id="vehicleId" name="id">
-            
-            <!-- ================= FILA 1: SERIALES + ESTATUS ================= -->
-            <div class="form-row">
-                <!-- SERIALES 🟡 -->
-                <div class="form-section seriales">
-                    <div class="form-section-header">
-                        <span class="form-section-icon">🔢</span>
-                        <h2 class="form-section-title">Seriales</h2>
-                    </div>
-                    <div class="form-fields-grid">
-                        <div class="form-group">
-                            <label>S/Carrocería</label>
-                            <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>S/Motor</label>
-                            <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial" disabled>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- ESTATUS 🔴 -->
-                <div class="form-section estatus">
-                    <div class="form-section-header">
-                        <span class="form-section-icon">📊</span>
-                        <h2 class="form-section-title">Estatus</h2>
-                    </div>
-                    <div class="form-fields-grid">
-                        <div class="form-group">
-                            <label>Situación</label>
-                            <select id="situacion" name="situacion" class="form-select" disabled>
-                                <option value="">Seleccione...</option>
-                                <option value="OPERATIVA">OPERATIVA</option>
-                                <option value="INOPERATIVA">INOPERATIVA</option>
-                                <option value="REPARACION">REPARACION</option>
-                                <option value="TALLER">TALLER</option>
-                                <option value="DESINCORPORADA">DESINCORPORADA</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Estatus</label>
-                            <select id="estatus" name="estatus" class="form-select" disabled>
-                                <option value="">Seleccione...</option>
-                                <option value="OPERATIVA">OPERATIVA</option>
-                                <option value="INOPERATIVA">INOPERATIVA</option>
-                                <option value="DESINCORPORADA">DESINCORPORADA</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= FILA 2: IDENTIFICACIÓN + CARACTERÍSTICAS ================= -->
-            <div class="form-row">
-                <!-- IDENTIFICACIÓN 🔵 -->
-                <div class="form-section identificacion">
-                    <div class="form-section-header">
-                        <span class="form-section-icon">🔖</span>
-                        <h2 class="form-section-title">Identificación</h2>
-                    </div>
-                    <div class="form-fields-grid">
-                        <div class="form-group">
-                            <label>Placa <span class="required">*</span></label>
-                            <input type="text" id="placa" name="placa" class="form-input" placeholder="AB123CD" required disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Facsímil</label>
-                            <input type="text" id="facsimil" name="facsimil" class="form-input" placeholder="123456" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>N° Identificación</label>
-                            <input type="text" id="n_identificacion" name="n_identificacion" class="form-input" placeholder="M-001" disabled>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- CARACTERÍSTICAS 🟢 -->
-                <div class="form-section caracteristicas">
-                    <div class="form-section-header">
-                        <span class="form-section-icon">🚗</span>
-                        <h2 class="form-section-title">Características</h2>
-                    </div>
-                    <div class="form-fields-grid">
-                        <div class="form-group">
-                            <label>Marca <span class="required">*</span></label>
-                            <input type="text" id="marca" name="marca" class="form-input" placeholder="TOYOTA" required disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Modelo <span class="required">*</span></label>
-                            <input type="text" id="modelo" name="modelo" class="form-input" placeholder="HILUX" required disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo <span class="required">*</span></label>
-                            <select id="tipo" name="tipo" class="form-select" required disabled>
-                                <option value="">Seleccione...</option>
-                                <option value="AUTOMOVIL">AUTOMOVIL</option>
-                                <option value="BUS">BUS</option>
-                                <option value="CAMION">CAMION</option>
-                                <option value="ENDURO">ENDURO</option>
-                                <option value="ESPECIAL">ESPECIAL</option>
-                                <option value="MACHITO">MACHITO</option>
-                                <option value="MINIBUS">MINIBUS</option>
-                                <option value="MOTO">MOTO</option>
-                                <option value="PICKUP">PICKUP</option>
-                                <option value="SPORTWAGON">SPORTWAGON</option>
-                                <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-                                <option value="TRIMOVIL">TRIMOVIL</option>
-                                <option value="VAM">VAM</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Clase <span class="required">*</span></label>
-                            <select id="clase" name="clase" class="form-select" required disabled>
-                                <option value="">Seleccione...</option>
-                                <option value="AUTOBUS">AUTOBUS</option>
-                                <option value="AUTOMOVIL">AUTOMOVIL</option>
-                                <option value="BLINDADO">BLINDADO</option>
-                                <option value="CAMION">CAMION</option>
-                                <option value="CAMIONETA">CAMIONETA</option>
-                                <option value="ESPECIAL">ESPECIAL</option>
-                                <option value="MOTO">MOTO</option>
-                                <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Año</label>
-                            <input type="number" id="ano" name="ano" class="form-input" placeholder="2023" min="1900" max="2030" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Color</label>
-                            <input type="text" id="color" name="color" class="form-input" placeholder="BLANCO" disabled>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= FILA 3: UBICACIÓN Y ASIGNACIÓN (FULL WIDTH) ================= -->
-            <div class="form-section ubicacion full-width">
-                <div class="form-section-header">
-                    <span class="form-section-icon">📍</span>
-                    <h2 class="form-section-title">Ubicación y Asignación</h2>
-                </div>
-                <div class="form-fields-grid">
-                    <div class="form-group">
-                        <label>Unidad Administrativa <span class="required">*</span></label>
-                        <select id="unidad_administrativa" name="unidad_administrativa" class="form-select" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="NO">NO</option>
-                            <option value="DIRECCION">DIRECCION</option>
-                            <option value="OPERACIONES">OPERACIONES</option>
-                            <option value="SALA SITUACIONAL">SALA SITUACIONAL</option>
-                            <option value="GESTION HUMANA">GESTION HUMANA</option>
-                            <option value="CAPTACION Y SELECCIÓN">CAPTACION Y SELECCIÓN</option>
-                            <option value="GESTION COMUNICACIONAL">GESTION COMUNICACIONAL</option>
-                            <option value="CUADRANTES DE PAZ">CUADRANTES DE PAZ</option>
-                            <option value="RESGUARDO DE INSTALACIONES">RESGUARDO DE INSTALACIONES</option>
-                            <option value="PARQUE DE ARMAS">PARQUE DE ARMAS</option>
-                            <option value="TECNOLOGIA">TECNOLOGIA</option>
-                            <option value="ASESORIA">ASESORIA</option>
-                            <option value="ALEGACION">ALEGACION</option>
-                            <option value="SERVICIOS GENERALES">SERVICIOS GENERALES</option>
-                            <option value="LOGISTICA">LOGISTICA</option>
-                            <option value="ATENCION Y PROTECCION A LA VICTIMA">ATENCION Y PROTECCION A LA VICTIMA</option>
-                            <option value="DERECHOS HUMANOS">DERECHOS HUMANOS</option>
-                            <option value="UENNA">UENNA</option>
-                            <option value="OAVDAP">OAVDAP</option>
-                            <option value="EQUIDAD">EQUIDAD</option>
-                            <option value="BIENESTAR SOCIAL">BIENESTAR SOCIAL</option>
-                            <option value="CULTURA">CULTURA</option>
-                            <option value="SERVICIO MEDICO">SERVICIO MEDICO</option>
-                            <option value="REDIP">REDIP</option>
-                            <option value="PROTECCION A LA MUJER">PROTECCION A LA MUJER</option>
-                            <option value="PROTECCION PUEBLOS INDIGENAS">PROTECCION PUEBLOS INDIGENAS</option>
-                            <option value="COMPLEJO EDUCATIVO">COMPLEJO EDUCATIVO</option>
-                            <option value="VEN 911/SIIPOL">VEN 911/SIIPOL</option>
-                            <option value="ICAP">ICAP</option>
-                            <option value="ORDP">ORDP</option>
-                            <option value="AMBIENTAL">AMBIENTAL</option>
-                            <option value="VIGILANCIA Y PATRULLAJE/CUPAZ">VIGILANCIA Y PATRULLAJE/CUPAZ</option>
-                            <option value="HOSPITALARIO">HOSPITALARIO</option>
-                            <option value="TURISTICA">TURISTICA</option>
-                            <option value="DIPLOMATICA">DIPLOMATICA</option>
-                            <option value="AEROPORTUARIA">AEROPORTUARIA</option>
-                            <option value="POLICIA RURAL">POLICIA RURAL</option>
-                            <option value="ORDEN PUBLICO">ORDEN PUBLICO</option>
-                            <option value="COMUNAL">COMUNAL</option>
-                            <option value="TRANSITO">TRANSITO</option>
-                            <option value="MIGRACION">MIGRACION</option>
-                            <option value="FERROVIARIA (METRO)">FERROVIARIA (METRO)</option>
-                            <option value="ACUATICOS">ACUATICOS</option>
-                            <option value="PENITENCIARIA">PENITENCIARIA</option>
-                            <option value="PATRULLAJE VEHICULAR">PATRULLAJE VEHICULAR</option>
-                            <option value="BRIGADA MOTORIZADA">BRIGADA MOTORIZADA</option>
-                            <option value="UNIVERSIDAD LUZ">UNIVERSIDAD LUZ</option>
-                            <option value="POLICIAL JUDICIAL">POLICIAL JUDICIAL</option>
-                            <option value="EDUCACION">EDUCACION</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>REDIP</label>
-                        <select id="redip" name="redip" class="form-select" disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="LOS ANDES">LOS ANDES</option>
-                            <option value="CAPITAL">CAPITAL</option>
-                            <option value="CENTRAL">CENTRAL</option>
-                            <option value="OCCIDENTAL">OCCIDENTAL</option>
-                            <option value="ORIENTAL">ORIENTAL</option>
-                            <option value="LOS LLANOS">LOS LLANOS</option>
-                            <option value="GUAYANA">GUAYANA</option>
-                            <option value="MARÍTIMA E INSULAR">MARÍTIMA E INSULAR</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>CCPE</label>
-                        <select id="ccpe" name="ccpe" class="form-select" disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="CCP METROPOLITANO">CCP METROPOLITANO</option>
-                            <option value="CCP COL">CCP COL</option>
-                            <option value="CCP GUAJIRA">CCP GUAJIRA</option>
-                            <option value="CCPE SUR DEL LAGO">CCPE SUR DEL LAGO</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>EPM</label>
-                        <select id="epm" name="epm" class="form-select" disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="MARACAIBO">MARACAIBO</option>
-                            <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-                            <option value="JESUS ENRIQUE LOSSADA">JESUS ENRIQUE LOSSADA</option>
-                            <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>EPP</label>
-                        <select id="epp" name="epp" class="form-select" disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="MARACAIBO">MARACAIBO</option>
-                            <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
-                            <option value="LUIS HURTADO">LUIS HURTADO</option>
-                            <option value="DAGNINO">DAGNINO</option>
-                            <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
-                            <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
-                            <option value="FRANCISCO EUGENIO">FRANCISCO EUGENIO</option>
-                            <option value="CARACCIOLO">CARACCIOLO</option>
-                            <option value="IDELFONSO">IDELFONSO</option>
-                            <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
-                            <option value="COQUIVACOA-ZAPARA">COQUIVACOA-ZAPARA</option>
-                            <option value="RAUL LEONI">RAUL LEONI</option>
-                            <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
-                            <option value="JUANA DE AVILA">JUANA DE AVILA</option>
-                            <option value="SAN ISIDRO">SAN ISIDRO</option>
-                            <option value="CASIQUE MARA">CASIQUE MARA</option>
-                            <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-                            <option value="EL BAJO">EL BAJO</option>
-                            <option value="DOMITILA">DOMITILA</option>
-                            <option value="CORTIJOS">CORTIJOS</option>
-                            <option value="LA CAÑADA">LA CAÑADA</option>
-                            <option value="POTRERITO">POTRERITO</option>
-                            <option value="ANDRES BELLO">ANDRES BELLO</option>
-                            <option value="ESTACION POLICIAL JESUS E. LOSADA">ESTACION POLICIAL JESUS E. LOSADA</option>
-                            <option value="DCDO">DCDO</option>
-                            <option value="DCD">DCD</option>
-                            <option value="DIP">DIP</option>
-                            <option value="GARANTIA">GARANTIA</option>
-                            <option value="DIE">DIE</option>
-                            <option value="K-9">K-9</option>
-                            <option value="HURTO Y ROBO">HURTO Y ROBO</option>
-                            <option value="MOTORIZADA">MOTORIZADA</option>
-                            <option value="DCSE">DCSE</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Ubicación Física</label>
-                        <input type="text" id="ubicacion_fisica" name="ubicacion_fisica" class="form-input" placeholder="Ej: CCPEM" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Asignación</label>
-                        <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje" disabled>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= FILA 4: DOCUMENTACIÓN (FULL WIDTH) ================= -->
-            <div class="form-section documentacion full-width">
-                <div class="form-section-header">
-                    <span class="form-section-icon">📄</span>
-                    <h2 class="form-section-title">Documentación</h2>
-                </div>
-                <div class="form-fields-grid">
-                    <div class="form-group">
-                        <label>Certificado de Origen</label>
-                        <input type="text" id="certificado_origen" name="certificado_origen" class="form-input" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Fecha Inspección</label>
-                        <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>N° Trámite</label>
-                        <input type="text" id="n_tramite" name="n_tramite" class="form-input" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Ubicación Título</label>
-                        <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Archivo" disabled>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= FILA 5: OBSERVACIONES (FULL WIDTH) ================= -->
-            <div class="form-section observaciones full-width">
-                <div class="form-section-header">
-                    <span class="form-section-icon">📝</span>
-                    <h2 class="form-section-title">Observaciones</h2>
-                </div>
-                <div class="form-fields-grid">
-                    <div class="form-group">
-                        <label>Observación General</label>
-                        <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales..." disabled></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Observación Extra</label>
-                        <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Info complementaria..." disabled></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= BOTONES DE ACCIÓN ================= -->
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="btnCancel" disabled>
-                    ❌ Cancelar
-                </button>
-                <button type="button" class="btn btn-warning" id="btnEdit">
-                    ✏️ Editar Información
-                </button>
-                <button type="submit" class="btn btn-primary" id="btnSubmit" style="display: none;">
-                    <span class="btn-text">💾 Guardar Cambios</span>
-                    <span class="btn-loader">⏳ Guardando...</span>
-                </button>
-            </div>
-        </form>
-    </div>
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="planilla.html" class="breadcrumb-link">Planilla</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Modificar</span>
+</div>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
+← Volver
+</button>
+</header>
+<section class="module-title-section">
+<h1 class="module-title">✏️ Modificar Vehículo</h1>
+<p class="module-subtitle">Busque y edite la información de un vehículo registrado</p>
+</section>
+<div class="form-container">
+<!-- Alertas -->
+<div id="alertSuccess" class="alert alert-success">
+<span>✅</span>
+<span id="successMessage">Vehículo actualizado exitosamente</span>
+</div>
+<div id="alertError" class="alert alert-error">
+<span>❌</span>
+<span id="errorMessage">Error al actualizar el vehículo</span>
+</div>
+<div id="alertInfo" class="alert alert-info">
+<span>ℹ️</span>
+<span id="infoMessage">Ingrese Placa, ID, Facsímil o Serial para buscar</span>
+</div>
+<!-- ================= BUSCADOR UNIVERSAL ================= -->
+<div class="search-container">
+<div class="search-group">
+<label for="searchUniversal">🔍 Búsqueda Universal</label>
+<input
+type="text"
+id="searchUniversal"
+class="search-input"
+placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
+<span class="search-hint">Busca por: Placa, ID, Facsímil, S/Carrocería o S/Motor</span>
+</div>
+<button type="button" class="btn-search" id="btnSearch">
+<span class="btn-search-text">🔍 Buscar Vehículo</span>
+<span class="btn-search-loader">⏳ Buscando...</span>
+</button>
+</div>
+<form id="vehicleForm" novalidate class="form-disabled">
+<!-- Campo oculto para el ID -->
+<input type="hidden" id="vehicleId" name="id">
+<!-- ================= FILA 1: SERIALES + ESTATUS ================= -->
+<div class="form-row">
+<!-- SERIALES 🟡 -->
+<div class="form-section seriales">
+<div class="form-section-header">
+<span class="form-section-icon">🔢</span>
+<h2 class="form-section-title">Seriales</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>S/Carrocería</label>
+<input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN" disabled>
+</div>
+<div class="form-group">
+<label>S/Motor</label>
+<input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial" disabled>
+</div>
+</div>
+</div>
+<!-- ESTATUS 🔴 -->
+<div class="form-section estatus">
+<div class="form-section-header">
+<span class="form-section-icon">📊</span>
+<h2 class="form-section-title">Estatus</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Situación</label>
+<select id="situacion" name="situacion" class="form-select" disabled>
+<option value="">Seleccione...</option>
+<option value="OPERATIVA">OPERATIVA</option>
+<option value="INOPERATIVA">INOPERATIVA</option>
+<option value="REPARACION">REPARACION</option>
+<option value="TALLER">TALLER</option>
+<option value="DESINCORPORADA">DESINCORPORADA</option>
+</select>
+</div>
+<div class="form-group">
+<label>Estatus</label>
+<select id="estatus" name="estatus" class="form-select" disabled>
+<option value="">Seleccione...</option>
+<option value="OPERATIVA">OPERATIVA</option>
+<option value="INOPERATIVA">INOPERATIVA</option>
+<option value="DESINCORPORADA">DESINCORPORADA</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= FILA 2: IDENTIFICACIÓN + CARACTERÍSTICAS ================= -->
+<div class="form-row">
+<!-- IDENTIFICACIÓN 🔵 -->
+<div class="form-section identificacion">
+<div class="form-section-header">
+<span class="form-section-icon">🔖</span>
+<h2 class="form-section-title">Identificación</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Placa <span class="required">*</span></label>
+<input type="text" id="placa" name="placa" class="form-input" placeholder="AB123CD" required disabled>
+</div>
+<div class="form-group">
+<label>Facsímil</label>
+<input type="text" id="facsimil" name="facsimil" class="form-input" placeholder="123456" disabled>
+</div>
+<div class="form-group">
+<label>N° Identificación</label>
+<input type="text" id="n_identificacion" name="n_identificacion" class="form-input" placeholder="M-001" disabled>
+</div>
+</div>
+</div>
+<!-- CARACTERÍSTICAS 🟢 -->
+<div class="form-section caracteristicas">
+<div class="form-section-header">
+<span class="form-section-icon">🚗</span>
+<h2 class="form-section-title">Características</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Marca <span class="required">*</span></label>
+<input type="text" id="marca" name="marca" class="form-input" placeholder="TOYOTA" required disabled>
+</div>
+<div class="form-group">
+<label>Modelo <span class="required">*</span></label>
+<input type="text" id="modelo" name="modelo" class="form-input" placeholder="HILUX" required disabled>
+</div>
+<div class="form-group">
+<label>Tipo <span class="required">*</span></label>
+<select id="tipo" name="tipo" class="form-select" required disabled>
+<option value="">Seleccione...</option>
+<option value="AUTOMOVIL">AUTOMOVIL</option>
+<option value="BUS">BUS</option>
+<option value="CAMION">CAMION</option>
+<option value="ENDURO">ENDURO</option>
+<option value="ESPECIAL">ESPECIAL</option>
+<option value="MACHITO">MACHITO</option>
+<option value="MINIBUS">MINIBUS</option>
+<option value="MOTO">MOTO</option>
+<option value="PICKUP">PICKUP</option>
+<option value="SPORTWAGON">SPORTWAGON</option>
+<option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+<option value="TRIMOVIL">TRIMOVIL</option>
+<option value="VAM">VAM</option>
+</select>
+</div>
+<div class="form-group">
+<label>Clase <span class="required">*</span></label>
+<select id="clase" name="clase" class="form-select" required disabled>
+<option value="">Seleccione...</option>
+<option value="AUTOBUS">AUTOBUS</option>
+<option value="AUTOMOVIL">AUTOMOVIL</option>
+<option value="BLINDADO">BLINDADO</option>
+<option value="CAMION">CAMION</option>
+<option value="CAMIONETA">CAMIONETA</option>
+<option value="ESPECIAL">ESPECIAL</option>
+<option value="MOTO">MOTO</option>
+<option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+</select>
+</div>
+<div class="form-group">
+<label>Año</label>
+<input type="number" id="ano" name="ano" class="form-input" placeholder="2023" min="1900" max="2030" disabled>
+</div>
+<div class="form-group">
+<label>Color</label>
+<input type="text" id="color" name="color" class="form-input" placeholder="BLANCO" disabled>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= FILA 3: UBICACIÓN Y ASIGNACIÓN (FULL WIDTH) ================= -->
+<div class="form-section ubicacion full-width">
+<div class="form-section-header">
+<span class="form-section-icon">📍</span>
+<h2 class="form-section-title">Ubicación y Asignación</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Unidad Administrativa <span class="required">*</span></label>
+<select id="unidad_administrativa" name="unidad_administrativa" class="form-select" required disabled>
+<option value="">Seleccione...</option>
+<option value="NO">NO</option>
+<option value="DIRECCION">DIRECCION</option>
+<option value="OPERACIONES">OPERACIONES</option>
+<option value="SALA SITUACIONAL">SALA SITUACIONAL</option>
+<option value="GESTION HUMANA">GESTION HUMANA</option>
+<option value="CAPTACION Y SELECCIÓN">CAPTACION Y SELECCIÓN</option>
+<option value="GESTION COMUNICACIONAL">GESTION COMUNICACIONAL</option>
+<option value="CUADRANTES DE PAZ">CUADRANTES DE PAZ</option>
+<option value="RESGUARDO DE INSTALACIONES">RESGUARDO DE INSTALACIONES</option>
+<option value="PARQUE DE ARMAS">PARQUE DE ARMAS</option>
+<option value="TECNOLOGIA">TECNOLOGIA</option>
+<option value="ASESORIA">ASESORIA</option>
+<option value="ALEGACION">ALEGACION</option>
+<option value="SERVICIOS GENERALES">SERVICIOS GENERALES</option>
+<option value="LOGISTICA">LOGISTICA</option>
+<option value="ATENCION Y PROTECCION A LA VICTIMA">ATENCION Y PROTECCION A LA VICTIMA</option>
+<option value="DERECHOS HUMANOS">DERECHOS HUMANOS</option>
+<option value="UENNA">UENNA</option>
+<option value="OAVDAP">OAVDAP</option>
+<option value="EQUIDAD">EQUIDAD</option>
+<option value="BIENESTAR SOCIAL">BIENESTAR SOCIAL</option>
+<option value="CULTURA">CULTURA</option>
+<option value="SERVICIO MEDICO">SERVICIO MEDICO</option>
+<option value="REDIP">REDIP</option>
+<option value="PROTECCION A LA MUJER">PROTECCION A LA MUJER</option>
+<option value="PROTECCION PUEBLOS INDIGENAS">PROTECCION PUEBLOS INDIGENAS</option>
+<option value="COMPLEJO EDUCATIVO">COMPLEJO EDUCATIVO</option>
+<option value="VEN 911/SIIPOL">VEN 911/SIIPOL</option>
+<option value="ICAP">ICAP</option>
+<option value="ORDP">ORDP</option>
+<option value="AMBIENTAL">AMBIENTAL</option>
+<option value="VIGILANCIA Y PATRULLAJE/CUPAZ">VIGILANCIA Y PATRULLAJE/CUPAZ</option>
+<option value="HOSPITALARIO">HOSPITALARIO</option>
+<option value="TURISTICA">TURISTICA</option>
+<option value="DIPLOMATICA">DIPLOMATICA</option>
+<option value="AEROPORTUARIA">AEROPORTUARIA</option>
+<option value="POLICIA RURAL">POLICIA RURAL</option>
+<option value="ORDEN PUBLICO">ORDEN PUBLICO</option>
+<option value="COMUNAL">COMUNAL</option>
+<option value="TRANSITO">TRANSITO</option>
+<option value="MIGRACION">MIGRACION</option>
+<option value="FERROVIARIA (METRO)">FERROVIARIA (METRO)</option>
+<option value="ACUATICOS">ACUATICOS</option>
+<option value="PENITENCIARIA">PENITENCIARIA</option>
+<option value="PATRULLAJE VEHICULAR">PATRULLAJE VEHICULAR</option>
+<option value="BRIGADA MOTORIZADA">BRIGADA MOTORIZADA</option>
+<option value="UNIVERSIDAD LUZ">UNIVERSIDAD LUZ</option>
+<option value="POLICIAL JUDICIAL">POLICIAL JUDICIAL</option>
+<option value="EDUCACION">EDUCACION</option>
+</select>
+</div>
+<div class="form-group">
+<label>REDIP</label>
+<select id="redip" name="redip" class="form-select" disabled>
+<option value="">Seleccione...</option>
+<option value="LOS ANDES">LOS ANDES</option>
+<option value="CAPITAL">CAPITAL</option>
+<option value="CENTRAL">CENTRAL</option>
+<option value="OCCIDENTAL">OCCIDENTAL</option>
+<option value="ORIENTAL">ORIENTAL</option>
+<option value="LOS LLANOS">LOS LLANOS</option>
+<option value="GUAYANA">GUAYANA</option>
+<option value="MARÍTIMA E INSULAR">MARÍTIMA E INSULAR</option>
+</select>
+</div>
+<div class="form-group">
+<label>CCPE</label>
+<select id="ccpe" name="ccpe" class="form-select" disabled>
+<option value="">Seleccione...</option>
+<option value="CCP METROPOLITANO">CCP METROPOLITANO</option>
+<option value="CCP COL">CCP COL</option>
+<option value="CCP GUAJIRA">CCP GUAJIRA</option>
+<option value="CCPE SUR DEL LAGO">CCPE SUR DEL LAGO</option>
+</select>
+</div>
+<div class="form-group">
+<label>EPM</label>
+<select id="epm" name="epm" class="form-select" disabled>
+<option value="">Seleccione...</option>
+<option value="MARACAIBO">MARACAIBO</option>
+<option value="SAN FRANCISCO">SAN FRANCISCO</option>
+<option value="JESUS ENRIQUE LOSSADA">JESUS ENRIQUE LOSSADA</option>
+<option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
+</select>
+</div>
+<div class="form-group">
+<label>EPP</label>
+<select id="epp" name="epp" class="form-select" disabled>
+<option value="">Seleccione...</option>
+<option value="MARACAIBO">MARACAIBO</option>
+<option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
+<option value="LUIS HURTADO">LUIS HURTADO</option>
+<option value="DAGNINO">DAGNINO</option>
+<option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
+<option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
+<option value="FRANCISCO EUGENIO">FRANCISCO EUGENIO</option>
+<option value="CARACCIOLO">CARACCIOLO</option>
+<option value="IDELFONSO">IDELFONSO</option>
+<option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
+<option value="COQUIVACOA-ZAPARA">COQUIVACOA-ZAPARA</option>
+<option value="RAUL LEONI">RAUL LEONI</option>
+<option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
+<option value="JUANA DE AVILA">JUANA DE AVILA</option>
+<option value="SAN ISIDRO">SAN ISIDRO</option>
+<option value="CASIQUE MARA">CASIQUE MARA</option>
+<option value="SAN FRANCISCO">SAN FRANCISCO</option>
+<option value="EL BAJO">EL BAJO</option>
+<option value="DOMITILA">DOMITILA</option>
+<option value="CORTIJOS">CORTIJOS</option>
+<option value="LA CAÑADA">LA CAÑADA</option>
+<option value="POTRERITO">POTRERITO</option>
+<option value="ANDRES BELLO">ANDRES BELLO</option>
+<option value="ESTACION POLICIAL JESUS E. LOSADA">ESTACION POLICIAL JESUS E. LOSADA</option>
+<option value="DCDO">DCDO</option>
+<option value="DCD">DCD</option>
+<option value="DIP">DIP</option>
+<option value="GARANTIA">GARANTIA</option>
+<option value="DIE">DIE</option>
+<option value="K-9">K-9</option>
+<option value="HURTO Y ROBO">HURTO Y ROBO</option>
+<option value="MOTORIZADA">MOTORIZADA</option>
+<option value="DCSE">DCSE</option>
+</select>
+</div>
+<div class="form-group">
+<label>Ubicación Física</label>
+<input type="text" id="ubicacion_fisica" name="ubicacion_fisica" class="form-input" placeholder="Ej: CCPEM" disabled>
+</div>
+<div class="form-group">
+<label>Asignación</label>
+<input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje" disabled>
+</div>
+</div>
+</div>
+<!-- ================= FILA 4: DOCUMENTACIÓN (FULL WIDTH) ================= -->
+<div class="form-section documentacion full-width">
+<div class="form-section-header">
+<span class="form-section-icon">📄</span>
+<h2 class="form-section-title">Documentación</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Certificado de Origen</label>
+<input type="text" id="certificado_origen" name="certificado_origen" class="form-input" disabled>
+</div>
+<div class="form-group">
+<label>Fecha Inspección</label>
+<input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input" disabled>
+</div>
+<div class="form-group">
+<label>N° Trámite</label>
+<input type="text" id="n_tramite" name="n_tramite" class="form-input" disabled>
+</div>
+<div class="form-group">
+<label>Ubicación Título</label>
+<input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Archivo" disabled>
+</div>
+</div>
+</div>
+<!-- ================= FILA 5: OBSERVACIONES (FULL WIDTH) ================= -->
+<div class="form-section observaciones full-width">
+<div class="form-section-header">
+<span class="form-section-icon">📝</span>
+<h2 class="form-section-title">Observaciones</h2>
+</div>
+<div class="form-fields-grid">
+<div class="form-group">
+<label>Observación General</label>
+<textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales..." disabled></textarea>
+</div>
+<div class="form-group">
+<label>Observación Extra</label>
+<textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Info complementaria..." disabled></textarea>
+</div>
+</div>
+</div>
+<!-- ================= BOTONES DE ACCIÓN ================= -->
+<div class="form-actions">
+<button type="button" class="btn btn-secondary" id="btnCancel" disabled>
+❌ Cancelar
+</button>
+<button type="button" class="btn btn-warning" id="btnEdit">
+✏️ Editar Información
+</button>
+<button type="submit" class="btn btn-primary" id="btnSubmit" style="display: none;">
+<span class="btn-text">💾 Guardar Cambios</span>
+<span class="btn-loader">⏳ Guardando...</span>
+</button>
+</div>
+</form>
+</div>
 </main>
-
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
