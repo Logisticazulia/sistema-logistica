@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consulta de Vehículos | Sistema de Logística</title>
+<title>Consulta de Vehículos | Sistema de Gestión Administgrativa</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
@@ -59,12 +59,13 @@
     border-radius: 8px;
 }
 .search-input {
-    flex: 1;
+    flex: 1;              /* Esto hace que ocupe todo el espacio disponible */
     padding: 10px 15px;
     border: 2px solid #ddd;
     border-radius: 6px;
     font-size: 0.9rem;
-    max-width: 400px;
+    max-width: none;      /* Eliminamos la restricción de 400px */
+    width: 100%;          /* Aseguramos que use el ancho completo */
 }
 .search-input:focus {
     outline: none;
@@ -414,7 +415,7 @@
         <div class="nav-brand">
             <img src="../img/logo.png" alt="Logo Principal" class="nav-logo" width="35" height="35">
             <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-            <span class="nav-title">Sistema de Logística</span>
+            <span class="nav-title">Sistema de Sistema de Gestión Administgrativa CCPE ZULIA</span>
         </div>
         <div class="nav-user">
             <span class="user-email" id="userEmail">usuario@institucion.com</span>
