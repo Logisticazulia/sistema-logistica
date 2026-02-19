@@ -446,6 +446,7 @@ function getEstatusBadge(estatus) {
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Inicializando consulta de vehículos...');
+    mostrarUsuarioAutenticado();
     getDOMElements();
     cargarVehiculos();
     setupSearchEnter();
