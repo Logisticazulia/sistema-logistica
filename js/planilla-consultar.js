@@ -9,7 +9,19 @@ let filteredVehicles = [];
 let currentPage = 1;
 const itemsPerPage = 20;
 
-// Cargar vehículos desde Supabase
+// Referencias a elementos del DOM
+let filterTipo, filterClase, filterEstatus, filterEPM, filterEPP;
+
+// Referencias a elementos del DOM
+function getDOMElements() {
+    filterTipo = document.getElementById('filterTipo');
+    filterClase = document.getElementById('filterClase');
+    filterEstatus = document.getElementById('filterEstatus');
+    filterEPM = document.getElementById('filterEPM');
+    filterEPP = document.getElementById('filterEPP');
+}
+
+// Cargar vehículos
 async function cargarVehiculos() {
     try {
         const { data, error } = await supabaseClient
@@ -28,7 +40,7 @@ async function cargarVehiculos() {
         console.error('Error cargando vehículos:', error);
         document.getElementById('vehiclesTableBody').innerHTML = `
             <tr>
-                <td colspan="13" style="text-align: center; color: #dc2626;">
+                <td colspan="11" style="text-align: center; color: #dc2626;">
                     Error al cargar los datos: ${error.message}
                 </td>
             </tr>
@@ -36,29 +48,25 @@ async function cargarVehiculos() {
     }
 }
 
-// Aplicar todos los filtros
+// Aplicar filtros
 function aplicarFiltros() {
-    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-    const filterTipo = document.getElementById('filterTipo').value;
-    const filterClase = document.getElementById('filterClase').value;
-    const filterEstatus = document.getElementById('filterEstatus').value;
-    const filterEPM = document.getElementById('filterEPM').value;
-    const filterEPP = document.getElementById('filterEPP').value;
+    // Obtener elementos del DOM si no existen
+    if (!filterTipo) getDOMElements();
+    
+    const filterTipoValue = filterTipo ? filterTipo.value : '';
+    const filterClaseValue = filterClase ? filterClase.value : '';
+    const filterEstatusValue = filterEstatus ? filterEstatus.value : '';
+    const filterEPMValue = filterEPM ? filterEPM.value : '';
+    const filterEPPValue = filterEPP ? filterEPP.value : '';
 
     filteredVehicles = allVehicles.filter(v => {
-        const matchesSearch = !searchTerm || 
-            (v.placa && v.placa.toLowerCase().includes(searchTerm)) ||
-            (v.facsimil && v.facsimil.toLowerCase().includes(searchTerm)) ||
-            (v.marca && v.marca.toLowerCase().includes(searchTerm)) ||
-            (v.modelo && v.modelo.toLowerCase().includes(searchTerm));
+        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.toUpperCase().includes(filterTipoValue.toUpperCase()));
+        const matchesClase = !filterClaseValue || (v.clase && v.clase.toUpperCase().includes(filterClaseValue.toUpperCase()));
+        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.toUpperCase().includes(filterEstatusValue.toUpperCase()));
+        const matchesEPM = !filterEPMValue || (v.epm && v.epm.toUpperCase().includes(filterEPMValue.toUpperCase()));
+        const matchesEPP = !filterEPPValue || (v.epp && v.epp.toUpperCase().includes(filterEPPValue.toUpperCase()));
         
-        const matchesTipo = !filterTipo || (v.tipo && v.tipo.toUpperCase().includes(filterTipo.toUpperCase()));
-        const matchesClase = !filterClase || (v.clase && v.clase.toUpperCase().includes(filterClase.toUpperCase()));
-        const matchesEstatus = !filterEstatus || (v.estatus && v.estatus.toUpperCase().includes(filterEstatus.toUpperCase()));
-        const matchesEPM = !filterEPM || (v.epm && v.epm.toUpperCase().includes(filterEPM.toUpperCase()));
-        const matchesEPP = !filterEPP || (v.epp && v.epp.toUpperCase().includes(filterEPP.toUpperCase()));
-        
-        return matchesSearch && matchesTipo && matchesClase && matchesEstatus && matchesEPM && matchesEPP;
+        return matchesTipo && matchesClase && matchesEstatus && matchesEPM && matchesEPP;
     });
 
     currentPage = 1;
@@ -66,22 +74,18 @@ function aplicarFiltros() {
     renderPagination();
 }
 
-// Limpiar todos los filtros
+// Limpiar filtros
 function limpiarFiltros() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterTipo').value = '';
-    document.getElementById('filterClase').value = '';
-    document.getElementById('filterEstatus').value = '';
-    document.getElementById('filterEPM').value = '';
-    document.getElementById('filterEPP').value = '';
+    if (filterTipo) filterTipo.value = '';
+    if (filterClase) filterClase.value = '';
+    if (filterEstatus) filterEstatus.value = '';
+    if (filterEPM) filterEPM.value = '';
+    if (filterEPP) filterEPP.value = '';
     
-    filteredVehicles = [...allVehicles];
-    currentPage = 1;
-    renderTable();
-    renderPagination();
+    aplicarFiltros();
 }
 
-// Renderizar tabla con paginación
+// Renderizar tabla
 function renderTable() {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
@@ -90,7 +94,7 @@ function renderTable() {
     if (pageVehicles.length === 0) {
         document.getElementById('vehiclesTableBody').innerHTML = `
             <tr>
-                <td colspan="13" style="text-align: center; color: #666;">
+                <td colspan="11" style="text-align: center; color: #666;">
                     No hay vehículos que mostrar
                 </td>
             </tr>
@@ -100,7 +104,7 @@ function renderTable() {
     }
 
     document.getElementById('vehiclesTableBody').innerHTML = pageVehicles.map(v => `
-        <tr>
+        <tr onclick="openFicha('${v.placa || ''}', '${v.facsimil || ''}')">
             <td>${v.placa || 'N/A'}</td>
             <td>${v.facsimil || 'N/A'}</td>
             <td>${v.marca || 'N/A'}</td>
@@ -112,12 +116,11 @@ function renderTable() {
             <td>${v.s_carroceria || 'N/A'}</td>
             <td>${v.s_motor || 'N/A'}</td>
             <td>${getEstatusBadge(v.estatus)}</td>
-            <td>${v.epm || 'N/A'}</td>
-            <td>${v.epp || 'N/A'}</td>
         </tr>
     `).join('');
 
     document.getElementById('resultsCount').textContent = `${filteredVehicles.length} vehículos encontrados`;
+    document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${Math.ceil(filteredVehicles.length / itemsPerPage)}`;
 }
 
 // Renderizar paginación
@@ -127,7 +130,6 @@ function renderPagination() {
     
     if (totalPages <= 1) {
         pagination.innerHTML = '';
-        document.getElementById('pageInfo').textContent = `Página 1 de 1`;
         return;
     }
 
@@ -150,7 +152,6 @@ function renderPagination() {
     `;
 
     pagination.innerHTML = html;
-    document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
 }
 
 // Cambiar página
@@ -161,26 +162,43 @@ function changePage(page) {
     currentPage = page;
     renderTable();
     renderPagination();
+}
+
+// Abrir ficha
+function openFicha(placa, facsimil) {
+    const vehicle = allVehicles.find(v => 
+        (v.placa && v.placa.trim() === placa.trim()) || 
+        (v.facsimil && v.facsimil.trim() === facsimil.trim())
+    );
     
-    // Scroll to top of table
-    document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+    if (!vehicle) return;
+
+    alert(`Ficha del Vehículo\n\nPlaca: ${vehicle.placa || 'N/A'}\nMarca: ${vehicle.marca || 'N/A'}\nModelo: ${vehicle.modelo || 'N/A'}`);
 }
 
 // Badge de estatus
 function getEstatusBadge(estatus) {
-    if (!estatus) return '<span class="badge">N/A</span>';
+    if (!estatus) return '<span class="badge badge-desincorporada">N/A</span>';
     
-    const e = estatus.toUpperCase();
-    let className = '';
+    const estatusUpper = estatus.toUpperCase();
+    let className = 'badge-desincorporada';
     
-    if (e.includes('OPERATIVA') && !e.includes('INOPERATIVA')) className = 'badge-operativa';
-    else if (e.includes('INOPERATIVA')) className = 'badge-inoperativa';
-    else if (e.includes('REPARACION')) className = 'badge-reparacion';
+    if (estatusUpper.includes('OPERATIVA') && !estatusUpper.includes('INOPERATIVA')) className = 'badge-operativa';
+    else if (estatusUpper.includes('INOPERATIVA')) className = 'badge-inoperativa';
+    else if (estatusUpper.includes('REPARACION')) className = 'badge-reparacion';
     
     return `<span class="badge ${className}">${estatus}</span>`;
 }
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
+    getDOMElements();
     cargarVehiculos();
+    
+    // Event listeners para filtros
+    if (filterTipo) filterTipo.addEventListener('change', aplicarFiltros);
+    if (filterClase) filterClase.addEventListener('change', aplicarFiltros);
+    if (filterEstatus) filterEstatus.addEventListener('change', aplicarFiltros);
+    if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
+    if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
 });
