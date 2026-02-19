@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Partes Generales - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Partes Generales | Sistema de Logística</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- jsPDF para exportar a PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ================= ESTILOS GENERALES ================= */
+.report-container {
+background: white;
+padding: 30px;
+border-radius: 12px;
+box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12);
+margin: 25px auto;
+max-width: 1440px;
+}
+
+/* ================= BOTONES DE ACCIÓN ================= */
+.report-actions {
+display: flex;
+gap: 15px;
+margin-bottom: 30px;
+justify-content: flex-end;
+flex-wrap: wrap;
+}
+
+.btn-action {
+padding: 12px 25px;
+border-radius: 8px;
+font-size: 0.9rem;
+font-weight: 600;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 8px;
+transition: all 0.3s;
+border: none;
+font-family: 'Roboto', sans-serif;
+}
+
+.btn-print {
+background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+color: white;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
+}
+
+.btn-print:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(0, 51, 102, 0.4);
+}
+
+.btn-pdf {
+background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+color: white;
+box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.btn-pdf:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+.btn-refresh {
+background: linear-gradient(135deg, #059669 0%, #047857 100%);
+color: white;
+box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+}
+
+.btn-refresh:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+/* ================= TARJETAS DE ESTADÍSTICAS ================= */
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 20px;
+margin-bottom: 30px;
+}
+
+.stat-card {
+background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+border-radius: 10px;
+padding: 25px;
+border-left: 5px solid #005b96;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+transition: transform 0.3s;
+}
+
+.stat-card:hover {
+transform: translateY(-3px);
+}
+
+.stat-card.operativas { border-left-color: #059669; }
+.stat-card.inoperativas { border-left-color: #dc2626; }
+.stat-card.mantenimiento { border-left-color: #f59e0b; }
+.stat-card.asignadas { border-left-color: #005b96; }
+
+.stat-card-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 10px;
+}
+
+.stat-icon {
+font-size: 2rem;
+}
+
+.stat-title {
+font-size: 0.9rem;
+color: #64748b;
+font-weight: 600;
+text-transform: uppercase;
+}
+
+.stat-value {
+font-size: 2.5rem;
+font-weight: 700;
+color: #1e293b;
+line-height: 1;
+}
+
+.stat-percentage {
+font-size: 0.85rem;
+color: #64748b;
+margin-top: 5px;
+}
+
+/* ================= SECCIÓN DE GRÁFICOS ================= */
+.charts-section {
+margin-bottom: 30px;
+}
+
+.section-title {
+font-size: 1.3rem;
+font-weight: 700;
+color: #1e293b;
+margin-bottom: 20px;
+padding-bottom: 10px;
+border-bottom: 3px solid #005b96;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.charts-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+gap: 25px;
+margin-bottom: 30px;
+}
+
+.chart-container {
+background: white;
+border-radius: 10px;
+padding: 25px;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+border: 2px solid #e2e8f0;
+}
+
+.chart-wrapper {
+position: relative;
+height: 300px;
+}
+
+/* ================= TABLAS ================= */
+.table-container {
+background: white;
+border-radius: 10px;
+padding: 25px;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+border: 2px solid #e2e8f0;
+overflow-x: auto;
+margin-bottom: 30px;
+}
+
+.data-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+padding: 12px 15px;
+text-align: left;
+border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+color: white;
+font-weight: 600;
+font-size: 0.85rem;
+text-transform: uppercase;
+}
+
+.data-table tr:hover {
+background: #f8fafc;
+}
+
+.data-table .badge {
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 0.75rem;
+font-weight: 600;
+display: inline-block;
+}
+
+.badge-operativa {
+background: #d1fae5;
+color: #059669;
+}
+
+.badge-inoperativa {
+background: #fee2e2;
+color: #dc2626;
+}
+
+.badge-mantenimiento {
+background: #fef3c7;
+color: #d97706;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+.report-container {
+padding: 20px;
+margin: 15px;
+}
+
+.report-actions {
+justify-content: center;
+}
+
+.btn-action {
+width: 100%;
+justify-content: center;
+}
+
+.charts-grid {
+grid-template-columns: 1fr;
+}
+
+.stat-value {
+font-size: 2rem;
+}
+}
+
+/* ================= ESTILOS DE IMPRESIÓN ================= */
+@media print {
+.navbar,
+.report-actions,
+.module-header {
+display: none !important;
+}
+
+.report-container {
+box-shadow: none;
+margin: 0;
+padding: 0;
+}
+
+body {
+background: white;
+}
+
+.chart-container,
+.table-container {
+break-inside: avoid;
+page-break-inside: avoid;
+}
+}
+</style>
+</head>
+<body class="dashboard-page">
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema de Logística</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">usuario@institucion.com</span>
+<button class="btn-logout" id="logoutBtn">
+<span class="logout-icon">🚪</span>
+<span class="logout-text">Cerrar Sesión</span>
+</button>
+</div>
+</div>
+</nav>
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+<!-- Header con Navegación de Migas -->
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Partes Generales</span>
+</div>
+</header>
+
+<!-- Título del Módulo -->
+<section class="module-title-section">
+<h1 class="module-title">📊 Partes Generales</h1>
+<p class="module-subtitle">Estadísticas y reportes del parque automotor</p>
+</section>
+
+<!-- Contenedor del Reporte -->
+<div class="report-container" id="reportContent">
+<!-- Botones de Acción -->
+<div class="report-actions">
+<button class="btn-action btn-refresh" onclick="location.reload()">
+🔄 Actualizar Datos
+</button>
+<button class="btn-action btn-print" onclick="imprimirReporte()">
+🖨️ Imprimir Reporte
+</button>
+<button class="btn-action btn-pdf" onclick="exportarPDF()">
+📄 Exportar a PDF
+</button>
+</div>
+
+<!-- Tarjetas de Estadísticas -->
+<div class="stats-grid">
+<div class="stat-card operativas">
+<div class="stat-card-header">
+<span class="stat-icon">✅</span>
+<span class="stat-title">Vehículos Operativos</span>
+</div>
+<div class="stat-value" id="totalOperativos">0</div>
+<div class="stat-percentage" id="porcentajeOperativos">0% del total</div>
+</div>
+
+<div class="stat-card inoperativas">
+<div class="stat-card-header">
+<span class="stat-icon">❌</span>
+<span class="stat-title">Vehículos Inoperativos</span>
+</div>
+<div class="stat-value" id="totalInoperativos">0</div>
+<div class="stat-percentage" id="porcentajeInoperativos">0% del total</div>
+</div>
+
+<div class="stat-card mantenimiento">
+<div class="stat-card-header">
+<span class="stat-icon">🔧</span>
+<span class="stat-title">En Mantenimiento</span>
+</div>
+<div class="stat-value" id="totalMantenimiento">0</div>
+<div class="stat-percentage" id="porcentajeMantenimiento">0% del total</div>
+</div>
+
+<div class="stat-card asignadas">
+<div class="stat-card-header">
+<span class="stat-icon">📍</span>
+<span class="stat-title">Vehículos Asignados</span>
+</div>
+<div class="stat-value" id="totalAsignados">0</div>
+<div class="stat-percentage" id="porcentajeAsignados">0% del total</div>
+</div>
+</div>
+
+<!-- Sección de Gráficos -->
+<div class="charts-section">
+<h2 class="section-title">📈 Distribución de Vehículos</h2>
+<div class="charts-grid">
+<!-- Gráfico de Estatus -->
+<div class="chart-container">
+<h3 style="margin-bottom: 15px; color: #1e293b; font-size: 1.1rem;">Por Estatus</h3>
+<div class="chart-wrapper">
+<canvas id="chartEstatus"></canvas>
+</div>
+</div>
+
+<!-- Gráfico por Tipo -->
+<div class="chart-container">
+<h3 style="margin-bottom: 15px; color: #1e293b; font-size: 1.1rem;">Por Tipo de Vehículo</h3>
+<div class="chart-wrapper">
+<canvas id="chartTipos"></canvas>
+</div>
+</div>
+
+<!-- Gráfico por Unidad Administrativa -->
+<div class="chart-container">
+<h3 style="margin-bottom: 15px; color: #1e293b; font-size: 1.1rem;">Por Unidad Administrativa</h3>
+<div class="chart-wrapper">
+<canvas id="chartUnidades"></canvas>
+</div>
+</div>
+
+<!-- Gráfico por Año -->
+<div class="chart-container">
+<h3 style="margin-bottom: 15px; color: #1e293b; font-size: 1.1rem;">Por Año de Fabricación</h3>
+<div class="chart-wrapper">
+<canvas id="chartAnos"></canvas>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Tabla de Resumen -->
+<div class="table-container">
+<h2 class="section-title">📋 Resumen Detallado por Unidad</h2>
+<table class="data-table" id="tablaResumen">
+<thead>
+<tr>
+<th>Unidad Administrativa</th>
+<th>Total Vehículos</th>
+<th>Operativos</th>
+<th>Inoperativos</th>
+<th>Mantenimiento</th>
+<th>% Operatividad</th>
+</tr>
+</thead>
+<tbody id="tbodyResumen">
+<!-- Se llena dinámicamente -->
+</tbody>
+</table>
+</div>
+
+<!-- Fecha del Reporte -->
+<div style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+Reporte generado el: <strong id="fechaReporte"></strong>
+</div>
+</div>
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/partes-generales.js" defer></script>
+</body>
+</html>
