@@ -1,519 +1,513 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crear Ficha Técnica - CCPE ZULIA</title>
-<link rel="stylesheet" href="../css/style.css">
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    font-family: 'Arial', sans-serif;
-    background: #f5f5f5;
-    padding: 20px;
-}
-.container {
-    max-width: 1800px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-/* Formulario */
-.form-section {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: 100%;
-}
-.form-section h2 {
-    color: #003366;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #003366;
-}
-.form-group {
-    margin-bottom: 15px;
-}
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
-    font-size: 14px;
-}
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 20px;
-    margin-right: 10px;
-}
-.btn-primary {
-    background: #003366;
-    color: white;
-}
-.btn-primary:hover {
-    background: #002244;
-}
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-/* Vista Previa - MÁS ANCHA Y ESTIRADA */
-.preview-section {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: 100%;
-    text-align: center;
-}
-.preview-section h2 {
-    color: #003366;
-    margin-bottom: 20px;
-}
-.ficha-tecnica {
-    border: 2px solid #003366;
-    padding: 30px;
-    background: white;
-    width: 100%;
-    max-width: 100%;
-    display: inline-block;
-    text-align: left;
-}
-.ficha-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #003366;
-}
-.ficha-logo {
-    width: 100px;
-    height: auto;
-}
-.ficha-title {
-    text-align: center;
-    flex: 1;
-    padding: 0 20px;
-}
-.ficha-title h1 {
-    font-size: 15px;
-    color: #003366;
-    margin-bottom: 5px;
-    line-height: 1.4;
-}
-.ficha-title h2 {
-    font-size: 18px;
-    color: #003366;
-    margin: 5px 0;
-}
-.ficha-title h3 {
-    font-size: 16px;
-    color: #003366;
-    margin-top: 5px;
-}
-.ficha-logo-right {
-    width: 100px;
-    height: auto;
-}
-.ficha-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 15px;
-    table-layout: fixed;
-}
-.ficha-table th {
-    background: #4a7c9b;
-    color: white;
-    padding: 12px 10px;
-    text-align: left;
-    font-size: 13px;
-    border: 2px solid #003366;
-    font-weight: bold;
-}
-.ficha-table td {
-    padding: 10px 8px;
-    border: 2px solid #003366;
-    font-size: 12px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    vertical-align: top;
-}
-.ficha-table .label {
-    font-weight: bold;
-    background: #f0f0f0;
-    width: 18%;
-}
-.ficha-table .value {
-    width: 32%;
-}
-.fotos-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-top: 15px;
-}
-.foto-box {
-    border: 2px solid #4a7c9b;
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #4a7c9b;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-}
-.observaciones-box {
-    min-height: 280px;
-    border: 2px solid #003366;
-    padding: 12px;
-    background: #fafafa;
-    font-size: 12px;
-    line-height: 1.5;
-}
-@media print {
-    .form-section, .btn {
-        display: none;
-    }
-    .container {
-        display: block;
-    }
-    .preview-section {
-        box-shadow: none;
-        padding: 0;
-    }
-    .ficha-tecnica {
-        border: 2px solid #003366;
-        width: 100%;
-    }
-}
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    .fotos-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .ficha-header {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crear Ficha Técnica de Vehículos - Sistema de Logística">
+    <meta name="theme-color" content="#003366">
+    <title>Crear Ficha Técnica | Transporte</title>
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        /* Formulario */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+        .form-section h2 {
+            color: #003366;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #003366;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #003366;
+            box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 20px;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #003366;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #002244;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        /* Vista Previa */
+        .preview-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            text-align: center;
+        }
+        .preview-section h2 {
+            color: #003366;
+            margin-bottom: 20px;
+        }
+        .ficha-tecnica {
+            border: 2px solid #003366;
+            padding: 30px;
+            background: white;
+            width: 100%;
+            max-width: 100%;
+            display: inline-block;
+            text-align: left;
+        }
+        .ficha-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #003366;
+        }
+        .ficha-logo {
+            width: 100px;
+            height: auto;
+        }
+        .ficha-title {
+            text-align: center;
+            flex: 1;
+            padding: 0 20px;
+        }
+        .ficha-title h1 {
+            font-size: 15px;
+            color: #003366;
+            margin-bottom: 5px;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+        .ficha-title h2 {
+            font-size: 18px;
+            color: #003366;
+            margin: 5px 0;
+            font-weight: 700;
+        }
+        .ficha-title h3 {
+            font-size: 16px;
+            color: #003366;
+            margin-top: 5px;
+            font-weight: 700;
+        }
+        .ficha-logo-right {
+            width: 100px;
+            height: auto;
+        }
+        .ficha-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            table-layout: fixed;
+        }
+        .ficha-table th {
+            background: #4a7c9b;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 13px;
+            border: 2px solid #003366;
+            font-weight: 700;
+        }
+        .ficha-table td {
+            padding: 10px 8px;
+            border: 2px solid #003366;
+            font-size: 12px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            vertical-align: top;
+        }
+        .ficha-table .label {
+            font-weight: 700;
+            background: #f0f0f0;
+            width: 18%;
+        }
+        .ficha-table .value {
+            width: 32%;
+        }
+        .fotos-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .foto-box {
+            border: 2px solid #4a7c9b;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #4a7c9b;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 4px;
+        }
+        .observaciones-box {
+            min-height: 280px;
+            border: 2px solid #003366;
+            padding: 12px;
+            background: #fafafa;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 4px;
+        }
+        @media print {
+            .navbar, .module-header, .btn {
+                display: none !important;
+            }
+            .container {
+                display: block;
+            }
+            .preview-section {
+                box-shadow: none;
+                padding: 0;
+            }
+            .ficha-tecnica {
+                border: 2px solid #003366;
+                width: 100%;
+            }
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .fotos-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .ficha-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
-<body>
-<div class="container">
-    <!-- Formulario -->
-    <div class="form-section">
-        <h2>📝 Datos del Vehículo</h2>
-        <form id="fichaForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Marca *</label>
-                    <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI">
-                </div>
-                <div class="form-group">
-                    <label>Modelo *</label>
-                    <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200">
-                </div>
+<body class="dashboard-page">
+    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema de Logística</span>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Tipo *</label>
-                    <select id="tipo" name="tipo" required>
-                        <option value="">Seleccione...</option>
-                        <option value="CAMIONETA">CAMIONETA</option>
-                        <option value="AUTOMOVIL">AUTOMÓVIL</option>
-                        <option value="MOTO">MOTO</option>
-                        <option value="CAMION">CAMIÓN</option>
-                        <option value="BUS">BUS</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Clase *</label>
-                    <input type="text" id="clase" name="clase" required placeholder="Ej: PICKUP D/ CABINA">
-                </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">usuario@institucion.com</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Serial Carrocería *</label>
-                    <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515">
-                </div>
-                <div class="form-group">
-                    <label>Color *</label>
-                    <input type="text" id="color" name="color" required placeholder="Ej: BLANCO">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Placa *</label>
-                    <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417">
-                </div>
-                <div class="form-group">
-                    <label>Facsimilar</label>
-                    <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Serial Motor *</label>
-                <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409">
-            </div>
-            <div class="form-group">
-                <label>Dependencia *</label>
-                <textarea id="dependencia" name="dependencia" rows="3" required placeholder="Ej: SERVICIO PATRULLAJE VEHICULAR CUADRANTES DE PAZ"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Estatus del Vehículo *</label>
-                <select id="estatus" name="estatus" required>
-                    <option value="OPERATIVO">OPERATIVO</option>
-                    <option value="INOPERATIVO">INOPERATIVO</option>
-                </select>
-            </div>
-            <h3 style="margin: 20px 0 15px; color: #003366;">Información Técnico Mecánica (Si es Inoperativo)</h3>
-            <div class="form-group">
-                <label>Causa</label>
-                <input type="text" id="causa" name="causa" placeholder="Describa la causa">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Mecánica</label>
-                    <input type="text" id="mecanica" name="mecanica" placeholder="Estado mecánico">
-                </div>
-                <div class="form-group">
-                    <label>Diagnóstico</label>
-                    <input type="text" id="diagnostico" name="diagnostico" placeholder="Diagnóstico">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Ubicación</label>
-                    <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación actual">
-                </div>
-                <div class="form-group">
-                    <label>Tapicería</label>
-                    <input type="text" id="tapiceria" name="tapiceria" placeholder="Estado tapicería">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Cauchos</label>
-                    <input type="text" id="cauchos" name="cauchos" placeholder="Estado cauchos">
-                </div>
-                <div class="form-group">
-                    <label>Luces</label>
-                    <input type="text" id="luces" name="luces" placeholder="Estado luces">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Observaciones</label>
-                <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales"></textarea>
-            </div>
-            <div>
-                <button type="button" class="btn btn-primary" onclick="guardarFicha()">💾 Guardar Ficha</button>
-                <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
-                <button type="reset" class="btn btn-secondary" onclick="limpiarFormulario()">🔄 Limpiar</button>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Vista Previa -->
-    <div class="preview-section">
-        <h2 style="color: #003366; margin-bottom: 20px;">👁️ Vista Previa</h2>
-        <div class="ficha-tecnica" id="fichaPreview">
-            <!-- Header -->
-            <div class="ficha-header">
-                <img src="../img/logo-venezuela.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
-                <div class="ficha-title">
-                    <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
-                    <h2>REDIP: OCCIDENTAL</h2>
-                    <h3>CCPE ZULIA</h3>
-                </div>
-                <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
-            </div>
-            
-            <!-- Tabla de Datos -->
-            <table class="ficha-table">
-                <tr>
-                    <th colspan="4">DATOS DEL VEHICULO</th>
-                    <th rowspan="4" style="width: 25%; vertical-align: top;">
-                        <strong>OBSERVACIONES</strong><br><br>
-                        <div class="observaciones-box" id="previewObservaciones"></div>
-                    </th>
-                </tr>
-                <tr>
-                    <td class="label">MARCA</td>
-                    <td class="value" id="previewMarca"></td>
-                    <td class="label">MODELO</td>
-                    <td class="value" id="previewModelo"></td>
-                    <td class="label">TIPO: <span id="previewTipo"></span></td>
-                </tr>
-                <tr>
-                    <td class="label">SERIAL CARROCERIA</td>
-                    <td class="value" id="previewSerialCarroceria"></td>
-                    <td class="label">CLASE</td>
-                    <td class="value" id="previewClase"></td>
-                    <td class="label">COLOR: <span id="previewColor"></span></td>
-                </tr>
-                <tr>
-                    <td class="label">PLACA:</td>
-                    <td class="value" id="previewPlaca"></td>
-                    <td class="label">FACSIMIL</td>
-                    <td class="value" id="previewFacsimilar"></td>
-                    <td class="label">DEPENDENCIA:<br><span id="previewDependencia"></span></td>
-                </tr>
-                <tr>
-                    <td class="label">SERIAL MOTOR</td>
-                    <td class="value" id="previewSerialMotor"></td>
-                    <td class="label"></td>
-                    <td class="value"></td>
-                    <td class="label"></td>
-                </tr>
-                <tr>
-                    <td class="label">ESTATUS DEL VEHICULO</td>
-                    <td colspan="3" style="text-align: center; font-weight: bold;" id="previewEstatus"></td>
-                </tr>
-                <tr>
-                    <th colspan="5">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
-                </tr>
-                <tr>
-                    <td class="label">CAUSA</td>
-                    <td colspan="2" id="previewCausa"></td>
-                    <td class="label">DIAGNÓSTICO</td>
-                    <td id="previewDiagnostico"></td>
-                </tr>
-                <tr>
-                    <td class="label">MECANICA</td>
-                    <td colspan="2" id="previewMecanica"></td>
-                    <td class="label">UBICACIÓN:</td>
-                    <td id="previewUbicacion"></td>
-                </tr>
-                <tr>
-                    <td class="label">TAPICERIA</td>
-                    <td id="previewTapiceria"></td>
-                    <td class="label">CAUCHOS</td>
-                    <td id="previewCauchos"></td>
-                    <td class="label">LUCES</td>
-                    <td id="previewLuces"></td>
-                </tr>
-                <tr>
-                    <th colspan="5">REGISTRO FOTOGRÁFICO</th>
-                </tr>
-                <tr>
-                    <td colspan="5">
-                        <div class="fotos-container">
-                            <div class="foto-box">Foto 1</div>
-                            <div class="foto-box">Foto 2</div>
-                            <div class="foto-box">Foto 3</div>
-                            <div class="foto-box">Foto 4</div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
         </div>
-    </div>
-</div>
+    </nav>
 
-<script>
-// Actualizar vista previa en tiempo real
-const inputs = document.querySelectorAll('input, select, textarea');
-inputs.forEach(input => {
-    input.addEventListener('input', actualizarVistaPrevia);
-});
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="dashboard-main" role="main">
+        <!-- Header con Navegación de Migas -->
+        <header class="module-header">
+            <div class="breadcrumb">
+                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Crear Ficha Técnica</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
+                ← Volver a Transporte
+            </button>
+        </header>
 
-function actualizarVistaPrevia() {
-    document.getElementById('previewMarca').textContent = document.getElementById('marca').value || '';
-    document.getElementById('previewModelo').textContent = document.getElementById('modelo').value || '';
-    document.getElementById('previewTipo').textContent = document.getElementById('tipo').value || '';
-    document.getElementById('previewClase').textContent = document.getElementById('clase').value || '';
-    document.getElementById('previewSerialCarroceria').textContent = document.getElementById('serialCarroceria').value || '';
-    document.getElementById('previewColor').textContent = document.getElementById('color').value || '';
-    document.getElementById('previewPlaca').textContent = document.getElementById('placa').value || '';
-    document.getElementById('previewFacsimilar').textContent = document.getElementById('facsimilar').value || '';
-    document.getElementById('previewSerialMotor').textContent = document.getElementById('serialMotor').value || '';
-    document.getElementById('previewDependencia').textContent = document.getElementById('dependencia').value || '';
-    document.getElementById('previewEstatus').textContent = document.getElementById('estatus').value || '';
-    document.getElementById('previewCausa').textContent = document.getElementById('causa').value || '';
-    document.getElementById('previewMecanica').textContent = document.getElementById('mecanica').value || '';
-    document.getElementById('previewDiagnostico').textContent = document.getElementById('diagnostico').value || '';
-    document.getElementById('previewUbicacion').textContent = document.getElementById('ubicacion').value || '';
-    document.getElementById('previewTapiceria').textContent = document.getElementById('tapiceria').value || '';
-    document.getElementById('previewCauchos').textContent = document.getElementById('cauchos').value || '';
-    document.getElementById('previewLuces').textContent = document.getElementById('luces').value || '';
-    document.getElementById('previewObservaciones').textContent = document.getElementById('observaciones').value || '';
-}
+        <!-- Título del Módulo -->
+        <section class="module-title-section">
+            <h1 class="module-title">📋 Crear Ficha Técnica de Vehículo</h1>
+            <p class="module-subtitle">Complete el formulario para registrar una nueva ficha técnica de vehículo</p>
+        </section>
 
-function guardarFicha() {
-    const form = document.getElementById('fichaForm');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    
-    const fichaData = {
-        marca: document.getElementById('marca').value,
-        modelo: document.getElementById('modelo').value,
-        tipo: document.getElementById('tipo').value,
-        clase: document.getElementById('clase').value,
-        serialCarroceria: document.getElementById('serialCarroceria').value,
-        color: document.getElementById('color').value,
-        placa: document.getElementById('placa').value,
-        facsimilar: document.getElementById('facsimilar').value,
-        serialMotor: document.getElementById('serialMotor').value,
-        dependencia: document.getElementById('dependencia').value,
-        estatus: document.getElementById('estatus').value,
-        causa: document.getElementById('causa').value,
-        mecanica: document.getElementById('mecanica').value,
-        diagnostico: document.getElementById('diagnostico').value,
-        ubicacion: document.getElementById('ubicacion').value,
-        tapiceria: document.getElementById('tapiceria').value,
-        cauchos: document.getElementById('cauchos').value,
-        luces: document.getElementById('luces').value,
-        observaciones: document.getElementById('observaciones').value,
-        fechaCreacion: new Date().toISOString()
-    };
-    
-    // Guardar en localStorage
-    let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
-    fichas.push(fichaData);
-    localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
-    
-    alert('✅ Ficha técnica guardada exitosamente');
-}
+        <div class="container">
+            <!-- Formulario -->
+            <div class="form-section">
+                <h2>📝 Datos del Vehículo</h2>
+                <form id="fichaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marca *</label>
+                            <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI">
+                        </div>
+                        <div class="form-group">
+                            <label>Modelo *</label>
+                            <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo *</label>
+                            <select id="tipo" name="tipo" required>
+                                <option value="">Seleccione...</option>
+                                <option value="CAMIONETA">CAMIONETA</option>
+                                <option value="AUTOMOVIL">AUTOMÓVIL</option>
+                                <option value="MOTO">MOTO</option>
+                                <option value="CAMION">CAMIÓN</option>
+                                <option value="BUS">BUS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Clase *</label>
+                            <input type="text" id="clase" name="clase" required placeholder="Ej: PICKUP D/ CABINA">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Serial Carrocería *</label>
+                            <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515">
+                        </div>
+                        <div class="form-group">
+                            <label>Color *</label>
+                            <input type="text" id="color" name="color" required placeholder="Ej: BLANCO">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Placa *</label>
+                            <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417">
+                        </div>
+                        <div class="form-group">
+                            <label>Facsimilar</label>
+                            <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Serial Motor *</label>
+                        <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409">
+                    </div>
+                    <div class="form-group">
+                        <label>Dependencia *</label>
+                        <textarea id="dependencia" name="dependencia" rows="3" required placeholder="Ej: SERVICIO PATRULLAJE VEHICULAR CUADRANTES DE PAZ"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Estatus del Vehículo *</label>
+                        <select id="estatus" name="estatus" required>
+                            <option value="OPERATIVO">OPERATIVO</option>
+                            <option value="INOPERATIVO">INOPERATIVO</option>
+                        </select>
+                    </div>
+                    <h3 style="margin: 20px 0 15px; color: #003366;">Información Técnico Mecánica (Si es Inoperativo)</h3>
+                    <div class="form-group">
+                        <label>Causa</label>
+                        <input type="text" id="causa" name="causa" placeholder="Describa la causa">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Mecánica</label>
+                            <input type="text" id="mecanica" name="mecanica" placeholder="Estado mecánico">
+                        </div>
+                        <div class="form-group">
+                            <label>Diagnóstico</label>
+                            <input type="text" id="diagnostico" name="diagnostico" placeholder="Diagnóstico">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ubicación</label>
+                            <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación actual">
+                        </div>
+                        <div class="form-group">
+                            <label>Tapicería</label>
+                            <input type="text" id="tapiceria" name="tapiceria" placeholder="Estado tapicería">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cauchos</label>
+                            <input type="text" id="cauchos" name="cauchos" placeholder="Estado cauchos">
+                        </div>
+                        <div class="form-group">
+                            <label>Luces</label>
+                            <input type="text" id="luces" name="luces" placeholder="Estado luces">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales"></textarea>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary" id="btnGuardar">💾 Guardar Ficha</button>
+                        <button type="button" class="btn btn-secondary" id="btnImprimir">🖨️ Imprimir</button>
+                        <button type="reset" class="btn btn-secondary" id="btnLimpiar">🔄 Limpiar</button>
+                    </div>
+                </form>
+            </div>
 
-function limpiarFormulario() {
-    if (confirm('¿Está seguro de limpiar el formulario?')) {
-        actualizarVistaPrevia();
-    }
-}
+            <!-- Vista Previa -->
+            <div class="preview-section">
+                <h2 style="color: #003366; margin-bottom: 20px;">👁️ Vista Previa</h2>
+                <div class="ficha-tecnica" id="fichaPreview">
+                    <div class="ficha-header">
+                        <img src="../img/logo-venezuela.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
+                        <div class="ficha-title">
+                            <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
+                            <h2>REDIP: OCCIDENTAL</h2>
+                            <h3>CCPE ZULIA</h3>
+                        </div>
+                        <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
+                    </div>
+                    <table class="ficha-table">
+                        <tr>
+                            <th colspan="4">DATOS DEL VEHICULO</th>
+                            <th rowspan="4" style="width: 25%; vertical-align: top;">
+                                <strong>OBSERVACIONES</strong><br><br>
+                                <div class="observaciones-box" id="previewObservaciones"></div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="label">MARCA</td>
+                            <td class="value" id="previewMarca"></td>
+                            <td class="label">MODELO</td>
+                            <td class="value" id="previewModelo"></td>
+                            <td class="label">TIPO: <span id="previewTipo"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">SERIAL CARROCERIA</td>
+                            <td class="value" id="previewSerialCarroceria"></td>
+                            <td class="label">CLASE</td>
+                            <td class="value" id="previewClase"></td>
+                            <td class="label">COLOR: <span id="previewColor"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">PLACA:</td>
+                            <td class="value" id="previewPlaca"></td>
+                            <td class="label">FACSIMIL</td>
+                            <td class="value" id="previewFacsimilar"></td>
+                            <td class="label">DEPENDENCIA:<br><span id="previewDependencia"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">SERIAL MOTOR</td>
+                            <td class="value" id="previewSerialMotor"></td>
+                            <td class="label"></td>
+                            <td class="value"></td>
+                            <td class="label"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">ESTATUS DEL VEHICULO</td>
+                            <td colspan="3" style="text-align: center; font-weight: bold;" id="previewEstatus"></td>
+                        </tr>
+                        <tr>
+                            <th colspan="5">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
+                        </tr>
+                        <tr>
+                            <td class="label">CAUSA</td>
+                            <td colspan="2" id="previewCausa"></td>
+                            <td class="label">DIAGNÓSTICO</td>
+                            <td id="previewDiagnostico"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">MECANICA</td>
+                            <td colspan="2" id="previewMecanica"></td>
+                            <td class="label">UBICACIÓN:</td>
+                            <td id="previewUbicacion"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">TAPICERIA</td>
+                            <td id="previewTapiceria"></td>
+                            <td class="label">CAUCHOS</td>
+                            <td id="previewCauchos"></td>
+                            <td class="label">LUCES</td>
+                            <td id="previewLuces"></td>
+                        </tr>
+                        <tr>
+                            <th colspan="5">REGISTRO FOTOGRÁFICO</th>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <div class="fotos-container">
+                                    <div class="foto-box">Foto 1</div>
+                                    <div class="foto-box">Foto 2</div>
+                                    <div class="foto-box">Foto 3</div>
+                                    <div class="foto-box">Foto 4</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 
-// Inicializar
-actualizarVistaPrevia();
-</script>
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../js/ficha-crear.js" defer></script>
 </body>
 </html>
