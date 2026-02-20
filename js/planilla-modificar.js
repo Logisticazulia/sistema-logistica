@@ -113,10 +113,8 @@ function cargarDatosVehiculo(vehiculo) {
 }
 
 // ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
-
-// ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
 async function buscarVehiculo() {
-    const searchTerm = searchUniversal.value.trim(); // ✅ SIN .toUpperCase()
+    const searchTerm = searchUniversal.value.trim().toUpperCase();
     if (!searchTerm) {
         showAlert('error', '❌ Ingrese Placa, ID, Facsímil o Serial para buscar');
         return;
@@ -127,20 +125,21 @@ async function buscarVehiculo() {
     btnSearch.disabled = true;
     
     try {
-        // ✅ USAR ilike PARA BÚSQUEDA INSENSIBLE A MAYÚSCULAS/MINÚSCULAS
+        // ✅ OPCIÓN 1: Usar ilike para búsqueda insensible (RECOMENDADO)
         let query = supabaseClient
             .from('vehiculos')
             .select('*')
-            .limit(5);
+            .limit(10);
         
         const esNumero = /^\d+$/.test(searchTerm);
         
         if (esNumero && searchTerm.length <= 5) {
+            // Búsqueda por ID numérico corto
             console.log('📍 Búsqueda por ID:', searchTerm);
             query = query.eq('id', parseInt(searchTerm));
         } else {
-            console.log('📍 Búsqueda en campos únicos:', searchTerm);
-            // ✅ CAMBIAR .eq. POR .ilike. (insensible a mayúsculas)
+            // ✅ Búsqueda con ILIKE (insensible a mayúsculas/minúsculas)
+            console.log('📍 Búsqueda en campos con ILIKE:', searchTerm);
             query = query.or(
                 `placa.ilike.%${searchTerm}%,` +
                 `facsimil.ilike.%${searchTerm}%,` +
@@ -148,11 +147,13 @@ async function buscarVehiculo() {
                 `s_motor.ilike.%${searchTerm}%`
             );
             
+            // Si es número largo, también buscar por ID
             if (esNumero) {
                 query = query.or(`id.eq.${searchTerm}`);
             }
         }
         
+        console.log('📊 Ejecutando consulta...');
         const { data, error } = await query;
         
         if (error) {
@@ -161,9 +162,17 @@ async function buscarVehiculo() {
             return;
         }
         
+        console.log('📊 [RESULTADOS] Cantidad:', data ? data.length : 0);
+        console.log('📊 [RESULTADOS] Datos:', data);
+        
         if (!data || data.length === 0) {
-            // ✅ MOSTRAR DEBUG PARA VER QUÉ HAY EN LA BD
-            console.log('❌ No encontrado. Término buscado:', searchTerm);
+            // ✅ DEBUG: Mostrar qué hay en la BD para comparar
+            const { data: todos } = await supabaseClient
+                .from('vehiculos')
+                .select('id, placa, facsimil')
+                .limit(5);
+            console.log('📊 Primeros 5 registros en BD:', todos);
+            
             showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
             return;
         }
