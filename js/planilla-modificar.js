@@ -112,7 +112,6 @@ function cargarDatosVehiculo(vehiculo) {
     showAlert('success', `✅ Vehículo ${vehiculo.placa} encontrado. Presione "Editar Información" para modificar.`);
 }
 
-// ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
 // ================= BÚSQUEDA UNIVERSAL (VERSIÓN FINAL) =================
 async function buscarVehiculo() {
     const searchTerm = searchUniversal.value.trim().toUpperCase();
@@ -325,4 +324,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     showAlert('info', 'ℹ️ Ingrese Placa, ID, Facsímil o Serial para buscar un vehículo');
+});
+// ================= AGREGA ESTA FUNCIÓN TEMPORAL =================
+async function debugRegistros() {
+    const { data, error } = await supabaseClient
+        .from('vehiculos')
+        .select('id, placa, facsimil, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+    
+    console.log('🔍 ÚLTIMOS 10 REGISTROS EN BD:');
+    console.table(data);
+    
+    // Verificar caracteres ocultos
+    data?.forEach(v => {
+        console.log(`ID ${v.id}: placa="${v.placa}" (${v.placa?.length} chars)`);
+        console.log(`  Bytes:`, [...v.placa].map(c => c.charCodeAt(0)));
+    });
+}
+
+// Llamar al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    debugRegistros(); // ← AGREGA ESTO
+    // ... resto del código
 });
