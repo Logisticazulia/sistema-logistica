@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ficha Técnica de Vehículos - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Ficha Técnica | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page">
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema de Logística</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">usuario@institucion.com</span>
+<button class="btn-logout" id="logoutBtn">
+<span class="logout-icon">🚪</span>
+<span class="logout-text">Cerrar Sesión</span>
+</button>
+</div>
+</div>
+</nav>
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+<!-- Header con Navegación de Migas -->
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Ficha Técnica</span>
+</div>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
+← Volver a Transporte
+</button>
+</header>
+
+<!-- Título del Módulo -->
+<section class="module-title-section">
+<h1 class="module-title">🔧 Ficha Técnica de Vehículos</h1>
+<p class="module-subtitle">Seleccione una opción para gestionar las fichas técnicas</p>
+</section>
+
+<!-- 4 Botones Estilo Dashboard -->
+<section class="modules-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 30px;">
+<!-- Botón 1: Consultar Ficha -->
+<a href="ficha-consultar.html" class="module-card" style="border-left-color: #005b96;">
+<div class="module-icon" style="color: #005b96;">🔍</div>
+<h2 class="module-title">Consultar Ficha</h2>
+<p class="module-description">Búsqueda y visualización de fichas técnicas registradas</p>
+<div class="module-arrow">→</div>
+</a>
+
+<!-- Botón 2: Crear Nueva Ficha -->
+<a href="ficha-crear.html" class="module-card" style="border-left-color: #2a9d8f;">
+<div class="module-icon" style="color: #2a9d8f;">➕</div>
+<h2 class="module-title">Crear Nueva Ficha</h2>
+<p class="module-description">Registro de nuevas fichas técnicas al sistema</p>
+<div class="module-arrow">→</div>
+</a>
+
+<!-- Botón 3: Modificar Ficha -->
+<a href="ficha-modificar.html" class="module-card" style="border-left-color: #e9c46a;">
+<div class="module-icon" style="color: #e9c46a;">✏️</div>
+<h2 class="module-title">Modificar Ficha</h2>
+<p class="module-description">Actualización y edición de fichas técnicas existentes</p>
+<div class="module-arrow">→</div>
+</a>
+
+<!-- Botón 4: Partes -->
+<a href="planilla-partes.html" class="module-card" style="border-left-color: #e76f51;">
+<div class="module-icon" style="color: #e76f51;">📄</div>
+<h2 class="module-title">Partes</h2>
+<p class="module-description">Gestión de partes, incidencias y novedades de los vehículos</p>
+<div class="module-arrow">→</div>
+</a>
+</section>
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/ficha.js" defer></script>
+</body>
+</html>
