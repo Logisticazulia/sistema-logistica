@@ -1,6 +1,6 @@
 /**
 * MODIFICAR VEHÍCULOS - PLANILLA
-* VERSIÓN CORREGIDA CON BÚSQUEDA INSENSIBLE A MAYÚSCULAS/MINÚSCULAS
+* VERSIÓN FINAL - FILTRADO LOCAL COMO planilla-consultar.js
 */
 
 // ================= CONFIGURACIÓN =================
@@ -33,6 +33,7 @@ const logoutBtn = document.getElementById('logoutBtn');
 // ================= ESTADO =================
 let isEditing = false;
 let vehicleData = null;
+let allVehicles = []; // ✅ TODOS LOS VEHÍCULOS CARGADOS
 
 // ================= FUNCIONES DE UTILIDAD =================
 
@@ -61,12 +62,10 @@ async function cerrarSesion() {
 }
 
 function showAlert(type, message) {
-    // Ocultar todas las alertas
     if (alertSuccess) alertSuccess.style.display = 'none';
     if (alertError) alertError.style.display = 'none';
     if (alertInfo) alertInfo.style.display = 'none';
     
-    // Mostrar la correspondiente
     if (type === 'success' && alertSuccess) {
         if (successMessage) successMessage.textContent = message;
         alertSuccess.style.display = 'flex';
@@ -137,7 +136,7 @@ function cargarDatosVehiculo(vehiculo) {
     showAlert('success', `✅ Vehículo ${placaDisplay} encontrado. Presione "Editar Información" para modificar.`);
 }
 
-// ================= FUNCIÓN DE LIMPIEZA DE TEXTO =================
+// ✅ FUNCIÓN DE LIMPIEZA DE TEXTO
 function limpiarTexto(texto) {
     if (!texto) return '';
     return texto
@@ -149,7 +148,33 @@ function limpiarTexto(texto) {
         .trim();
 }
 
-// ================= BÚSQUEDA UNIVERSAL (VERSIÓN FINAL CORREGIDA) =================
+// ================= CARGAR TODOS LOS VEHÍCULOS (COMO planilla-consultar.js) =================
+async function cargarTodosLosVehiculos() {
+    try {
+        console.log('📥 Cargando todos los vehículos desde Supabase...');
+        
+        const { data, error } = await supabaseClient
+            .from('vehiculos')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('❌ Error al cargar vehículos:', error);
+            throw error;
+        }
+        
+        allVehicles = data || [];
+        console.log(`✅ ${allVehicles.length} vehículos cargados correctamente`);
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Error en cargarTodosLosVehiculos:', error);
+        showAlert('error', 'Error al cargar datos: ' + error.message);
+        return false;
+    }
+}
+
+// ================= BÚSQUEDA UNIVERSAL (FILTRADO LOCAL) =================
 async function buscarVehiculo() {
     if (!searchUniversal) {
         console.error('❌ Elemento searchUniversal no encontrado');
@@ -157,7 +182,6 @@ async function buscarVehiculo() {
         return;
     }
     
-    // ✅ NORMALIZAR: trim + uppercase (IGUAL que en registrar)
     const searchTerm = searchUniversal.value.trim().toUpperCase();
     
     if (!searchTerm) {
@@ -165,9 +189,7 @@ async function buscarVehiculo() {
         return;
     }
     
-    console.log('🔍 [BUSQUEDA] Iniciando búsqueda...');
-    console.log('🔍 [BUSQUEDA] Término:', searchTerm);
-    console.log('🔍 [BUSQUEDA] Longitud:', searchTerm.length);
+    console.log('🔍 [BÚSQUEDA] Término:', searchTerm);
     
     if (btnSearch) {
         btnSearch.classList.add('searching');
@@ -175,82 +197,65 @@ async function buscarVehiculo() {
     }
     
     try {
-        // ✅ CONSULTA DIRECTA CON ILIKE (INSENSIBLE A MAYÚSCULAS/MINÚSCULAS)
-        let query = supabaseClient
-            .from('vehiculos')
-            .select('*')
-            .limit(20);
-        
-        // Detectar si es número (ID) o texto
-        const esNumero = /^\d+$/.test(searchTerm);
-        
-        if (esNumero && searchTerm.length <= 5) {
-            // ID numérico corto - búsqueda exacta por ID
-            console.log('📍 Búsqueda por ID numérico:', searchTerm);
-            query = query.eq('id', parseInt(searchTerm));
-        } else {
-            // ✅ BÚSQUEDA CON ILIKE (PARCIAL E INSENSIBLE)
-            console.log('📍 Búsqueda en campos de texto con ILIKE:', searchTerm);
-            
-            // Construir condición OR para múltiples campos
-            const condiciones = [
-                `placa.ilike.%${searchTerm}%`,
-                `facsimil.ilike.%${searchTerm}%`,
-                `s_carroceria.ilike.%${searchTerm}%`,
-                `s_motor.ilike.%${searchTerm}%`,
-                `n_identificacion.ilike.%${searchTerm}%`
-            ];
-            
-            // Si es número largo, también buscar por ID
-            if (esNumero) {
-                condiciones.push(`id.eq.${searchTerm}`);
+        // ✅ SI NO HAY DATOS CARGADOS, CARGARLOS PRIMERO
+        if (allVehicles.length === 0) {
+            console.log('📥 No hay datos en memoria, cargando desde Supabase...');
+            const cargado = await cargarTodosLosVehiculos();
+            if (!cargado) {
+                showAlert('error', 'No se pudieron cargar los vehículos. Verifique su conexión.');
+                return;
             }
-            
-            query = query.or(condiciones.join(','));
         }
         
-        console.log('📊 Ejecutando consulta a Supabase...');
-        const { data, error } = await query;
+        console.log(`🔍 Buscando en ${allVehicles.length} vehículos locales...`);
         
-        if (error) {
-            console.error('❌ [ERROR SUPABASE] Error en la consulta:', error);
-            showAlert('error', 'Error al buscar: ' + error.message);
-            return;
-        }
-        
-        console.log('📊 [RESULTADOS] Cantidad encontrada:', data ? data.length : 0);
-        
-        if (!data || data.length === 0) {
-            // ✅ DEBUG: Mostrar últimos registros para comparar
-            console.log('⚠️ No se encontraron resultados. Obteniendo últimos registros para debug...');
-            const { data: ultimos, error: errorUltimos } = await supabaseClient
-                .from('vehiculos')
-                .select('id, placa, facsimil, created_at')
-                .order('created_at', { ascending: false })
-                .limit(5);
+        // ✅ FILTRAR LOCALMENTE (IGUAL QUE planilla-consultar.js)
+        const vehiculoEncontrado = allVehicles.find(v => {
+            const placa = (v.placa || '').toString().trim().toUpperCase();
+            const facsimil = (v.facsimil || '').toString().trim().toUpperCase();
+            const sCarroceria = (v.s_carroceria || '').toString().trim().toUpperCase();
+            const sMotor = (v.s_motor || '').toString().trim().toUpperCase();
+            const nIdentificacion = (v.n_identificacion || '').toString().trim().toUpperCase();
+            const id = (v.id || '').toString();
             
-            if (!errorUltimos && ultimos) {
-                console.log('📊 ÚLTIMOS 5 REGISTROS EN BD:', ultimos);
-            }
+            // Búsqueda exacta o parcial
+            return placa === searchTerm ||
+                   placa.includes(searchTerm) ||
+                   facsimil === searchTerm ||
+                   facsimil.includes(searchTerm) ||
+                   sCarroceria === searchTerm ||
+                   sCarroceria.includes(searchTerm) ||
+                   sMotor === searchTerm ||
+                   sMotor.includes(searchTerm) ||
+                   nIdentificacion === searchTerm ||
+                   nIdentificacion.includes(searchTerm) ||
+                   id === searchTerm;
+        });
+        
+        console.log('🔍 Resultado:', vehiculoEncontrado ? '✅ ENCONTRADO' : '❌ NO ENCONTRADO');
+        
+        if (!vehiculoEncontrado) {
+            // ✅ DEBUG: Mostrar últimos registros
+            const ultimos = allVehicles.slice(0, 5);
+            console.log('📊 ÚLTIMOS 5 VEHÍCULOS EN MEMORIA:');
+            ultimos.forEach(v => {
+                console.log(`  ID: ${v.id}, Placa: ${v.placa}, Facsímil: ${v.facsimil}`);
+            });
             
             showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
             return;
         }
         
-        // Tomar el primer resultado
-        const vehiculo = data[0];
-        vehicleData = vehiculo;
+        vehicleData = vehiculoEncontrado;
+        console.log('✅ Vehículo encontrado:', vehiculoEncontrado.placa || vehiculoEncontrado.id);
         
-        console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
-        console.log('✅ Datos completos:', vehiculo);
-        
-        cargarDatosVehiculo(vehiculo);
+        cargarDatosVehiculo(vehiculoEncontrado);
         
         if (btnEdit) btnEdit.disabled = false;
         if (btnCancel) btnCancel.disabled = false;
         
     } catch (error) {
-        console.error('❌ [EXCEPCION] Error en buscarVehiculo:', error);
+        console.error('❌ [EXCEPCIÓN] Error en buscarVehiculo:', error);
         showAlert('error', 'Error de conexión: ' + error.message);
     } finally {
         if (btnSearch) {
@@ -308,7 +313,6 @@ async function actualizarVehiculo(event) {
     }
     
     try {
-        // ✅ NORMALIZAR DATOS (igual que en registrar)
         const vehiculoActualizado = {
             placa: limpiarTexto(document.getElementById('placa')?.value),
             facsimil: limpiarTexto(document.getElementById('facsimil')?.value),
@@ -339,7 +343,6 @@ async function actualizarVehiculo(event) {
         };
         
         console.log('📝 Actualizando vehículo ID:', vehicleId);
-        console.log('📝 Datos:', vehiculoActualizado);
         
         const { data, error } = await supabaseClient
             .from('vehiculos')
@@ -354,6 +357,13 @@ async function actualizarVehiculo(event) {
         
         console.log('✅ Vehículo actualizado:', data);
         showAlert('success', '✅ Vehículo ' + (vehiculoActualizado.placa || vehicleId) + ' actualizado exitosamente');
+        
+        // ✅ ACTUALIZAR EN MEMORIA
+        const index = allVehicles.findIndex(v => v.id == vehicleId);
+        if (index !== -1) {
+            allVehicles[index] = { ...allVehicles[index], ...vehiculoActualizado };
+        }
+        
         toggleFormFields(false);
         
     } catch (error) {
@@ -376,17 +386,19 @@ function cancelarEdicion() {
 }
 
 // ================= INICIALIZACIÓN =================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Inicializando modificación de vehículos...');
     
-    // Verificar elementos críticos
     if (!form || !btnSearch || !searchUniversal) {
         console.error('❌ Elementos críticos del DOM no encontrados');
         showAlert('error', 'Error de inicialización. Recargue la página.');
         return;
     }
     
-    mostrarUsuarioAutenticado();
+    await mostrarUsuarioAutenticado();
+    
+    // ✅ CARGAR TODOS LOS VEHÍCULOS AL INICIAR
+    await cargarTodosLosVehiculos();
     
     // Búsqueda universal
     btnSearch.addEventListener('click', buscarVehiculo);
@@ -413,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', cerrarSesion);
     }
     
-    showAlert('info', 'ℹ️ Ingrese Placa, ID, Facsímil o Serial para buscar un vehículo');
+    showAlert('info', `ℹ️ ${allVehicles.length} vehículos cargados. Ingrese Placa, ID, Facsímil o Serial para buscar`);
     
     console.log('✅ Inicialización completada');
 });
