@@ -56,13 +56,11 @@ body {
     border-radius: 4px;
     font-size: 14px;
 }
-/* Fila de 4 campos */
 .form-row-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
 }
-/* Fila de 2 campos */
 .form-row-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -89,10 +87,10 @@ body {
     background: #6c757d;
     color: white;
 }
-/* Vista Previa - Más Ancha Horizontal */
+/* Vista Previa - MÁS GRANDE Y ESPACIOSA */
 .preview-section {
     background: white;
-    padding: 20px;
+    padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     width: 100%;
@@ -101,10 +99,11 @@ body {
     color: #003366;
     margin-bottom: 20px;
     text-align: center;
+    font-size: 24px;
 }
 .ficha-tecnica {
-    border: 3px solid #003366;
-    padding: 25px;
+    border: 4px solid #003366;
+    padding: 40px;
     background: white;
     width: 100%;
     margin: 0 auto;
@@ -113,38 +112,40 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #003366;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 4px solid #003366;
 }
 .ficha-logo {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .ficha-title {
     text-align: center;
     flex: 1;
+    padding: 0 20px;
 }
 .ficha-title h1 {
-    font-size: 16px;
-    color: #003366;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-.ficha-title h2 {
     font-size: 20px;
     color: #003366;
-    margin: 5px 0;
+    margin-bottom: 8px;
+    font-weight: bold;
+    line-height: 1.4;
+}
+.ficha-title h2 {
+    font-size: 24px;
+    color: #003366;
+    margin: 8px 0;
     font-weight: bold;
 }
 .ficha-title h3 {
-    font-size: 18px;
+    font-size: 22px;
     color: #003366;
-    margin-top: 5px;
+    margin-top: 8px;
     font-weight: bold;
 }
 .ficha-logo-right {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .ficha-table {
@@ -154,48 +155,56 @@ body {
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 10px;
+    padding: 15px 12px;
     text-align: left;
-    font-size: 13px;
-    border: 2px solid #003366;
+    font-size: 16px;
+    border: 3px solid #003366;
     font-weight: bold;
+    letter-spacing: 0.5px;
 }
 .ficha-table td {
-    padding: 8px;
-    border: 2px solid #003366;
-    font-size: 13px;
+    padding: 12px 10px;
+    border: 3px solid #003366;
+    font-size: 15px;
+    min-height: 40px;
+    vertical-align: middle;
 }
 .ficha-table .label {
     font-weight: bold;
     background: #f0f0f0;
-    width: 20%;
+    width: 18%;
+    font-size: 14px;
 }
 .ficha-table .value {
-    width: 30%;
+    width: 32%;
+    font-size: 15px;
 }
 .fotos-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 10px;
+    gap: 15px;
+    margin-top: 15px;
 }
 .foto-box {
-    border: 2px solid #4a7c9b;
-    height: 100px;
+    border: 3px solid #4a7c9b;
+    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #4a7c9b;
     color: white;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
+    border-radius: 4px;
 }
 .observaciones-box {
-    min-height: 180px;
-    border: 2px solid #003366;
-    padding: 10px;
+    min-height: 280px;
+    border: 3px solid #003366;
+    padding: 15px;
     background: #fafafa;
-    font-size: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+    border-radius: 4px;
 }
 @media print {
     .form-section, .btn, .preview-section h2 {
@@ -209,11 +218,14 @@ body {
         padding: 0;
     }
     .ficha-tecnica {
-        border: 3px solid #003366;
+        border: 4px solid #003366;
     }
 }
 @media (max-width: 1200px) {
     .form-row-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .fotos-container {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -227,7 +239,16 @@ body {
     }
     .ficha-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+    }
+    .ficha-title h1 {
+        font-size: 16px;
+    }
+    .ficha-title h2 {
+        font-size: 20px;
+    }
+    .ficha-title h3 {
+        font-size: 18px;
     }
 }
 </style>
@@ -238,7 +259,6 @@ body {
     <div class="form-section">
         <h2>📝 Datos del Vehículo</h2>
         <form id="fichaForm">
-            <!-- PRIMERA FILA - 4 CAMPOS EN UNA LÍNEA -->
             <div class="form-row-4">
                 <div class="form-group">
                     <label>Marca *</label>
@@ -265,7 +285,6 @@ body {
                 </div>
             </div>
             
-            <!-- SEGUNDA FILA - 2 CAMPOS -->
             <div class="form-row-2">
                 <div class="form-group">
                     <label>Serial Carrocería *</label>
@@ -277,7 +296,6 @@ body {
                 </div>
             </div>
             
-            <!-- TERCERA FILA - 2 CAMPOS -->
             <div class="form-row-2">
                 <div class="form-group">
                     <label>Placa *</label>
@@ -289,19 +307,16 @@ body {
                 </div>
             </div>
             
-            <!-- SERIAL MOTOR -->
             <div class="form-group">
                 <label>Serial Motor *</label>
                 <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409">
             </div>
             
-            <!-- DEPENDENCIA -->
             <div class="form-group">
                 <label>Dependencia *</label>
                 <textarea id="dependencia" name="dependencia" rows="3" required placeholder="Ej: SERVICIO PATRULLAJE VEHICULAR CUADRANTES DE PAZ"></textarea>
             </div>
             
-            <!-- ESTATUS -->
             <div class="form-group">
                 <label>Estatus del Vehículo *</label>
                 <select id="estatus" name="estatus" required>
@@ -312,13 +327,11 @@ body {
             
             <h3 style="margin: 20px 0 15px; color: #003366;">Información Técnico Mecánica (Si es Inoperativo)</h3>
             
-            <!-- CAUSA -->
             <div class="form-group">
                 <label>Causa</label>
                 <input type="text" id="causa" name="causa" placeholder="Describa la causa">
             </div>
             
-            <!-- FILA MECÁNICA/DIAGNÓSTICO -->
             <div class="form-row-2">
                 <div class="form-group">
                     <label>Mecánica</label>
@@ -330,7 +343,6 @@ body {
                 </div>
             </div>
             
-            <!-- FILA UBICACIÓN/TAPICERÍA -->
             <div class="form-row-2">
                 <div class="form-group">
                     <label>Ubicación</label>
@@ -342,7 +354,6 @@ body {
                 </div>
             </div>
             
-            <!-- FILA CAUCHOS/LUCES -->
             <div class="form-row-2">
                 <div class="form-group">
                     <label>Cauchos</label>
@@ -354,13 +365,11 @@ body {
                 </div>
             </div>
             
-            <!-- OBSERVACIONES -->
             <div class="form-group">
                 <label>Observaciones</label>
                 <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales"></textarea>
             </div>
             
-            <!-- BOTONES -->
             <div>
                 <button type="button" class="btn btn-primary" onclick="guardarFicha()">💾 Guardar Ficha</button>
                 <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
@@ -369,9 +378,9 @@ body {
         </form>
     </div>
     
-    <!-- Vista Previa (MÁS ANCHA HORIZONTAL) -->
+    <!-- Vista Previa (MÁS GRANDE) -->
     <div class="preview-section">
-        <h2>👁️ Vista Previa - Formato Horizontal</h2>
+        <h2>👁️ Vista Previa - Formato Ampliado</h2>
         <div class="ficha-tecnica" id="fichaPreview">
             <div class="ficha-header">
                 <img src="../img/logo-venezuela.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
@@ -386,7 +395,7 @@ body {
                 <tr>
                     <th colspan="4">DATOS DEL VEHICULO</th>
                     <th rowspan="4" style="width: 25%; vertical-align: top;">
-                        <strong>OBSERVACIONES</strong><br><br>
+                        <strong style="font-size: 16px;">OBSERVACIONES</strong><br><br>
                         <div class="observaciones-box" id="previewObservaciones"></div>
                     </th>
                 </tr>
@@ -420,10 +429,10 @@ body {
                 </tr>
                 <tr>
                     <td class="label">ESTATUS DEL VEHICULO</td>
-                    <td colspan="3" style="text-align: center; font-weight: bold; font-size: 14px;" id="previewEstatus"></td>
+                    <td colspan="3" style="text-align: center; font-weight: bold; font-size: 16px; padding: 15px;" id="previewEstatus"></td>
                 </tr>
                 <tr>
-                    <th colspan="5">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
+                    <th colspan="5" style="padding: 18px 12px; font-size: 17px;">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
                 </tr>
                 <tr>
                     <td class="label">CAUSA</td>
@@ -446,7 +455,7 @@ body {
                     <td id="previewLuces"></td>
                 </tr>
                 <tr>
-                    <th colspan="5">REGISTRO FOTOGRÁFICO</th>
+                    <th colspan="5" style="padding: 18px 12px; font-size: 17px;">REGISTRO FOTOGRÁFICO</th>
                 </tr>
                 <tr>
                     <td colspan="5">
