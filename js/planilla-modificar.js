@@ -164,6 +164,13 @@ async function buscarVehiculo() {
         
         console.log('📊 [RESULTADOS] Cantidad:', data ? data.length : 0);
         console.log('📊 [RESULTADOS] Datos:', data);
+        // Agrega esto ANTES del if (!data || data.length === 0)
+const { data: prueba, error: errorPrueba } = await supabaseClient
+    .from('vehiculos')
+    .select('id, placa, facsimil, s_carroceria, s_motor')
+    .ilike('placa', `%${searchTerm}%`);
+    
+console.log('🧪 PRUEBA DIRECTA:', prueba);
         
         if (!data || data.length === 0) {
             // ✅ DEBUG: Mostrar qué hay en la BD para comparar
