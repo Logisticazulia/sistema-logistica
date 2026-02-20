@@ -1,137 +1,588 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- ================= METAETIQUETAS ESENCIALES ================= -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Acceso al sistema institucional - Login seguro">
-    <meta name="theme-color" content="#003366">
-    
-    <!-- ================= TÍTULO E ICONOS ================= -->
-    <title>Acceso | Sistema de Gestión Administrativa</title>
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="img/logo.png">
-    
-    <!-- ================= ESTILOS ================= -->
-    <!-- Fuentes Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Hoja de estilos principal -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
+<!-- ================= METAETIQUETAS ESENCIALES ================= -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Acceso al sistema institucional - Login seguro">
+<meta name="theme-color" content="#003366">
+<!-- ================= TÍTULO E ICONOS ================= -->
+<title>Acceso | Sistema de Gestión Administrativa</title>
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="img/logo.png">
+<!-- ================= ESTILOS ================= -->
+<!-- Fuentes Google -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- Hoja de estilos principal -->
+<link rel="stylesheet" href="css/style.css">
 
+<style>
+/* ================= LAYOUT SPLIT-SCREEN ================= */
+.login-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    background: #f5f7fa;
+}
+
+/* ================= PANEL IZQUIERDO: SLIDESHOW ================= */
+.login-slideshow {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #003366 0%, #005b96 50%, #003366 100%);
+}
+
+.slideshow-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.slideshow-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.slideshow-slide.active {
+    opacity: 1;
+}
+
+/* Overlay oscuro para mejor legibilidad del texto */
+.slideshow-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg, 
+        rgba(0, 51, 102, 0.85) 0%, 
+        rgba(0, 91, 150, 0.7) 50%, 
+        rgba(0, 51, 102, 0.85) 100%
+    );
+    z-index: 1;
+}
+
+/* Contenido del slideshow */
+.slideshow-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+    padding: 40px;
+    max-width: 500px;
+}
+
+.slideshow-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 1s ease;
+}
+
+.slideshow-content p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    line-height: 1.6;
+    opacity: 0.95;
+    animation: fadeInUp 1s ease 0.3s both;
+}
+
+/* Indicadores del slideshow */
+.slideshow-indicators {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+}
+
+.slideshow-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    border: 2px solid white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slideshow-indicator.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+.slideshow-indicator:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= PANEL DERECHO: FORMULARIO ================= */
+.login-form-panel {
+    flex: 0 0 45%;
+    max-width: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: white;
+    position: relative;
+}
+
+/* Tarjeta de Login */
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 51, 102, 0.15);
+    padding: 40px 35px;
+    animation: slideInRight 0.6s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================= HEADER DEL LOGIN ================= */
+.login-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.login-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #003366;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.login-subtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* ================= FORMULARIO ================= */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    transition: all 0.25s ease;
+    background: #f8fafc;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #005b96;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(0, 91, 150, 0.1);
+}
+
+.form-input::placeholder {
+    color: #94a3b8;
+}
+
+/* ================= BOTONES ================= */
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 51, 102, 0.4);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-loader {
+    display: none;
+}
+
+.btn-login.loading .btn-text {
+    display: none;
+}
+
+.btn-login.loading .btn-loader {
+    display: inline;
+}
+
+/* ================= MENSAJES ================= */
+.form-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.form-message.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #22c55e;
+    display: block;
+}
+
+.form-message.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================= FOOTER DEL LOGIN ================= */
+.login-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.security-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.security-icon {
+    font-size: 1.2rem;
+}
+
+.security-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.copyright {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+    .login-wrapper {
+        flex-direction: column;
+    }
+    
+    .login-slideshow {
+        flex: 0 0 35vh;
+        min-height: 250px;
+    }
+    
+    .login-form-panel {
+        flex: 1;
+        max-width: 100%;
+        padding: 30px 20px;
+    }
+    
+    .slideshow-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .slideshow-content p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 25px;
+        border-radius: 12px;
+    }
+    
+    .login-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .logo {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .form-input {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+    }
+    
+    .btn-login {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+}
+</style>
+</head>
 <body class="login-page">
 
-    <!-- ================= CONTENEDOR PRINCIPAL ================= -->
-    <main class="login-wrapper" role="main">
-        
-        <!-- Tarjeta de Login -->
+<!-- ================= CONTENEDOR PRINCIPAL SPLIT-SCREEN ================= -->
+<main class="login-wrapper" role="main">
+    
+    <!-- ================= PANEL IZQUIERDO: SLIDESHOW ================= -->
+    <section class="login-slideshow" aria-label="Galería institucional">
+        <div class="slideshow-container">
+            <!-- Imágenes del slideshow (reemplazar con tus imágenes reales) -->
+            <div class="slideshow-slide active" style="background-image: url('img/slideshow/img1.jpg');"></div>
+            <div class="slideshow-slide" style="background-image: url('img/slideshow/img2.jpg');"></div>
+            <div class="slideshow-slide" style="background-image: url('img/slideshow/img3.jpg');"></div>
+            <div class="slideshow-slide" style="background-image: url('img/slideshow/img4.jpg');"></div>
+            
+            <!-- Overlay oscuro -->
+            <div class="slideshow-overlay"></div>
+            
+            <!-- Contenido de texto -->
+            <div class="slideshow-content">
+                <h2>🛡️ Cuerpo de Policía Nacional Bolivariana</h2>
+                <p>Comprometidos con la seguridad, la justicia y el servicio a la comunidad del estado Zulia.</p>
+            </div>
+            
+            <!-- Indicadores -->
+            <div class="slideshow-indicators">
+                <span class="slideshow-indicator active" data-slide="0"></span>
+                <span class="slideshow-indicator" data-slide="1"></span>
+                <span class="slideshow-indicator" data-slide="2"></span>
+                <span class="slideshow-indicator" data-slide="3"></span>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ================= PANEL DERECHO: FORMULARIO ================= -->
+    <section class="login-form-panel">
         <article class="login-card" aria-labelledby="login-title">
             
-            <!-- Sección: Logo y Título -->
+            <!-- Header: Logo y Título -->
             <header class="login-header">
                 <div class="logo-container">
-                    <!-- 🔧 REEMPLAZA: src con tu logo real -->
-                    <img 
-                        src="img/logo.png" 
-                        alt="Logo Institucional" 
-                        class="logo"
-                        width="80" 
-                        height="80"
-                        loading="lazy"
-                    >
+                    <img src="img/logo.png" alt="Logo Institucional" class="logo" width="60" height="60" loading="lazy">
+                    <img src="img/logo_derecho.png" alt="Logo Secundario" class="logo" width="60" height="60" loading="lazy">
                 </div>
                 <h1 id="login-title">Sistema Automatizado de Gestión Administrativa</h1>
                 <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
             </header>
-
-            <!-- Sección: Formulario -->
+            
+            <!-- Formulario de Login -->
             <form id="loginForm" class="login-form" novalidate>
-                
                 <!-- Campo: Email -->
                 <div class="form-group">
-                    <label for="email" class="form-label">
-                        Correo Electrónico
-                    </label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email"
-                        class="form-input" 
-                        placeholder="ejemplo@institucion.com"
-                        required
-                        autocomplete="email"
-                        aria-required="true"
-                    >
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" class="form-input" 
+                           placeholder="ejemplo@institucion.com" required autocomplete="email">
                 </div>
-
+                
                 <!-- Campo: Contraseña -->
                 <div class="form-group">
-                    <label for="password" class="form-label">
-                        Contraseña
-                    </label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password"
-                        class="form-input" 
-                        placeholder="••••••••"
-                        required
-                        autocomplete="current-password"
-                        aria-required="true"
-                        minlength="6"
-                    >
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-input" 
+                           placeholder="••••••••" required autocomplete="current-password" minlength="6">
                 </div>
-
-                <!-- Mensajes de error/éxito -->
+                
+                <!-- Mensajes -->
                 <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
-
+                
                 <!-- Botón de envío -->
-                <button type="submit" class="btn btn-primary btn-login" id="submitBtn">
-                    <span class="btn-text">Ingresar</span>
-                    <span class="btn-loader" hidden>Procesando...</span>
+                <button type="submit" class="btn-login" id="submitBtn">
+                    <span class="btn-text">🔐 Ingresar al Sistema</span>
+                    <span class="btn-loader">⏳ Verificando...</span>
                 </button>
-
             </form>
-
-          <!-- Footer: Mensaje de Seguridad Elegante -->
-<footer class="login-footer">
-    
-    <!-- Badge de seguridad minimalista -->
-    <div class="security-badge">
-        <span class="security-icon">🔒</span>
-        <span class="security-label">Conexión segura y encriptada</span>
-         <span class="security-label">Cuerpo de Policia Nacional Bolivariana</span>
-    </div>
-
-</footer>
-
+            
+            <!-- Footer: Seguridad -->
+            <footer class="login-footer">
+                <div class="security-badge">
+                    <span class="security-icon">🔒</span>
+                    <span class="security-label">Conexión segura y encriptada</span>
+                    <span class="security-label">Cuerpo de Policía Nacional Bolivariana</span>
+                </div>
+            </footer>
+            
         </article>
-
-        <!-- Pie de página institucional -->
+        
+        <!-- Copyright -->
         <p class="copyright">
             &copy; <span id="currentYear"></span> OTIC ZULIA. Todos los derechos reservados.
         </p>
-
-    </main>
-
-    <!-- ================= SCRIPTS ================= -->
-    <!-- Librería de Supabase (CDN) -->
-    <script 
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
-        defer
-    ></script>
+    </section>
     
-    <!-- Lógica de autenticación (archivo separado) -->
-    <script src="js/auth.js" defer></script>
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<!-- Librería de Supabase (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<!-- Lógica de autenticación -->
+<script src="js/auth.js" defer></script>
+
+<!-- Script del Slideshow y elementos dinámicos -->
+<script>
+// ================= SLIDESHOW AUTOMÁTICO =================
+document.addEventListener('DOMContentLoaded', () => {
+    // Año automático en copyright
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
     
-    <!-- Script pequeño para elementos dinámicos -->
-    <script>
-        // Año automático en el copyright
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
+    // Configuración del slideshow
+    const slides = document.querySelectorAll('.slideshow-slide');
+    const indicators = document.querySelectorAll('.slideshow-indicator');
+    let currentSlide = 0;
+    const slideInterval = 6000; // 6 segundos por imagen
+    
+    // Función para cambiar de slide
+    function goToSlide(index) {
+        // Validar índice
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        
+        // Remover clase active de todos
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        
+        // Agregar clase active al nuevo slide
+        slides[index].classList.add('active');
+        indicators[index].classList.add('active');
+        
+        currentSlide = index;
+    }
+    
+    // Auto-play del slideshow
+    function startSlideshow() {
+        setInterval(() => {
+            goToSlide(currentSlide + 1);
+        }, slideInterval);
+    }
+    
+    // Event listeners para indicadores
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            goToSlide(index);
+        });
+    });
+    
+    // Iniciar slideshow solo si hay slides
+    if (slides.length > 1) {
+        startSlideshow();
+    }
+    
+    // Efecto hover en inputs del formulario
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>
