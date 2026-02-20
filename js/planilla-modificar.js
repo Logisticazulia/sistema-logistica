@@ -26,7 +26,6 @@ let vehicleData = null;
 
 // ================= FUNCIONES DE UTILIDAD =================
 
-// Mostrar usuario autenticado
 async function mostrarUsuarioAutenticado() {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -38,7 +37,6 @@ async function mostrarUsuarioAutenticado() {
     }
 }
 
-// Cerrar sesión
 async function cerrarSesion() {
     try {
         await supabaseClient.auth.signOut();
@@ -49,7 +47,6 @@ async function cerrarSesion() {
     }
 }
 
-// Mostrar alertas
 function showAlert(type, message) {
     alertSuccess.style.display = 'none';
     alertError.style.display = 'none';
@@ -72,7 +69,6 @@ function showAlert(type, message) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Habilitar/deshabilitar campos del formulario
 function toggleFormFields(enable) {
     const fields = form.querySelectorAll('.form-input, .form-select, .form-textarea');
     fields.forEach(field => {
@@ -89,7 +85,6 @@ function toggleFormFields(enable) {
     isEditing = enable;
 }
 
-// Llenar formulario con datos del vehículo
 function cargarDatosVehiculo(vehiculo) {
     const campos = [
         'placa', 'facsimil', 'n_identificacion', 'marca', 'modelo', 'tipo', 'clase',
@@ -103,7 +98,6 @@ function cargarDatosVehiculo(vehiculo) {
         const input = document.getElementById(campo);
         if (input && vehiculo[campo] !== undefined && vehiculo[campo] !== null) {
             if (input.type === 'date' && vehiculo[campo]) {
-                // Manejar fechas correctamente
                 const fecha = new Date(vehiculo[campo]);
                 if (!isNaN(fecha.getTime())) {
                     input.value = fecha.toISOString().split('T')[0];
@@ -118,11 +112,10 @@ function cargarDatosVehiculo(vehiculo) {
     showAlert('success', `✅ Vehículo ${vehiculo.placa} encontrado. Presione "Editar Información" para modificar.`);
 }
 
-// ================= BÚSQUEDA UNIVERSAL =================
+// ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
 
-// Buscar vehículo en múltiples campos
 async function buscarVehiculo() {
-    // ✅ LIMPIAR Y NORMALIZAR EL TÉRMINO DE BÚSQUEDA
+    // ✅ NORMALIZAR: trim + uppercase (igual que en registrar)
     const searchTerm = searchUniversal.value.trim().toUpperCase();
     
     if (!searchTerm) {
@@ -130,61 +123,69 @@ async function buscarVehiculo() {
         return;
     }
     
+    console.log('🔍 [BUSQUEDA] Término:', searchTerm);
+    
     btnSearch.classList.add('searching');
     btnSearch.disabled = true;
     
     try {
-        console.log('🔍 Buscando:', searchTerm);
+        // ✅ USAR .eq() para coincidencia exacta (los datos se guardan en MAYÚSCULAS)
+        let query = supabaseClient
+            .from('vehiculos')
+            .select('*')
+            .limit(5);
         
-        let query = supabaseClient.from('vehiculos').select('*').limit(5);
-        
-        // Detectar si es número (ID) o texto (Placa, Facsímil, Seriales)
+        // Detectar si es número (ID) o texto
         const esNumero = /^\d+$/.test(searchTerm);
         
         if (esNumero && searchTerm.length <= 5) {
-            // Probablemente es ID numérico corto
+            // ID numérico corto
             console.log('📍 Búsqueda por ID:', searchTerm);
             query = query.eq('id', parseInt(searchTerm));
-        } else if (esNumero && searchTerm.length > 5) {
-            // Número largo, buscar en múltiples campos
-            console.log('📍 Búsqueda múltiple con número:', searchTerm);
-            query = query.or(`id.eq.${searchTerm},placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm}`);
         } else {
-            // Búsqueda de texto en múltiples campos
-            console.log('📍 Búsqueda de texto:', searchTerm);
+            // ✅ Búsqueda OR con .eq() (coincidencia exacta)
+            console.log('📍 Búsqueda en campos únicos:', searchTerm);
             query = query.or(
                 `placa.eq.${searchTerm},` +
                 `facsimil.eq.${searchTerm},` +
                 `s_carroceria.eq.${searchTerm},` +
                 `s_motor.eq.${searchTerm}`
             );
+            
+            // Si es número largo, también buscar por ID
+            if (esNumero) {
+                query = query.or(`id.eq.${searchTerm}`);
+            }
         }
         
+        console.log('📊 Ejecutando consulta...');
         const { data, error } = await query;
         
         if (error) {
-            console.error('❌ Error en la consulta:', error);
+            console.error('❌ [ERROR] Error en la consulta:', error);
             showAlert('error', 'Error al buscar: ' + error.message);
             return;
         }
         
-        console.log('📊 Resultados:', data);
+        console.log('📊 [RESULTADOS] Cantidad:', data ? data.length : 0);
+        console.log('📊 [RESULTADOS] Datos:', data);
         
         if (!data || data.length === 0) {
             showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
             return;
         }
         
-        // Si hay múltiples resultados, tomar el primero
+        // Tomar el primer resultado
         const vehiculo = data[0];
         vehicleData = vehiculo;
         
+        console.log('✅ Vehículo encontrado:', vehiculo.placa);
         cargarDatosVehiculo(vehiculo);
         btnEdit.disabled = false;
         btnCancel.disabled = false;
         
     } catch (error) {
-        console.error('❌ Error en buscarVehiculo:', error);
+        console.error('❌ [EXCEPCION] Error en buscarVehiculo:', error);
         showAlert('error', 'Error de conexión: ' + error.message);
     } finally {
         btnSearch.classList.remove('searching');
@@ -235,7 +236,7 @@ async function actualizarVehiculo(event) {
     btnSubmit.disabled = true;
     
     try {
-        // ✅ NORMALIZAR DATOS ANTES DE GUARDAR (igual que en registrar)
+        // ✅ NORMALIZAR DATOS (igual que en registrar)
         const vehiculoActualizado = {
             placa: document.getElementById('placa').value.trim().toUpperCase(),
             facsimil: document.getElementById('facsimil').value.trim().toUpperCase(),
@@ -252,7 +253,7 @@ async function actualizarVehiculo(event) {
             estatus: document.getElementById('estatus').value.trim().toUpperCase(),
             unidad_administrativa: document.getElementById('unidad_administrativa').value.trim().toUpperCase(),
             ubicacion_fisica: document.getElementById('ubicacion_fisica').value.trim().toUpperCase(),
-            asignacion: document.getElementById('asignacion').value || null,
+            asignacion: document.getElementById('asignacion').value.trim().toUpperCase(),
             redip: document.getElementById('redip').value.trim().toUpperCase(),
             ccpe: document.getElementById('ccpe').value.trim().toUpperCase(),
             epm: document.getElementById('epm').value.trim().toUpperCase(),
@@ -265,7 +266,8 @@ async function actualizarVehiculo(event) {
             observacion_extra: document.getElementById('observacion_extra').value.trim()
         };
         
-        console.log('📝 Actualizando vehículo:', vehiculoActualizado);
+        console.log('📝 Actualizando vehículo ID:', vehicleId);
+        console.log('📝 Datos:', vehiculoActualizado);
         
         const { data, error } = await supabaseClient
             .from('vehiculos')
