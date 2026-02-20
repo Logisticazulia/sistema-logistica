@@ -115,7 +115,7 @@ function cargarDatosVehiculo(vehiculo) {
 // ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
 
 async function buscarVehiculo() {
-    // ✅ NORMALIZAR: trim + uppercase (igual que en registrar)
+    // ✅ NORMALIZAR: trim + uppercase (IGUAL que en registrar)
     const searchTerm = searchUniversal.value.trim().toUpperCase();
     
     if (!searchTerm) {
