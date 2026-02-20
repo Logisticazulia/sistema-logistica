@@ -17,7 +17,7 @@ body {
     padding: 20px;
 }
 .container {
-    max-width: 1600px;
+    max-width: 1800px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -82,7 +82,7 @@ body {
     background: #6c757d;
     color: white;
 }
-/* Vista Previa - AJUSTADA CON MEJORES PROPORCIONES */
+/* Vista Previa - MÁS ANCHA Y ESTIRADA */
 .preview-section {
     background: white;
     padding: 30px;
@@ -99,9 +99,8 @@ body {
     border: 2px solid #003366;
     padding: 30px;
     background: white;
-    width: 95%;
-    max-width: 1500px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
     display: inline-block;
     text-align: left;
 }
@@ -146,30 +145,32 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 15px;
+    table-layout: fixed;
 }
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 10px 8px;
+    padding: 12px 10px;
     text-align: left;
     font-size: 13px;
     border: 2px solid #003366;
     font-weight: bold;
 }
 .ficha-table td {
-    padding: 8px 6px;
+    padding: 10px 8px;
     border: 2px solid #003366;
     font-size: 12px;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    vertical-align: top;
 }
 .ficha-table .label {
     font-weight: bold;
     background: #f0f0f0;
-    width: 20%;
+    width: 18%;
 }
 .ficha-table .value {
-    width: 30%;
+    width: 32%;
 }
 .fotos-container {
     display: grid;
@@ -179,7 +180,7 @@ body {
 }
 .foto-box {
     border: 2px solid #4a7c9b;
-    height: 140px;
+    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -189,7 +190,7 @@ body {
     font-size: 15px;
 }
 .observaciones-box {
-    min-height: 260px;
+    min-height: 280px;
     border: 2px solid #003366;
     padding: 12px;
     background: #fafafa;
@@ -210,7 +211,6 @@ body {
     .ficha-tecnica {
         border: 2px solid #003366;
         width: 100%;
-        max-width: 100%;
     }
 }
 @media (max-width: 768px) {
@@ -346,6 +346,7 @@ body {
     <div class="preview-section">
         <h2 style="color: #003366; margin-bottom: 20px;">👁️ Vista Previa</h2>
         <div class="ficha-tecnica" id="fichaPreview">
+            <!-- Header -->
             <div class="ficha-header">
                 <img src="../img/logo-venezuela.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
                 <div class="ficha-title">
@@ -355,6 +356,8 @@ body {
                 </div>
                 <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
             </div>
+            
+            <!-- Tabla de Datos -->
             <table class="ficha-table">
                 <tr>
                     <th colspan="4">DATOS DEL VEHICULO</th>
@@ -495,6 +498,7 @@ function guardarFicha() {
         fechaCreacion: new Date().toISOString()
     };
     
+    // Guardar en localStorage
     let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
     fichas.push(fichaData);
     localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
