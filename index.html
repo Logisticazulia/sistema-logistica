@@ -45,10 +45,9 @@ body {
     overflow: hidden;
 }
 
-/* ================= PANEL IZQUIERDO: SLIDESHOW (60%) ================= */
+/* ================= PANEL IZQUIERDO: SLIDESHOW ================= */
 .login-slideshow {
-    flex: 0 0 60%;
-    width: 60%;
+    flex: 1;
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, #003366 0%, #005b96 100%);
@@ -156,10 +155,10 @@ body {
     background: rgba(255, 255, 255, 0.8);
 }
 
-/* ================= PANEL DERECHO: LOGIN (40%) ================= */
+/* ================= PANEL DERECHO: LOGIN ================= */
 .login-panel {
-    flex: 0 0 40%;
-    width: 40%;
+    flex: 0 0 500px;
+    width: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -407,7 +406,7 @@ body {
 <!-- ================= CONTENEDOR PRINCIPAL SPLIT-SCREEN ================= -->
 <main class="login-wrapper" role="main">
     
-    <!-- ================= PANEL IZQUIERDO: SLIDESHOW (60%) ================= -->
+    <!-- ================= PANEL IZQUIERDO: SLIDESHOW ================= -->
     <section class="login-slideshow" aria-label="Galería institucional">
         <div class="slideshow-container">
             <!-- 🔧 REEMPLAZA: URLs con tus 4 imágenes reales -->
@@ -435,7 +434,7 @@ body {
         </div>
     </section>
     
-    <!-- ================= PANEL DERECHO: LOGIN (40%) ================= -->
+    <!-- ================= PANEL DERECHO: LOGIN ================= -->
     <section class="login-panel">
         <article class="login-card" aria-labelledby="login-title">
             
