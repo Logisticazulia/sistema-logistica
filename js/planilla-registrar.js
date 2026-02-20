@@ -210,6 +210,23 @@ async function validarTodosCamposUnicos() {
     
     return todosValidos;
 }
+// ✅ AGREGA ESTA FUNCIÓN DE LIMPIEZA
+function limpiarTexto(texto) {
+    if (!texto) return '';
+    return texto
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, ' ')  // Reemplazar múltiples espacios por uno
+        .replace(/[^\w\s\-]/g, '') // Eliminar caracteres especiales no deseados
+        .trim();
+}
+
+// En guardarVehiculo(), usa la función:
+const vehiculo = {
+    placa: limpiarTexto(document.getElementById('placa').value),
+    facsimil: limpiarTexto(document.getElementById('facsimil').value),
+    // ... resto de campos
+};
 
 // Guardar vehículo
 async function guardarVehiculo(event) {
