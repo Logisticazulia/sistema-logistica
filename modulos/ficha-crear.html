@@ -92,31 +92,38 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
-        /* Sección de fotos */
+        /* Sección de fotos - AJUSTADA */
         .fotos-upload-section {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
             margin-top: 20px;
             border: 2px dashed #003366;
+            width: 100%;
+            overflow: hidden;
         }
         .fotos-upload-section h3 {
             color: #003366;
             margin-bottom: 15px;
             font-size: 16px;
+            text-align: center;
         }
         .fotos-upload-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 12px;
+            width: 100%;
+            max-width: 100%;
         }
         .foto-upload-box {
             background: white;
             border: 2px solid #ddd;
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             transition: all 0.3s ease;
+            width: 100%;
+            min-width: 0;
         }
         .foto-upload-box:hover {
             border-color: #003366;
@@ -134,6 +141,7 @@
             justify-content: center;
             color: #999;
             font-size: 12px;
+            overflow: hidden;
         }
         .foto-upload-box .preview-img img {
             width: 100%;
@@ -153,6 +161,11 @@
         .foto-upload-box .preview-img .placeholder span {
             font-size: 24px;
             margin-bottom: 5px;
+        }
+        .foto-upload-box input[type="file"] {
+            width: 100%;
+            font-size: 11px;
+            padding: 6px;
         }
         .btn {
             padding: 12px 24px;
@@ -282,8 +295,9 @@
         .fotos-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 12px;
             margin-top: 15px;
+            width: 100%;
         }
         .foto-box {
             border: 2px solid #4a7c9b;
@@ -297,6 +311,7 @@
             font-size: 15px;
             border-radius: 4px;
             overflow: hidden;
+            width: 100%;
         }
         .foto-box img {
             width: 100%;
@@ -517,7 +532,7 @@
                         <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales"></textarea>
                     </div>
 
-                    <!-- SECCIÓN DE CARGA DE FOTOS -->
+                    <!-- SECCIÓN DE CARGA DE FOTOS - AJUSTADA -->
                     <div class="fotos-upload-section">
                         <h3>📸 Registro Fotográfico (4 Fotos)</h3>
                         <div class="fotos-upload-container">
