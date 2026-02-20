@@ -44,13 +44,13 @@ async function mostrarUsuarioAutenticado() {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
         if (session?.user?.email) {
-            userEmail.textContent = session.user.email.split('@')[0];
+            // ✅ Muestra el email completo con @gmail.com
+            userEmail.textContent = session.user.email;
         }
     } catch (err) {
         console.error('Error obteniendo sesión:', err);
     }
 }
-
 // Cerrar sesión
 async function cerrarSesion() {
     try {
