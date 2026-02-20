@@ -87,10 +87,10 @@ body {
     background: #6c757d;
     color: white;
 }
-/* Vista Previa - MÁS GRANDE Y ESPACIOSA */
+/* Vista Previa - FORMATO PROFESIONAL */
 .preview-section {
     background: white;
-    padding: 30px;
+    padding: 40px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     width: 100%;
@@ -99,25 +99,25 @@ body {
     color: #003366;
     margin-bottom: 20px;
     text-align: center;
-    font-size: 24px;
 }
 .ficha-tecnica {
-    border: 4px solid #003366;
-    padding: 40px;
+    border: 2px solid #000;
+    padding: 30px;
     background: white;
     width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
 }
 .ficha-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 4px solid #003366;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #000;
 }
 .ficha-logo {
-    width: 120px;
+    width: 100px;
     height: auto;
 }
 .ficha-title {
@@ -126,26 +126,26 @@ body {
     padding: 0 20px;
 }
 .ficha-title h1 {
-    font-size: 20px;
-    color: #003366;
-    margin-bottom: 8px;
+    font-size: 14px;
+    color: #000;
+    margin-bottom: 3px;
     font-weight: bold;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 .ficha-title h2 {
-    font-size: 24px;
-    color: #003366;
-    margin: 8px 0;
+    font-size: 18px;
+    color: #000;
+    margin: 5px 0;
     font-weight: bold;
 }
 .ficha-title h3 {
-    font-size: 22px;
-    color: #003366;
-    margin-top: 8px;
+    font-size: 16px;
+    color: #000;
+    margin-top: 5px;
     font-weight: bold;
 }
 .ficha-logo-right {
-    width: 120px;
+    width: 100px;
     height: auto;
 }
 .ficha-table {
@@ -155,39 +155,39 @@ body {
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 15px 12px;
-    text-align: left;
-    font-size: 16px;
-    border: 3px solid #003366;
+    padding: 8px 6px;
+    text-align: center;
+    font-size: 12px;
+    border: 2px solid #000;
     font-weight: bold;
-    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 .ficha-table td {
-    padding: 12px 10px;
-    border: 3px solid #003366;
-    font-size: 15px;
-    min-height: 40px;
-    vertical-align: middle;
+    padding: 6px 4px;
+    border: 2px solid #000;
+    font-size: 11px;
+    vertical-align: top;
 }
 .ficha-table .label {
     font-weight: bold;
-    background: #f0f0f0;
+    background: #fff;
     width: 18%;
-    font-size: 14px;
+    font-size: 11px;
 }
 .ficha-table .value {
-    width: 32%;
-    font-size: 15px;
+    width: 22%;
+    font-size: 11px;
 }
 .fotos-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    margin-top: 15px;
+    margin-top: 20px;
+    padding: 10px;
 }
 .foto-box {
-    border: 3px solid #4a7c9b;
-    height: 150px;
+    border: 2px solid #000;
+    height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,16 +195,14 @@ body {
     color: white;
     font-weight: bold;
     font-size: 16px;
-    border-radius: 4px;
 }
 .observaciones-box {
-    min-height: 280px;
-    border: 3px solid #003366;
-    padding: 15px;
-    background: #fafafa;
-    font-size: 14px;
-    line-height: 1.6;
-    border-radius: 4px;
+    min-height: 320px;
+    border: 2px solid #000;
+    padding: 8px;
+    background: #fff;
+    font-size: 11px;
+    line-height: 1.5;
 }
 @media print {
     .form-section, .btn, .preview-section h2 {
@@ -218,14 +216,11 @@ body {
         padding: 0;
     }
     .ficha-tecnica {
-        border: 4px solid #003366;
+        border: 2px solid #000;
     }
 }
 @media (max-width: 1200px) {
     .form-row-4 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .fotos-container {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -239,16 +234,7 @@ body {
     }
     .ficha-header {
         flex-direction: column;
-        gap: 15px;
-    }
-    .ficha-title h1 {
-        font-size: 16px;
-    }
-    .ficha-title h2 {
-        font-size: 20px;
-    }
-    .ficha-title h3 {
-        font-size: 18px;
+        gap: 10px;
     }
 }
 </style>
@@ -378,9 +364,9 @@ body {
         </form>
     </div>
     
-    <!-- Vista Previa (MÁS GRANDE) -->
+    <!-- Vista Previa -->
     <div class="preview-section">
-        <h2>👁️ Vista Previa - Formato Ampliado</h2>
+        <h2>👁️ Vista Previa</h2>
         <div class="ficha-tecnica" id="fichaPreview">
             <div class="ficha-header">
                 <img src="../img/logo-venezuela.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
@@ -391,11 +377,12 @@ body {
                 </div>
                 <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
             </div>
+            
             <table class="ficha-table">
                 <tr>
                     <th colspan="4">DATOS DEL VEHICULO</th>
-                    <th rowspan="4" style="width: 25%; vertical-align: top;">
-                        <strong style="font-size: 16px;">OBSERVACIONES</strong><br><br>
+                    <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+                        OBSERVACIONES<br><br>
                         <div class="observaciones-box" id="previewObservaciones"></div>
                     </th>
                 </tr>
@@ -404,35 +391,37 @@ body {
                     <td class="value" id="previewMarca"></td>
                     <td class="label">MODELO</td>
                     <td class="value" id="previewModelo"></td>
-                    <td class="label">TIPO: <span id="previewTipo"></span></td>
                 </tr>
                 <tr>
                     <td class="label">SERIAL CARROCERIA</td>
                     <td class="value" id="previewSerialCarroceria"></td>
                     <td class="label">CLASE</td>
                     <td class="value" id="previewClase"></td>
-                    <td class="label">COLOR: <span id="previewColor"></span></td>
                 </tr>
                 <tr>
                     <td class="label">PLACA:</td>
                     <td class="value" id="previewPlaca"></td>
                     <td class="label">FACSIMIL</td>
                     <td class="value" id="previewFacsimilar"></td>
-                    <td class="label">DEPENDENCIA:<br><span id="previewDependencia"></span></td>
                 </tr>
                 <tr>
                     <td class="label">SERIAL MOTOR</td>
                     <td class="value" id="previewSerialMotor"></td>
-                    <td class="label"></td>
-                    <td class="value"></td>
-                    <td class="label"></td>
+                    <td class="label">TIPO</td>
+                    <td class="value" id="previewTipo"></td>
+                </tr>
+                <tr>
+                    <td class="label">COLOR</td>
+                    <td class="value" id="previewColor"></td>
+                    <td class="label">DEPENDENCIA</td>
+                    <td class="value" id="previewDependencia" style="font-size: 10px;"></td>
                 </tr>
                 <tr>
                     <td class="label">ESTATUS DEL VEHICULO</td>
-                    <td colspan="3" style="text-align: center; font-weight: bold; font-size: 16px; padding: 15px;" id="previewEstatus"></td>
+                    <td colspan="3" style="text-align: center; font-weight: bold;" id="previewEstatus"></td>
                 </tr>
                 <tr>
-                    <th colspan="5" style="padding: 18px 12px; font-size: 17px;">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
+                    <th colspan="5">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
                 </tr>
                 <tr>
                     <td class="label">CAUSA</td>
@@ -443,7 +432,7 @@ body {
                 <tr>
                     <td class="label">MECANICA</td>
                     <td colspan="2" id="previewMecanica"></td>
-                    <td class="label">UBICACIÓN:</td>
+                    <td class="label">UBICACIÓN</td>
                     <td id="previewUbicacion"></td>
                 </tr>
                 <tr>
@@ -455,7 +444,7 @@ body {
                     <td id="previewLuces"></td>
                 </tr>
                 <tr>
-                    <th colspan="5" style="padding: 18px 12px; font-size: 17px;">REGISTRO FOTOGRÁFICO</th>
+                    <th colspan="5">REGISTRO FOTOGRÁFICO</th>
                 </tr>
                 <tr>
                     <td colspan="5">
@@ -472,6 +461,80 @@ body {
     </div>
 </div>
 
-<script src="../js/ficha-crear.js"></script>
+<script>
+// Actualizar vista previa en tiempo real
+const inputs = document.querySelectorAll('input, select, textarea');
+inputs.forEach(input => {
+    input.addEventListener('input', actualizarVistaPrevia);
+});
+
+function actualizarVistaPrevia() {
+    document.getElementById('previewMarca').textContent = document.getElementById('marca').value || '';
+    document.getElementById('previewModelo').textContent = document.getElementById('modelo').value || '';
+    document.getElementById('previewTipo').textContent = document.getElementById('tipo').value || '';
+    document.getElementById('previewClase').textContent = document.getElementById('clase').value || '';
+    document.getElementById('previewSerialCarroceria').textContent = document.getElementById('serialCarroceria').value || '';
+    document.getElementById('previewColor').textContent = document.getElementById('color').value || '';
+    document.getElementById('previewPlaca').textContent = document.getElementById('placa').value || '';
+    document.getElementById('previewFacsimilar').textContent = document.getElementById('facsimilar').value || '';
+    document.getElementById('previewSerialMotor').textContent = document.getElementById('serialMotor').value || '';
+    document.getElementById('previewDependencia').textContent = document.getElementById('dependencia').value || '';
+    document.getElementById('previewEstatus').textContent = document.getElementById('estatus').value || '';
+    document.getElementById('previewCausa').textContent = document.getElementById('causa').value || '';
+    document.getElementById('previewMecanica').textContent = document.getElementById('mecanica').value || '';
+    document.getElementById('previewDiagnostico').textContent = document.getElementById('diagnostico').value || '';
+    document.getElementById('previewUbicacion').textContent = document.getElementById('ubicacion').value || '';
+    document.getElementById('previewTapiceria').textContent = document.getElementById('tapiceria').value || '';
+    document.getElementById('previewCauchos').textContent = document.getElementById('cauchos').value || '';
+    document.getElementById('previewLuces').textContent = document.getElementById('luces').value || '';
+    document.getElementById('previewObservaciones').textContent = document.getElementById('observaciones').value || '';
+}
+
+function guardarFicha() {
+    const form = document.getElementById('fichaForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const fichaData = {
+        marca: document.getElementById('marca').value,
+        modelo: document.getElementById('modelo').value,
+        tipo: document.getElementById('tipo').value,
+        clase: document.getElementById('clase').value,
+        serialCarroceria: document.getElementById('serialCarroceria').value,
+        color: document.getElementById('color').value,
+        placa: document.getElementById('placa').value,
+        facsimilar: document.getElementById('facsimilar').value,
+        serialMotor: document.getElementById('serialMotor').value,
+        dependencia: document.getElementById('dependencia').value,
+        estatus: document.getElementById('estatus').value,
+        causa: document.getElementById('causa').value,
+        mecanica: document.getElementById('mecanica').value,
+        diagnostico: document.getElementById('diagnostico').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        tapiceria: document.getElementById('tapiceria').value,
+        cauchos: document.getElementById('cauchos').value,
+        luces: document.getElementById('luces').value,
+        observaciones: document.getElementById('observaciones').value,
+        fechaCreacion: new Date().toISOString()
+    };
+    
+    let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
+    fichas.push(fichaData);
+    localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
+    
+    alert('✅ Ficha técnica guardada exitosamente');
+}
+
+function limpiarFormulario() {
+    if (confirm('¿Está seguro de limpiar el formulario?')) {
+        actualizarVistaPrevia();
+    }
+}
+
+// Inicializar
+actualizarVistaPrevia();
+</script>
 </body>
 </html>
