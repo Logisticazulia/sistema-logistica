@@ -1,776 +1,297 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- ================= METAETIQUETAS ESENCIALES ================= -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrar Vehículo | Sistema de Gestión Administrativa</title>
-<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<meta name="description" content="Acceso al sistema institucional - Login seguro">
+<meta name="theme-color" content="#003366">
+<!-- ================= TÍTULO E ICONOS ================= -->
+<title>Acceso | Sistema de Gestión Administrativa</title>
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="img/logo.png">
+<!-- ================= ESTILOS ================= -->
+<!-- Fuentes Google -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css">
+<!-- Hoja de estilos principal -->
+<link rel="stylesheet" href="css/style.css">
+
+<!-- ================= ESTILOS NUEVOS PARA LAYOUT DIVIDIDO ================= -->
 <style>
-/* ================= RESET Y BASE ================= */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+    /* Reset básico para el layout */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body.login-page {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f4f6f9;
+        height: 100vh;
+        overflow: hidden; /* Evitar scroll en pantallas grandes */
+    }
 
-body {
-  font-family: 'Roboto', sans-serif;
-  background: #f5f7fa;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  color: #333;
-  line-height: 1.5;
-}
+    /* Contenedor Principal Dividido */
+    .split-container {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+    }
 
-/* ================= CONTENEDOR PRINCIPAL - FULL WIDTH ================= */
-.form-container {
-  background: white;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12);
-  margin: 20px auto;
-  width: 98%;
-  max-width: 100%;
-}
+    /* ================= LADO IZQUIERDO: VISOR DE IMÁGENES ================= */
+    .visual-panel {
+        flex: 1; /* Ocupa el 50% */
+        position: relative;
+        background-color: #003366;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-/* ================= FILAS DEL FORMULARIO ================= */
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  width: 100%;
-  margin-bottom: 20px;
-}
+    .slider-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
 
-.form-row:last-child {
-  margin-bottom: 0;
-}
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1.5s ease-in-out; /* Transición suave */
+    }
 
-/* ================= SECCIONES DEL FORMULARIO ================= */
-.form-section {
-  background: #fafbfc;
-  border-radius: 10px;
-  padding: 20px;
-  border-top: 4px solid;
-  min-width: 0;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  height: 100%;
-}
+    .slide.active {
+        opacity: 1;
+    }
 
-.form-section:hover {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
+    /* Capa oscura sobre las imágenes para que el texto resalte (opcional) */
+    .visual-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 51, 102, 0.4);
+        z-index: 1;
+    }
 
-.form-section.seriales { border-color: #e9c46a; }
-.form-section.estatus { border-color: #e76f51; }
-.form-section.identificacion { border-color: #005b96; }
-.form-section.caracteristicas { border-color: #2a9d8f; }
-.form-section.ubicacion { border-color: #e76f51; }
-.form-section.documentacion { border-color: #9b5de5; }
-.form-section.observaciones { border-color: #f15bb5; }
+    .visual-text {
+        position: relative;
+        z-index: 2;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        max-width: 80%;
+    }
 
-.form-section.full-width {
-  grid-column: 1 / -1;
-}
+    .visual-text h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
 
-/* ================= HEADER DE SECCIÓN ================= */
-.form-section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #e8eef5;
-}
+    /* ================= LADO DERECHO: LOGIN ================= */
+    .login-panel {
+        flex: 1; /* Ocupa el 50% */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        padding: 20px;
+        position: relative;
+        z-index: 10;
+    }
 
-.form-section-icon {
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
+    .login-wrapper {
+        width: 100%;
+        max-width: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-.form-section.seriales .form-section-icon { background: rgba(233, 196, 106, 0.2); }
-.form-section.estatus .form-section-icon { background: rgba(231, 111, 81, 0.2); }
-.form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
-.form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.2); }
-.form-section.ubicacion .form-section-icon { background: rgba(231, 111, 81, 0.2); }
-.form-section.documentacion .form-section-icon { background: rgba(155, 93, 229, 0.2); }
-.form-section.observaciones .form-section-icon { background: rgba(241, 91, 181, 0.2); }
+    /* Ajustes para la tarjeta de login existente */
+    .login-card {
+        width: 100%;
+        padding: 2rem;
+        /* Eliminar sombras o bordes si conflictúan con el nuevo diseño limpio */
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        background: #fff;
+    }
 
-.form-section-title {
-  font-size: 0.9rem;
-  color: #1a1a2e;
-  font-weight: 700;
-  text-transform: uppercase;
-  margin: 0;
-  letter-spacing: 0.8px;
-}
+    .login-header { text-align: center; margin-bottom: 2rem; }
+    .logo { margin-bottom: 1rem; }
+    
+    /* Footer y Copyright ajustados */
+    .copyright {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: #666;
+        text-align: center;
+    }
 
-/* ================= GRID DE CAMPOS ================= */
-.form-fields-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
+    .login-footer { margin-top: 2rem; }
+    .security-badge { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        font-size: 0.8rem; 
+        color: #28a745; 
+        background: #e8f5e9; 
+        padding: 8px 12px; 
+        border-radius: 20px;
+        width: fit-content;
+        margin: 0 auto;
+    }
 
-.form-section.full-width .form-fields-grid {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-}
-
-/* ================= GRUPOS DE CAMPOS ================= */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.form-group label {
-  font-size: 0.75rem;
-  color: #4a5568;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.form-group label .required {
-  color: #dc2626;
-  margin-left: 3px;
-}
-
-/* ================= INPUTS ================= */
-.form-input, .form-select, .form-textarea {
-  width: 100%;
-  max-width: 100%;
-  padding: 9px 12px;
-  border: 2px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.88rem;
-  font-family: 'Roboto', sans-serif;
-  transition: all 0.25s ease;
-  background: white;
-  color: #2d3748;
-}
-
-.form-input:hover, .form-select:hover, .form-textarea:hover {
-  border-color: #cbd5e0;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  outline: none;
-  border-color: #005b96;
-  box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12);
-  background: #fff;
-}
-
-.form-input::placeholder, .form-textarea::placeholder {
-  color: #a0aec0;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 60px;
-  line-height: 1.5;
-}
-
-.form-select {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 35px;
-}
-
-/* ================= BOTONES DE ACCIÓN ================= */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  padding-top: 25px;
-  margin-top: 25px;
-  border-top: 2px solid #e8eef5;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 12px 28px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  border: none;
-  white-space: nowrap;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 51, 102, 0.35);
-}
-
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45);
-}
-
-/* ================= ALERTAS ================= */
-.alert {
-  padding: 14px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  display: none;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.alert-success {
-  background: #d1fae5;
-  color: #059669;
-  border: 1px solid #059669;
-}
-
-.alert-error {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #dc2626;
-}
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 1400px) {
-  .form-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .form-section.full-width .form-fields-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 1024px) {
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-  
-  .form-section.full-width .form-fields-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .form-container {
-    padding: 25px 30px;
-    margin: 15px;
-    width: calc(100% - 30px);
-  }
-}
-
-@media (max-width: 768px) {
-  .form-container {
-    margin: 10px;
-    padding: 18px;
-    border-radius: 10px;
-    width: calc(100% - 20px);
-  }
-  
-  .form-section.full-width .form-fields-grid,
-  .form-fields-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .btn {
-    width: 100%;
-    justify-content: center;
-    padding: 12px 24px;
-  }
-  
-  .form-section {
-    padding: 16px;
-  }
-  
-  .form-section-header {
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-  }
-  
-  .form-section-title {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .form-container {
-    padding: 15px;
-    margin: 8px;
-    width: calc(100% - 16px);
-  }
-  
-  .form-input, .form-select, .form-textarea {
-    padding: 9px 11px;
-    font-size: 0.85rem;
-  }
-  
-  .form-group label {
-    font-size: 0.7rem;
-  }
-}
-
-/* ================= LOADER ================= */
-.btn-loader { display: none; }
-.loading .btn-text { display: none; }
-.loading .btn-loader { display: inline; }
-
-/* ================= SCROLLBAR ================= */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
+    /* ================= RESPONSIVE (MÓVILES) ================= */
+    @media (max-width: 768px) {
+        .split-container { flex-direction: column; }
+        .visual-panel { display: none; /* Ocultar imágenes en móvil */ }
+        .login-panel { width: 100%; height: 100%; }
+        body.login-page { overflow: auto; } /* Permitir scroll en móvil */
+    }
 </style>
 </head>
-<body class="dashboard-page">
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar">
-  <div class="nav-container">
-    <div class="nav-brand">
-      <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-      <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-      <span class="nav-title">Sistema Automatizado || Gestión Adminstrativa del CCPE ZULIA</span>
-    </div>
-    <div class="nav-user">
-      <span class="user-email" id="userEmail">Cargando...</span>
-      <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
-    </div>
-  </div>
-</nav>
+<body class="login-page">
 
-<!-- ================= CONTENIDO PRINCIPAL ================= -->
-<main class="dashboard-main">
-  <header class="module-header">
-    <div class="breadcrumb">
-      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="planilla.html" class="breadcrumb-link">Planilla</a>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">Registrar</span>
-    </div>
-    <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
-      ← Volver
-    </button>
-  </header>
-  
-  <section class="module-title-section">
-    <h1 class="module-title">➕ Registrar Nuevo Vehículo</h1>
-    <p class="module-subtitle">Complete los campos para ingresar un nuevo vehículo</p>
-  </section>
-  
-  <div class="form-container">
-    <!-- Alertas -->
-    <div id="alertSuccess" class="alert alert-success">
-      <span>✅</span>
-      <span id="successMessage">Vehículo registrado exitosamente</span>
-    </div>
-    <div id="alertError" class="alert alert-error">
-      <span>❌</span>
-      <span id="errorMessage">Error al registrar el vehículo</span>
-    </div>
+<!-- ================= CONTENEDOR PRINCIPAL DIVIDIDO ================= -->
+<div class="split-container">
     
-    <form id="vehicleForm" novalidate>
-      <!-- ================= FILA 1: SERIALES + ESTATUS (3 columnas) ================= -->
-      <div class="form-row">
-        <!-- SERIALES 🟡 -->
-        <div class="form-section seriales">
-          <div class="form-section-header">
-            <span class="form-section-icon">🔢</span>
-            <h2 class="form-section-title">Seriales</h2>
-          </div>
-          <div class="form-fields-grid">
-            <div class="form-group">
-              <label>S/Carrocería</label>
-              <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN">
-            </div>
-            <div class="form-group">
-              <label>S/Motor</label>
-              <input type="text" id="s_motor" name="s_motor" class="form-input" placeholder="Serial">
-            </div>
-          </div>
+    <!-- LADO IZQUIERDO: Visor de Imágenes -->
+    <section class="visual-panel">
+        <div class="slider-container">
+            <!-- 🔧 REEMPLAZA: src con tus 4 imágenes institucionales -->
+            <!-- Usando placeholders para el ejemplo -->
+            <img src="https://placehold.co/1080x1920/003366/FFF?text=Seguridad+1" alt="Institucional 1" class="slide active">
+            <img src="https://placehold.co/1080x1920/004080/FFF?text=Tecnología+2" alt="Institucional 2" class="slide">
+            <img src="https://placehold.co/1080x1920/0059b3/FFF?text=Gestión+3" alt="Institucional 3" class="slide">
+            <img src="https://placehold.co/1080x1920/0073e6/FFF?text=Servicio+4" alt="Institucional 4" class="slide">
         </div>
-        
-        <!-- ESTATUS 🔴 -->
-        <div class="form-section estatus">
-          <div class="form-section-header">
-            <span class="form-section-icon">📊</span>
-            <h2 class="form-section-title">Estatus</h2>
-          </div>
-          <div class="form-fields-grid">
-            <div class="form-group">
-              <label>Situación</label>
-              <select id="situacion" name="situacion" class="form-select">
-                <option value="">Seleccione...</option>
-                <option value="OPERATIVA">OPERATIVA</option>
-                <option value="INOPERATIVA">INOPERATIVA</option>
-                <option value="REPARACION">REPARACION</option>
-                <option value="TALLER">TALLER</option>
-                <option value="DESINCORPORADA">DESINCORPORADA</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Estatus</label>
-              <select id="estatus" name="estatus" class="form-select">
-                <option value="">Seleccione...</option>
-                <option value="OPERATIVA">OPERATIVA</option>
-                <option value="INOPERATIVA">INOPERATIVA</option>
-                <option value="DESINCORPORADA">DESINCORPORADA</option>
-              </select>
-            </div>
-          </div>
+        <div class="visual-overlay"></div>
+        <div class="visual-text">
+            <h2>Sistema de Gestión Administrativa</h2>
+            <p>Plataforma segura para el Cuerpo de Policía Nacional Bolivariana</p>
         </div>
-        
-        <!-- IDENTIFICACIÓN 🔵 -->
-        <div class="form-section identificacion">
-          <div class="form-section-header">
-            <span class="form-section-icon">🔖</span>
-            <h2 class="form-section-title">Identificación</h2>
-          </div>
-          <div class="form-fields-grid">
-            <div class="form-group">
-              <label>Placa <span class="required">*</span></label>
-              <input type="text" id="placa" name="placa" class="form-input" placeholder="AB123CD" required>
-            </div>
-            <div class="form-group">
-              <label>Facsímil</label>
-              <input type="text" id="facsimil" name="facsimil" class="form-input" placeholder="123456">
-            </div>
-            <div class="form-group">
-              <label>N° Identificación</label>
-              <input type="text" id="n_identificacion" name="n_identificacion" class="form-input" placeholder="M-001">
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- ================= FILA 2: CARACTERÍSTICAS (FULL WIDTH) ================= -->
-      <div class="form-section caracteristicas full-width">
-        <div class="form-section-header">
-          <span class="form-section-icon">🚗</span>
-          <h2 class="form-section-title">Características del Vehículo</h2>
-        </div>
-        <div class="form-fields-grid">
-          <div class="form-group">
-            <label>Marca <span class="required">*</span></label>
-            <input type="text" id="marca" name="marca" class="form-input" placeholder="TOYOTA" required>
-          </div>
-          <div class="form-group">
-            <label>Modelo <span class="required">*</span></label>
-            <input type="text" id="modelo" name="modelo" class="form-input" placeholder="HILUX" required>
-          </div>
-          <div class="form-group">
-            <label>Tipo <span class="required">*</span></label>
-            <select id="tipo" name="tipo" class="form-select" required>
-              <option value="">Seleccione...</option>
-              <option value="AUTOMOVIL">AUTOMOVIL</option>
-              <option value="BUS">BUS</option>
-              <option value="CAMION">CAMION</option>
-              <option value="ENDURO">ENDURO</option>
-              <option value="ESPECIAL">ESPECIAL</option>
-              <option value="MACHITO">MACHITO</option>
-              <option value="MINIBUS">MINIBUS</option>
-              <option value="MOTO">MOTO</option>
-              <option value="PICKUP">PICKUP</option>
-              <option value="SPORTWAGON">SPORTWAGON</option>
-              <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-              <option value="TRIMOVIL">TRIMOVIL</option>
-              <option value="VAM">VAM</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Clase <span class="required">*</span></label>
-            <select id="clase" name="clase" class="form-select" required>
-              <option value="">Seleccione...</option>
-              <option value="AUTOBUS">AUTOBUS</option>
-              <option value="AUTOMOVIL">AUTOMOVIL</option>
-              <option value="BLINDADO">BLINDADO</option>
-              <option value="CAMION">CAMION</option>
-              <option value="CAMIONETA">CAMIONETA</option>
-              <option value="ESPECIAL">ESPECIAL</option>
-              <option value="MOTO">MOTO</option>
-              <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Año</label>
-            <input type="number" id="ano" name="ano" class="form-input" placeholder="2023" min="1900" max="2030">
-          </div>
-          <div class="form-group">
-            <label>Color</label>
-            <input type="text" id="color" name="color" class="form-input" placeholder="BLANCO">
-          </div>
-        </div>
-      </div>
-      
-      <!-- ================= FILA 3: UBICACIÓN Y ASIGNACIÓN (FULL WIDTH) ================= -->
-      <div class="form-section ubicacion full-width">
-        <div class="form-section-header">
-          <span class="form-section-icon">📍</span>
-          <h2 class="form-section-title">Ubicación y Asignación</h2>
-        </div>
-        <div class="form-fields-grid">
-          <div class="form-group">
-            <label>Unidad Administrativa <span class="required">*</span></label>
-            <select id="unidad_administrativa" name="unidad_administrativa" class="form-select" required>
-              <option value="">Seleccione...</option>
-              <option value="NO">NO</option>
-              <option value="DIRECCION">DIRECCION</option>
-              <option value="OPERACIONES">OPERACIONES</option>
-              <option value="SALA SITUACIONAL">SALA SITUACIONAL</option>
-              <option value="GESTION HUMANA">GESTION HUMANA</option>
-              <option value="CAPTACION Y SELECCIÓN">CAPTACION Y SELECCIÓN</option>
-              <option value="GESTION COMUNICACIONAL">GESTION COMUNICACIONAL</option>
-              <option value="CUADRANTES DE PAZ">CUADRANTES DE PAZ</option>
-              <option value="RESGUARDO DE INSTALACIONES">RESGUARDO DE INSTALACIONES</option>
-              <option value="PARQUE DE ARMAS">PARQUE DE ARMAS</option>
-              <option value="TECNOLOGIA">TECNOLOGIA</option>
-              <option value="ASESORIA">ASESORIA</option>
-              <option value="ALEGACION">ALEGACION</option>
-              <option value="SERVICIOS GENERALES">SERVICIOS GENERALES</option>
-              <option value="LOGISTICA">LOGISTICA</option>
-              <option value="ATENCION Y PROTECCION A LA VICTIMA">ATENCION Y PROTECCION A LA VICTIMA</option>
-              <option value="DERECHOS HUMANOS">DERECHOS HUMANOS</option>
-              <option value="UENNA">UENNA</option>
-              <option value="OAVDAP">OAVDAP</option>
-              <option value="EQUIDAD">EQUIDAD</option>
-              <option value="BIENESTAR SOCIAL">BIENESTAR SOCIAL</option>
-              <option value="CULTURA">CULTURA</option>
-              <option value="SERVICIO MEDICO">SERVICIO MEDICO</option>
-              <option value="REDIP">REDIP</option>
-              <option value="PROTECCION A LA MUJER">PROTECCION A LA MUJER</option>
-              <option value="PROTECCION PUEBLOS INDIGENAS">PROTECCION PUEBLOS INDIGENAS</option>
-              <option value="COMPLEJO EDUCATIVO">COMPLEJO EDUCATIVO</option>
-              <option value="VEN 911/SIIPOL">VEN 911/SIIPOL</option>
-              <option value="ICAP">ICAP</option>
-              <option value="ORDP">ORDP</option>
-              <option value="AMBIENTAL">AMBIENTAL</option>
-              <option value="VIGILANCIA Y PATRULLAJE/CUPAZ">VIGILANCIA Y PATRULLAJE/CUPAZ</option>
-              <option value="HOSPITALARIO">HOSPITALARIO</option>
-              <option value="TURISTICA">TURISTICA</option>
-              <option value="DIPLOMATICA">DIPLOMATICA</option>
-              <option value="AEROPORTUARIA">AEROPORTUARIA</option>
-              <option value="POLICIA RURAL">POLICIA RURAL</option>
-              <option value="ORDEN PUBLICO">ORDEN PUBLICO</option>
-              <option value="COMUNAL">COMUNAL</option>
-              <option value="TRANSITO">TRANSITO</option>
-              <option value="MIGRACION">MIGRACION</option>
-              <option value="FERROVIARIA (METRO)">FERROVIARIA (METRO)</option>
-              <option value="ACUATICOS">ACUATICOS</option>
-              <option value="PENITENCIARIA">PENITENCIARIA</option>
-              <option value="PATRULLAJE VEHICULAR">PATRULLAJE VEHICULAR</option>
-              <option value="BRIGADA MOTORIZADA">BRIGADA MOTORIZADA</option>
-              <option value="UNIVERSIDAD LUZ">UNIVERSIDAD LUZ</option>
-              <option value="POLICIAL JUDICIAL">POLICIAL JUDICIAL</option>
-              <option value="EDUCACION">EDUCACION</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>REDIP</label>
-            <select id="redip" name="redip" class="form-select">
-              <option value="">Seleccione...</option>
-              <option value="LOS ANDES">LOS ANDES</option>
-              <option value="CAPITAL">CAPITAL</option>
-              <option value="CENTRAL">CENTRAL</option>
-              <option value="OCCIDENTAL">OCCIDENTAL</option>
-              <option value="ORIENTAL">ORIENTAL</option>
-              <option value="LOS LLANOS">LOS LLANOS</option>
-              <option value="GUAYANA">GUAYANA</option>
-              <option value="MARÍTIMA E INSULAR">MARÍTIMA E INSULAR</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>CCPE</label>
-            <select id="ccpe" name="ccpe" class="form-select">
-              <option value="">Seleccione...</option>
-              <option value="CCP METROPOLITANO">CCP METROPOLITANO</option>
-              <option value="CCP COL">CCP COL</option>
-              <option value="CCP GUAJIRA">CCP GUAJIRA</option>
-              <option value="CCPE SUR DEL LAGO">CCPE SUR DEL LAGO</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>EPM</label>
-            <select id="epm" name="epm" class="form-select">
-              <option value="">Seleccione...</option>
-              <option value="MARACAIBO">MARACAIBO</option>
-              <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-              <option value="JESUS ENRIQUE LOSSADA">JESUS ENRIQUE LOSSADA</option>
-              <option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>EPP</label>
-            <select id="epp" name="epp" class="form-select">
-              <option value="">Seleccione...</option>
-              <option value="MARACAIBO">MARACAIBO</option>
-              <option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option>
-              <option value="LUIS HURTADO">LUIS HURTADO</option>
-              <option value="DAGNINO">DAGNINO</option>
-              <option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option>
-              <option value="CHIQUINQUIRA">CHIQUINQUIRA</option>
-              <option value="FRANCISCO EUGENIO">FRANCISCO EUGENIO</option>
-              <option value="CARACCIOLO">CARACCIOLO</option>
-              <option value="IDELFONSO">IDELFONSO</option>
-              <option value="VENANCIO PULGAR">VENANCIO PULGAR</option>
-              <option value="COQUIVACOA-ZAPARA">COQUIVACOA-ZAPARA</option>
-              <option value="RAUL LEONI">RAUL LEONI</option>
-              <option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option>
-              <option value="JUANA DE AVILA">JUANA DE AVILA</option>
-              <option value="SAN ISIDRO">SAN ISIDRO</option>
-              <option value="CASIQUE MARA">CASIQUE MARA</option>
-              <option value="SAN FRANCISCO">SAN FRANCISCO</option>
-              <option value="EL BAJO">EL BAJO</option>
-              <option value="DOMITILA">DOMITILA</option>
-              <option value="CORTIJOS">CORTIJOS</option>
-              <option value="LA CAÑADA">LA CAÑADA</option>
-              <option value="POTRERITO">POTRERITO</option>
-              <option value="ANDRES BELLO">ANDRES BELLO</option>
-              <option value="ESTACION POLICIAL JESUS E. LOSADA">ESTACION POLICIAL JESUS E. LOSADA</option>
-              <option value="DCDO">DCDO</option>
-              <option value="DCD">DCD</option>
-              <option value="DIP">DIP</option>
-              <option value="GARANTIA">GARANTIA</option>
-              <option value="DIE">DIE</option>
-              <option value="K-9">K-9</option>
-              <option value="HURTO Y ROBO">HURTO Y ROBO</option>
-              <option value="MOTORIZADA">MOTORIZADA</option>
-              <option value="DCSE">DCSE</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ubicación Física</label>
-            <input type="text" id="ubicacion_fisica" name="ubicacion_fisica" class="form-input" placeholder="Ej: CCPEM">
-          </div>
-          <div class="form-group">
-            <label>Asignación</label>
-            <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje">
-          </div>
-        </div>
-      </div>
-      
-      <!-- ================= FILA 4: DOCUMENTACIÓN (FULL WIDTH) ================= -->
-      <div class="form-section documentacion full-width">
-        <div class="form-section-header">
-          <span class="form-section-icon">📄</span>
-          <h2 class="form-section-title">Documentación</h2>
-        </div>
-        <div class="form-fields-grid">
-          <div class="form-group">
-            <label>Certificado de Origen</label>
-            <input type="text" id="certificado_origen" name="certificado_origen" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>Fecha Inspección</label>
-            <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>N° Trámite</label>
-            <input type="text" id="n_tramite" name="n_tramite" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>Ubicación Título</label>
-            <input type="text" id="ubicacion_titulo" name="ubicacion_titulo" class="form-input" placeholder="Archivo">
-          </div>
-        </div>
-      </div>
-      
-      <!-- ================= FILA 5: OBSERVACIONES (FULL WIDTH) ================= -->
-      <div class="form-section observaciones full-width">
-        <div class="form-section-header">
-          <span class="form-section-icon">📝</span>
-          <h2 class="form-section-title">Observaciones</h2>
-        </div>
-        <div class="form-fields-grid">
-          <div class="form-group">
-            <label>Observación General</label>
-            <textarea id="observacion" name="observacion" class="form-textarea" placeholder="Detalles adicionales..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Observación Extra</label>
-            <textarea id="observacion_extra" name="observacion_extra" class="form-textarea" placeholder="Info complementaria..."></textarea>
-          </div>
-        </div>
-      </div>
-      
-      <!-- BOTONES DE ACCIÓN -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='planilla.html'">
-          ❌ Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary" id="btnSubmit">
-          <span class="btn-text">💾 Guardar Vehículo</span>
-          <span class="btn-loader">⏳ Guardando...</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</main>
+    </section>
 
-<!-- Scripts -->
+    <!-- LADO DERECHO: Login -->
+    <section class="login-panel">
+        <main class="login-wrapper" role="main">
+            <!-- Tarjeta de Login -->
+            <article class="login-card" aria-labelledby="login-title">
+                <!-- Sección: Logo y Título -->
+                <header class="login-header">
+                    <div class="logo-container">
+                        <!-- 🔧 REEMPLAZA: src con tu logo real -->
+                        <img
+                            src="img/logo.png"
+                            alt="Logo Institucional"
+                            class="logo"
+                            width="80"
+                            height="80"
+                            loading="lazy"
+                        >
+                    </div>
+                    <h1 id="login-title">Acceso Usuario</h1>
+                    <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
+                </header>
+                <!-- Sección: Formulario -->
+                <form id="loginForm" class="login-form" novalidate>
+                    <!-- Campo: Email -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-input"
+                            placeholder="ejemplo@institucion.com"
+                            required
+                            autocomplete="email"
+                            aria-required="true"
+                        >
+                    </div>
+                    <!-- Campo: Contraseña -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="••••••••"
+                            required
+                            autocomplete="current-password"
+                            aria-required="true"
+                            minlength="6"
+                        >
+                    </div>
+                    <!-- Mensajes de error/éxito -->
+                    <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+                    <!-- Botón de envío -->
+                    <button type="submit" class="btn btn-primary btn-login" id="submitBtn">
+                        <span class="btn-text">Ingresar</span>
+                        <span class="btn-loader" hidden>Procesando...</span>
+                    </button>
+                </form>
+                <!-- Footer: Mensaje de Seguridad Elegante -->
+                <footer class="login-footer">
+                    <!-- Badge de seguridad minimalista -->
+                    <div class="security-badge">
+                        <span class="security-icon">🔒</span>
+                        <span class="security-label">Conexión segura</span>
+                    </div>
+                </footer>
+            </article>
+            <!-- Pie de página institucional -->
+            <p class="copyright">
+                &copy; <span id="currentYear"></span> OTIC ZULIA. Todos los derechos reservados.
+            </p>
+        </main>
+    </section>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<!-- Librería de Supabase (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="../js/config.js" defer></script>
-<script src="../js/planilla-registrar.js" defer></script>
+<!-- Lógica de autenticación (archivo separado) -->
+<script src="js/auth.js" defer></script>
+
+<!-- Script para el Slider de Imágenes y Año -->
+<script>
+    // 1. Año automático en el copyright
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // 2. Lógica del Slider de Imágenes (Carrusel Suave)
+    document.addEventListener('DOMContentLoaded', () => {
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        const slideInterval = 5000; // 5 segundos por imagen (poco a poco)
+
+        function nextSlide() {
+            // Quitar clase active de la actual
+            slides[currentSlide].classList.remove('active');
+            // Calcular siguiente índice
+            currentSlide = (currentSlide + 1) % slides.length;
+            // Poner clase active a la siguiente
+            slides[currentSlide].classList.add('active');
+        }
+
+        // Iniciar el intervalo si hay más de una imagen
+        if (slides.length > 1) {
+            setInterval(nextSlide, slideInterval);
+        }
+    });
+</script>
 </body>
 </html>
