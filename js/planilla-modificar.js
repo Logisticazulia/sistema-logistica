@@ -1,7 +1,7 @@
 /**
- * MODIFICAR VEHÍCULOS - PLANILLA
- * Maneja la búsqueda universal y actualización de vehículos existentes
- */
+* MODIFICAR VEHÍCULOS - PLANILLA
+* Maneja la búsqueda universal y actualización de vehículos existentes
+*/
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 
 // Referencias al DOM
@@ -103,8 +103,11 @@ function cargarDatosVehiculo(vehiculo) {
         const input = document.getElementById(campo);
         if (input && vehiculo[campo] !== undefined && vehiculo[campo] !== null) {
             if (input.type === 'date' && vehiculo[campo]) {
+                // Manejar fechas correctamente
                 const fecha = new Date(vehiculo[campo]);
-                input.value = fecha.toISOString().split('T')[0];
+                if (!isNaN(fecha.getTime())) {
+                    input.value = fecha.toISOString().split('T')[0];
+                }
             } else {
                 input.value = vehiculo[campo];
             }
@@ -112,7 +115,6 @@ function cargarDatosVehiculo(vehiculo) {
     });
     
     document.getElementById('vehicleId').value = vehiculo.id;
-    
     showAlert('success', `✅ Vehículo ${vehiculo.placa} encontrado. Presione "Editar Información" para modificar.`);
 }
 
@@ -120,7 +122,8 @@ function cargarDatosVehiculo(vehiculo) {
 
 // Buscar vehículo en múltiples campos
 async function buscarVehiculo() {
-    const searchTerm = searchUniversal.value.trim();
+    // ✅ LIMPIAR Y NORMALIZAR EL TÉRMINO DE BÚSQUEDA
+    const searchTerm = searchUniversal.value.trim().toUpperCase();
     
     if (!searchTerm) {
         showAlert('error', '❌ Ingrese Placa, ID, Facsímil o Serial para buscar');
@@ -131,50 +134,57 @@ async function buscarVehiculo() {
     btnSearch.disabled = true;
     
     try {
-        let query = supabaseClient.from('vehiculos').select('*').limit(1);
+        console.log('🔍 Buscando:', searchTerm);
+        
+        let query = supabaseClient.from('vehiculos').select('*').limit(5);
         
         // Detectar si es número (ID) o texto (Placa, Facsímil, Seriales)
         const esNumero = /^\d+$/.test(searchTerm);
-        const searchUpper = searchTerm.toUpperCase();
         
         if (esNumero && searchTerm.length <= 5) {
-            // Probablemente es ID
+            // Probablemente es ID numérico corto
+            console.log('📍 Búsqueda por ID:', searchTerm);
             query = query.eq('id', parseInt(searchTerm));
+        } else if (esNumero && searchTerm.length > 5) {
+            // Número largo, buscar en múltiples campos
+            console.log('📍 Búsqueda múltiple con número:', searchTerm);
+            query = query.or(`id.eq.${searchTerm},placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm}`);
         } else {
-            // Búsqueda OR en múltiples campos
-            query = query.or(`placa.ilike.%${searchUpper}%,facsimil.ilike.%${searchUpper}%,s_carroceria.ilike.%${searchUpper}%,s_motor.ilike.%${searchUpper}%`);
-            
-            // Si es número largo, también buscar por ID
-            if (esNumero) {
-                query = query.or(`id.eq.${searchTerm}`);
-            }
+            // Búsqueda de texto en múltiples campos
+            console.log('📍 Búsqueda de texto:', searchTerm);
+            query = query.or(
+                `placa.eq.${searchTerm},` +
+                `facsimil.eq.${searchTerm},` +
+                `s_carroceria.eq.${searchTerm},` +
+                `s_motor.eq.${searchTerm}`
+            );
         }
         
-        const { data, error } = await query.single();
+        const { data, error } = await query;
         
         if (error) {
-            if (error.code === 'PGRST116') {
-                showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
-            } else {
-                console.error('Error al buscar:', error);
-                showAlert('error', 'Error al buscar: ' + error.message);
-            }
+            console.error('❌ Error en la consulta:', error);
+            showAlert('error', 'Error al buscar: ' + error.message);
             return;
         }
         
-        if (!data) {
-            showAlert('error', '❌ Vehículo no encontrado');
+        console.log('📊 Resultados:', data);
+        
+        if (!data || data.length === 0) {
+            showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
             return;
         }
         
-        vehicleData = data;
-        cargarDatosVehiculo(data);
+        // Si hay múltiples resultados, tomar el primero
+        const vehiculo = data[0];
+        vehicleData = vehiculo;
         
+        cargarDatosVehiculo(vehiculo);
         btnEdit.disabled = false;
         btnCancel.disabled = false;
         
     } catch (error) {
-        console.error('Error en buscarVehiculo:', error);
+        console.error('❌ Error en buscarVehiculo:', error);
         showAlert('error', 'Error de conexión: ' + error.message);
     } finally {
         btnSearch.classList.remove('searching');
@@ -215,6 +225,7 @@ async function actualizarVehiculo(event) {
     }
     
     const vehicleId = document.getElementById('vehicleId').value;
+    
     if (!vehicleId) {
         showAlert('error', 'Error: No se encontró el ID del vehículo');
         return;
@@ -224,6 +235,7 @@ async function actualizarVehiculo(event) {
     btnSubmit.disabled = true;
     
     try {
+        // ✅ NORMALIZAR DATOS ANTES DE GUARDAR (igual que en registrar)
         const vehiculoActualizado = {
             placa: document.getElementById('placa').value.trim().toUpperCase(),
             facsimil: document.getElementById('facsimil').value.trim().toUpperCase(),
@@ -240,7 +252,7 @@ async function actualizarVehiculo(event) {
             estatus: document.getElementById('estatus').value.trim().toUpperCase(),
             unidad_administrativa: document.getElementById('unidad_administrativa').value.trim().toUpperCase(),
             ubicacion_fisica: document.getElementById('ubicacion_fisica').value.trim().toUpperCase(),
-            asignacion: document.getElementById('asignacion').value.trim().toUpperCase(),
+            asignacion: document.getElementById('asignacion').value || null,
             redip: document.getElementById('redip').value.trim().toUpperCase(),
             ccpe: document.getElementById('ccpe').value.trim().toUpperCase(),
             epm: document.getElementById('epm').value.trim().toUpperCase(),
@@ -253,19 +265,25 @@ async function actualizarVehiculo(event) {
             observacion_extra: document.getElementById('observacion_extra').value.trim()
         };
         
+        console.log('📝 Actualizando vehículo:', vehiculoActualizado);
+        
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .update(vehiculoActualizado)
             .eq('id', parseInt(vehicleId))
             .select();
         
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Error al actualizar:', error);
+            throw error;
+        }
         
+        console.log('✅ Vehículo actualizado:', data);
         showAlert('success', '✅ Vehículo ' + vehiculoActualizado.placa + ' actualizado exitosamente');
         toggleFormFields(false);
         
     } catch (error) {
-        console.error('Error en actualizarVehiculo:', error);
+        console.error('❌ Error en actualizarVehiculo:', error);
         showAlert('error', '❌ Error al actualizar: ' + (error.message || 'Verifique su conexión'));
     } finally {
         btnSubmit.classList.remove('loading');
@@ -282,9 +300,9 @@ function cancelarEdicion() {
 }
 
 // ================= EVENT LISTENERS =================
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Inicializando modificación de vehículos...');
-    
+    console.log('🚀 Inicializando modificación de vehículos...');
     mostrarUsuarioAutenticado();
     
     // Búsqueda universal
@@ -305,5 +323,5 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', cerrarSesion);
     }
     
-    showAlert('info', 'Ingrese Placa, ID, Facsímil o Serial para buscar un vehículo');
+    showAlert('info', 'ℹ️ Ingrese Placa, ID, Facsímil o Serial para buscar un vehículo');
 });
