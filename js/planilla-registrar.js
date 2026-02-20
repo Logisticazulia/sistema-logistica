@@ -14,30 +14,40 @@ const errorMessage = document.getElementById('errorMessage');
 const userEmail = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// Mostrar usuario autenticado
+// Campos que deben ser únicos
+const CAMPOS_UNICOS = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
+
+// Estado de validación
+const validacionEstado = {
+    placa: { valido: true, mensaje: '' },
+    facsimil: { valido: true, mensaje: '' },
+    s_carroceria: { valido: true, mensaje: '' },
+    s_motor: { valido: true, mensaje: '' },
+    n_identificacion: { valido: true, mensaje: '' }
+};
+
+// Debounce para evitar consultas excesivas
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 // Mostrar usuario autenticado
 async function mostrarUsuarioAutenticado() {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
-        
-        if (error) {
-            console.error('Error de sesión:', error);
-            userEmail.textContent = 'Invitado';
-            return;
-        }
-        
         if (session?.user?.email) {
-            // Muestra solo el nombre antes del @
-           userEmail.textContent = session.user.email;
-        } else if (session?.user?.user_metadata?.full_name) {
-            // Fallback: usa el nombre completo si existe
-            userEmail.textContent = session.user.user_metadata.full_name;
-        } else {
-            userEmail.textContent = 'Usuario';
+            userEmail.textContent = session.user.email.split('@')[0];
         }
     } catch (err) {
         console.error('Error obteniendo sesión:', err);
-        userEmail.textContent = 'Invitado';
     }
 }
 
@@ -56,7 +66,6 @@ async function cerrarSesion() {
 function showAlert(type, message) {
     alertSuccess.style.display = 'none';
     alertError.style.display = 'none';
-    
     if (type === 'success') {
         successMessage.textContent = message;
         alertSuccess.style.display = 'flex';
@@ -67,12 +76,10 @@ function showAlert(type, message) {
         errorMessage.textContent = message;
         alertError.style.display = 'flex';
     }
-    
-    // Scroll hacia la alerta
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Validar formulario
+// Validar formulario (campos obligatorios)
 function validarFormulario() {
     const camposObligatorios = ['placa', 'marca', 'modelo', 'tipo', 'clase'];
     let isValid = true;
@@ -92,8 +99,116 @@ function validarFormulario() {
     if (!isValid) {
         showAlert('error', mensajeError);
     }
-    
     return isValid;
+}
+
+// Validar campos únicos en tiempo real
+async function validarCampoUnico(campo, valor) {
+    const input = document.getElementById(campo);
+    const formGroup = input.closest('.form-group');
+    
+    // Limpiar estados previos
+    formGroup.classList.remove('error', 'success');
+    input.style.borderColor = '#e2e8f0';
+    
+    // Si el campo está vacío, no validar
+    if (!valor || valor.trim() === '') {
+        validacionEstado[campo] = { valido: true, mensaje: '' };
+        return true;
+    }
+    
+    // Mostrar indicador de carga
+    input.classList.add('loading');
+    
+    try {
+        // Consultar si ya existe en la base de datos
+        const { data, error } = await supabaseClient
+            .from('vehiculos')
+            .select('id')
+            .eq(campo, valor.trim().toUpperCase())
+            .limit(1);
+        
+        input.classList.remove('loading');
+        
+        if (error) {
+            throw error;
+        }
+        
+        if (data && data.length > 0) {
+            // Campo duplicado
+            validacionEstado[campo] = { 
+                valido: false, 
+                mensaje: `⚠️ Este ${campo.replace('_', ' ')} ya está registrado` 
+            };
+            input.style.borderColor = '#dc2626';
+            formGroup.classList.add('error');
+            mostrarMensajeErrorCampo(campo, validacionEstado[campo].mensaje);
+            return false;
+        } else {
+            // Campo único
+            validacionEstado[campo] = { valido: true, mensaje: '' };
+            input.style.borderColor = '#059669';
+            formGroup.classList.add('success');
+            eliminarMensajeErrorCampo(campo);
+            return true;
+        }
+    } catch (error) {
+        console.error(`Error validando ${campo}:`, error);
+        input.classList.remove('loading');
+        validacionEstado[campo] = { 
+            valido: true, 
+            mensaje: 'Error de conexión, se validará al guardar' 
+        };
+        input.style.borderColor = '#e2e8f0';
+        return true; // Permitir continuar en caso de error de conexión
+    }
+}
+
+// Mostrar mensaje de error debajo del campo
+function mostrarMensajeErrorCampo(campo, mensaje) {
+    const input = document.getElementById(campo);
+    const formGroup = input.closest('.form-group');
+    
+    // Eliminar mensaje existente si hay
+    eliminarMensajeErrorCampo(campo);
+    
+    // Crear elemento de mensaje
+    const mensajeElement = document.createElement('small');
+    mensajeElement.id = `error-${campo}`;
+    mensajeElement.className = 'field-error-message';
+    mensajeElement.style.color = '#dc2626';
+    mensajeElement.style.fontSize = '0.75rem';
+    mensajeElement.style.marginTop = '4px';
+    mensajeElement.textContent = mensaje;
+    
+    formGroup.appendChild(mensajeElement);
+}
+
+// Eliminar mensaje de error del campo
+function eliminarMensajeErrorCampo(campo) {
+    const existingError = document.getElementById(`error-${campo}`);
+    if (existingError) {
+        existingError.remove();
+    }
+}
+
+// Validar todos los campos únicos antes de guardar
+async function validarTodosCamposUnicos() {
+    let todosValidos = true;
+    
+    for (const campo of CAMPOS_UNICOS) {
+        const input = document.getElementById(campo);
+        const valor = input.value.trim().toUpperCase();
+        
+        if (valor) {
+            const esValido = await validarCampoUnico(campo, valor);
+            if (!esValido) {
+                todosValidos = false;
+            }
+        }
+    }
+    
+    return todosValidos;
 }
 
 // Guardar vehículo
@@ -101,6 +216,13 @@ async function guardarVehiculo(event) {
     event.preventDefault();
     
     if (!validarFormulario()) {
+        return;
+    }
+    
+    // Validar campos únicos antes de guardar
+    const camposUnicosValidos = await validarTodosCamposUnicos();
+    if (!camposUnicosValidos) {
+        showAlert('error', '❌ Hay campos duplicados. Por favor corríjalos antes de guardar.');
         return;
     }
     
@@ -149,7 +271,14 @@ async function guardarVehiculo(event) {
         
         if (error) {
             console.error('Error al guardar:', error);
-            throw error;
+            
+            // Verificar si es error de duplicado a nivel de base de datos
+            if (error.code === '23505' || error.message.includes('duplicate')) {
+                showAlert('error', '❌ Error: Ya existe un vehículo con estos datos únicos.');
+            } else {
+                throw error;
+            }
+            return;
         }
         
         console.log('Vehículo guardado:', data);
@@ -157,6 +286,16 @@ async function guardarVehiculo(event) {
         
         // Limpiar formulario
         form.reset();
+        
+        // Limpiar estados de validación
+        CAMPOS_UNICOS.forEach(campo => {
+            const input = document.getElementById(campo);
+            const formGroup = input.closest('.form-group');
+            input.style.borderColor = '#e2e8f0';
+            formGroup.classList.remove('error', 'success');
+            eliminarMensajeErrorCampo(campo);
+            validacionEstado[campo] = { valido: true, mensaje: '' };
+        });
         
         // Opcional: Redirigir a consultar después de 2 segundos
         // setTimeout(() => {
@@ -173,14 +312,38 @@ async function guardarVehiculo(event) {
     }
 }
 
+// Inicializar validación en tiempo real
+function inicializarValidacionTiempoReal() {
+    CAMPOS_UNICOS.forEach(campo => {
+        const input = document.getElementById(campo);
+        if (input) {
+            // Validar cuando el usuario deja el campo (blur)
+            input.addEventListener('blur', () => {
+                const valor = input.value.trim().toUpperCase();
+                if (valor) {
+                    validarCampoUnico(campo, valor);
+                }
+            });
+            
+            // Validar mientras escribe (con debounce)
+            input.addEventListener('input', debounce(() => {
+                const valor = input.value.trim().toUpperCase();
+                if (valor && valor.length >= 3) { // Mínimo 3 caracteres para validar
+                    validarCampoUnico(campo, valor);
+                }
+            }, 500));
+        }
+    });
+}
+
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Inicializando registro de vehículos...');
     mostrarUsuarioAutenticado();
+    inicializarValidacionTiempoReal();
     
     // Event listeners
     form.addEventListener('submit', guardarVehiculo);
-    
     if (logoutBtn) {
         logoutBtn.addEventListener('click', cerrarSesion);
     }
