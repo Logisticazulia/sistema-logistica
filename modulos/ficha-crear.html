@@ -70,9 +70,20 @@
             border-color: #003366;
             box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
         }
-        .form-row {
+        /* Filas del formulario */
+        .form-row-4 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
         .btn {
@@ -243,8 +254,18 @@
                 width: 100%;
             }
         }
+        @media (max-width: 1200px) {
+            .form-row-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-row-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
         @media (max-width: 768px) {
-            .form-row {
+            .form-row-4,
+            .form-row-3,
+            .form-row-2 {
                 grid-template-columns: 1fr;
             }
             .fotos-container {
@@ -302,7 +323,8 @@
             <div class="form-section">
                 <h2>📝 Datos del Vehículo</h2>
                 <form id="fichaForm">
-                    <div class="form-row">
+                    <!-- FILA 1: 4 CAMPOS -->
+                    <div class="form-row-4">
                         <div class="form-group">
                             <label>Marca *</label>
                             <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI">
@@ -311,8 +333,6 @@
                             <label>Modelo *</label>
                             <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200">
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label>Tipo *</label>
                             <select id="tipo" name="tipo" required>
@@ -329,17 +349,25 @@
                             <input type="text" id="clase" name="clase" required placeholder="Ej: PICKUP D/ CABINA">
                         </div>
                     </div>
-                    <div class="form-row">
+
+                    <!-- FILA 2: 3 CAMPOS -->
+                    <div class="form-row-3">
                         <div class="form-group">
                             <label>Serial Carrocería *</label>
                             <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515">
+                        </div>
+                        <div class="form-group">
+                            <label>Serial Motor *</label>
+                            <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409">
                         </div>
                         <div class="form-group">
                             <label>Color *</label>
                             <input type="text" id="color" name="color" required placeholder="Ej: BLANCO">
                         </div>
                     </div>
-                    <div class="form-row">
+
+                    <!-- FILA 3: 3 CAMPOS -->
+                    <div class="form-row-3">
                         <div class="form-group">
                             <label>Placa *</label>
                             <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417">
@@ -348,28 +376,30 @@
                             <label>Facsimilar</label>
                             <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417">
                         </div>
+                        <div class="form-group">
+                            <label>Estatus del Vehículo *</label>
+                            <select id="estatus" name="estatus" required>
+                                <option value="OPERATIVO">OPERATIVO</option>
+                                <option value="INOPERATIVO">INOPERATIVO</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Serial Motor *</label>
-                        <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409">
-                    </div>
+
+                    <!-- DEPENDENCIA -->
                     <div class="form-group">
                         <label>Dependencia *</label>
                         <textarea id="dependencia" name="dependencia" rows="3" required placeholder="Ej: SERVICIO PATRULLAJE VEHICULAR CUADRANTES DE PAZ"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label>Estatus del Vehículo *</label>
-                        <select id="estatus" name="estatus" required>
-                            <option value="OPERATIVO">OPERATIVO</option>
-                            <option value="INOPERATIVO">INOPERATIVO</option>
-                        </select>
-                    </div>
+
+                    <!-- INFORMACIÓN TÉCNICO MECÁNICA -->
                     <h3 style="margin: 20px 0 15px; color: #003366;">Información Técnico Mecánica (Si es Inoperativo)</h3>
+                    
                     <div class="form-group">
                         <label>Causa</label>
                         <input type="text" id="causa" name="causa" placeholder="Describa la causa">
                     </div>
-                    <div class="form-row">
+
+                    <div class="form-row-2">
                         <div class="form-group">
                             <label>Mecánica</label>
                             <input type="text" id="mecanica" name="mecanica" placeholder="Estado mecánico">
@@ -379,7 +409,8 @@
                             <input type="text" id="diagnostico" name="diagnostico" placeholder="Diagnóstico">
                         </div>
                     </div>
-                    <div class="form-row">
+
+                    <div class="form-row-2">
                         <div class="form-group">
                             <label>Ubicación</label>
                             <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación actual">
@@ -389,7 +420,8 @@
                             <input type="text" id="tapiceria" name="tapiceria" placeholder="Estado tapicería">
                         </div>
                     </div>
-                    <div class="form-row">
+
+                    <div class="form-row-2">
                         <div class="form-group">
                             <label>Cauchos</label>
                             <input type="text" id="cauchos" name="cauchos" placeholder="Estado cauchos">
@@ -399,10 +431,14 @@
                             <input type="text" id="luces" name="luces" placeholder="Estado luces">
                         </div>
                     </div>
+
+                    <!-- OBSERVACIONES -->
                     <div class="form-group">
                         <label>Observaciones</label>
                         <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales"></textarea>
                     </div>
+
+                    <!-- BOTONES -->
                     <div>
                         <button type="button" class="btn btn-primary" id="btnGuardar">💾 Guardar Ficha</button>
                         <button type="button" class="btn btn-secondary" id="btnImprimir">🖨️ Imprimir</button>
