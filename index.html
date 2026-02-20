@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- ================= METAETIQUETAS ESENCIALES ================= -->
+<!-- ================= METAETIQUETAS ================= -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Acceso al sistema institucional - Login seguro">
@@ -11,34 +11,42 @@
 <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" href="img/logo.png">
 <!-- ================= ESTILOS ================= -->
-<!-- Fuentes Google -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<!-- Hoja de estilos principal -->
 <link rel="stylesheet" href="css/style.css">
 
 <style>
+/* ================= RESET Y BASE ================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
 /* ================= LAYOUT SPLIT-SCREEN ================= */
 .login-wrapper {
     display: flex;
     min-height: 100vh;
     width: 100%;
-    background: #f5f7fa;
 }
 
-/* ================= PANEL IZQUIERDO: SLIDESHOW ================= */
-.login-slideshow {
+/* ================= PANEL IZQUIERDO: GALERÍA DE IMÁGENES ================= */
+.login-gallery {
     flex: 1;
     position: relative;
     overflow: hidden;
+    background: #003366;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #003366 0%, #005b96 50%, #003366 100%);
 }
 
-.slideshow-container {
+.gallery-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -46,25 +54,26 @@
     height: 100%;
 }
 
-.slideshow-slide {
+.gallery-slide {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     opacity: 0;
-    transition: opacity 2s ease-in-out;
+    transition: opacity 3s ease-in-out; /* Transición lenta y suave */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-.slideshow-slide.active {
+.gallery-slide.active {
     opacity: 1;
+    z-index: 1;
 }
 
-/* Overlay oscuro para mejor legibilidad del texto */
-.slideshow-overlay {
+/* Overlay oscuro para mejor contraste */
+.gallery-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -72,53 +81,51 @@
     height: 100%;
     background: linear-gradient(
         135deg, 
-        rgba(0, 51, 102, 0.85) 0%, 
+        rgba(0, 51, 102, 0.9) 0%, 
         rgba(0, 91, 150, 0.7) 50%, 
-        rgba(0, 51, 102, 0.85) 100%
+        rgba(0, 51, 102, 0.9) 100%
     );
-    z-index: 1;
+    z-index: 2;
 }
 
-/* Contenido del slideshow */
-.slideshow-content {
+/* Texto institucional sobre la galería */
+.gallery-text {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     text-align: center;
     color: white;
     padding: 40px;
-    max-width: 500px;
+    max-width: 450px;
 }
 
-.slideshow-content h2 {
-    font-size: 2rem;
+.gallery-text h2 {
+    font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 15px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    animation: fadeInUp 1s ease;
 }
 
-.slideshow-content p {
-    font-size: 1.1rem;
+.gallery-text p {
+    font-size: 1rem;
     font-weight: 300;
-    line-height: 1.6;
     opacity: 0.95;
-    animation: fadeInUp 1s ease 0.3s both;
+    line-height: 1.6;
 }
 
-/* Indicadores del slideshow */
-.slideshow-indicators {
+/* Indicadores de la galería */
+.gallery-indicators {
     position: absolute;
-    bottom: 30px;
+    bottom: 25px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 10px;
-    z-index: 2;
+    gap: 12px;
+    z-index: 3;
 }
 
-.slideshow-indicator {
-    width: 12px;
-    height: 12px;
+.gallery-indicator {
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.4);
     border: 2px solid white;
@@ -126,23 +133,23 @@
     transition: all 0.3s ease;
 }
 
-.slideshow-indicator.active {
+.gallery-indicator.active {
     background: white;
     transform: scale(1.2);
 }
 
-.slideshow-indicator:hover {
+.gallery-indicator:hover {
     background: rgba(255, 255, 255, 0.8);
 }
 
-/* ================= PANEL DERECHO: FORMULARIO ================= */
-.login-form-panel {
-    flex: 0 0 45%;
-    max-width: 550px;
+/* ================= PANEL DERECHO: LOGIN ================= */
+.login-panel {
+    flex: 0 0 480px;
+    max-width: 480px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 40px 35px;
     background: white;
     position: relative;
 }
@@ -150,18 +157,18 @@
 /* Tarjeta de Login */
 .login-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 51, 102, 0.15);
-    padding: 40px 35px;
-    animation: slideInRight 0.6s ease;
+    padding: 35px 30px;
+    box-shadow: 0 10px 40px rgba(0, 51, 102, 0.12);
+    animation: slideInRight 0.5s ease;
 }
 
 @keyframes slideInRight {
     from {
         opacity: 0;
-        transform: translateX(30px);
+        transform: translateX(20px);
     }
     to {
         opacity: 1;
@@ -169,79 +176,66 @@
     }
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 /* ================= HEADER DEL LOGIN ================= */
 .login-header {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 18px;
 }
 
 .logo {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .login-header h1 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #003366;
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
     line-height: 1.4;
 }
 
 .login-subtitle {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #64748b;
     margin: 0;
-    font-weight: 400;
 }
 
 /* ================= FORMULARIO ================= */
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
 }
 
 .form-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #334155;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
 .form-input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 11px 14px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-family: 'Roboto', sans-serif;
     transition: all 0.25s ease;
     background: #f8fafc;
@@ -258,51 +252,39 @@
     color: #94a3b8;
 }
 
-/* ================= BOTONES ================= */
+/* ================= BOTÓN ================= */
 .btn-login {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     background: linear-gradient(135deg, #003366 0%, #005b96 100%);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .btn-login:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 51, 102, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 51, 102, 0.35);
 }
 
 .btn-login:active {
     transform: translateY(0);
 }
 
-.btn-loader {
-    display: none;
-}
-
-.btn-login.loading .btn-text {
-    display: none;
-}
-
-.btn-login.loading .btn-loader {
-    display: inline;
-}
-
 /* ================= MENSAJES ================= */
 .form-message {
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    padding: 11px 15px;
+    border-radius: 7px;
+    font-size: 0.85rem;
     display: none;
     animation: slideDown 0.3s ease;
 }
@@ -322,41 +304,27 @@
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* ================= FOOTER DEL LOGIN ================= */
+/* ================= FOOTER ================= */
 .login-footer {
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 25px;
+    padding-top: 18px;
     border-top: 1px solid #e2e8f0;
+    text-align: center;
 }
 
 .security-badge {
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 12px;
+    padding: 8px 14px;
     background: #f1f5f9;
-    border-radius: 8px;
-}
-
-.security-icon {
-    font-size: 1.2rem;
-}
-
-.security-label {
+    border-radius: 6px;
     font-size: 0.75rem;
     color: #64748b;
-    font-weight: 500;
 }
 
 .copyright {
@@ -364,9 +332,10 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #94a3b8;
     text-align: center;
+    width: 100%;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -375,30 +344,34 @@
         flex-direction: column;
     }
     
-    .login-slideshow {
+    .login-gallery {
         flex: 0 0 35vh;
-        min-height: 250px;
+        min-height: 220px;
     }
     
-    .login-form-panel {
+    .login-panel {
         flex: 1;
         max-width: 100%;
-        padding: 30px 20px;
+        padding: 30px 25px;
     }
     
-    .slideshow-content h2 {
-        font-size: 1.5rem;
+    .gallery-text h2 {
+        font-size: 1.4rem;
     }
     
-    .slideshow-content p {
-        font-size: 1rem;
+    .gallery-text p {
+        font-size: 0.9rem;
     }
 }
 
 @media (max-width: 480px) {
+    .login-panel {
+        padding: 25px 20px;
+    }
+    
     .login-card {
-        padding: 30px 25px;
-        border-radius: 12px;
+        padding: 28px 24px;
+        border-radius: 14px;
     }
     
     .login-header h1 {
@@ -406,64 +379,64 @@
     }
     
     .logo {
-        width: 50px;
-        height: 50px;
+        width: 48px;
+        height: 48px;
     }
     
     .form-input {
-        padding: 10px 14px;
-        font-size: 0.95rem;
+        padding: 10px 13px;
+        font-size: 0.9rem;
     }
     
     .btn-login {
         padding: 12px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
 }
 </style>
 </head>
 <body class="login-page">
 
-<!-- ================= CONTENEDOR PRINCIPAL SPLIT-SCREEN ================= -->
+<!-- ================= CONTENEDOR PRINCIPAL ================= -->
 <main class="login-wrapper" role="main">
     
-    <!-- ================= PANEL IZQUIERDO: SLIDESHOW ================= -->
-    <section class="login-slideshow" aria-label="Galería institucional">
-        <div class="slideshow-container">
-            <!-- Imágenes del slideshow (reemplazar con tus imágenes reales) -->
-            <div class="slideshow-slide active" style="background-image: url('img/slideshow/img1.jpg');"></div>
-            <div class="slideshow-slide" style="background-image: url('img/slideshow/img2.jpg');"></div>
-            <div class="slideshow-slide" style="background-image: url('img/slideshow/img3.jpg');"></div>
-            <div class="slideshow-slide" style="background-image: url('img/slideshow/img4.jpg');"></div>
+    <!-- ================= PANEL IZQUIERDO: GALERÍA DE IMÁGENES ================= -->
+    <section class="login-gallery" aria-label="Galería institucional">
+        <div class="gallery-container">
+            <!-- 🔧 REEMPLAZA: URLs con tus 4 imágenes reales -->
+            <div class="gallery-slide active" style="background-image: url('img/gallery/img1.jpg');"></div>
+            <div class="gallery-slide" style="background-image: url('img/gallery/img2.jpg');"></div>
+            <div class="gallery-slide" style="background-image: url('img/gallery/img3.jpg');"></div>
+            <div class="gallery-slide" style="background-image: url('img/gallery/img4.jpg');"></div>
             
             <!-- Overlay oscuro -->
-            <div class="slideshow-overlay"></div>
+            <div class="gallery-overlay"></div>
             
-            <!-- Contenido de texto -->
-            <div class="slideshow-content">
+            <!-- Texto institucional -->
+            <div class="gallery-text">
                 <h2>🛡️ Cuerpo de Policía Nacional Bolivariana</h2>
-                <p>Comprometidos con la seguridad, la justicia y el servicio a la comunidad del estado Zulia.</p>
+                <p>Sistema de Gestión Administrativa del CCPE ZULIA</p>
             </div>
             
-            <!-- Indicadores -->
-            <div class="slideshow-indicators">
-                <span class="slideshow-indicator active" data-slide="0"></span>
-                <span class="slideshow-indicator" data-slide="1"></span>
-                <span class="slideshow-indicator" data-slide="2"></span>
-                <span class="slideshow-indicator" data-slide="3"></span>
+            <!-- Indicadores de la galería -->
+            <div class="gallery-indicators">
+                <span class="gallery-indicator active" data-slide="0"></span>
+                <span class="gallery-indicator" data-slide="1"></span>
+                <span class="gallery-indicator" data-slide="2"></span>
+                <span class="gallery-indicator" data-slide="3"></span>
             </div>
         </div>
     </section>
     
-    <!-- ================= PANEL DERECHO: FORMULARIO ================= -->
-    <section class="login-form-panel">
+    <!-- ================= PANEL DERECHO: LOGIN ================= -->
+    <section class="login-panel">
         <article class="login-card" aria-labelledby="login-title">
             
             <!-- Header: Logo y Título -->
             <header class="login-header">
                 <div class="logo-container">
-                    <img src="img/logo.png" alt="Logo Institucional" class="logo" width="60" height="60" loading="lazy">
-                    <img src="img/logo_derecho.png" alt="Logo Secundario" class="logo" width="60" height="60" loading="lazy">
+                    <img src="img/logo.png" alt="Logo Institucional" class="logo" width="55" height="55" loading="lazy">
+                    <img src="img/logo_derecho.png" alt="Logo Secundario" class="logo" width="55" height="55" loading="lazy">
                 </div>
                 <h1 id="login-title">Sistema Automatizado de Gestión Administrativa</h1>
                 <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
@@ -490,17 +463,14 @@
                 
                 <!-- Botón de envío -->
                 <button type="submit" class="btn-login" id="submitBtn">
-                    <span class="btn-text">🔐 Ingresar al Sistema</span>
-                    <span class="btn-loader">⏳ Verificando...</span>
+                    🔐 Ingresar al Sistema
                 </button>
             </form>
             
             <!-- Footer: Seguridad -->
             <footer class="login-footer">
                 <div class="security-badge">
-                    <span class="security-icon">🔒</span>
-                    <span class="security-label">Conexión segura y encriptada</span>
-                    <span class="security-label">Cuerpo de Policía Nacional Bolivariana</span>
+                    🔒 Conexión segura y encriptada
                 </div>
             </footer>
             
@@ -515,35 +485,32 @@
 </main>
 
 <!-- ================= SCRIPTS ================= -->
-<!-- Librería de Supabase (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<!-- Lógica de autenticación -->
 <script src="js/auth.js" defer></script>
 
 <!-- Script del Slideshow y elementos dinámicos -->
 <script>
-// ================= SLIDESHOW AUTOMÁTICO =================
 document.addEventListener('DOMContentLoaded', () => {
     // Año automático en copyright
     document.getElementById('currentYear').textContent = new Date().getFullYear();
     
-    // Configuración del slideshow
-    const slides = document.querySelectorAll('.slideshow-slide');
-    const indicators = document.querySelectorAll('.slideshow-indicator');
+    // ================= CONFIGURACIÓN DEL SLIDESHOW =================
+    const slides = document.querySelectorAll('.gallery-slide');
+    const indicators = document.querySelectorAll('.gallery-indicator');
     let currentSlide = 0;
-    const slideInterval = 6000; // 6 segundos por imagen
+    const slideInterval = 5000; // 5 segundos entre imágenes (ajustable)
     
-    // Función para cambiar de slide
+    // Función para cambiar de imagen
     function goToSlide(index) {
-        // Validar índice
+        // Validar índice cíclico
         if (index < 0) index = slides.length - 1;
         if (index >= slides.length) index = 0;
         
-        // Remover clase active de todos
+        // Remover clase 'active' de todos
         slides.forEach(slide => slide.classList.remove('active'));
         indicators.forEach(indicator => indicator.classList.remove('active'));
         
-        // Agregar clase active al nuevo slide
+        // Activar nuevo slide e indicador
         slides[index].classList.add('active');
         indicators[index].classList.add('active');
         
@@ -557,30 +524,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }, slideInterval);
     }
     
-    // Event listeners para indicadores
+    // Click en indicadores para navegación manual
     indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => {
             goToSlide(index);
         });
     });
     
-    // Iniciar slideshow solo si hay slides
+    // Iniciar slideshow solo si hay más de 1 imagen
     if (slides.length > 1) {
         startSlideshow();
     }
-    
-    // Efecto hover en inputs del formulario
-    const inputs = document.querySelectorAll('.form-input');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
-        input.addEventListener('blur', function() {
-            if (!this.value) {
-                this.parentElement.classList.remove('focused');
-            }
-        });
-    });
 });
 </script>
 
