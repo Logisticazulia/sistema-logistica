@@ -19,10 +19,11 @@ body {
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 30px;
 }
+/* Formulario */
 .form-section {
     background: white;
     padding: 30px;
@@ -80,6 +81,7 @@ body {
     background: #6c757d;
     color: white;
 }
+/* Vista Previa - Ficha */
 .preview-section {
     background: white;
     padding: 30px;
@@ -189,15 +191,18 @@ body {
         display: none;
     }
     .container {
-        grid-template-columns: 1fr;
+        display: block;
     }
     .preview-section {
         box-shadow: none;
     }
 }
-@media (max-width: 1200px) {
-    .container {
+@media (max-width: 768px) {
+    .form-row {
         grid-template-columns: 1fr;
+    }
+    .fotos-container {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 </style>
@@ -316,7 +321,8 @@ body {
             </div>
         </form>
     </div>
-    <!-- Vista Previa -->
+    
+    <!-- Vista Previa (AHORA DEBAJO) -->
     <div class="preview-section">
         <h2 style="color: #003366; margin-bottom: 20px;">👁️ Vista Previa</h2>
         <div class="ficha-tecnica" id="fichaPreview">
@@ -410,7 +416,6 @@ body {
     </div>
 </div>
 
-<!-- Referencia al archivo JS externo -->
 <script src="../js/ficha-crear.js"></script>
 </body>
 </html>
