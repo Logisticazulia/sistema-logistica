@@ -1,8 +1,8 @@
 // ================= CONFIGURACIÓN =================
-let supabase;
 let currentUser = null;
 let allVehiclesData = [];
 let charts = {};
+let supabaseClient = null; // ✅ Cambiado de 'supabase' a 'supabaseClient'
 
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -12,16 +12,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function initializeSupabase() {
-    if (typeof window.supabase !== 'undefined') {
-        supabase = window.supabase.createClient(
+    // ✅ Usar las credenciales globales de config.js
+    if (typeof window.supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_KEY) {
+        supabaseClient = window.supabase.createClient(
             window.SUPABASE_URL,
-            window.SUPABASE_ANON_KEY
+            window.SUPABASE_KEY
         );
+    } else {
+        console.error('❌ Supabase no está configurado correctamente');
+        showAlert('error', 'Error de configuración de base de datos');
     }
 }
 
 async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
+    if (!supabaseClient) {
+        console.error('❌ Cliente de Supabase no inicializado');
+        return;
+    }
+    
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
         window.location.href = '../login.html';
         return;
@@ -32,8 +41,16 @@ async function checkAuth() {
 
 // ================= CARGAR DATOS =================
 async function loadVehicleData() {
+    showLoading();
+    
+    if (!supabaseClient) {
+        hideLoading();
+        showAlert('error', 'Cliente de Supabase no inicializado');
+        return;
+    }
+    
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .order('created_at', { ascending: false });
@@ -46,22 +63,31 @@ async function loadVehicleData() {
         createCharts();
     } catch (error) {
         console.error('Error:', error);
-        showError('Error al cargar los datos: ' + error.message);
         hideLoading();
+        showAlert('error', 'Error al cargar los datos: ' + error.message);
     }
 }
 
-function hideLoading() {
-    document.getElementById('loadingOverlay').style.display = 'none';
+function showLoading() {
+    const loader = document.getElementById('loadingOverlay');
+    if (loader) loader.style.display = 'flex';
 }
 
-function showError(message) {
+function hideLoading() {
+    const loader = document.getElementById('loadingOverlay');
+    if (loader) loader.style.display = 'none';
+}
+
+function showAlert(type, message) {
     const alertEl = document.getElementById('alertError');
-    document.getElementById('errorMessage').textContent = message;
-    alertEl.style.display = 'flex';
-    setTimeout(() => {
-        alertEl.style.display = 'none';
-    }, 5000);
+    const messageEl = document.getElementById('errorMessage');
+    if (alertEl && messageEl) {
+        messageEl.textContent = message;
+        alertEl.style.display = 'flex';
+        setTimeout(() => {
+            alertEl.style.display = 'none';
+        }, 5000);
+    }
 }
 
 // ================= ACTUALIZAR MÉTRICAS =================
@@ -88,10 +114,10 @@ function updateMetrics() {
 function getFilteredData() {
     let data = [...allVehiclesData];
     
-    const redip = document.getElementById('filterRedip').value;
-    const ccpe = document.getElementById('filterCcpe').value;
-    const estatus = document.getElementById('filterEstatus').value;
-    const tipo = document.getElementById('filterTipo').value;
+    const redip = document.getElementById('filterRedip')?.value;
+    const ccpe = document.getElementById('filterCcpe')?.value;
+    const estatus = document.getElementById('filterEstatus')?.value;
+    const tipo = document.getElementById('filterTipo')?.value;
 
     if (redip) data = data.filter(v => v.redip === redip);
     if (ccpe) data = data.filter(v => v.ccpe === ccpe);
@@ -126,7 +152,9 @@ function updateCharts() {
 
 // ================= GRÁFICO 1: ESTATUS =================
 function createEstatusChart() {
-    const ctx = document.getElementById('chartEstatus').getContext('2d');
+    const ctx = document.getElementById('chartEstatus');
+    if (!ctx) return;
+    
     const data = getFilteredData();
     const statusCounts = countByField(data, 'estatus');
 
@@ -161,6 +189,7 @@ function createEstatusChart() {
 }
 
 function updateEstatusChart(data) {
+    if (!charts.estatus) return;
     const statusCounts = countByField(data, 'estatus');
     charts.estatus.data.labels = Object.keys(statusCounts);
     charts.estatus.data.datasets[0].data = Object.values(statusCounts);
@@ -169,7 +198,9 @@ function updateEstatusChart(data) {
 
 // ================= GRÁFICO 2: TIPO =================
 function createTipoChart() {
-    const ctx = document.getElementById('chartTipo').getContext('2d');
+    const ctx = document.getElementById('chartTipo');
+    if (!ctx) return;
+    
     const data = getFilteredData();
     const tipoCounts = countByField(data, 'tipo');
     const sorted = sortObjectByValue(tipoCounts);
@@ -199,6 +230,7 @@ function createTipoChart() {
 }
 
 function updateTipoChart(data) {
+    if (!charts.tipo) return;
     const tipoCounts = countByField(data, 'tipo');
     const sorted = sortObjectByValue(tipoCounts);
     charts.tipo.data.labels = Object.keys(sorted);
@@ -208,7 +240,9 @@ function updateTipoChart(data) {
 
 // ================= GRÁFICO 3: MARCAS =================
 function createMarcasChart() {
-    const ctx = document.getElementById('chartMarcas').getContext('2d');
+    const ctx = document.getElementById('chartMarcas');
+    if (!ctx) return;
+    
     const data = getFilteredData();
     const marcaCounts = countByField(data, 'marca');
     const top10 = getTopN(markaCounts, 10);
@@ -239,6 +273,7 @@ function createMarcasChart() {
 }
 
 function updateMarcasChart(data) {
+    if (!charts.marcas) return;
     const marcaCounts = countByField(data, 'marca');
     const top10 = getTopN(markaCounts, 10);
     charts.marcas.data.labels = Object.keys(top10);
@@ -248,7 +283,9 @@ function updateMarcasChart(data) {
 
 // ================= GRÁFICO 4: AÑO =================
 function createAnoChart() {
-    const ctx = document.getElementById('chartAno').getContext('2d');
+    const ctx = document.getElementById('chartAno');
+    if (!ctx) return;
+    
     const data = getFilteredData();
     const anoCounts = countByField(data, 'ano');
     const sorted = sortObjectByKey(anoCounts);
@@ -280,114 +317,10 @@ function createAnoChart() {
 }
 
 function updateAnoChart(data) {
+    if (!charts.ano) return;
     const anoCounts = countByField(data, 'ano');
     const sorted = sortObjectByKey(anoCounts);
     charts.ano.data.labels = Object.keys(sorted);
     charts.ano.data.datasets[0].data = Object.values(sorted);
     charts.ano.update();
 }
-
-// ================= GRÁFICO 5: UNIDADES =================
-function createUnidadesChart() {
-    const ctx = document.getElementById('chartUnidades').getContext('2d');
-    const data = getFilteredData();
-    const unidadCounts = countByField(data, 'unidad_administrativa');
-    const top15 = getTopN(unidadCounts, 15);
-
-    charts.unidades = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(top15),
-            datasets: [{
-                label: 'Vehículos',
-                data: Object.values(top15),
-                backgroundColor: '#e76f51',
-                borderRadius: 5
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: { beginAtZero: true }
-            }
-        }
-    });
-}
-
-function updateUnidadesChart(data) {
-    const unidadCounts = countByField(data, 'unidad_administrativa');
-    const top15 = getTopN(unidadCounts, 15);
-    charts.unidades.data.labels = Object.keys(top15);
-    charts.unidades.data.datasets[0].data = Object.values(top15);
-    charts.unidades.update();
-}
-
-// ================= UTILIDADES =================
-function countByField(data, field) {
-    return data.reduce((acc, item) => {
-        const value = item[field] || 'SIN DATO';
-        acc[value] = (acc[value] || 0) + 1;
-        return acc;
-    }, {});
-}
-
-function sortObjectByValue(obj) {
-    return Object.entries(obj)
-        .sort((a, b) => b[1] - a[1])
-        .reduce((acc, [key, value]) => {
-            acc[key] = value;
-            return acc;
-        }, {});
-}
-
-function sortObjectByKey(obj) {
-    return Object.entries(obj)
-        .sort((a, b) => a[0] - b[0])
-        .reduce((acc, [key, value]) => {
-            acc[key] = value;
-            return acc;
-        }, {});
-}
-
-function getTopN(obj, n) {
-    return Object.entries(obj)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, n)
-        .reduce((acc, [key, value]) => {
-            acc[key] = value;
-            return acc;
-        }, {});
-}
-
-// ================= ACCIONES =================
-function refreshData() {
-    document.getElementById('loadingOverlay').style.display = 'flex';
-    loadVehicleData();
-}
-
-function exportReport() {
-    const data = getFilteredData();
-    const csvContent = "data:text/csv;charset=utf-8," 
-        + Object.keys(data[0] || {}).join(",") + "\n"
-        + data.map(e => Object.values(e).join(",")).join("\n");
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "reporte_vehiculos_" + new Date().toISOString().split('T')[0] + ".csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-async function handleLogout() {
-    await supabase.auth.signOut();
-    window.location.href = '../login.html';
-}
-
-document.getElementById('logoutBtn').addEventListener('click', handleLogout);
