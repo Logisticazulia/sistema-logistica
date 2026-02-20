@@ -135,9 +135,9 @@ function createEstatusChart() {
                 label: 'Cantidad',
                 data: Object.values(statusCounts),
                 backgroundColor: [
-                    '#2a9d8f', // OPERATIVA
-                    '#e76f51', // INOPERATIVA
-                    '#6c757d'  // DESINCORPORADA
+                    '#2a9d8f',
+                    '#e76f51',
+                    '#6c757d'
                 ],
                 borderRadius: 5
             }]
@@ -194,8 +194,8 @@ function createMarcasChart() {
     if (!ctx) return;
     
     const data = allVehiclesData;
-    const marcaCounts = countByField(data, 'marca');
-    const top10 = getTopN(markaCounts, 10);
+    const marcaCounts = countByField(data, 'marca'); // ✅ CORREGIDO: era 'markaCounts'
+    const top10 = getTopN(marcaCounts, 10); // ✅ CORREGIDO: era 'markaCounts'
 
     charts.marcas = new Chart(ctx, {
         type: 'bar',
