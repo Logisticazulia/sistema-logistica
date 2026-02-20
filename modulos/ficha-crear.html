@@ -22,7 +22,7 @@
             background: #f5f5f5;
         }
         .container {
-            max-width: 1800px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
             display: flex;
@@ -122,10 +122,10 @@
         }
         .ficha-tecnica {
             border: 2px solid #003366;
-            padding: 30px;
+            padding: 25px;
             background: white;
-            width: 100%;
-            max-width: 100%;
+            width: 95%;
+            max-width: 1500px;
             display: inline-block;
             text-align: left;
         }
@@ -208,7 +208,7 @@
         }
         .foto-box {
             border: 2px solid #4a7c9b;
-            height: 150px;
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -219,7 +219,7 @@
             border-radius: 4px;
         }
         .observaciones-box {
-            min-height: 280px;
+            min-height: 260px;
             border: 2px solid #003366;
             padding: 12px;
             background: #fafafa;
@@ -426,9 +426,9 @@
                     </div>
                     <table class="ficha-table">
                         <tr>
-                            <th colspan="4">DATOS DEL VEHICULO</th>
-                            <th rowspan="4" style="width: 25%; vertical-align: top;">
-                                <strong>OBSERVACIONES</strong><br><br>
+                            <th colspan="5">DATOS DEL VEHICULO</th>
+                            <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+                                OBSERVACIONES<br><br>
                                 <div class="observaciones-box" id="previewObservaciones"></div>
                             </th>
                         </tr>
@@ -447,7 +447,7 @@
                             <td class="label">COLOR: <span id="previewColor"></span></td>
                         </tr>
                         <tr>
-                            <td class="label">PLACA:</td>
+                            <td class="label">PLACA</td>
                             <td class="value" id="previewPlaca"></td>
                             <td class="label">FACSIMIL</td>
                             <td class="value" id="previewFacsimilar"></td>
@@ -456,28 +456,26 @@
                         <tr>
                             <td class="label">SERIAL MOTOR</td>
                             <td class="value" id="previewSerialMotor"></td>
-                            <td class="label"></td>
-                            <td class="value"></td>
-                            <td class="label"></td>
+                            <td class="label" colspan="3"></td>
                         </tr>
                         <tr>
                             <td class="label">ESTATUS DEL VEHICULO</td>
-                            <td colspan="3" style="text-align: center; font-weight: bold;" id="previewEstatus"></td>
+                            <td colspan="4" style="text-align: center; font-weight: bold;" id="previewEstatus"></td>
                         </tr>
                         <tr>
-                            <th colspan="5">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
+                            <th colspan="6">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
                         </tr>
                         <tr>
                             <td class="label">CAUSA</td>
                             <td colspan="2" id="previewCausa"></td>
                             <td class="label">DIAGNÓSTICO</td>
-                            <td id="previewDiagnostico"></td>
+                            <td colspan="2" id="previewDiagnostico"></td>
                         </tr>
                         <tr>
                             <td class="label">MECANICA</td>
                             <td colspan="2" id="previewMecanica"></td>
-                            <td class="label">UBICACIÓN:</td>
-                            <td id="previewUbicacion"></td>
+                            <td class="label">UBICACIÓN</td>
+                            <td colspan="2" id="previewUbicacion"></td>
                         </tr>
                         <tr>
                             <td class="label">TAPICERIA</td>
@@ -488,10 +486,10 @@
                             <td id="previewLuces"></td>
                         </tr>
                         <tr>
-                            <th colspan="5">REGISTRO FOTOGRÁFICO</th>
+                            <th colspan="6">REGISTRO FOTOGRÁFICO</th>
                         </tr>
                         <tr>
-                            <td colspan="5">
+                            <td colspan="6">
                                 <div class="fotos-container">
                                     <div class="foto-box">Foto 1</div>
                                     <div class="foto-box">Foto 2</div>
