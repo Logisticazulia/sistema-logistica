@@ -1,228 +1,237 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Módulo de Transporte - Sistema de Logística">
-    <meta name="theme-color" content="#003366">
-    
-    <title>Transporte | Sistema de Gestión Administrativa</title>
-    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-    /* Estadísticas en línea con barras */
-    .stats-inline {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 30px;
-        padding: 25px 40px;
-        background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-        border-radius: 12px;
-        margin: 30px 0 40px 0;
-        box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
-        flex-wrap: wrap;
-    }
-
-    .stat-item {
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .stat-value {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: white;
-        line-height: 1;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 400;
-    }
-
-    .stat-separator {
-        color: rgba(255, 255, 255, 0.4);
-        font-size: 1.5rem;
-        font-weight: 300;
-    }
-
-    /* Grid de botones */
-    .transporte-buttons-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 25px;
-        margin-top: 30px;
-    }
-
-    .transporte-btn {
-        background: white;
-        border-radius: 12px;
-        padding: 35px 30px;
-        text-decoration: none;
-        box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-        border: 2px solid #e8eef5;
-        transition: all 0.3s ease;
-        display: block;
-    }
-
-    .transporte-btn:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 30px rgba(0, 51, 102, 0.15);
-        border-color: #005b96;
-    }
-
-    .btn-icon {
-        font-size: 3.5rem;
-        margin-bottom: 20px;
-        display: block;
-        text-align: center;
-    }
-
-    .btn-title {
-        color: #003366;
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-        text-align: center;
-    }
-
-    .btn-description {
-        color: #666;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        text-align: center;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .stats-inline {
-            flex-direction: column;
-            gap: 15px;
-            padding: 20px;
-        }
-        
-        .stat-separator {
-            display: none;
-        }
-        
-        .stat-item {
-            width: 100%;
-            flex-direction: row;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .transporte-buttons-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Módulo de Transporte - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Transporte | Sistema de Logística</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* Estadísticas en línea con barras */
+.stats-inline {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 30px;
+padding: 25px 40px;
+background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+border-radius: 12px;
+margin: 30px 0 40px 0;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
+flex-wrap: wrap;
+}
+.stat-item {
+text-align: center;
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+.stat-value {
+font-size: 2.5rem;
+font-weight: 700;
+color: white;
+line-height: 1;
+}
+.stat-label {
+font-size: 0.9rem;
+color: rgba(255, 255, 255, 0.9);
+font-weight: 400;
+}
+.stat-separator {
+color: rgba(255, 255, 255, 0.4);
+font-size: 1.5rem;
+font-weight: 300;
+}
+/* Grid de botones */
+.transporte-buttons-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 25px;
+margin-top: 30px;
+}
+.transporte-btn {
+background: white;
+border-radius: 12px;
+padding: 35px 30px;
+text-decoration: none;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
+border: 2px solid #e8eef5;
+transition: all 0.3s ease;
+display: block;
+}
+.transporte-btn:hover {
+transform: translateY(-8px);
+box-shadow: 0 12px 30px rgba(0, 51, 102, 0.15);
+border-color: #005b96;
+}
+.btn-icon {
+font-size: 3.5rem;
+margin-bottom: 20px;
+display: block;
+text-align: center;
+}
+.btn-title {
+color: #003366;
+font-size: 1.2rem;
+font-weight: 700;
+margin-bottom: 12px;
+text-align: center;
+}
+.btn-description {
+color: #666;
+font-size: 0.9rem;
+line-height: 1.5;
+text-align: center;
+}
+/* Botón Volver */
+.btn-volver {
+background: #6c757d;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 0.85rem;
+font-weight: 500;
+display: flex;
+align-items: center;
+gap: 5px;
+transition: all 0.3s;
+}
+.btn-volver:hover {
+background: #5a6268;
+transform: translateY(-2px);
+}
+/* Loader para estadísticas */
+.stat-loading {
+font-size: 1.5rem;
+animation: pulse 1s infinite;
+}
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.5; }
+}
+/* Responsive */
+@media (max-width: 768px) {
+.stats-inline {
+flex-direction: column;
+gap: 15px;
+padding: 20px;
+}
+.stat-separator {
+display: none;
+}
+.stat-item {
+width: 100%;
+flex-direction: row;
+justify-content: space-between;
+padding: 10px 0;
+border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.transporte-buttons-grid {
+grid-template-columns: 1fr;
+}
+}
 </style>
 </head>
-
 <body class="dashboard-page">
-
-    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
-    <nav class="navbar" role="navigation">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-                <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-                <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
-            </div>
-            <div class="nav-user">
-                <span class="user-email" id="userEmail">usuario@institucion.com</span>
-                <button class="btn-logout" id="logoutBtn">
-                    <span class="logout-icon">🚪</span>
-                    <span class="logout-text">Cerrar Sesión</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
-    <main class="dashboard-main" role="main">
-        
-        <!-- Header con Navegación de Migas -->
-        <header class="module-header">
-            <div class="breadcrumb">
-                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-current">Transporte</span>
-            </div>
-        </header>
-
-        <!-- Título del Módulo -->
-        <section class="module-title-section">
-            <h1 class="module-title">🚓 Módulo de Transporte</h1>
-            <p class="module-subtitle">Gestión integral del parque automotor institucional</p>
-        </section>
-
-        <!-- Estadísticas en UNA SOLA LÍNEA con barras -->
-        <section class="stats-inline">
-            <div class="stat-item">
-                <span class="stat-value" id="totalVehicles">0</span>
-                <span class="stat-label">Total Vehículos</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="availableVehicles">0</span>
-                <span class="stat-label">Disponibles</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="maintenanceVehicles">0</span>
-                <span class="stat-label">En Mantenimiento</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="assignedVehicles">0</span>
-                <span class="stat-label">Asignados</span>
-            </div>
-        </section>
-
-        <!-- 4 Botones Principales -->
-        <section class="transporte-buttons-grid">
-            
-            <!-- Botón 1: Planilla de Datos -->
-            <a href="planilla.html" class="transporte-btn">
-                <div class="btn-icon">📋</div>
-                <h3 class="btn-title">Planilla de Datos de Vehículos</h3>
-                <p class="btn-description">Registro y consulta de información general del parque automotor</p>
-            </a>
-
-            <!-- Botón 2: Ficha Técnica -->
-            <a href="ficha.html" class="transporte-btn">
-                <div class="btn-icon">🔧</div>
-                <h3 class="btn-title">Ficha Técnica</h3>
-                <p class="btn-description">Especificaciones técnicas y características mecánicas</p>
-            </a>
-
-            <!-- Botón 3: Acta de Asignación -->
-            <a href="acta.html" class="transporte-btn">
-                <div class="btn-icon">📝</div>
-                <h3 class="btn-title">Acta de Asignación</h3>
-                <p class="btn-description">Documentos de asignación de vehículos a personal</p>
-            </a>
-
-            <!-- Botón 4: Inspección PVR -->
-            <a href="inspeccion.html" class="transporte-btn">
-                <div class="btn-icon">🔍</div>
-                <h3 class="btn-title">Inspección de PVR Individual</h3>
-                <p class="btn-description">Inspección física vehicular individual de cada unidad</p>
-            </a>
-
-        </section>
-
-    </main>
-
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema de Logística</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">usuario@institucion.com</span>
+<button class="btn-logout" id="logoutBtn">
+<span class="logout-icon">🚪</span>
+<span class="logout-text">Cerrar Sesión</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+<!-- Header con Navegación de Migas -->
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Transporte</span>
+</div>
+<!-- ✅ BOTÓN VOLVER AGREGADO -->
+<button class="btn-volver" onclick="window.location.href='../dashboard.html'">
+← Volver
+</button>
+</header>
+<!-- Título del Módulo -->
+<section class="module-title-section">
+<h1 class="module-title">🚓 Módulo de Transporte</h1>
+<p class="module-subtitle">Gestión integral del parque automotor institucional</p>
+</section>
+<!-- ✅ ESTADÍSTICAS ACTUALIZADAS CON 5 INDICADORES -->
+<section class="stats-inline">
+<div class="stat-item">
+<span class="stat-value" id="totalVehicles"><span class="stat-loading">⏳</span></span>
+<span class="stat-label">Total Vehículos</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="automovilVehicles"><span class="stat-loading">⏳</span></span>
+<span class="stat-label">Automóviles</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="motosVehicles"><span class="stat-loading">⏳</span></span>
+<span class="stat-label">Motos</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="operativosVehicles"><span class="stat-loading">⏳</span></span>
+<span class="stat-label">Operativos</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="inoperativosVehicles"><span class="stat-loading">⏳</span></span>
+<span class="stat-label">Inoperativos</span>
+</div>
+</section>
+<!-- 4 Botones Principales -->
+<section class="transporte-buttons-grid">
+<!-- Botón 1: Planilla de Datos -->
+<a href="planilla.html" class="transporte-btn">
+<div class="btn-icon">📋</div>
+<h3 class="btn-title">Planilla de Datos de Vehículos</h3>
+<p class="btn-description">Registro y consulta de información general del parque automotor</p>
+</a>
+<!-- Botón 2: Ficha Técnica -->
+<a href="ficha.html" class="transporte-btn">
+<div class="btn-icon">🔧</div>
+<h3 class="btn-title">Ficha Técnica</h3>
+<p class="btn-description">Especificaciones técnicas y características mecánicas</p>
+</a>
+<!-- Botón 3: Acta de Asignación -->
+<a href="acta.html" class="transporte-btn">
+<div class="btn-icon">📝</div>
+<h3 class="btn-title">Acta de Asignación</h3>
+<p class="btn-description">Documentos de asignación de vehículos a personal</p>
+</a>
+<!-- Botón 4: Inspección PVR -->
+<a href="inspeccion.html" class="transporte-btn">
+<div class="btn-icon">🔍</div>
+<h3 class="btn-title">Inspección de PVR Individual</h3>
+<p class="btn-description">Inspección física vehicular individual de cada unidad</p>
+</a>
+</section>
+</main>
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/transporte.js" defer></script>
 </body>
 </html>
