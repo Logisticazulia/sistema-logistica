@@ -10,33 +10,199 @@ const fotosData = {
     foto4: null
 };
 
+// Base de datos de vehículos (se cargará desde CSV o localStorage)
+let vehiculosDB = [];
+
 // Actualizar vista previa en tiempo real
 const inputs = document.querySelectorAll('input, select, textarea');
 inputs.forEach(input => {
     input.addEventListener('input', actualizarVistaPrevia);
 });
 
-// Función para actualizar la vista previa
-function actualizarVistaPrevia() {
-    document.getElementById('previewMarca').textContent = document.getElementById('marca').value || '';
-    document.getElementById('previewModelo').textContent = document.getElementById('modelo').value || '';
-    document.getElementById('previewTipo').textContent = document.getElementById('tipo').value || '';
-    document.getElementById('previewClase').textContent = document.getElementById('clase').value || '';
-    document.getElementById('previewSerialCarroceria').textContent = document.getElementById('serialCarroceria').value || '';
-    document.getElementById('previewColor').textContent = document.getElementById('color').value || '';
-    document.getElementById('previewPlaca').textContent = document.getElementById('placa').value || '';
-    document.getElementById('previewFacsimilar').textContent = document.getElementById('facsimilar').value || '';
-    document.getElementById('previewSerialMotor').textContent = document.getElementById('serialMotor').value || '';
-    document.getElementById('previewDependencia').textContent = document.getElementById('dependencia').value || '';
-    document.getElementById('previewEstatus').textContent = document.getElementById('estatus').value || '';
-    document.getElementById('previewCausa').textContent = document.getElementById('causa').value || '';
-    document.getElementById('previewMecanica').textContent = document.getElementById('mecanica').value || '';
-    document.getElementById('previewDiagnostico').textContent = document.getElementById('diagnostico').value || '';
-    document.getElementById('previewUbicacion').textContent = document.getElementById('ubicacion').value || '';
-    document.getElementById('previewTapiceria').textContent = document.getElementById('tapiceria').value || '';
-    document.getElementById('previewCauchos').textContent = document.getElementById('cauchos').value || '';
-    document.getElementById('previewLuces').textContent = document.getElementById('luces').value || '';
-    document.getElementById('previewObservaciones').textContent = document.getElementById('observaciones').value || '';
+// Función para cargar la base de datos desde CSV
+async function cargarBaseDeDatos() {
+    try {
+        // Intentar cargar desde localStorage primero
+        const stored = localStorage.getItem('vehiculosDB');
+        if (stored) {
+            vehiculosDB = JSON.parse(stored);
+            console.log('✅ Base de datos cargada desde localStorage:', vehiculosDB.length, 'vehículos');
+            return;
+        }
+
+        // Si no hay en localStorage, cargar desde CSV
+        const response = await fetch('../data/vehiculos_rows.csv');
+        const csvText = await response.text();
+        vehiculosDB = parseCSV(csvText);
+        
+        // Guardar en localStorage para futuras consultas
+        localStorage.setItem('vehiculosDB', JSON.stringify(vehiculosDB));
+        console.log('✅ Base de datos cargada desde CSV:', vehiculosDB.length, 'vehículos');
+    } catch (error) {
+        console.error('❌ Error al cargar base de datos:', error);
+        mostrarAlerta('⚠️ No se pudo cargar la base de datos de vehículos', 'error');
+    }
+}
+
+// Función para parsear CSV
+function parseCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const result = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const obj = {};
+        
+        headers.forEach((header, index) => {
+            obj[header] = values[index] ? values[index].trim() : '';
+        });
+        
+        result.push(obj);
+    }
+    
+    return result;
+}
+
+// Función para parsear una línea de CSV considerando comillas
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            result.push(current);
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    
+    result.push(current);
+    return result;
+}
+
+// Función para buscar vehículo
+async function buscarVehiculo() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.trim().toUpperCase();
+    
+    if (!searchTerm) {
+        mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
+        return;
+    }
+
+    // Cargar base de datos si no está cargada
+    if (vehiculosDB.length === 0) {
+        mostrarAlerta('⏳ Cargando base de datos...', 'info');
+        await cargarBaseDeDatos();
+    }
+
+    // Buscar en placa, facsimilar, serial carroceria y serial motor
+    const vehiculo = vehiculosDB.find(v => 
+        (v.placa && v.placa.toUpperCase() === searchTerm) ||
+        (v.facsimil && v.facsimil.toUpperCase() === searchTerm) ||
+        (v.s_carroceria && v.s_carroceria.toUpperCase() === searchTerm) ||
+        (v.s_motor && v.s_motor.toUpperCase() === searchTerm)
+    );
+
+    if (vehiculo) {
+        // Llenar formulario con los datos encontrados
+        llenarFormulario(vehiculo);
+        mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo} - Placa: ${vehiculo.placa}`, 'success');
+    } else {
+        mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+    }
+}
+
+// Función para llenar el formulario con los datos del vehículo
+function llenarFormulario(vehiculo) {
+    // Mapear campos del CSV al formulario
+    const mapeoCampos = {
+        'marca': 'marca',
+        'modelo': 'modelo',
+        'tipo': 'tipo',
+        'clase': 'clase',
+        'color': 'color',
+        's_carroceria': 'serialCarroceria',
+        's_motor': 'serialMotor',
+        'placa': 'placa',
+        'facsimil': 'facsimilar',
+        'situacion': 'estatus',
+        'unidad_administrativa': 'dependencia',
+        'observacion': 'observaciones',
+        'ubicacion_fisica': 'ubicacion'
+    };
+
+    // Llenar campos
+    Object.entries(mapeoCampos).forEach(([csvField, formField]) => {
+        const element = document.getElementById(formField);
+        if (element && vehiculo[csvField]) {
+            if (element.tagName === 'SELECT') {
+                // Para selects, buscar la opción que coincida
+                const options = Array.from(element.options);
+                const matchingOption = options.find(opt => 
+                    opt.value.toUpperCase() === vehiculo[csvField].toUpperCase()
+                );
+                if (matchingOption) {
+                    element.value = matchingOption.value;
+                }
+            } else {
+                element.value = vehiculo[csvField];
+            }
+        }
+    });
+
+    // Actualizar vista previa
+    actualizarVistaPrevia();
+}
+
+// Función para limpiar búsqueda
+function limpiarBusqueda() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchAlert').style.display = 'none';
+    
+    // Limpiar formulario
+    document.getElementById('fichaForm').reset();
+    
+    // Limpiar vista previa
+    actualizarVistaPrevia();
+    
+    // Limpiar fotos
+    for (let i = 1; i <= 4; i++) {
+        const input = document.getElementById('foto' + i);
+        const img = document.getElementById('previewFoto' + i);
+        const container = document.getElementById('previewFoto' + i + 'Container');
+        const placeholder = container.querySelector('.placeholder');
+        
+        if (input) input.value = '';
+        if (img) {
+            img.src = '';
+            img.style.display = 'none';
+        }
+        if (placeholder) placeholder.style.display = 'flex';
+        
+        fotosData['foto' + i] = null;
+    }
+    
+    actualizarFotosPreview();
+}
+
+// Función para mostrar alertas
+function mostrarAlerta(mensaje, tipo) {
+    const alertDiv = document.getElementById('searchAlert');
+    alertDiv.textContent = mensaje;
+    alertDiv.className = 'alert alert-' + tipo;
+    alertDiv.style.display = 'block';
+    
+    setTimeout(() => {
+        alertDiv.style.display = 'none';
+    }, 5000);
 }
 
 // Función para previsualizar imágenes
@@ -83,6 +249,29 @@ function actualizarFotosPreview() {
             span.style.display = 'block';
         }
     }
+}
+
+// Función para actualizar la vista previa
+function actualizarVistaPrevia() {
+    document.getElementById('previewMarca').textContent = document.getElementById('marca').value || '';
+    document.getElementById('previewModelo').textContent = document.getElementById('modelo').value || '';
+    document.getElementById('previewTipo').textContent = document.getElementById('tipo').value || '';
+    document.getElementById('previewClase').textContent = document.getElementById('clase').value || '';
+    document.getElementById('previewSerialCarroceria').textContent = document.getElementById('serialCarroceria').value || '';
+    document.getElementById('previewColor').textContent = document.getElementById('color').value || '';
+    document.getElementById('previewPlaca').textContent = document.getElementById('placa').value || '';
+    document.getElementById('previewFacsimilar').textContent = document.getElementById('facsimilar').value || '';
+    document.getElementById('previewSerialMotor').textContent = document.getElementById('serialMotor').value || '';
+    document.getElementById('previewDependencia').textContent = document.getElementById('dependencia').value || '';
+    document.getElementById('previewEstatus').textContent = document.getElementById('estatus').value || '';
+    document.getElementById('previewCausa').textContent = document.getElementById('causa').value || '';
+    document.getElementById('previewMecanica').textContent = document.getElementById('mecanica').value || '';
+    document.getElementById('previewDiagnostico').textContent = document.getElementById('diagnostico').value || '';
+    document.getElementById('previewUbicacion').textContent = document.getElementById('ubicacion').value || '';
+    document.getElementById('previewTapiceria').textContent = document.getElementById('tapiceria').value || '';
+    document.getElementById('previewCauchos').textContent = document.getElementById('cauchos').value || '';
+    document.getElementById('previewLuces').textContent = document.getElementById('luces').value || '';
+    document.getElementById('previewObservaciones').textContent = document.getElementById('observaciones').value || '';
 }
 
 // Función para guardar la ficha
@@ -159,32 +348,14 @@ function imprimirFicha() {
     window.print();
 }
 
-// Función para mostrar alertas
-function mostrarAlerta(mensaje, tipo) {
-    let alertDiv = document.getElementById('alertMessage');
-    if (!alertDiv) {
-        alertDiv = document.createElement('div');
-        alertDiv.id = 'alertMessage';
-        alertDiv.style.cssText = 'padding: 12px; border-radius: 8px; margin: 16px 0; display: none;';
-        document.querySelector('.form-section').insertBefore(alertDiv, document.querySelector('.form-section h2'));
-    }
-
-    alertDiv.textContent = mensaje;
-    alertDiv.className = tipo === 'success' ? 'alert-success' : 'alert-error';
-    alertDiv.style.backgroundColor = tipo === 'success' ? '#e8f5e9' : '#ffebee';
-    alertDiv.style.color = tipo === 'success' ? '#2e7d32' : '#c62828';
-    alertDiv.style.display = 'block';
-
-    setTimeout(() => {
-        alertDiv.style.display = 'none';
-    }, 3000);
-}
-
 // ============================================
 // INICIALIZACIÓN Y EVENTOS
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Cargar base de datos al iniciar
+    cargarBaseDeDatos();
+    
     // Inicializar vista previa
     actualizarVistaPrevia();
     actualizarFotosPreview();
@@ -205,6 +376,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnLimpiar) {
         btnLimpiar.addEventListener('click', limpiarFormulario);
+    }
+
+    // Permitir buscar con Enter
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                buscarVehiculo();
+            }
+        });
     }
 
     // Cerrar sesión
@@ -228,7 +409,7 @@ async function cargarUsuario() {
             const { data } = await supabase.auth.getSession();
             const session = data?.session;
             if (session) {
-                const {  perfilData } = await supabase
+                const { data: perfilData, error: perfilError } = await supabase
                     .from('perfiles')
                     .select('email')
                     .eq('id', session.user.id)
