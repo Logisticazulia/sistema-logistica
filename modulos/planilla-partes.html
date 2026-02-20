@@ -37,7 +37,7 @@ body {
 /* ================= TARJETAS DE MÉTRICAS ================= */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -122,47 +122,6 @@ body {
     width: 100%;
 }
 
-/* ================= FILTROS ================= */
-.filters-section {
-    background: #fafbfc;
-    border-radius: 10px;
-    padding: 22px;
-    margin-bottom: 25px;
-    border-left: 5px solid #005b96;
-}
-.filters-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-}
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-.filter-group label {
-    font-size: 0.78rem;
-    color: #4a5568;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.filter-select {
-    width: 100%;
-    padding: 11px 14px;
-    border: 2px solid #e2e8f0;
-    border-radius: 7px;
-    font-size: 0.92rem;
-    font-family: 'Roboto', sans-serif;
-    background: white;
-    cursor: pointer;
-}
-.filter-select:focus {
-    outline: none;
-    border-color: #005b96;
-    box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12);
-}
-
 /* ================= BOTONES ================= */
 .btn {
     padding: 13px 32px;
@@ -215,13 +174,10 @@ body {
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1200px) {
     .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
     .charts-grid {
         grid-template-columns: 1fr;
-    }
-    .filters-grid {
-        grid-template-columns: repeat(2, 1fr);
     }
 }
 @media (max-width: 768px) {
@@ -230,13 +186,15 @@ body {
         padding: 18px;
     }
     .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-    .filters-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     .chart-wrapper {
         height: 250px;
+    }
+}
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -313,50 +271,7 @@ body {
     </div>
 
     <div class="dashboard-container">
-        <!-- ================= FILTROS ================= -->
-        <div class="filters-section">
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label>REDIP</label>
-                    <select id="filterRedip" class="filter-select" onchange="applyFilters()">
-                        <option value="">Todos</option>
-                        <option value="OCCIDENTAL">OCCIDENTAL</option>
-                        <option value="CAPITAL">CAPITAL</option>
-                        <option value="CENTRAL">CENTRAL</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>CCPE</label>
-                    <select id="filterCcpe" class="filter-select" onchange="applyFilters()">
-                        <option value="">Todos</option>
-                        <option value="ZULIA">ZULIA</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Estatus</label>
-                    <select id="filterEstatus" class="filter-select" onchange="applyFilters()">
-                        <option value="">Todos</option>
-                        <option value="OPERATIVA">OPERATIVA</option>
-                        <option value="INOPERATIVA">INOPERATIVA</option>
-                        <option value="REPARACION">REPARACION</option>
-                        <option value="DESINCORPORADA">DESINCORPORADA</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Tipo</label>
-                    <select id="filterTipo" class="filter-select" onchange="applyFilters()">
-                        <option value="">Todos</option>
-                        <option value="MOTO">MOTO</option>
-                        <option value="PICKUP">PICKUP</option>
-                        <option value="CAMIONETA">CAMIONETA</option>
-                        <option value="AUTOMOVIL">AUTOMOVIL</option>
-                        <option value="CAMION">CAMION</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= MÉTRICAS PRINCIPALES ================= -->
+        <!-- ================= MÉTRICAS PRINCIPALES (5 TARJETAS) ================= -->
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-icon">🚗</div>
@@ -378,9 +293,14 @@ body {
                 <div class="metric-value" id="totalReparacion">0</div>
                 <div class="metric-label">En Reparación</div>
             </div>
+            <div class="metric-card desincorporada">
+                <div class="metric-icon">📋</div>
+                <div class="metric-value" id="totalDesincorporados">0</div>
+                <div class="metric-label">Desincorporados</div>
+            </div>
         </div>
 
-        <!-- ================= GRID DE GRÁFICOS ================= -->
+        <!-- ================= GRID DE GRÁFICOS (TODOS DE BARRA) ================= -->
         <div class="charts-grid">
             <!-- Gráfico 1: Estatus -->
             <div class="chart-container">
