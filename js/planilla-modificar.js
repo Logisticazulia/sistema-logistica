@@ -113,6 +113,7 @@ function cargarDatosVehiculo(vehiculo) {
 }
 
 // ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
+// ================= BÚSQUEDA UNIVERSAL (VERSIÓN FINAL) =================
 async function buscarVehiculo() {
     const searchTerm = searchUniversal.value.trim().toUpperCase();
     if (!searchTerm) {
@@ -121,25 +122,25 @@ async function buscarVehiculo() {
     }
     
     console.log('🔍 [BUSQUEDA] Término:', searchTerm);
+    console.log('🔍 [BUSQUEDA] Longitud:', searchTerm.length);
     btnSearch.classList.add('searching');
     btnSearch.disabled = true;
     
     try {
-        // ✅ OPCIÓN 1: Usar ilike para búsqueda insensible (RECOMENDADO)
+        // ✅ USAR ILIKE EN LUGAR DE EQ (ignora mayúsculas/minúsculas y es más flexible)
         let query = supabaseClient
             .from('vehiculos')
             .select('*')
-            .limit(10);
+            .limit(20); // ← AUMENTADO DE 5 A 20
         
         const esNumero = /^\d+$/.test(searchTerm);
         
         if (esNumero && searchTerm.length <= 5) {
-            // Búsqueda por ID numérico corto
             console.log('📍 Búsqueda por ID:', searchTerm);
             query = query.eq('id', parseInt(searchTerm));
         } else {
-            // ✅ Búsqueda con ILIKE (insensible a mayúsculas/minúsculas)
-            console.log('📍 Búsqueda en campos con ILIKE:', searchTerm);
+            // ✅ CAMBIAR .eq. POR .ilike. (búsqueda parcial)
+            console.log('📍 Búsqueda con ILIKE:', searchTerm);
             query = query.or(
                 `placa.ilike.%${searchTerm}%,` +
                 `facsimil.ilike.%${searchTerm}%,` +
@@ -147,7 +148,6 @@ async function buscarVehiculo() {
                 `s_motor.ilike.%${searchTerm}%`
             );
             
-            // Si es número largo, también buscar por ID
             if (esNumero) {
                 query = query.or(`id.eq.${searchTerm}`);
             }
@@ -163,22 +163,15 @@ async function buscarVehiculo() {
         }
         
         console.log('📊 [RESULTADOS] Cantidad:', data ? data.length : 0);
-        console.log('📊 [RESULTADOS] Datos:', data);
-        // Agrega esto ANTES del if (!data || data.length === 0)
-const { data: prueba, error: errorPrueba } = await supabaseClient
-    .from('vehiculos')
-    .select('id, placa, facsimil, s_carroceria, s_motor')
-    .ilike('placa', `%${searchTerm}%`);
-    
-console.log('🧪 PRUEBA DIRECTA:', prueba);
         
         if (!data || data.length === 0) {
-            // ✅ DEBUG: Mostrar qué hay en la BD para comparar
-            const { data: todos } = await supabaseClient
+            // ✅ DEBUG: Mostrar últimos registros para comparar
+            const {  ultimos } = await supabaseClient
                 .from('vehiculos')
-                .select('id, placa, facsimil')
+                .select('id, placa, facsimil, created_at')
+                .order('created_at', { ascending: false })
                 .limit(5);
-            console.log('📊 Primeros 5 registros en BD:', todos);
+            console.log('📊 ÚLTIMOS 5 REGISTROS EN BD:', ultimos);
             
             showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
             return;
