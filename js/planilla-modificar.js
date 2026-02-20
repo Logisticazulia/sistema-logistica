@@ -114,51 +114,45 @@ function cargarDatosVehiculo(vehiculo) {
 
 // ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
 
+// ================= BÚSQUEDA UNIVERSAL (CORREGIDA) =================
 async function buscarVehiculo() {
-    // ✅ NORMALIZAR: trim + uppercase (IGUAL que en registrar)
-    const searchTerm = searchUniversal.value.trim().toUpperCase();
-    
+    const searchTerm = searchUniversal.value.trim(); // ✅ SIN .toUpperCase()
     if (!searchTerm) {
         showAlert('error', '❌ Ingrese Placa, ID, Facsímil o Serial para buscar');
         return;
     }
     
     console.log('🔍 [BUSQUEDA] Término:', searchTerm);
-    
     btnSearch.classList.add('searching');
     btnSearch.disabled = true;
     
     try {
-        // ✅ USAR .eq() para coincidencia exacta (los datos se guardan en MAYÚSCULAS)
+        // ✅ USAR ilike PARA BÚSQUEDA INSENSIBLE A MAYÚSCULAS/MINÚSCULAS
         let query = supabaseClient
             .from('vehiculos')
             .select('*')
             .limit(5);
         
-        // Detectar si es número (ID) o texto
         const esNumero = /^\d+$/.test(searchTerm);
         
         if (esNumero && searchTerm.length <= 5) {
-            // ID numérico corto
             console.log('📍 Búsqueda por ID:', searchTerm);
             query = query.eq('id', parseInt(searchTerm));
         } else {
-            // ✅ Búsqueda OR con .eq() (coincidencia exacta)
             console.log('📍 Búsqueda en campos únicos:', searchTerm);
+            // ✅ CAMBIAR .eq. POR .ilike. (insensible a mayúsculas)
             query = query.or(
-                `placa.eq.${searchTerm},` +
-                `facsimil.eq.${searchTerm},` +
-                `s_carroceria.eq.${searchTerm},` +
-                `s_motor.eq.${searchTerm}`
+                `placa.ilike.%${searchTerm}%,` +
+                `facsimil.ilike.%${searchTerm}%,` +
+                `s_carroceria.ilike.%${searchTerm}%,` +
+                `s_motor.ilike.%${searchTerm}%`
             );
             
-            // Si es número largo, también buscar por ID
             if (esNumero) {
                 query = query.or(`id.eq.${searchTerm}`);
             }
         }
         
-        console.log('📊 Ejecutando consulta...');
         const { data, error } = await query;
         
         if (error) {
@@ -167,18 +161,15 @@ async function buscarVehiculo() {
             return;
         }
         
-        console.log('📊 [RESULTADOS] Cantidad:', data ? data.length : 0);
-        console.log('📊 [RESULTADOS] Datos:', data);
-        
         if (!data || data.length === 0) {
+            // ✅ MOSTRAR DEBUG PARA VER QUÉ HAY EN LA BD
+            console.log('❌ No encontrado. Término buscado:', searchTerm);
             showAlert('error', '❌ Vehículo no encontrado. Verifique los datos e intente nuevamente.');
             return;
         }
         
-        // Tomar el primer resultado
         const vehiculo = data[0];
         vehicleData = vehiculo;
-        
         console.log('✅ Vehículo encontrado:', vehiculo.placa);
         cargarDatosVehiculo(vehiculo);
         btnEdit.disabled = false;
@@ -192,7 +183,6 @@ async function buscarVehiculo() {
         btnSearch.disabled = false;
     }
 }
-
 // ================= VALIDACIÓN Y ACTUALIZACIÓN =================
 
 function validarFormulario() {
