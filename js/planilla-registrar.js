@@ -248,7 +248,7 @@ async function guardarVehiculo(event) {
             estatus: document.getElementById('estatus').value.trim().toUpperCase(),
             unidad_administrativa: document.getElementById('unidad_administrativa').value.trim().toUpperCase(),
             ubicacion_fisica: document.getElementById('ubicacion_fisica').value.trim().toUpperCase(),
-            asignacion: document.getElementById('asignacion').value.trim().toUpperCase(),
+            asignacion: document.getElementById('asignacion').value || null,
             redip: document.getElementById('redip').value.trim().toUpperCase(),
             ccpe: document.getElementById('ccpe').value.trim().toUpperCase(),
             epm: document.getElementById('epm').value.trim().toUpperCase(),
