@@ -17,7 +17,7 @@ body {
     padding: 20px;
 }
 .container {
-    max-width: 1800px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -29,6 +29,8 @@ body {
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-width: 1200px;
+    margin: 0 auto;
     width: 100%;
 }
 .form-section h2 {
@@ -56,14 +58,9 @@ body {
     border-radius: 4px;
     font-size: 14px;
 }
-.form-row-4 {
+.form-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-}
-.form-row-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
 .btn {
@@ -87,10 +84,10 @@ body {
     background: #6c757d;
     color: white;
 }
-/* Vista Previa - FORMATO PROFESIONAL */
+/* Vista Previa - MÁS ANCHA ESTIRADA */
 .preview-section {
     background: white;
-    padding: 40px;
+    padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     width: 100%;
@@ -101,12 +98,11 @@ body {
     text-align: center;
 }
 .ficha-tecnica {
-    border: 2px solid #000;
+    border: 2px solid #003366;
     padding: 30px;
     background: white;
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 100%;
 }
 .ficha-header {
     display: flex;
@@ -114,7 +110,7 @@ body {
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #003366;
 }
 .ficha-logo {
     width: 100px;
@@ -123,26 +119,23 @@ body {
 .ficha-title {
     text-align: center;
     flex: 1;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 .ficha-title h1 {
-    font-size: 14px;
-    color: #000;
-    margin-bottom: 3px;
-    font-weight: bold;
-    line-height: 1.3;
+    font-size: 15px;
+    color: #003366;
+    margin-bottom: 5px;
+    line-height: 1.4;
 }
 .ficha-title h2 {
-    font-size: 18px;
-    color: #000;
+    font-size: 19px;
+    color: #003366;
     margin: 5px 0;
-    font-weight: bold;
 }
 .ficha-title h3 {
-    font-size: 16px;
-    color: #000;
+    font-size: 17px;
+    color: #003366;
     margin-top: 5px;
-    font-weight: bold;
 }
 .ficha-logo-right {
     width: 100px;
@@ -151,61 +144,69 @@ body {
 .ficha-table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 15px;
+    table-layout: fixed;
 }
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 8px 6px;
-    text-align: center;
-    font-size: 12px;
-    border: 2px solid #000;
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 13px;
+    border: 2px solid #003366;
     font-weight: bold;
-    text-transform: uppercase;
 }
 .ficha-table td {
-    padding: 6px 4px;
-    border: 2px solid #000;
-    font-size: 11px;
-    vertical-align: top;
+    padding: 8px 6px;
+    border: 2px solid #003366;
+    font-size: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 .ficha-table .label {
     font-weight: bold;
-    background: #fff;
-    width: 18%;
-    font-size: 11px;
+    background: #f0f0f0;
+    width: 20%;
 }
 .ficha-table .value {
-    width: 22%;
-    font-size: 11px;
+    width: 30%;
+}
+.ficha-section-title {
+    background: #4a7c9b;
+    color: white;
+    padding: 6px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    border: 1px solid #003366;
 }
 .fotos-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    margin-top: 20px;
-    padding: 10px;
+    margin-top: 15px;
 }
 .foto-box {
-    border: 2px solid #000;
-    height: 180px;
+    border: 2px solid #4a7c9b;
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #4a7c9b;
     color: white;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 15px;
 }
 .observaciones-box {
-    min-height: 320px;
-    border: 2px solid #000;
-    padding: 8px;
-    background: #fff;
-    font-size: 11px;
+    min-height: 280px;
+    border: 2px solid #003366;
+    padding: 12px;
+    background: #fafafa;
+    font-size: 12px;
     line-height: 1.5;
 }
 @media print {
-    .form-section, .btn, .preview-section h2 {
+    .form-section, .btn {
         display: none;
     }
     .container {
@@ -213,20 +214,10 @@ body {
     }
     .preview-section {
         box-shadow: none;
-        padding: 0;
-    }
-    .ficha-tecnica {
-        border: 2px solid #000;
-    }
-}
-@media (max-width: 1200px) {
-    .form-row-4 {
-        grid-template-columns: repeat(2, 1fr);
     }
 }
 @media (max-width: 768px) {
-    .form-row-4,
-    .form-row-2 {
+    .form-row {
         grid-template-columns: 1fr;
     }
     .fotos-container {
@@ -245,7 +236,7 @@ body {
     <div class="form-section">
         <h2>📝 Datos del Vehículo</h2>
         <form id="fichaForm">
-            <div class="form-row-4">
+            <div class="form-row">
                 <div class="form-group">
                     <label>Marca *</label>
                     <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI">
@@ -254,6 +245,8 @@ body {
                     <label>Modelo *</label>
                     <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200">
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group">
                     <label>Tipo *</label>
                     <select id="tipo" name="tipo" required>
@@ -270,8 +263,7 @@ body {
                     <input type="text" id="clase" name="clase" required placeholder="Ej: PICKUP D/ CABINA">
                 </div>
             </div>
-            
-            <div class="form-row-2">
+            <div class="form-row">
                 <div class="form-group">
                     <label>Serial Carrocería *</label>
                     <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515">
@@ -281,8 +273,7 @@ body {
                     <input type="text" id="color" name="color" required placeholder="Ej: BLANCO">
                 </div>
             </div>
-            
-            <div class="form-row-2">
+            <div class="form-row">
                 <div class="form-group">
                     <label>Placa *</label>
                     <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417">
@@ -292,17 +283,14 @@ body {
                     <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417">
                 </div>
             </div>
-            
             <div class="form-group">
                 <label>Serial Motor *</label>
                 <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409">
             </div>
-            
             <div class="form-group">
                 <label>Dependencia *</label>
                 <textarea id="dependencia" name="dependencia" rows="3" required placeholder="Ej: SERVICIO PATRULLAJE VEHICULAR CUADRANTES DE PAZ"></textarea>
             </div>
-            
             <div class="form-group">
                 <label>Estatus del Vehículo *</label>
                 <select id="estatus" name="estatus" required>
@@ -310,15 +298,12 @@ body {
                     <option value="INOPERATIVO">INOPERATIVO</option>
                 </select>
             </div>
-            
             <h3 style="margin: 20px 0 15px; color: #003366;">Información Técnico Mecánica (Si es Inoperativo)</h3>
-            
             <div class="form-group">
                 <label>Causa</label>
                 <input type="text" id="causa" name="causa" placeholder="Describa la causa">
             </div>
-            
-            <div class="form-row-2">
+            <div class="form-row">
                 <div class="form-group">
                     <label>Mecánica</label>
                     <input type="text" id="mecanica" name="mecanica" placeholder="Estado mecánico">
@@ -328,8 +313,7 @@ body {
                     <input type="text" id="diagnostico" name="diagnostico" placeholder="Diagnóstico">
                 </div>
             </div>
-            
-            <div class="form-row-2">
+            <div class="form-row">
                 <div class="form-group">
                     <label>Ubicación</label>
                     <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación actual">
@@ -339,8 +323,7 @@ body {
                     <input type="text" id="tapiceria" name="tapiceria" placeholder="Estado tapicería">
                 </div>
             </div>
-            
-            <div class="form-row-2">
+            <div class="form-row">
                 <div class="form-group">
                     <label>Cauchos</label>
                     <input type="text" id="cauchos" name="cauchos" placeholder="Estado cauchos">
@@ -350,12 +333,10 @@ body {
                     <input type="text" id="luces" name="luces" placeholder="Estado luces">
                 </div>
             </div>
-            
             <div class="form-group">
                 <label>Observaciones</label>
                 <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales"></textarea>
             </div>
-            
             <div>
                 <button type="button" class="btn btn-primary" onclick="guardarFicha()">💾 Guardar Ficha</button>
                 <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
@@ -364,9 +345,9 @@ body {
         </form>
     </div>
     
-    <!-- Vista Previa -->
+    <!-- Vista Previa - MÁS ANCHA -->
     <div class="preview-section">
-        <h2>👁️ Vista Previa</h2>
+        <h2 style="color: #003366; margin-bottom: 20px;">👁️ Vista Previa</h2>
         <div class="ficha-tecnica" id="fichaPreview">
             <div class="ficha-header">
                 <img src="../img/logo-venezuela.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
@@ -377,12 +358,11 @@ body {
                 </div>
                 <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
             </div>
-            
             <table class="ficha-table">
                 <tr>
                     <th colspan="4">DATOS DEL VEHICULO</th>
-                    <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
-                        OBSERVACIONES<br><br>
+                    <th rowspan="4" style="width: 25%; vertical-align: top;">
+                        <strong>OBSERVACIONES</strong><br><br>
                         <div class="observaciones-box" id="previewObservaciones"></div>
                     </th>
                 </tr>
@@ -391,30 +371,28 @@ body {
                     <td class="value" id="previewMarca"></td>
                     <td class="label">MODELO</td>
                     <td class="value" id="previewModelo"></td>
+                    <td class="label">TIPO: <span id="previewTipo"></span></td>
                 </tr>
                 <tr>
                     <td class="label">SERIAL CARROCERIA</td>
                     <td class="value" id="previewSerialCarroceria"></td>
                     <td class="label">CLASE</td>
                     <td class="value" id="previewClase"></td>
+                    <td class="label">COLOR: <span id="previewColor"></span></td>
                 </tr>
                 <tr>
                     <td class="label">PLACA:</td>
                     <td class="value" id="previewPlaca"></td>
                     <td class="label">FACSIMIL</td>
                     <td class="value" id="previewFacsimilar"></td>
+                    <td class="label">DEPENDENCIA:<br><span id="previewDependencia"></span></td>
                 </tr>
                 <tr>
                     <td class="label">SERIAL MOTOR</td>
                     <td class="value" id="previewSerialMotor"></td>
-                    <td class="label">TIPO</td>
-                    <td class="value" id="previewTipo"></td>
-                </tr>
-                <tr>
-                    <td class="label">COLOR</td>
-                    <td class="value" id="previewColor"></td>
-                    <td class="label">DEPENDENCIA</td>
-                    <td class="value" id="previewDependencia" style="font-size: 10px;"></td>
+                    <td class="label"></td>
+                    <td class="value"></td>
+                    <td class="label"></td>
                 </tr>
                 <tr>
                     <td class="label">ESTATUS DEL VEHICULO</td>
@@ -432,7 +410,7 @@ body {
                 <tr>
                     <td class="label">MECANICA</td>
                     <td colspan="2" id="previewMecanica"></td>
-                    <td class="label">UBICACIÓN</td>
+                    <td class="label">UBICACIÓN:</td>
                     <td id="previewUbicacion"></td>
                 </tr>
                 <tr>
