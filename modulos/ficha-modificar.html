@@ -183,7 +183,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
                             <option value="VAM">VAM</option>
                         </select>
                     </div>
-                    <!-- ✅ CAMBIO 1: CLASE AHORA ES SELECT CON OPCIONES DE LA IMAGEN -->
+                    <!-- ✅ CAMBIO 1: CLASE AHORA ES SELECT CON 8 OPCIONES -->
                     <div class="form-group">
                         <label>Clase *</label>
                         <select id="clase" name="clase" required disabled>
@@ -201,12 +201,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
                 </div>
                 <!-- FILA 2: 3 CAMPOS -->
                 <div class="form-row-3">
+                    <!-- ✅ CAMBIO 2: CAMPOS NO EDITABLES (siempre disabled) -->
                     <div class="form-group">
-                        <label>Serial Carrocería *</label>
+                        <label>Serial Carrocería * 🔒</label>
                         <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515" disabled>
                     </div>
                     <div class="form-group">
-                        <label>Serial Motor *</label>
+                        <label>Serial Motor * 🔒</label>
                         <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409" disabled>
                     </div>
                     <div class="form-group">
@@ -216,12 +217,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
                 </div>
                 <!-- FILA 3: 3 CAMPOS -->
                 <div class="form-row-3">
+                    <!-- ✅ CAMBIO 3: CAMPOS NO EDITABLES (siempre disabled) -->
                     <div class="form-group">
-                        <label>Placa *</label>
+                        <label>Placa * 🔒</label>
                         <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417" disabled>
                     </div>
                     <div class="form-group">
-                        <label>Facsimilar</label>
+                        <label>Facsímil 🔒</label>
                         <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417" disabled>
                     </div>
                     <div class="form-group">
