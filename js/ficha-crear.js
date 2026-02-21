@@ -113,7 +113,7 @@ async function verificarFichaExistente(vehiculo) {
     }
 }
 
-// ✅ FUNCIÓN CORREGIDA PARA LLENAR FORMULARIO
+// ✅ LLENAR EL FORMULARIO CON LOS DATOS DEL VEHÍCULO
 function llenarFormulario(vehiculo) {
     console.log('📝 Llenando formulario con vehículo:', vehiculo);
     
@@ -121,79 +121,97 @@ function llenarFormulario(vehiculo) {
     const mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
+        'tipo': 'tipo',
         'clase': 'clase',
         'color': 'color',
         's_carroceria': 'serialCarroceria',
         's_motor': 'serialMotor',
         'placa': 'placa',
         'facsimil': 'facsimilar',
+        'situacion': 'estatus',
+        'estatus': 'estatus',
         'unidad_administrativa': 'dependencia',
         'observacion': 'observaciones',
         'ubicacion_fisica': 'ubicacion'
     };
     
-    // Llenar campos de texto
+    // Llenar campos
     Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
         const element = document.getElementById(formField);
         if (element && vehiculo[dbField]) {
-            element.value = vehiculo[dbField];
+            if (element.tagName === 'SELECT') {
+                // Para selects, buscar la opción que coincida
+                const options = Array.from(element.options);
+                const matchingOption = options.find(opt =>
+                    opt.value.toUpperCase() === vehiculo[dbField].toUpperCase()
+                );
+                if (matchingOption) {
+                    element.value = matchingOption.value;
+                    console.log('✅ Select asignado:', formField, '=', matchingOption.value);
+                } else {
+                    console.log('⚠️ Opción no encontrada para:', formField, '=', vehiculo[dbField]);
+                }
+            } else {
+                element.value = vehiculo[dbField];
+            }
         }
     });
     
-    // ✅ CORREGIR: CAMPO TIPO (coincidencia flexible)
-    const tipoElement = document.getElementById('tipo');
-    if (tipoElement && vehiculo.tipo) {
-        const tipoValor = vehiculo.tipo.toUpperCase().trim();
-        const options = Array.from(tipoElement.options);
-        const matchingOption = options.find(opt => 
-            opt.value.toUpperCase() === tipoValor ||
-            opt.text.toUpperCase().includes(tipoValor) ||
-            tipoValor.includes(opt.value.toUpperCase())
-        );
-        if (matchingOption) {
-            tipoElement.value = matchingOption.value;
-            console.log('✅ Tipo asignado:', matchingOption.value);
-        } else {
-            // Si no coincide, poner el valor directo (por si hay opciones dinámicas)
-            tipoElement.value = tipoValor;
-            console.log('⚠️ Tipo no encontrado en opciones, usando valor directo:', tipoValor);
-        }
-    }
-    
-    // ✅ CORREGIR: CAMPO ESTATUS (convertir OPERATIVA→OPERATIVO, INOPERATIVA→INOPERATIVO)
-    const estatusElement = document.getElementById('estatus');
-    if (estatusElement && vehiculo.situacion) {
-        const situacionValor = vehiculo.situacion.toUpperCase().trim();
-        
-        // Convertir valores de la BD al formato del formulario
-        const equivalencias = {
-            'OPERATIVA': 'OPERATIVO',
-            'INOPERATIVA': 'INOPERATIVO',
-            'REPARACION': 'OPERATIVO',  // O puedes crear una opción "EN REPARACIÓN"
-            'TALLER': 'INOPERATIVO',
-            'DESINCORPORADA': 'OPERATIVO'  // Ajustar según tu lógica
-        };
-        
-        const estatusConvertido = equivalencias[situacionValor] || situacionValor;
-        
-        const options = Array.from(estatusElement.options);
-        const matchingOption = options.find(opt => 
-            opt.value.toUpperCase() === estatusConvertido.toUpperCase()
-        );
-        
-        if (matchingOption) {
-            estatusElement.value = matchingOption.value;
-            console.log('✅ Estatus asignado:', matchingOption.value);
-        } else {
-            console.log('⚠️ Estatus no encontrado:', situacionValor);
-        }
-    }
-    
     // Actualizar vista previa
     actualizarVistaPrevia();
+    actualizarFotosPreview();
     
     console.log('✅ Formulario llenado correctamente');
 }
+
+// ✅ LIMPIAR FORMULARIO COMPLETO (ANTES DE BUSCAR NUEVO)
+function limpiarFormularioCompleto() {
+    console.log('🧹 Limpiando formulario completo...');
+    
+    // Limpiar inputs de texto
+    const textInputs = document.querySelectorAll('#fichaForm input[type="text"], #fichaForm textarea');
+    textInputs.forEach(input => {
+        input.value = '';
+    });
+    
+    // ✅ LIMPIAR SELECTS (INCLUYENDO ESTATUS Y TIPO)
+    const selects = document.querySelectorAll('#fichaForm select');
+    selects.forEach(select => {
+        select.value = '';  // Resetear a la primera opción
+    });
+    
+    // Limpiar fotos
+    for (let i = 1; i <= 4; i++) {
+        const input = document.getElementById('foto' + i);
+        const img = document.getElementById('previewFoto' + i);
+        const container = document.getElementById('previewFoto' + i + 'Container');
+        const placeholder = container.querySelector('.placeholder');
+        
+        if (input) input.value = '';
+        if (img) {
+            img.src = '';
+            img.style.display = 'none';
+        }
+        if (placeholder) placeholder.style.display = 'flex';
+        
+        fotosData['foto' + i] = null;
+    }
+    
+    // Limpiar vista previa
+    actualizarVistaPrevia();
+    actualizarFotosPreview();
+    
+    console.log('✅ Formulario limpiado');
+}
+
+// Limpiar búsqueda
+function limpiarBusqueda() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchAlert').style.display = 'none';
+    limpiarFormularioCompleto();
+    vehiculoSeleccionado = null;
+}
+
 // ============================================
 // FUNCIONES DE VISTA PREVIA
 // ============================================
