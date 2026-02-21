@@ -7,33 +7,11 @@
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
 
-// ✅ VALIDACIÓN TEMPRANA CON MENSAJE CLARO
 if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.error('❌ Error: Configuración de Supabase no encontrada');
-    console.error('🔧 Verifica que config.js esté cargado ANTES de este script');
-    console.error('📁 Orden correcto:');
-    console.error('   1. supabase-js@2');
-    console.error('   2. ../js/config.js');
-    console.error('   3. transporte.js');
-    
-    // Mostrar alerta visual si es posible
-    document.addEventListener('DOMContentLoaded', () => {
-        const main = document.querySelector('main');
-        if (main) {
-            main.innerHTML = `
-                <div style="padding: 40px; text-align: center; color: #dc2626;">
-                    <h2>⚠️ Error de Configuración</h2>
-                    <p>No se encontraron las credenciales de Supabase.</p>
-                    <p><small>Verifica que <strong>config.js</strong> esté cargado correctamente.</small></p>
-                </div>
-            `;
-        }
-    });
-} else {
-    console.log('✅ Configuración de Supabase cargada correctamente');
 }
 
-const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ================= REFERENCIAS AL DOM =================
 const userEmail = document.getElementById('userEmail');
@@ -49,9 +27,9 @@ const inoperativosVehiclesEl = document.getElementById('inoperativosVehicles');
 // ================= FUNCIONES DE UTILIDAD =================
 
 async function mostrarUsuarioAutenticado() {
-    if (!supabaseClient) return;
     try {
-        const {  { session }, error } = await supabaseClient.auth.getSession();
+        // ✅ SINTAXIS CORRECTA: data: { session }
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
         if (session?.user?.email) {
             userEmail.textContent = session.user.email;
         } else {
@@ -64,10 +42,6 @@ async function mostrarUsuarioAutenticado() {
 }
 
 async function cerrarSesion() {
-    if (!supabaseClient) {
-        window.location.href = '../index.html';
-        return;
-    }
     try {
         await supabaseClient.auth.signOut();
         window.location.href = '../index.html';
@@ -79,16 +53,6 @@ async function cerrarSesion() {
 
 // ================= CARGAR ESTADÍSTICAS =================
 async function cargarEstadisticas() {
-    if (!supabaseClient) {
-        console.warn('⚠️ Cliente de Supabase no disponible, mostrando ceros');
-        if (totalVehiclesEl) totalVehiclesEl.textContent = '0';
-        if (automovilVehiclesEl) automovilVehiclesEl.textContent = '0';
-        if (motosVehiclesEl) motosVehiclesEl.textContent = '0';
-        if (operativosVehiclesEl) operativosVehiclesEl.textContent = '0';
-        if (inoperativosVehiclesEl) inoperativosVehiclesEl.textContent = '0';
-        return;
-    }
-    
     try {
         console.log('📊 Cargando estadísticas de vehículos...');
         
