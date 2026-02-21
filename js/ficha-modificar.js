@@ -235,7 +235,10 @@ function limpiarBusqueda() {
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
     fields.forEach(function(field) {
-        if (field.id !== 'fichaId') {
+        // ✅ NO HABILITAR CAMPOS DE IDENTIFICACIÓN ÚNICA
+        const camposNoEditables = ['serialCarroceria', 'serialMotor', 'placa', 'facsimilar', 'marca', 'modelo'];
+        
+        if (field.id !== 'fichaId' && !camposNoEditables.includes(field.id)) {
             field.disabled = !enable;
         }
     });
