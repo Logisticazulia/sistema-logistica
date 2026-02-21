@@ -4,7 +4,7 @@
 
 // Configuración de Supabase
 const supabaseClient = window.supabase.createClient(
-    window.SUPABASE_URL, 
+    window.SUPABASE_URL,
     window.SUPABASE_KEY
 );
 
@@ -35,6 +35,9 @@ const fotosModificadas = {
 // Ficha seleccionada
 let fichaSeleccionada = null;
 let isEditing = false;
+
+// ✅ CAMPOS QUE NO SE PUEDEN MODIFICAR (siempre disabled)
+const camposNoEditables = ['placa', 'facsimilar', 'serialCarroceria', 'serialMotor', 'marca', 'modelo'];
 
 // ============================================
 // FUNCIONES DE BÚSQUEDA
@@ -128,14 +131,27 @@ function llenarFormulario(ficha) {
         if (element && ficha[dbField]) {
             if (element.tagName === 'SELECT') {
                 const options = Array.from(element.options);
-                const matchingOption = options.find(function(opt) {
-                    return opt.value.toUpperCase() === ficha[dbField].toUpperCase();
+                const dbValue = ficha[dbField].toUpperCase().trim();
+                
+                // Búsqueda flexible para Clase (con/sin espacios)
+                let matchingOption = options.find(function(opt) {
+                    const optValue = opt.value.toUpperCase().trim();
+                    if (optValue === dbValue) return true;
+                    if (optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '')) return true;
+                    return false;
                 });
+                
                 if (matchingOption) {
                     element.value = matchingOption.value;
                     console.log('✅ Select asignado:', formField, '=', matchingOption.value);
                 } else {
-                    console.log('⚠️ Opción no encontrada para:', formField, '=', ficha[dbField]);
+                    // Si no encuentra, agregar la opción dinámicamente
+                    const newOption = document.createElement('option');
+                    newOption.value = dbValue;
+                    newOption.textContent = dbValue;
+                    newOption.selected = true;
+                    element.appendChild(newOption);
+                    console.log('⚠️ Opción agregada dinámicamente:', formField, '=', dbValue);
                 }
             } else {
                 element.value = ficha[dbField];
@@ -218,10 +234,14 @@ function limpiarBusqueda() {
 // FUNCIONES DE EDICIÓN
 // ============================================
 
+// ✅ CAMBIO 4: TOGGLE FORM FIELDS EXCLUYE CAMPOS NO EDITABLES
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
     fields.forEach(function(field) {
-        if (field.id !== 'fichaId') {
+        // ✅ NUNCA HABILITAR CAMPOS DE IDENTIFICACIÓN ÚNICA
+        if (camposNoEditables.includes(field.id)) {
+            field.disabled = true;
+        } else if (field.id !== 'fichaId') {
             field.disabled = !enable;
         }
     });
@@ -243,14 +263,13 @@ function editarFicha() {
     document.getElementById('btnGuardar').style.display = 'inline-flex';
     document.getElementById('btnCancelar').disabled = false;
     
-    mostrarAlerta('ℹ️ Editando ficha. Realice los cambios y guarde.', 'info');
+    mostrarAlerta('ℹ️ Editando ficha. Los campos Placa, Facsímil, Serial Carrocería y Serial Motor NO se pueden modificar.', 'info');
 }
 
 function cancelarEdicion() {
     if (fichaSeleccionada) {
         llenarFormulario(fichaSeleccionada);
     }
-    
     toggleFormFields(false);
     
     document.getElementById('btnEditar').style.display = 'inline-flex';
@@ -485,13 +504,11 @@ async function guardarFicha(event) {
         }
         
         console.log('✅ Ficha actualizada:', data);
-        
-        // ✅ CAMBIO 2: MENSAJE CORRECTO AL GUARDAR
         mostrarAlerta('✅ Ficha técnica actualizada exitosamente', 'success');
         
         fichaSeleccionada = Object.assign({}, fichaSeleccionada, data[0]);
         
-        // ✅ CAMBIO 3: LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
+        // ✅ CAMBIO 5: LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
         setTimeout(function() {
             limpiarTodoParaNuevaBusqueda();
         }, 2000);
@@ -509,48 +526,21 @@ async function guardarFicha(event) {
 function limpiarTodoParaNuevaBusqueda() {
     console.log('🧹 Limpiando formulario para nueva búsqueda...');
     
-    // Limpiar campo de búsqueda
     document.getElementById('searchInput').value = '';
-    document.getElementById('searchAlert').style.display = 'none';
-    
-    // Limpiar formulario
     document.getElementById('fichaForm').reset();
     document.getElementById('fichaId').value = '';
     
-    // Limpiar fotos
-    for (let i = 1; i <= 4; i++) {
-        const img = document.getElementById('previewFoto' + i);
-        const container = document.getElementById('previewFoto' + i + 'Container');
-        const placeholder = container.querySelector('.placeholder');
-        const btnRemove = container.parentElement.querySelector('.btn-remove');
-        const input = document.getElementById('foto' + i);
-        
-        img.src = '';
-        img.style.display = 'none';
-        placeholder.style.display = 'flex';
-        if (btnRemove) btnRemove.style.display = 'none';
-        input.value = '';
-        
-        fotosData['foto' + i] = null;
-        fotosUrlsExistentes['foto' + i] = null;
-        fotosModificadas['foto' + i] = false;
-    }
-    
-    // Limpiar vista previa
-    actualizarVistaPrevia();
-    actualizarFotosPreview();
-    
-    // Resetear estado
-    fichaSeleccionada = null;
     toggleFormFields(false);
     
-    // Resetear botones
     document.getElementById('btnEditar').style.display = 'inline-flex';
     document.getElementById('btnGuardar').style.display = 'none';
     document.getElementById('btnCancelar').disabled = true;
     
-    // Scroll al top
+    fichaSeleccionada = null;
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    mostrarAlerta('ℹ️ Ingrese placa, facsímil o serial para buscar una ficha', 'info');
     
     console.log('✅ Formulario limpiado, listo para nueva búsqueda');
 }
