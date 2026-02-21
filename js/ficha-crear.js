@@ -112,7 +112,7 @@ async function verificarFichaExistente(vehiculo) {
     }
 }
 
-// ✅ LLENAR EL FORMULARIO CON LOS DATOS DEL VEHÍCULO (CORREGIDO)
+// ✅ FUNCIÓN CORREGIDA PARA LLENAR FORMULARIO
 function llenarFormulario(vehiculo) {
     console.log('📝 Llenando formulario con vehículo:', vehiculo);
     
@@ -177,14 +177,14 @@ function llenarFormulario(vehiculo) {
         
         // ✅ TABLA DE EQUIVALENCIAS (BD → FORMULARIO)
         const equivalencias = {
-            'OPERATIVA': 'OPERATIVO',
-            'INOPERATIVA': 'INOPERATIVO',
-            'REPARACION': 'INOPERATIVO',
-            'TALLER': 'INOPERATIVO',
-            'DESINCORPORADA': 'OPERATIVO',
-            'DONACION': 'OPERATIVO',
-            'COMODATO': 'OPERATIVO',
-            'DENUNCIADA': 'INOPERATIVO'
+            'OPERATIVA': 'OPERATIVA',
+            'INOPERATIVA': 'INOPERATIVA',
+            'REPARACION': 'REPARACION',
+            'TALLER': 'TALLER',
+            'DESINCORPORADA': 'DESINCORPORADA',
+            'DONACION': 'DONACION',
+            'COMODATO': 'COMODATO',
+            'DENUNCIADA': 'DENUNCIADA'
         };
         
         const estatusConvertido = equivalencias[situacionValor] || 
@@ -212,11 +212,9 @@ function llenarFormulario(vehiculo) {
     
     // Actualizar vista previa
     actualizarVistaPrevia();
-    actualizarFotosPreview();
     
     console.log('✅ Formulario llenado correctamente');
 }
-
 // ✅ LIMPIAR FORMULARIO COMPLETO
 function limpiarFormularioCompleto() {
     console.log('🧹 Limpiando formulario completo...');
