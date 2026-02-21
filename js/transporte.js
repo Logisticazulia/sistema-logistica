@@ -7,11 +7,33 @@
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
 
+// ✅ VALIDACIÓN TEMPRANA CON MENSAJE CLARO
 if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.error('❌ Error: Configuración de Supabase no encontrada');
+    console.error('🔧 Verifica que config.js esté cargado ANTES de este script');
+    console.error('📁 Orden correcto:');
+    console.error('   1. supabase-js@2');
+    console.error('   2. ../js/config.js');
+    console.error('   3. transporte.js');
+    
+    // Mostrar alerta visual si es posible
+    document.addEventListener('DOMContentLoaded', () => {
+        const main = document.querySelector('main');
+        if (main) {
+            main.innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #dc2626;">
+                    <h2>⚠️ Error de Configuración</h2>
+                    <p>No se encontraron las credenciales de Supabase.</p>
+                    <p><small>Verifica que <strong>config.js</strong> esté cargado correctamente.</small></p>
+                </div>
+            `;
+        }
+    });
+} else {
+    console.log('✅ Configuración de Supabase cargada correctamente');
 }
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ================= REFERENCIAS AL DOM =================
 const userEmail = document.getElementById('userEmail');
@@ -26,10 +48,10 @@ const inoperativosVehiclesEl = document.getElementById('inoperativosVehicles');
 
 // ================= FUNCIONES DE UTILIDAD =================
 
-// Mostrar usuario autenticado
 async function mostrarUsuarioAutenticado() {
+    if (!supabaseClient) return;
     try {
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        const {  { session }, error } = await supabaseClient.auth.getSession();
         if (session?.user?.email) {
             userEmail.textContent = session.user.email;
         } else {
@@ -41,8 +63,11 @@ async function mostrarUsuarioAutenticado() {
     }
 }
 
-// Cerrar sesión
 async function cerrarSesion() {
+    if (!supabaseClient) {
+        window.location.href = '../index.html';
+        return;
+    }
     try {
         await supabaseClient.auth.signOut();
         window.location.href = '../index.html';
@@ -54,10 +79,19 @@ async function cerrarSesion() {
 
 // ================= CARGAR ESTADÍSTICAS =================
 async function cargarEstadisticas() {
+    if (!supabaseClient) {
+        console.warn('⚠️ Cliente de Supabase no disponible, mostrando ceros');
+        if (totalVehiclesEl) totalVehiclesEl.textContent = '0';
+        if (automovilVehiclesEl) automovilVehiclesEl.textContent = '0';
+        if (motosVehiclesEl) motosVehiclesEl.textContent = '0';
+        if (operativosVehiclesEl) operativosVehiclesEl.textContent = '0';
+        if (inoperativosVehiclesEl) inoperativosVehiclesEl.textContent = '0';
+        return;
+    }
+    
     try {
         console.log('📊 Cargando estadísticas de vehículos...');
         
-        // ✅ CONSULTAR TODOS LOS VEHÍCULOS
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('tipo, estatus, situacion')
@@ -90,58 +124,34 @@ async function cargarEstadisticas() {
             v.estatus && v.estatus.trim().toUpperCase() === 'INOPERATIVA'
         ).length;
         
-        // ✅ ACTUALIZAR DOM CON ANIMACIÓN
-        actualizarContador(totalVehiclesEl, total);
-        actualizarContador(automovilVehiclesEl, automoviles);
-        actualizarContador(motosVehiclesEl, motos);
-        actualizarContador(operativosVehiclesEl, operativos);
-        actualizarContador(inoperativosVehiclesEl, inoperativos);
+        // ✅ ACTUALIZAR DOM
+        if (totalVehiclesEl) totalVehiclesEl.textContent = total;
+        if (automovilVehiclesEl) automovilVehiclesEl.textContent = automoviles;
+        if (motosVehiclesEl) motosVehiclesEl.textContent = motos;
+        if (operativosVehiclesEl) operativosVehiclesEl.textContent = operativos;
+        if (inoperativosVehiclesEl) inoperativosVehiclesEl.textContent = inoperativos;
         
-        console.log('📊 Estadísticas:', {
-            total,
-            automoviles,
-            motos,
-            operativos,
-            inoperativos
-        });
+        console.log('📊 Estadísticas:', { total, automoviles, motos, operativos, inoperativos });
         
     } catch (error) {
         console.error('❌ Error en cargarEstadisticas:', error);
         // Mostrar ceros en caso de error
-        totalVehiclesEl.textContent = '0';
-        automovilVehiclesEl.textContent = '0';
-        motosVehiclesEl.textContent = '0';
-        operativosVehiclesEl.textContent = '0';
-        inoperativosVehiclesEl.textContent = '0';
+        if (totalVehiclesEl) totalVehiclesEl.textContent = '0';
+        if (automovilVehiclesEl) automovilVehiclesEl.textContent = '0';
+        if (motosVehiclesEl) motosVehiclesEl.textContent = '0';
+        if (operativosVehiclesEl) operativosVehiclesEl.textContent = '0';
+        if (inoperativosVehiclesEl) inoperativosVehiclesEl.textContent = '0';
     }
-}
-
-// Animación de contador
-function actualizarContador(elemento, valorFinal) {
-    if (!elemento) return;
-    
-    let valorActual = 0;
-    const duracion = 1000; // 1 segundo
-    const pasos = 30;
-    const incremento = valorFinal / pasos;
-    const intervalo = duracion / pasos;
-    
-    const timer = setInterval(() => {
-        valorActual += incremento;
-        if (valorActual >= valorFinal) {
-            valorActual = valorFinal;
-            clearInterval(timer);
-        }
-        elemento.textContent = Math.floor(valorActual);
-    }, intervalo);
 }
 
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando módulo de Transporte...');
     
-    mostrarUsuarioAutenticado();
-    cargarEstadisticas();
+    if (supabaseClient) {
+        mostrarUsuarioAutenticado();
+        cargarEstadisticas();
+    }
     
     // Event listener para logout
     if (logoutBtn) {
