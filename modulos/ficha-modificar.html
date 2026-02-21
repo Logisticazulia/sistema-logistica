@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Modificar Ficha Técnica de Vehículos - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Modificar Ficha Técnica | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #f5f5f5;
+}
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 100%;
+}
+.form-section h2 {
+    color: #003366;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #003366;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 14px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #003366;
+    box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
+}
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+.form-row-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+.form-row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+.form-row-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+.search-section {
+    background: linear-gradient(135deg, #003366 0%, #004080 100%);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,51,102,0.2);
+}
+.search-section h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.search-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.search-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 12px 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    font-size: 15px;
+    background: rgba(255,255,255,0.95);
+    transition: all 0.3s ease;
+}
+.search-input:focus {
+    outline: none;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+.search-input::placeholder {
+    color: #666;
+}
+.btn-search {
+    padding: 12px 28px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.btn-search:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+.btn-search:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+.btn-clear {
+    padding: 12px 28px;
+    background: #ffc107;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.btn-clear:hover {
+    background: #e0a800;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+}
+.search-hint {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    margin-top: 10px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.search-hint span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 15px 0;
+    display: none;
+    font-weight: 500;
+}
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+.fotos-upload-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 2px dashed #003366;
+}
+.fotos-upload-section h3 {
+    color: #003366;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+.fotos-upload-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+}
+.foto-upload-box {
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+    width: 100%;
+    min-width: 0;
+    position: relative;
+}
+.foto-upload-box:hover {
+    border-color: #003366;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.foto-upload-box .preview-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 12px;
+    overflow: hidden;
+}
+.foto-upload-box .preview-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    display: none;
+}
+.foto-upload-box .preview-img .placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+}
+.foto-upload-box .preview-img .placeholder span {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+.foto-upload-box input[type="file"] {
+    width: 100%;
+    font-size: 11px;
+    padding: 6px;
+}
+.foto-upload-box .btn-remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.foto-upload-box .btn-remove:hover {
+    background: #b91c1c;
+}
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 20px;
+    margin-right: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.btn-primary {
+    background: #003366;
+    color: white;
+}
+.btn-primary:hover {
+    background: #002244;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+.btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.preview-section {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    text-align: center;
+}
+.preview-section h2 {
+    color: #003366;
+    margin-bottom: 20px;
+}
+.ficha-tecnica {
+    border: 2px solid #003366;
+    padding: 25px;
+    background: white;
+    width: 95%;
+    max-width: 1500px;
+    display: inline-block;
+    text-align: left;
+}
+.ficha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #003366;
+}
+.ficha-logo {
+    width: 100px;
+    height: auto;
+}
+.ficha-title {
+    text-align: center;
+    flex: 1;
+    padding: 0 20px;
+}
+.ficha-title h1 {
+    font-size: 15px;
+    color: #003366;
+    margin-bottom: 5px;
+    line-height: 1.4;
+    font-weight: 700;
+}
+.ficha-title h2 {
+    font-size: 18px;
+    color: #003366;
+    margin: 5px 0;
+    font-weight: 700;
+}
+.ficha-title h3 {
+    font-size: 16px;
+    color: #003366;
+    margin-top: 5px;
+    font-weight: 700;
+}
+.ficha-logo-right {
+    width: 100px;
+    height: auto;
+}
+.ficha-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    table-layout: fixed;
+}
+.ficha-table th {
+    background: #4a7c9b;
+    color: white;
+    padding: 12px 10px;
+    text-align: left;
+    font-size: 13px;
+    border: 2px solid #003366;
+    font-weight: 700;
+}
+.ficha-table td {
+    padding: 10px 8px;
+    border: 2px solid #003366;
+    font-size: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    vertical-align: top;
+}
+.ficha-table .label {
+    font-weight: 700;
+    background: #f0f0f0;
+    width: 18%;
+}
+.ficha-table .value {
+    width: 32%;
+}
+.fotos-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+    width: 100%;
+}
+.foto-box {
+    border: 2px solid #4a7c9b;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4a7c9b;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 100%;
+}
+.foto-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+.observaciones-box {
+    min-height: 260px;
+    border: 2px solid #003366;
+    padding: 12px;
+    background: #fafafa;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 4px;
+    color: #000000 !important;
+    white-space: pre-wrap;
+}
+.form-disabled .form-input,
+.form-disabled .form-select,
+.form-disabled .form-textarea {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+@media print {
+    .navbar, .module-header, .btn, .fotos-upload-section, .search-section {
+        display: none !important;
+    }
+    .container {
+        display: block;
+    }
+    .preview-section {
+        box-shadow: none;
+        padding: 0;
+    }
+    .ficha-tecnica {
+        border: 2px solid #003366;
+        width: 100%;
+    }
+}
+@media (max-width: 1200px) {
+    .form-row-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .form-row-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .fotos-upload-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 768px) {
+    .form-row-4,
+    .form-row-3,
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+    .fotos-container,
+    .fotos-upload-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .ficha-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .search-container {
+        flex-direction: column;
+    }
+    .search-input {
+        min-width: 100%;
+    }
+}
+</style>
+</head>
+<body class="dashboard-page">
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+            <span class="nav-title">Sistema de Logística</span>
+        </div>
+        <div class="nav-user">
+            <span class="user-email" id="userEmail">usuario@institucion.com</span>
+            <button class="btn-logout" id="logoutBtn">
+                <span class="logout-icon">🚪</span>
+                <span class="logout-text">Cerrar Sesión</span>
+            </button>
+        </div>
+    </div>
+</nav>
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+    <!-- Header con Navegación de Migas -->
+    <header class="module-header">
+        <div class="breadcrumb">
+            <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Modificar Ficha Técnica</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
+            ← Volver a Transporte
+        </button>
+    </header>
+    <!-- Título del Módulo -->
+    <section class="module-title-section">
+        <h1 class="module-title">✏️ Modificar Ficha Técnica de Vehículo</h1>
+        <p class="module-subtitle">Busque y edite una ficha técnica existente</p>
+    </section>
+    <div class="container">
+        <!-- Formulario -->
+        <div class="form-section">
+            <!-- SECCIÓN DE BÚSQUEDA -->
+            <div class="search-section">
+                <h3>🔍 Buscar Ficha Técnica en Base de Datos</h3>
+                <div id="searchAlert" class="alert"></div>
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Ingrese placa, facsimilar, serial de carrocería o serial de motor..."
+                        autocomplete="off"
+                    >
+                    <button class="btn-search" onclick="buscarFicha()" id="btnSearch">
+                        <span>🔍</span>
+                        <span>Buscar</span>
+                    </button>
+                    <button class="btn-clear" onclick="limpiarBusqueda()">
+                        <span>🔄</span>
+                        <span>Limpiar</span>
+                    </button>
+                </div>
+                <div class="search-hint">
+                    <span>💡 Busque por:</span>
+                    <span>🚗 Placa</span>
+                    <span>📄 Facsimilar</span>
+                    <span>🔢 Serial Carrocería</span>
+                    <span>⚙️ Serial Motor</span>
+                </div>
+            </div>
+            <h2>📝 Datos del Vehículo</h2>
+            <form id="fichaForm" class="form-disabled">
+                <!-- Campo oculto para el ID de la ficha -->
+                <input type="hidden" id="fichaId" name="fichaId">
+                <!-- FILA 1: 4 CAMPOS -->
+                <div class="form-row-4">
+                    <div class="form-group">
+                        <label>Marca *</label>
+                        <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo *</label>
+                        <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select id="tipo" name="tipo" required disabled>
+                            <option value="">Seleccione...</option>
+                            <option value="AUTOMOVIL">AUTOMOVIL</option>
+                            <option value="BUS">BUS</option>
+                            <option value="CAMION">CAMION</option>
+                            <option value="CAMIONETA">CAMIONETA</option>
+                            <option value="ENDURO">ENDURO</option>
+                            <option value="ESPECIAL">ESPECIAL</option>
+                            <option value="MACHITO">MACHITO</option>
+                            <option value="MINIBUS">MINIBUS</option>
+                            <option value="MOTO">MOTO</option>
+                            <option value="PICKUP">PICKUP</option>
+                            <option value="SPORTWAGON">SPORTWAGON</option>
+                            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                            <option value="TRIMOVIL">TRIMOVIL</option>
+                            <option value="VAM">VAM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Clase *</label>
+                        <input type="text" id="clase" name="clase" required placeholder="Ej: PICKUP D/ CABINA" disabled>
+                    </div>
+                </div>
+                <!-- FILA 2: 3 CAMPOS -->
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Serial Carrocería *</label>
+                        <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Serial Motor *</label>
+                        <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Color *</label>
+                        <input type="text" id="color" name="color" required placeholder="Ej: BLANCO" disabled>
+                    </div>
+                </div>
+                <!-- FILA 3: 3 CAMPOS -->
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Placa *</label>
+                        <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Facsimilar</label>
+                        <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Estatus del Vehículo *</label>
+                        <select id="estatus" name="estatus" required disabled>
+                            <option value="">Seleccione...</option>
+                            <option value="OPERATIVA">OPERATIVA</option>
+                            <option value="INOPERATIVA">INOPERATIVA</option>
+                            <option value="REPARACION">REPARACION</option>
+                            <option value="TALLER">TALLER</option>
+                            <option value="DESINCORPORADA">DESINCORPORADA</option>
+                            <option value="DONACION">DONACION</option>
+                            <option value="COMODATO">COMODATO</option>
+                            <option value="DENUNCIADA">DENUNCIADA</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- DEPENDENCIA -->
+                <div class="form-group">
+                    <label>Dependencia *</label>
+                    <textarea id="dependencia" name="dependencia" rows="3" required placeholder="Ej: SERVICIO PATRULLAJE VEHICULAR CUADRANTES DE PAZ" disabled></textarea>
+                </div>
+                <!-- INFORMACIÓN TÉCNICO MECÁNICA -->
+                <h3 style="margin: 20px 0 15px; color: #003366;">Información Técnico Mecánica (Si es Inoperativo)</h3>
+                <div class="form-group">
+                    <label>Causa</label>
+                    <input type="text" id="causa" name="causa" placeholder="Describa la causa" disabled>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Mecánica</label>
+                        <input type="text" id="mecanica" name="mecanica" placeholder="Estado mecánico" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Diagnóstico</label>
+                        <input type="text" id="diagnostico" name="diagnostico" placeholder="Diagnóstico" disabled>
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Ubicación</label>
+                        <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación actual" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Tapicería</label>
+                        <input type="text" id="tapiceria" name="tapiceria" placeholder="Estado tapicería" disabled>
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Cauchos</label>
+                        <input type="text" id="cauchos" name="cauchos" placeholder="Estado cauchos" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Luces</label>
+                        <input type="text" id="luces" name="luces" placeholder="Estado luces" disabled>
+                    </div>
+                </div>
+                <!-- OBSERVACIONES -->
+                <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea id="observaciones" name="observaciones" rows="4" placeholder="Observaciones adicionales" disabled></textarea>
+                </div>
+                <!-- SECCIÓN DE CARGA DE FOTOS -->
+                <div class="fotos-upload-section">
+                    <h3>📸 Registro Fotográfico (4 Fotos)</h3>
+                    <div class="fotos-upload-container">
+                        <div class="foto-upload-box">
+                            <button type="button" class="btn-remove" onclick="removeFoto(1)">✕</button>
+                            <div class="preview-img" id="previewFoto1Container">
+                                <div class="placeholder">
+                                    <span>📷</span>
+                                    <span>Foto 1</span>
+                                </div>
+                                <img id="previewFoto1" alt="Foto 1">
+                            </div>
+                            <input type="file" id="foto1" name="foto1" accept="image/*" onchange="previewImage(this, 'previewFoto1')" disabled>
+                        </div>
+                        <div class="foto-upload-box">
+                            <button type="button" class="btn-remove" onclick="removeFoto(2)">✕</button>
+                            <div class="preview-img" id="previewFoto2Container">
+                                <div class="placeholder">
+                                    <span>📷</span>
+                                    <span>Foto 2</span>
+                                </div>
+                                <img id="previewFoto2" alt="Foto 2">
+                            </div>
+                            <input type="file" id="foto2" name="foto2" accept="image/*" onchange="previewImage(this, 'previewFoto2')" disabled>
+                        </div>
+                        <div class="foto-upload-box">
+                            <button type="button" class="btn-remove" onclick="removeFoto(3)">✕</button>
+                            <div class="preview-img" id="previewFoto3Container">
+                                <div class="placeholder">
+                                    <span>📷</span>
+                                    <span>Foto 3</span>
+                                </div>
+                                <img id="previewFoto3" alt="Foto 3">
+                            </div>
+                            <input type="file" id="foto3" name="foto3" accept="image/*" onchange="previewImage(this, 'previewFoto3')" disabled>
+                        </div>
+                        <div class="foto-upload-box">
+                            <button type="button" class="btn-remove" onclick="removeFoto(4)">✕</button>
+                            <div class="preview-img" id="previewFoto4Container">
+                                <div class="placeholder">
+                                    <span>📷</span>
+                                    <span>Foto 4</span>
+                                </div>
+                                <img id="previewFoto4" alt="Foto 4">
+                            </div>
+                            <input type="file" id="foto4" name="foto4" accept="image/*" onchange="previewImage(this, 'previewFoto4')" disabled>
+                        </div>
+                    </div>
+                </div>
+                <!-- BOTONES -->
+                <div>
+                    <button type="button" class="btn btn-secondary" id="btnCancelar" disabled>❌ Cancelar</button>
+                    <button type="button" class="btn btn-warning" id="btnEditar">✏️ Editar Ficha</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardar" style="display: none;">💾 Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+        <!-- Vista Previa -->
+        <div class="preview-section">
+            <h2 style="color: #003366; margin-bottom: 20px;">👁️ Vista Previa</h2>
+            <div class="ficha-tecnica" id="fichaPreview">
+                <div class="ficha-header">
+                    <img src="../img/logo.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
+                    <div class="ficha-title">
+                        <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
+                        <h2>REDIP: OCCIDENTAL</h2>
+                        <h3>CCPE ZULIA</h3>
+                    </div>
+                    <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
+                </div>
+                <table class="ficha-table">
+                    <tr>
+                        <th colspan="5">DATOS DEL VEHICULO</th>
+                        <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+                            OBSERVACIONES<br><br>
+                            <div class="observaciones-box" id="previewObservaciones"></div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="label">MARCA</td>
+                        <td class="value" id="previewMarca"></td>
+                        <td class="label">MODELO</td>
+                        <td class="value" id="previewModelo"></td>
+                        <td class="label">TIPO: <span id="previewTipo"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">SERIAL CARROCERIA</td>
+                        <td class="value" id="previewSerialCarroceria"></td>
+                        <td class="label">CLASE</td>
+                        <td class="value" id="previewClase"></td>
+                        <td class="label">COLOR: <span id="previewColor"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">PLACA</td>
+                        <td class="value" id="previewPlaca"></td>
+                        <td class="label">FACSIMIL</td>
+                        <td class="value" id="previewFacsimilar"></td>
+                        <td class="label">DEPENDENCIA:<br><span id="previewDependencia"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">SERIAL MOTOR</td>
+                        <td class="value" id="previewSerialMotor"></td>
+                        <td class="label" colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">ESTATUS DEL VEHICULO</td>
+                        <td colspan="4" style="text-align: center; font-weight: bold;" id="previewEstatus"></td>
+                    </tr>
+                    <tr>
+                        <th colspan="6">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
+                    </tr>
+                    <tr>
+                        <td class="label">CAUSA</td>
+                        <td colspan="2" id="previewCausa"></td>
+                        <td class="label">DIAGNÓSTICO</td>
+                        <td colspan="2" id="previewDiagnostico"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">MECANICA</td>
+                        <td colspan="2" id="previewMecanica"></td>
+                        <td class="label">UBICACIÓN</td>
+                        <td colspan="2" id="previewUbicacion"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">TAPICERIA</td>
+                        <td id="previewTapiceria"></td>
+                        <td class="label">CAUCHOS</td>
+                        <td id="previewCauchos"></td>
+                        <td class="label">LUCES</td>
+                        <td id="previewLuces"></td>
+                    </tr>
+                    <tr>
+                        <th colspan="6">REGISTRO FOTOGRÁFICO</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <div class="fotos-container">
+                                <div class="foto-box" id="previewBox1">
+                                    <span>Foto 1</span>
+                                    <img id="previewImg1" alt="Foto 1">
+                                </div>
+                                <div class="foto-box" id="previewBox2">
+                                    <span>Foto 2</span>
+                                    <img id="previewImg2" alt="Foto 2">
+                                </div>
+                                <div class="foto-box" id="previewBox3">
+                                    <span>Foto 3</span>
+                                    <img id="previewImg3" alt="Foto 3">
+                                </div>
+                                <div class="foto-box" id="previewBox4">
+                                    <span>Foto 4</span>
+                                    <img id="previewImg4" alt="Foto 4">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/ficha-modificar.js" defer></script>
+</body>
+</html>
