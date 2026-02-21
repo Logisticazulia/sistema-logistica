@@ -84,7 +84,6 @@ async function buscarFicha() {
         mostrarAlerta('✅ Ficha técnica encontrada: ' + fichaSeleccionada.marca + ' ' + fichaSeleccionada.modelo + ' - Placa: ' + fichaSeleccionada.placa, 'success');
         
         actualizarVistaPrevia();
-        
     } catch (error) {
         console.error('❌ Error en buscarFicha:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
@@ -134,6 +133,9 @@ function llenarFormulario(ficha) {
                 });
                 if (matchingOption) {
                     element.value = matchingOption.value;
+                    console.log('✅ Select asignado:', formField, '=', matchingOption.value);
+                } else {
+                    console.log('⚠️ Opción no encontrada para:', formField, '=', ficha[dbField]);
                 }
             } else {
                 element.value = ficha[dbField];
@@ -142,9 +144,7 @@ function llenarFormulario(ficha) {
     });
     
     document.getElementById('fichaId').value = ficha.id;
-    
     cargarFotosExistentes(ficha);
-    
     actualizarVistaPrevia();
     
     console.log('✅ Formulario llenado correctamente');
@@ -177,7 +177,6 @@ function cargarFotosExistentes(ficha) {
             if (btnRemove) btnRemove.style.display = 'none';
         }
     }
-    
     actualizarFotosPreview();
 }
 
@@ -205,7 +204,6 @@ function resetearFormulario() {
     
     actualizarVistaPrevia();
     actualizarFotosPreview();
-    
     toggleFormFields(false);
 }
 
@@ -230,7 +228,6 @@ function toggleFormFields(enable) {
     
     const form = document.getElementById('fichaForm');
     form.classList.toggle('form-disabled', !enable);
-    
     isEditing = enable;
 }
 
@@ -412,8 +409,8 @@ async function guardarFicha(event) {
         for (let i = 1; i <= 4; i++) {
             if (fotosModificadas['foto' + i] && fotosData['foto' + i]) {
                 const base64Data = fotosData['foto' + i];
-                
                 let blob;
+                
                 if (base64Data.startsWith('http')) {
                     const response = await fetch(base64Data);
                     blob = await response.blob();
@@ -488,11 +485,16 @@ async function guardarFicha(event) {
         }
         
         console.log('✅ Ficha actualizada:', data);
+        
+        // ✅ CAMBIO 2: MENSAJE CORRECTO AL GUARDAR
         mostrarAlerta('✅ Ficha técnica actualizada exitosamente', 'success');
         
         fichaSeleccionada = Object.assign({}, fichaSeleccionada, data[0]);
         
-        cancelarEdicion();
+        // ✅ CAMBIO 3: LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
+        setTimeout(function() {
+            limpiarTodoParaNuevaBusqueda();
+        }, 2000);
         
     } catch (error) {
         console.error('❌ Error en guardarFicha:', error);
@@ -501,6 +503,56 @@ async function guardarFicha(event) {
         btnGuardar.disabled = false;
         btnGuardar.innerHTML = '<span>💾</span><span>Guardar Cambios</span>';
     }
+}
+
+// ✅ NUEVA FUNCIÓN: LIMPIAR TODO PARA NUEVA BÚSQUEDA
+function limpiarTodoParaNuevaBusqueda() {
+    console.log('🧹 Limpiando formulario para nueva búsqueda...');
+    
+    // Limpiar campo de búsqueda
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchAlert').style.display = 'none';
+    
+    // Limpiar formulario
+    document.getElementById('fichaForm').reset();
+    document.getElementById('fichaId').value = '';
+    
+    // Limpiar fotos
+    for (let i = 1; i <= 4; i++) {
+        const img = document.getElementById('previewFoto' + i);
+        const container = document.getElementById('previewFoto' + i + 'Container');
+        const placeholder = container.querySelector('.placeholder');
+        const btnRemove = container.parentElement.querySelector('.btn-remove');
+        const input = document.getElementById('foto' + i);
+        
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        if (btnRemove) btnRemove.style.display = 'none';
+        input.value = '';
+        
+        fotosData['foto' + i] = null;
+        fotosUrlsExistentes['foto' + i] = null;
+        fotosModificadas['foto' + i] = false;
+    }
+    
+    // Limpiar vista previa
+    actualizarVistaPrevia();
+    actualizarFotosPreview();
+    
+    // Resetear estado
+    fichaSeleccionada = null;
+    toggleFormFields(false);
+    
+    // Resetear botones
+    document.getElementById('btnEditar').style.display = 'inline-flex';
+    document.getElementById('btnGuardar').style.display = 'none';
+    document.getElementById('btnCancelar').disabled = true;
+    
+    // Scroll al top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    console.log('✅ Formulario limpiado, listo para nueva búsqueda');
 }
 
 // ============================================
