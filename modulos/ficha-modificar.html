@@ -156,89 +156,65 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
                 <!-- FILA 1: 4 CAMPOS -->
                 <div class="form-row-4">
                     <div class="form-group">
-                        <label>Marca *</label>
-                        <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Modelo *</label>
-                        <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo *</label>
-                        <select id="tipo" name="tipo" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="AUTOMOVIL">AUTOMOVIL</option>
-                            <option value="BUS">BUS</option>
-                            <option value="CAMION">CAMION</option>
-                            <option value="CAMIONETA">CAMIONETA</option>
-                            <option value="ENDURO">ENDURO</option>
-                            <option value="ESPECIAL">ESPECIAL</option>
-                            <option value="MACHITO">MACHITO</option>
-                            <option value="MINIBUS">MINIBUS</option>
-                            <option value="MOTO">MOTO</option>
-                            <option value="PICKUP">PICKUP</option>
-                            <option value="SPORTWAGON">SPORTWAGON</option>
-                            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-                            <option value="TRIMOVIL">TRIMOVIL</option>
-                            <option value="VAM">VAM</option>
-                        </select>
-                    </div>
-                    <!-- ✅ CAMBIO 1: CLASE AHORA ES SELECT CON OPCIONES DE LA IMAGEN -->
-                    <div class="form-group">
-                        <label>Clase *</label>
-                        <select id="clase" name="clase" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="AUTOBUS">AUTOBUS</option>
-                            <option value="AUTOMOVIL">AUTOMOVIL</option>
-                            <option value="BLINDADO">BLINDADO</option>
-                            <option value="CAMION">CAMION</option>
-                            <option value="CAMIONETA">CAMIONETA</option>
-                            <option value="ESPECIAL">ESPECIAL</option>
-                            <option value="MOTO">MOTO</option>
-                            <option value="TRACCIONDESANGRE">TRACCIONDESANGRE</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- FILA 2: 3 CAMPOS -->
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Serial Carrocería *</label>
-                        <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Serial Motor *</label>
-                        <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Color *</label>
-                        <input type="text" id="color" name="color" required placeholder="Ej: BLANCO" disabled>
-                    </div>
-                </div>
-                <!-- FILA 3: 3 CAMPOS -->
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Placa *</label>
-                        <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Facsimilar</label>
-                        <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Estatus del Vehículo *</label>
-                        <select id="estatus" name="estatus" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="OPERATIVA">OPERATIVA</option>
-                            <option value="INOPERATIVA">INOPERATIVA</option>
-                            <option value="REPARACION">REPARACION</option>
-                            <option value="TALLER">TALLER</option>
-                            <option value="DESINCORPORADA">DESINCORPORADA</option>
-                            <option value="DONACION">DONACION</option>
-                            <option value="COMODATO">COMODATO</option>
-                            <option value="DENUNCIADA">DENUNCIADA</option>
-                        </select>
-                    </div>
-                </div>
+                      <!-- FILA 1: 4 CAMPOS -->
+<div class="form-row-4">
+    <div class="form-group">
+        <label>Marca *</label>
+        <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI" disabled>
+    </div>
+    <div class="form-group">
+        <label>Modelo *</label>
+        <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200" disabled>
+    </div>
+    <div class="form-group">
+        <label>Tipo *</label>
+        <select id="tipo" name="tipo" required disabled>
+            <!-- opciones... -->
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Clase *</label>
+        <select id="clase" name="clase" required disabled>
+            <!-- opciones... -->
+        </select>
+    </div>
+</div>
+
+<!-- FILA 2: 3 CAMPOS -->
+<div class="form-row-3">
+    <!-- ✅ ESTOS 3 CAMPOS PERMANECEN DESHABILITADOS -->
+    <div class="form-group">
+        <label>Serial Carrocería *</label>
+        <input type="text" id="serialCarroceria" name="serialCarroceria" required placeholder="Ej: MMBJJKL10PH096515" disabled>
+    </div>
+    <div class="form-group">
+        <label>Serial Motor *</label>
+        <input type="text" id="serialMotor" name="serialMotor" required placeholder="Ej: 4N15UKL1409" disabled>
+    </div>
+    <div class="form-group">
+        <label>Color *</label>
+        <input type="text" id="color" name="color" required placeholder="Ej: BLANCO" disabled>
+    </div>
+</div>
+
+<!-- FILA 3: 3 CAMPOS -->
+<div class="form-row-3">
+    <!-- ✅ ESTOS 2 CAMPOS PERMANECEN DESHABILITADOS -->
+    <div class="form-group">
+        <label>Placa *</label>
+        <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417" disabled>
+    </div>
+    <div class="form-group">
+        <label>Facsímil</label>
+        <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417" disabled>
+    </div>
+    <div class="form-group">
+        <label>Estatus del Vehículo *</label>
+        <select id="estatus" name="estatus" required disabled>
+            <!-- opciones... -->
+        </select>
+    </div>
+</div>
                 <!-- DEPENDENCIA -->
                 <div class="form-group">
                     <label>Dependencia *</label>
