@@ -57,7 +57,6 @@ async function buscarFicha() {
     btnSearch.disabled = true;
     
     try {
-        // ✅ CONSULTA CON OR PARA MÚLTIPLES CAMPOS
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
@@ -71,22 +70,19 @@ async function buscarFicha() {
         }
         
         if (!data || data.length === 0) {
-            mostrarAlerta(`❌ No se encontró ninguna ficha técnica con: ${searchTerm}`, 'error');
+            mostrarAlerta('❌ No se encontró ninguna ficha técnica con: ' + searchTerm, 'error');
             fichaSeleccionada = null;
             resetearFormulario();
             return;
         }
         
-        // ✅ FICHA ENCONTRADA
         fichaSeleccionada = data[0];
         console.log('✅ Ficha encontrada:', fichaSeleccionada);
         
-        // Llenar formulario con los datos encontrados
         llenarFormulario(fichaSeleccionada);
         
-        mostrarAlerta(`✅ Ficha técnica encontrada: ${fichaSeleccionada.marca} ${fichaSeleccionada.modelo} - Placa: ${fichaSeleccionada.placa}`, 'success');
+        mostrarAlerta('✅ Ficha técnica encontrada: ' + fichaSeleccionada.marca + ' ' + fichaSeleccionada.modelo + ' - Placa: ' + fichaSeleccionada.placa, 'success');
         
-        // Actualizar vista previa
         actualizarVistaPrevia();
         
     } catch (error) {
@@ -104,7 +100,6 @@ async function buscarFicha() {
 function llenarFormulario(ficha) {
     console.log('📝 Llenando formulario con ficha:', ficha);
     
-    // Mapeo de campos de la BD al formulario
     const mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
@@ -127,15 +122,16 @@ function llenarFormulario(ficha) {
         'observaciones': 'observaciones'
     };
     
-    // Llenar campos de texto y selects
-    Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
+    Object.entries(mapeoCampos).forEach(function(pair) {
+        const dbField = pair[0];
+        const formField = pair[1];
         const element = document.getElementById(formField);
         if (element && ficha[dbField]) {
             if (element.tagName === 'SELECT') {
                 const options = Array.from(element.options);
-                const matchingOption = options.find(opt =>
-                    opt.value.toUpperCase() === ficha[dbField].toUpperCase()
-                );
+                const matchingOption = options.find(function(opt) {
+                    return opt.value.toUpperCase() === ficha[dbField].toUpperCase();
+                });
                 if (matchingOption) {
                     element.value = matchingOption.value;
                 }
@@ -145,20 +141,16 @@ function llenarFormulario(ficha) {
         }
     });
     
-    // Guardar ID de la ficha
     document.getElementById('fichaId').value = ficha.id;
     
-    // ✅ CARGAR FOTOS EXISTENTES
     cargarFotosExistentes(ficha);
     
-    // Actualizar vista previa
     actualizarVistaPrevia();
     
     console.log('✅ Formulario llenado correctamente');
 }
 
 function cargarFotosExistentes(ficha) {
-    // Limpiar fotos actuales
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewFoto' + i);
         const container = document.getElementById('previewFoto' + i + 'Container');
@@ -166,7 +158,6 @@ function cargarFotosExistentes(ficha) {
         const btnRemove = container.parentElement.querySelector('.btn-remove');
         
         if (ficha['foto' + i + '_url']) {
-            // Hay foto existente
             fotosUrlsExistentes['foto' + i] = ficha['foto' + i + '_url'];
             fotosData['foto' + i] = ficha['foto' + i + '_url'];
             fotosModificadas['foto' + i] = false;
@@ -174,9 +165,8 @@ function cargarFotosExistentes(ficha) {
             img.src = ficha['foto' + i + '_url'];
             img.style.display = 'block';
             placeholder.style.display = 'none';
-            btnRemove.style.display = 'flex';
+            if (btnRemove) btnRemove.style.display = 'flex';
         } else {
-            // No hay foto
             fotosUrlsExistentes['foto' + i] = null;
             fotosData['foto' + i] = null;
             fotosModificadas['foto' + i] = false;
@@ -184,7 +174,7 @@ function cargarFotosExistentes(ficha) {
             img.src = '';
             img.style.display = 'none';
             placeholder.style.display = 'flex';
-            btnRemove.style.display = 'none';
+            if (btnRemove) btnRemove.style.display = 'none';
         }
     }
     
@@ -195,7 +185,6 @@ function resetearFormulario() {
     document.getElementById('fichaForm').reset();
     document.getElementById('fichaId').value = '';
     
-    // Limpiar fotos
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewFoto' + i);
         const container = document.getElementById('previewFoto' + i + 'Container');
@@ -206,7 +195,7 @@ function resetearFormulario() {
         img.src = '';
         img.style.display = 'none';
         placeholder.style.display = 'flex';
-        btnRemove.style.display = 'none';
+        if (btnRemove) btnRemove.style.display = 'none';
         input.value = '';
         
         fotosData['foto' + i] = null;
@@ -217,7 +206,6 @@ function resetearFormulario() {
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    // Deshabilitar campos
     toggleFormFields(false);
 }
 
@@ -234,7 +222,7 @@ function limpiarBusqueda() {
 
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
-    fields.forEach(field => {
+    fields.forEach(function(field) {
         if (field.id !== 'fichaId') {
             field.disabled = !enable;
         }
@@ -302,7 +290,8 @@ function actualizarVistaPrevia() {
         'observaciones': 'previewObservaciones'
     };
     
-    Object.entries(campos).forEach(([formField, previewField]) => {
+    Object.keys(campos).forEach(function(formField) {
+        const previewField = campos[formField];
         const element = document.getElementById(formField);
         const preview = document.getElementById(previewField);
         if (element && preview) {
@@ -338,7 +327,7 @@ function previewImage(input, previewId) {
             img.src = e.target.result;
             img.style.display = 'block';
             placeholder.style.display = 'none';
-            btnRemove.style.display = 'flex';
+            if (btnRemove) btnRemove.style.display = 'flex';
             
             const fotoNum = previewId.replace('previewFoto', 'foto');
             fotosData[fotoNum] = e.target.result;
@@ -360,7 +349,7 @@ function removeFoto(numero) {
     img.src = '';
     img.style.display = 'none';
     placeholder.style.display = 'flex';
-    btnRemove.style.display = 'none';
+    if (btnRemove) btnRemove.style.display = 'none';
     input.value = '';
     
     fotosData['foto' + numero] = null;
@@ -411,7 +400,6 @@ async function guardarFicha(event) {
     btnGuardar.textContent = '⏳ Guardando...';
     
     try {
-        // ✅ SUBIR FOTOS NUEVAS O MODIFICADAS A SUPABASE STORAGE
         const fotoUrls = {
             foto1_url: fotosUrlsExistentes.foto1,
             foto2_url: fotosUrlsExistentes.foto2,
@@ -422,20 +410,18 @@ async function guardarFicha(event) {
         const bucketName = 'fichas-tecnicas';
         
         for (let i = 1; i <= 4; i++) {
-            // Solo subir si la foto fue modificada y hay datos
-            if (fotosModificadas['foto' + i] && fotosData['foto' + i']) {
+            if (fotosModificadas['foto' + i] && fotosData['foto' + i]) {
                 const base64Data = fotosData['foto' + i];
                 
-                // Si es URL existente, convertir a blob
                 let blob;
                 if (base64Data.startsWith('http')) {
                     const response = await fetch(base64Data);
                     blob = await response.blob();
                 } else {
-                    blob = await fetch(base64Data).then(r => r.blob());
+                    blob = await fetch(base64Data).then(function(r) { return r.blob(); });
                 }
                 
-                const fileName = `ficha_${Date.now()}_foto${i}_${fichaSeleccionada.placa}.jpg`;
+                const fileName = 'ficha_' + Date.now() + '_foto' + i + '_' + fichaSeleccionada.placa + '.jpg';
                 
                 const { data: uploadData, error: uploadError } = await supabaseClient
                     .storage
@@ -446,21 +432,20 @@ async function guardarFicha(event) {
                     });
                 
                 if (uploadError) {
-                    console.error(`Error subiendo foto ${i}:`, uploadError);
+                    console.error('Error subiendo foto ' + i + ':', uploadError);
                     throw uploadError;
                 }
                 
-                const { data: { publicUrl } } = supabaseClient
+                const { data: urlData } = supabaseClient
                     .storage
                     .from(bucketName)
                     .getPublicUrl(fileName);
                 
-                fotoUrls['foto' + i + '_url'] = publicUrl;
-                console.log(`✅ Foto ${i} subida:`, publicUrl);
+                fotoUrls['foto' + i + '_url'] = urlData.publicUrl;
+                console.log('✅ Foto ' + i + ' subida:', urlData.publicUrl);
             }
         }
         
-        // ✅ PREPARAR DATOS ACTUALIZADOS
         const fichaActualizada = {
             marca: document.getElementById('marca').value.trim().toUpperCase(),
             modelo: document.getElementById('modelo').value.trim().toUpperCase(),
@@ -481,14 +466,15 @@ async function guardarFicha(event) {
             cauchos: document.getElementById('cauchos').value.trim() || null,
             luces: document.getElementById('luces').value.trim() || null,
             observaciones: document.getElementById('observaciones').value.trim() || null,
-            ...fotoUrls,
+            foto1_url: fotoUrls.foto1_url,
+            foto2_url: fotoUrls.foto2_url,
+            foto3_url: fotoUrls.foto3_url,
+            foto4_url: fotoUrls.foto4_url,
             updated_at: new Date().toISOString()
         };
         
         console.log('📝 Actualizando ficha ID:', fichaSeleccionada.id);
-        console.log('📝 Datos:', fichaActualizada);
         
-        // ✅ ACTUALIZAR EN TABLA fichas_tecnicas
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .update(fichaActualizada)
@@ -504,10 +490,8 @@ async function guardarFicha(event) {
         console.log('✅ Ficha actualizada:', data);
         mostrarAlerta('✅ Ficha técnica actualizada exitosamente', 'success');
         
-        // Actualizar ficha seleccionada con los nuevos datos
-        fichaSeleccionada = { ...fichaSeleccionada, ...data[0] };
+        fichaSeleccionada = Object.assign({}, fichaSeleccionada, data[0]);
         
-        // Volver a modo lectura
         cancelarEdicion();
         
     } catch (error) {
@@ -533,7 +517,7 @@ function mostrarAlerta(mensaje, tipo) {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    setTimeout(() => {
+    setTimeout(function() {
         alertDiv.style.display = 'none';
     }, 5000);
 }
@@ -542,21 +526,17 @@ function mostrarAlerta(mensaje, tipo) {
 // INICIALIZACIÓN Y EVENTOS
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando modificación de fichas técnicas...');
     
-    // Inicializar vista previa
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    // Event listeners para inputs (actualización en tiempo real)
     const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
-    inputs.forEach(input => {
+    inputs.forEach(function(input) {
         input.addEventListener('input', actualizarVistaPrevia);
     });
     
-    // Event listeners para botones
-    const btnBuscar = document.getElementById('btnSearch');
     const btnEditar = document.getElementById('btnEditar');
     const btnGuardar = document.getElementById('btnGuardar');
     const btnCancelar = document.getElementById('btnCancelar');
@@ -574,19 +554,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCancelar.addEventListener('click', cancelarEdicion);
     }
     
-    // Permitir buscar con Enter
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => {
+        searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 buscarFicha();
             }
         });
     }
     
-    // Cerrar sesión
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
+        logoutBtn.addEventListener('click', async function() {
             if (confirm('¿Está seguro de cerrar sesión?')) {
                 await supabaseClient.auth.signOut();
                 window.location.href = '../index.html';
@@ -594,7 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Cargar información del usuario
     cargarUsuario();
     
     console.log('✅ Modificación de fichas inicializada');
@@ -603,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function cargarUsuario() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user?.email) {
+        if (session && session.user && session.user.email) {
             document.getElementById('userEmail').textContent = session.user.email;
         }
     } catch (error) {
