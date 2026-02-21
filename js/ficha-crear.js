@@ -89,7 +89,6 @@ async function buscarVehiculo() {
 // ✅ VERIFICAR SI YA EXISTE UNA FICHA PARA ESTE VEHÍCULO
 async function verificarFichaExistente(vehiculo) {
     try {
-        // Buscar por placa O serial de carrocería O serial de motor
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('id, placa, fecha_creacion')
@@ -113,49 +112,103 @@ async function verificarFichaExistente(vehiculo) {
     }
 }
 
-// ✅ LLENAR EL FORMULARIO CON LOS DATOS DEL VEHÍCULO
+// ✅ LLENAR EL FORMULARIO CON LOS DATOS DEL VEHÍCULO (CORREGIDO)
 function llenarFormulario(vehiculo) {
     console.log('📝 Llenando formulario con vehículo:', vehiculo);
     
-    // Mapeo de campos de la BD al formulario
-    const mapeoCampos = {
+    // ✅ CAMPOS DE TEXTO SIMPLE
+    const camposTexto = {
         'marca': 'marca',
         'modelo': 'modelo',
-        'tipo': 'tipo',
         'clase': 'clase',
         'color': 'color',
         's_carroceria': 'serialCarroceria',
         's_motor': 'serialMotor',
         'placa': 'placa',
         'facsimil': 'facsimilar',
-        'situacion': 'estatus',
-        'estatus': 'estatus',
         'unidad_administrativa': 'dependencia',
         'observacion': 'observaciones',
         'ubicacion_fisica': 'ubicacion'
     };
     
-    // Llenar campos
-    Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
+    // Llenar campos de texto
+    Object.entries(camposTexto).forEach(([dbField, formField]) => {
         const element = document.getElementById(formField);
         if (element && vehiculo[dbField]) {
-            if (element.tagName === 'SELECT') {
-                // Para selects, buscar la opción que coincida
-                const options = Array.from(element.options);
-                const matchingOption = options.find(opt =>
-                    opt.value.toUpperCase() === vehiculo[dbField].toUpperCase()
-                );
-                if (matchingOption) {
-                    element.value = matchingOption.value;
-                    console.log('✅ Select asignado:', formField, '=', matchingOption.value);
-                } else {
-                    console.log('⚠️ Opción no encontrada para:', formField, '=', vehiculo[dbField]);
-                }
-            } else {
-                element.value = vehiculo[dbField];
-            }
+            element.value = vehiculo[dbField];
         }
     });
+    
+    // ✅ CAMPO TIPO - CON BÚSQUEDA FLEXIBLE
+    const tipoElement = document.getElementById('tipo');
+    if (tipoElement && vehiculo.tipo) {
+        const tipoValor = vehiculo.tipo.toUpperCase().trim();
+        const options = Array.from(tipoElement.options);
+        
+        // Buscar coincidencia exacta primero
+        let matchingOption = options.find(opt => opt.value.toUpperCase() === tipoValor);
+        
+        // Si no encuentra, buscar coincidencia parcial
+        if (!matchingOption) {
+            matchingOption = options.find(opt => 
+                tipoValor.includes(opt.value.toUpperCase()) ||
+                opt.value.toUpperCase().includes(tipoValor)
+            );
+        }
+        
+        if (matchingOption) {
+            tipoElement.value = matchingOption.value;
+            console.log('✅ Tipo asignado:', matchingOption.value);
+        } else {
+            // Si no hay coincidencia, agregar la opción dinámicamente
+            const newOption = document.createElement('option');
+            newOption.value = tipoValor;
+            newOption.textContent = tipoValor;
+            newOption.selected = true;
+            tipoElement.appendChild(newOption);
+            console.log('⚠️ Tipo agregado dinámicamente:', tipoValor);
+        }
+    }
+    
+    // ✅ CAMPO ESTATUS - CON EQUIVALENCIAS
+    const estatusElement = document.getElementById('estatus');
+    if (estatusElement && vehiculo.situacion) {
+        const situacionValor = vehiculo.situacion.toUpperCase().trim();
+        
+        // ✅ TABLA DE EQUIVALENCIAS (BD → FORMULARIO)
+        const equivalencias = {
+            'OPERATIVA': 'OPERATIVO',
+            'INOPERATIVA': 'INOPERATIVO',
+            'REPARACION': 'INOPERATIVO',
+            'TALLER': 'INOPERATIVO',
+            'DESINCORPORADA': 'OPERATIVO',
+            'DONACION': 'OPERATIVO',
+            'COMODATO': 'OPERATIVO',
+            'DENUNCIADA': 'INOPERATIVO'
+        };
+        
+        const estatusConvertido = equivalencias[situacionValor] || 
+                                  equivalencias[Object.keys(equivalencias).find(k => situacionValor.includes(k))] ||
+                                  situacionValor;
+        
+        const options = Array.from(estatusElement.options);
+        const matchingOption = options.find(opt => 
+            opt.value.toUpperCase() === estatusConvertido.toUpperCase()
+        );
+        
+        if (matchingOption) {
+            estatusElement.value = matchingOption.value;
+            console.log('✅ Estatus asignado:', matchingOption.value, '(desde:', situacionValor, ')');
+        } else {
+            // Agregar opción dinámicamente si no existe
+            const newOption = document.createElement('option');
+            newOption.value = estatusConvertido;
+            newOption.textContent = estatusConvertido;
+            newOption.selected = true;
+            estatusElement.appendChild(newOption);
+            console.log('⚠️ Estatus agregado dinámicamente:', estatusConvertido);
+        }
+    }
     
     // Actualizar vista previa
     actualizarVistaPrevia();
@@ -164,7 +217,7 @@ function llenarFormulario(vehiculo) {
     console.log('✅ Formulario llenado correctamente');
 }
 
-// ✅ LIMPIAR FORMULARIO COMPLETO (ANTES DE BUSCAR NUEVO)
+// ✅ LIMPIAR FORMULARIO COMPLETO
 function limpiarFormularioCompleto() {
     console.log('🧹 Limpiando formulario completo...');
     
@@ -177,7 +230,7 @@ function limpiarFormularioCompleto() {
     // ✅ LIMPIAR SELECTS (INCLUYENDO ESTATUS Y TIPO)
     const selects = document.querySelectorAll('#fichaForm select');
     selects.forEach(select => {
-        select.value = '';  // Resetear a la primera opción
+        select.value = '';
     });
     
     // Limpiar fotos
@@ -244,7 +297,6 @@ function actualizarVistaPrevia() {
         const preview = document.getElementById(previewField);
         if (element && preview) {
             preview.textContent = element.value || '';
-            // ✅ MANTENER SALTOS DE LÍNEA EN OBSERVACIONES
             if (formField === 'observaciones') {
                 preview.style.whiteSpace = 'pre-wrap';
             }
@@ -256,13 +308,11 @@ function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
         
-        // Validar que sea imagen
         if (!file.type.startsWith('image/')) {
             mostrarAlerta('⚠️ Por favor seleccione un archivo de imagen válido', 'error');
             return;
         }
         
-        // Validar tamaño (máx 5MB)
         if (file.size > 5 * 1024 * 1024) {
             mostrarAlerta('⚠️ La imagen no debe superar los 5MB', 'error');
             return;
@@ -309,16 +359,13 @@ function actualizarFotosPreview() {
 // ============================================
 
 async function guardarFicha() {
-    // ✅ SCROLL AL TOP PARA VER MENSAJES
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Validar que haya un vehículo seleccionado
     if (!vehiculoSeleccionado) {
         mostrarAlerta('⚠️ Primero debe buscar y seleccionar un vehículo', 'error');
         return;
     }
     
-    // Validar formulario
     const form = document.getElementById('fichaForm');
     if (!form.checkValidity()) {
         form.reportValidity();
@@ -326,14 +373,12 @@ async function guardarFicha() {
         return;
     }
     
-    // Validar que haya al menos una foto
     const fotosCount = Object.values(fotosData).filter(f => f !== null).length;
     if (fotosCount === 0) {
         mostrarAlerta('⚠️ Debe cargar al menos una foto del vehículo', 'error');
         return;
     }
     
-    // ✅ VERIFICAR DUPLICADOS ANTES DE GUARDAR
     const fichaExistente = await verificarFichaExistente(vehiculoSeleccionado);
     if (fichaExistente) {
         mostrarAlerta(`⚠️ Ya existe una ficha para este vehículo (Placa: ${vehiculoSeleccionado.placa}). No se permiten duplicados.`, 'error');
@@ -343,7 +388,6 @@ async function guardarFicha() {
     console.log('💾 Guardando ficha técnica...');
     
     try {
-        // ✅ SUBIR FOTOS A SUPABASE STORAGE
         const fotoUrls = [];
         const bucketName = 'fichas-tecnicas';
         
@@ -376,7 +420,6 @@ async function guardarFicha() {
             }
         }
         
-        // Preparar datos de la ficha
         const fichaData = {
             vehiculo_id: vehiculoSeleccionado.id,
             placa: vehiculoSeleccionado.placa,
@@ -408,7 +451,6 @@ async function guardarFicha() {
         
         console.log('📝 Datos a guardar:', fichaData);
         
-        // Insertar en tabla fichas_tecnicas
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .insert([fichaData])
@@ -423,7 +465,6 @@ async function guardarFicha() {
         console.log('✅ Ficha guardada:', data);
         mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
         
-        // ✅ LIMPIAR TODO DESPUÉS DE GUARDAR
         setTimeout(() => {
             limpiarTodo();
         }, 2000);
@@ -434,7 +475,6 @@ async function guardarFicha() {
     }
 }
 
-// ✅ LIMPIAR TODO DESPUÉS DE GUARDAR
 function limpiarTodo() {
     document.getElementById('searchInput').value = '';
     document.getElementById('fichaForm').reset();
@@ -486,7 +526,6 @@ function mostrarAlerta(mensaje, tipo) {
     alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
     
-    // ✅ SCROLL AL TOP PARA VER ALERTA
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     setTimeout(() => {
@@ -515,13 +554,11 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    // Event listeners para inputs (actualización en tiempo real)
     const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
     inputs.forEach(input => {
         input.addEventListener('input', actualizarVistaPrevia);
     });
     
-    // Event listeners para botones
     const btnGuardar = document.getElementById('btnGuardar');
     const btnImprimir = document.getElementById('btnImprimir');
     const btnLimpiar = document.getElementById('btnLimpiar');
@@ -539,7 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLimpiar.addEventListener('click', limpiarFormulario);
     }
     
-    // Permitir buscar con Enter
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
@@ -549,7 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Cerrar sesión
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
             if (confirm('¿Está seguro de cerrar sesión?')) {
