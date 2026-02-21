@@ -128,14 +128,29 @@ function llenarFormulario(ficha) {
         if (element && ficha[dbField]) {
             if (element.tagName === 'SELECT') {
                 const options = Array.from(element.options);
-                const matchingOption = options.find(function(opt) {
-                    return opt.value.toUpperCase() === ficha[dbField].toUpperCase();
+                const dbValue = ficha[dbField].toUpperCase().trim();
+                
+                // ✅ Búsqueda mejorada para Clase
+                let matchingOption = options.find(function(opt) {
+                    const optValue = opt.value.toUpperCase().trim();
+                    // Comparación exacta
+                    if (optValue === dbValue) return true;
+                    // Comparación sin espacios (para TRACCIONDESANGRE vs TRACCION DE SANGRE)
+                    if (optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '')) return true;
+                    return false;
                 });
+                
                 if (matchingOption) {
                     element.value = matchingOption.value;
                     console.log('✅ Select asignado:', formField, '=', matchingOption.value);
                 } else {
-                    console.log('⚠️ Opción no encontrada para:', formField, '=', ficha[dbField]);
+                    console.log('⚠️ Opción no encontrada para:', formField, '=', dbValue);
+                    // Si no encuentra, agregar la opción dinámicamente
+                    const newOption = document.createElement('option');
+                    newOption.value = dbValue;
+                    newOption.textContent = dbValue;
+                    newOption.selected = true;
+                    element.appendChild(newOption);
                 }
             } else {
                 element.value = ficha[dbField];
@@ -149,7 +164,6 @@ function llenarFormulario(ficha) {
     
     console.log('✅ Formulario llenado correctamente');
 }
-
 function cargarFotosExistentes(ficha) {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewFoto' + i);
