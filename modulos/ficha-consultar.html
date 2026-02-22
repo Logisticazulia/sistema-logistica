@@ -23,6 +23,7 @@ body {
     background: #f5f5f5;
 }
 
+/* Container con las mismas proporciones que ficha-crear */
 .container {
     max-width: 1600px;
     margin: 0 auto;
@@ -32,7 +33,7 @@ body {
     gap: 30px;
 }
 
-/* ================= SECCIÓN DE BÚSQUEDA ================= */
+/* Sección de búsqueda - igual que ficha-crear */
 .search-section {
     background: linear-gradient(135deg, #003366 0%, #004080 100%);
     padding: 25px;
@@ -136,7 +137,7 @@ body {
     gap: 5px;
 }
 
-/* ================= ALERTAS ================= */
+/* Alertas */
 .alert {
     padding: 12px 16px;
     border-radius: 6px;
@@ -163,7 +164,7 @@ body {
     border: 1px solid #bee5eb;
 }
 
-/* ================= SECCIÓN DE RESULTADOS ================= */
+/* Sección de resultados - igual que form-section en ficha-crear */
 .results-section {
     background: white;
     padding: 30px;
@@ -245,7 +246,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* ================= BOTONES ================= */
+/* Botones - igual que ficha-crear */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -294,7 +295,35 @@ body {
     box-shadow: 0 4px 8px rgba(40,167,69,0.2);
 }
 
-/* ================= MODAL ================= */
+/* Estadísticas - tamaño compacto como en ficha-crear */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-card .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #003366;
+}
+
+.stat-card .stat-label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Modal - igual que ficha-crear */
 .modal {
     display: none;
     position: fixed;
@@ -332,7 +361,7 @@ body {
     color: #003366;
 }
 
-/* ================= FICHA TÉCNICA ================= */
+/* Ficha técnica - igual que ficha-crear */
 .ficha-tecnica {
     border: 2px solid #003366;
     padding: 25px;
@@ -466,57 +495,7 @@ body {
     justify-content: flex-end;
 }
 
-/* ================= ESTADÍSTICAS ================= */
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.stat-card .stat-number {
-    font-size: 28px;
-    font-weight: 700;
-    color: #003366;
-}
-
-.stat-card .stat-label {
-    font-size: 13px;
-    color: #666;
-    margin-top: 5px;
-}
-
-/* ================= IMPRESIÓN ================= */
-@media print {
-    .navbar, .module-header, .btn, .search-section, .results-section, .modal-actions, .modal-close {
-        display: none !important;
-    }
-    
-    .modal {
-        position: absolute;
-        background: white;
-    }
-    
-    .modal-content {
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-    }
-    
-    .ficha-tecnica {
-        border: 2px solid #003366;
-    }
-}
-
-/* ================= RESPONSIVE ================= */
+/* Responsive - igual que ficha-crear */
 @media (max-width: 1200px) {
     .stats-container {
         grid-template-columns: repeat(2, 1fr);
@@ -547,6 +526,27 @@ body {
     
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media print {
+    .navbar, .module-header, .btn, .search-section, .results-section, .modal-actions, .modal-close {
+        display: none !important;
+    }
+    
+    .modal {
+        position: absolute;
+        background: white;
+    }
+    
+    .modal-content {
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+    
+    .ficha-tecnica {
+        border: 2px solid #003366;
     }
 }
 </style>
