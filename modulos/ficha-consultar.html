@@ -22,10 +22,11 @@ body {
     background: #f5f5f5;
 }
 .container {
-    /* AJUSTADO PARA COINCIDIR CON ficha-crear.html */
-    max-width: 1600px;
+    /* AJUSTADO: Más ancho para aprovechar pantallas grandes */
+    max-width: 1920px;
+    width: 98%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -33,31 +34,31 @@ body {
 /* ================= BARRA DE BÚSQUEDA ================= */
 .search-section {
     background: linear-gradient(135deg, #003366 0%, #004080 100%);
-    padding: 25px;
+    padding: 30px;
     border-radius: 8px;
     margin-bottom: 25px;
     box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
 .search-section h3 {
     color: white;
-    margin-bottom: 15px;
-    font-size: 16px;
+    margin-bottom: 20px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 .search-container {
     display: flex;
-    gap: 12px;
+    gap: 15px;
     flex-wrap: wrap;
 }
 .search-input {
     flex: 1;
-    min-width: 250px;
-    padding: 12px 16px;
+    min-width: 400px;
+    padding: 14px 18px;
     border: 2px solid rgba(255,255,255,0.3);
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
     background: rgba(255,255,255,0.95);
     transition: all 0.3s ease;
 }
@@ -70,12 +71,12 @@ body {
     color: #666;
 }
 .btn-search {
-    padding: 12px 28px;
+    padding: 14px 32px;
     background: #28a745;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -95,12 +96,12 @@ body {
     transform: none;
 }
 .btn-clear {
-    padding: 12px 28px;
+    padding: 14px 32px;
     background: #ffc107;
     color: #000;
     border: none;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -116,10 +117,10 @@ body {
 }
 .search-hint {
     color: rgba(255,255,255,0.9);
-    font-size: 13px;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-top: 15px;
     display: flex;
-    gap: 20px;
+    gap: 25px;
     flex-wrap: wrap;
 }
 .search-hint span {
@@ -130,33 +131,35 @@ body {
 /* ================= LISTA DE FICHAS ================= */
 .fichas-section {
     background: white;
-    padding: 30px;
+    padding: 35px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .fichas-section h2 {
     color: #003366;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
     border-bottom: 3px solid #003366;
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 22px;
 }
 .fichas-list {
     display: grid;
-    gap: 15px;
+    gap: 20px;
 }
 .ficha-item {
     background: #f8f9fa;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
-    padding: 20px;
+    padding: 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    /* AJUSTADO: Columnas más anchas para escritorio */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
 }
 .ficha-item:hover {
     border-color: #003366;
@@ -174,29 +177,30 @@ body {
     gap: 5px;
 }
 .ficha-field-label {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 .ficha-field-value {
-    font-size: 14px;
+    font-size: 16px;
     color: #003366;
-    font-weight: 500;
+    font-weight: 600;
 }
 .ficha-date {
-    font-size: 12px;
+    font-size: 13px;
     color: #999;
     grid-column: 1 / -1;
     text-align: right;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
     border-top: 1px solid #e0e0e0;
 }
 /* ================= VISTA DE FICHA ================= */
 .ficha-view-section {
     background: white;
-    padding: 30px;
+    padding: 40px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: none;
@@ -208,26 +212,26 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
     border-bottom: 3px solid #003366;
 }
 .ficha-view-title {
     color: #003366;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
 }
 .ficha-view-actions {
     display: flex;
-    gap: 10px;
+    gap: 15px;
 }
 .btn {
-    padding: 12px 24px;
+    padding: 14px 28px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -260,104 +264,110 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-/* ================= FICHA TÉCNICA PREVIEW ================= */
+/* ================= FICHA TÉCNICA PREVIEW - ESTIRADA ================= */
 .ficha-tecnica {
     border: 2px solid #003366;
-    padding: 25px;
+    padding: 35px;
     background: white;
-    width: 95%;
-    max-width: 1500px;
-    display: inline-block;
+    /* AJUSTADO: Más ancho para aprovechar la pantalla */
+    width: 100%;
+    max-width: 1850px;
+    display: block;
     text-align: left;
 }
 .ficha-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
     border-bottom: 2px solid #003366;
 }
 .ficha-logo {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .ficha-title {
     text-align: center;
     flex: 1;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 .ficha-title h1 {
-    font-size: 15px;
+    font-size: 17px;
     color: #003366;
-    margin-bottom: 5px;
-    line-height: 1.4;
+    margin-bottom: 8px;
+    line-height: 1.5;
     font-weight: 700;
 }
 .ficha-title h2 {
-    font-size: 18px;
+    font-size: 20px;
     color: #003366;
-    margin: 5px 0;
+    margin: 8px 0;
     font-weight: 700;
 }
 .ficha-title h3 {
-    font-size: 16px;
+    font-size: 18px;
     color: #003366;
-    margin-top: 5px;
+    margin-top: 8px;
     font-weight: 700;
 }
 .ficha-logo-right {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .ficha-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     table-layout: fixed;
 }
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 12px 10px;
+    padding: 15px 12px;
     text-align: left;
-    font-size: 13px;
+    font-size: 14px;
     border: 2px solid #003366;
     font-weight: 700;
 }
 .ficha-table td {
-    padding: 10px 8px;
+    padding: 12px 10px;
     border: 2px solid #003366;
-    font-size: 12px;
+    font-size: 13px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: top;
+    line-height: 1.5;
 }
 .ficha-table .label {
     font-weight: 700;
     background: #f0f0f0;
-    width: 18%;
+    /* AJUSTADO: Etiquetas un poco más estrechas para dar más espacio a valores */
+    width: 15%;
 }
 .ficha-table .value {
-    width: 32%;
+    /* AJUSTADO: Valores más anchos */
+    width: 35%;
 }
 .fotos-container {
     display: grid;
+    /* 4 columnas más anchas */
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-top: 15px;
+    gap: 15px;
+    margin-top: 20px;
     width: 100%;
 }
 .foto-box {
     border: 2px solid #4a7c9b;
-    height: 140px;
+    /* AJUSTADO: Más altas */
+    height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #4a7c9b;
     color: white;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
     border-radius: 4px;
     overflow: hidden;
     width: 100%;
@@ -369,23 +379,25 @@ body {
     display: none;
 }
 .observaciones-box {
-    min-height: 260px;
+    /* AJUSTADO: Más alta para más contenido */
+    min-height: 320px;
     border: 2px solid #003366;
-    padding: 12px;
+    padding: 15px;
     background: #fafafa;
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.6;
     border-radius: 4px;
     color: #000000 !important;
     white-space: pre-wrap;
 }
 /* ================= ALERTAS ================= */
 .alert {
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 6px;
     margin: 15px 0;
     display: none;
     font-weight: 500;
+    font-size: 15px;
 }
 .alert-success {
     background: #d4edda;
@@ -417,13 +429,25 @@ body {
         width: 100%;
     }
 }
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .container {
-        max-width: 100%;
-        padding: 15px;
+        max-width: 1400px;
+        width: 95%;
+    }
+    .ficha-tecnica {
+        max-width: 1350px;
     }
     .ficha-item {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+        padding: 20px;
+    }
+    .search-input {
+        min-width: 300px;
     }
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
@@ -449,7 +473,10 @@ body {
     }
     .ficha-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+    }
+    .ficha-logo, .ficha-logo-right {
+        width: 100px;
     }
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
@@ -462,6 +489,9 @@ body {
     .ficha-view-actions {
         width: 100%;
         justify-content: center;
+    }
+    .ficha-tecnica {
+        padding: 20px;
     }
 }
 </style>
