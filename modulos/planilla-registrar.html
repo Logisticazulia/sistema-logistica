@@ -449,24 +449,23 @@ body {
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>Situación</label>
-<select id="situacion" name="situacion" class="form-select">
-<option value="">Seleccione...</option>
-<option value="OPERATIVA">OPERATIVA</option>
-<option value="INOPERATIVA">INOPERATIVA</option>
-<option value="REPARACION">REPARACION</option>
-<option value="TALLER">TALLER</option>
-<option value="DESINCORPORADA">DESINCORPORADA</option>
-</select>
+<div class="form-group">
+<label>Situación <span class="required">*</span></label>
+ <select id="situacion" name="situacion" class="form-select" required>
+        <option value="">Seleccione...</option>
+        <option value="REPARACION">REPARACION</option>
+        <option value="TALLER">TALLER</option>
+        <option value="DESINCORPORADA">DESINCORPORADA</option>
+    </select>
 </div>
 <div class="form-group">
-<label>Estatus</label>
-<select id="estatus" name="estatus" class="form-select">
-<option value="">Seleccione...</option>
-<option value="OPERATIVA">OPERATIVA</option>
-<option value="INOPERATIVA">INOPERATIVA</option>
-<option value="DESINCORPORADA">DESINCORPORADA</option>
-</select>
+    <label>Estatus <span class="required">*</span></label>
+    <select id="estatus" name="estatus" class="form-select" required>
+        <option value="">Seleccione...</option>
+        <option value="OPERATIVA">OPERATIVA</option>
+        <option value="INOPERATIVA">INOPERATIVA</option>
+        <option value="DESINCORPORADA">DESINCORPORADA</option>
+    </select>
 </div>
 </div>
 </div>
