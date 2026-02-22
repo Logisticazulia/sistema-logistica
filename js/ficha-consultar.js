@@ -14,42 +14,28 @@ let fichaSeleccionada = null;
 // ============================================
 // FUNCIONES DE BÚSQUEDA
 // ============================================
-
 async function buscarFichas() {
-    const placa = document.getElementById('searchPlaca').value.trim().toUpperCase();
-    const facsimil = document.getElementById('searchFacsimil').value.trim().toUpperCase();
-    const serialCarroceria = document.getElementById('searchSerialCarroceria').value.trim().toUpperCase();
-    const serialMotor = document.getElementById('searchSerialMotor').value.trim().toUpperCase();
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.trim().toUpperCase();
     
-    if (!placa && !facsimil && !serialCarroceria && !serialMotor) {
-        mostrarAlerta('⚠️ Por favor ingrese al menos un criterio de búsqueda', 'error');
+    if (!searchTerm) {
+        mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
-    console.log('🔍 Buscando fichas técnicas...');
+    console.log('🔍 Buscando fichas técnicas:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
     const btnSearch = document.getElementById('btnSearch');
     btnSearch.disabled = true;
     
     try {
-        let query = supabaseClient
+        // Buscar en placa, facsimilar, serial carroceria y serial motor
+        const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
+            .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm}`)
             .order('created_at', { ascending: false });
-        
-        // Construir condiciones de búsqueda
-        const condiciones = [];
-        if (placa) condiciones.push(`placa.ilike.%${placa}%`);
-        if (facsimil) condiciones.push(`facsimil.ilike.%${facsimil}%`);
-        if (serialCarroceria) condiciones.push(`s_carroceria.ilike.%${serialCarroceria}%`);
-        if (serialMotor) condiciones.push(`s_motor.ilike.%${serialMotor}%`);
-        
-        if (condiciones.length > 0) {
-            query = query.or(condiciones.join(','));
-        }
-        
-        const { data, error } = await query;
         
         if (error) {
             console.error('❌ Error en la búsqueda:', error);
@@ -58,7 +44,7 @@ async function buscarFichas() {
         }
         
         if (!data || data.length === 0) {
-            mostrarAlerta('❌ No se encontraron fichas técnicas con los criterios especificados', 'error');
+            mostrarAlerta('❌ No se encontró ninguna ficha técnica con: ' + searchTerm, 'error');
             fichasEncontradas = [];
             document.getElementById('fichasList').innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #666;">
@@ -82,6 +68,18 @@ async function buscarFichas() {
     }
 }
 
+function limpiarBusqueda() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchAlert').style.display = 'none';
+    fichasEncontradas = [];
+    fichaSeleccionada = null;
+    document.getElementById('fichasList').innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <p>🔍 Realice una búsqueda para ver las fichas disponibles</p>
+        </div>
+    `;
+    document.getElementById('fichaViewSection').classList.remove('active');
+}
 // ============================================
 // RENDERIZAR LISTA DE FICHAS
 // ============================================
@@ -386,4 +384,13 @@ async function cargarUsuario() {
     } catch (error) {
         console.error('Error al cargar usuario:', error);
     }
+}
+// Permitir buscar con Enter
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            buscarFichas();
+        }
+    });
 }
