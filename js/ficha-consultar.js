@@ -1,35 +1,76 @@
 // ============================================
-// CONSULTAR FICHA TÉCNICA DE VEHÍCULOS - LÓGICA
+// CONSULTAR FICHA TÉCNICA - LÓGICA CORREGIDA
 // ============================================
 
-// Base de datos de vehículos
 let vehiculosDB = [];
 let vehiculoSeleccionado = null;
 
-// ============================================
-// CARGA DE DATOS DESDE CSV
-// ============================================
-
+// Cargar base de datos al iniciar
 async function cargarBaseDeDatos() {
     try {
+        console.log('🔄 Intentando cargar base de datos...');
+        
         // Intentar cargar desde localStorage primero
         const stored = localStorage.getItem('vehiculosDB');
-        if (stored) {
+        const storedTime = localStorage.getItem('vehiculosDB_time');
+        const now = new Date().getTime();
+        
+        // Si hay datos en localStorage y tienen menos de 5 minutos, usarlos
+        if (stored && storedTime && (now - storedTime) < 300000) {
             vehiculosDB = JSON.parse(stored);
             console.log('✅ Base de datos cargada desde localStorage:', vehiculosDB.length, 'vehículos');
+            if (vehiculosDB.length > 0) {
+                mostrarResultados(vehiculosDB);
+            }
             return;
         }
         
-        // Cargar desde CSV con el nombre correcto de tu tabla
-        const response = await fetch('../data/fichas_tecnicas_rows.csv');
-        if (!response.ok) throw new Error('CSV no encontrado');
+        // Cargar desde CSV - Probar diferentes rutas
+        const posiblesRutas = [
+            '../data/fichas_tecnicas_rows.csv',
+            '../../data/fichas_tecnicas_rows.csv',
+            'data/fichas_tecnicas_rows.csv',
+            './fichas_tecnicas_rows.csv'
+        ];
         
-        const csvText = await response.text();
+        let csvText = null;
+        let rutaUsada = null;
+        
+        for (const ruta of posiblesRutas) {
+            try {
+                console.log(`🔍 Probando ruta: ${ruta}`);
+                const response = await fetch(ruta);
+                if (response.ok) {
+                    csvText = await response.text();
+                    rutaUsada = ruta;
+                    console.log(`✅ CSV cargado desde: ${ruta}`);
+                    break;
+                }
+            } catch (e) {
+                console.log(`❌ Falló ruta: ${ruta}`);
+                continue;
+            }
+        }
+        
+        if (!csvText) {
+            throw new Error('No se pudo cargar el CSV desde ninguna ruta');
+        }
+        
+        // Parsear CSV
         vehiculosDB = parseCSV(csvText);
+        console.log(`✅ ${vehiculosDB.length} vehículos cargados desde CSV`);
         
-        // Guardar en localStorage para futuras consultas
+        if (vehiculosDB.length > 0) {
+            console.log('📋 Primer vehículo:', vehiculosDB[0]);
+        }
+        
+        // Guardar en localStorage
         localStorage.setItem('vehiculosDB', JSON.stringify(vehiculosDB));
-        console.log('✅ Base de datos cargada desde CSV:', vehiculosDB.length, 'vehículos');
+        localStorage.setItem('vehiculosDB_time', now.toString());
+        
+        // Mostrar todos los vehículos al cargar
+        mostrarResultados(vehiculosDB);
+        
     } catch (error) {
         console.error('❌ Error al cargar base de datos:', error);
         mostrarAlerta('⚠️ No se pudo cargar la base de datos', 'error');
@@ -38,12 +79,26 @@ async function cargarBaseDeDatos() {
 
 // Parsear CSV
 function parseCSV(csvText) {
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const result = [];
+    if (!csvText || csvText.trim() === '') {
+        console.error('❌ CSV vacío o nulo');
+        return [];
+    }
     
+    const lines = csvText.trim().split('\n');
+    console.log(`📄 Total de líneas en CSV: ${lines.length}`);
+    
+    if (lines.length < 2) {
+        console.error('❌ CSV sin datos válidos');
+        return [];
+    }
+    
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    console.log('📋 Headers:', headers);
+    
+    const result = [];
     for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
+        
         const values = parseCSVLine(lines[i]);
         const obj = {};
         headers.forEach((header, index) => {
@@ -51,10 +106,12 @@ function parseCSV(csvText) {
         });
         result.push(obj);
     }
+    
+    console.log(`✅ ${result.length} registros parseados correctamente`);
     return result;
 }
 
-// Parsear línea CSV con soporte para comillas
+// Parsear línea CSV
 function parseCSVLine(line) {
     const result = [];
     let current = '';
@@ -75,33 +132,42 @@ function parseCSVLine(line) {
     return result;
 }
 
-// ============================================
-// BÚSQUEDA DE VEHÍCULOS
-// ============================================
-
+// Buscar vehículo
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchTerm = searchInput.value.trim().toUpperCase();
+    
+    console.log('🔍 Término de búsqueda:', searchTerm);
     
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
+    // Cargar base de datos si no está cargada
     if (vehiculosDB.length === 0) {
         mostrarAlerta('⏳ Cargando base de datos...', 'info');
         await cargarBaseDeDatos();
     }
     
-    // Buscar usando los nombres exactos del CSV fichas_tecnicas
-    const resultados = vehiculosDB.filter(v =>
-        (v.placa && v.placa.toUpperCase().includes(searchTerm)) ||
-        (v.facsimil && v.facsimil.toUpperCase().includes(searchTerm)) ||
-        (v.s_carroceria && v.s_carroceria.toUpperCase().includes(searchTerm)) ||
-        (v.s_motor && v.s_motor.toUpperCase().includes(searchTerm)) ||
-        (v.marca && v.marca.toUpperCase().includes(searchTerm)) ||
-        (v.modelo && v.modelo.toUpperCase().includes(searchTerm))
-    );
+    // Buscar en todos los campos
+    const resultados = vehiculosDB.filter(v => {
+        const match = 
+            (v.placa && v.placa.toUpperCase().includes(searchTerm)) ||
+            (v.facsimil && v.facsimil.toUpperCase().includes(searchTerm)) ||
+            (v.s_carroceria && v.s_carroceria.toUpperCase().includes(searchTerm)) ||
+            (v.s_motor && v.s_motor.toUpperCase().includes(searchTerm)) ||
+            (v.marca && v.marca.toUpperCase().includes(searchTerm)) ||
+            (v.modelo && v.modelo.toUpperCase().includes(searchTerm));
+        
+        if (match) {
+            console.log('✅ Vehículo encontrado:', v.placa, v.marca, v.modelo);
+        }
+        
+        return match;
+    });
+    
+    console.log(`📊 Total de resultados: ${resultados.length}`);
     
     if (resultados.length > 0) {
         mostrarResultados(resultados);
@@ -116,11 +182,18 @@ async function buscarVehiculo() {
 function mostrarResultados(resultados) {
     const tbody = document.getElementById('resultsBody');
     
+    if (!tbody) {
+        console.error('❌ No se encontró el tbody con id "resultsBody"');
+        return;
+    }
+    
+    console.log(`📋 Mostrando ${resultados.length} resultados en la tabla`);
+    
     if (resultados.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                    📭 No se encontraron vehículos.
+                    📭 No hay vehículos registrados. Realice una búsqueda.
                 </td>
             </tr>
         `;
@@ -155,22 +228,24 @@ function mostrarResultados(resultados) {
     });
     
     tbody.innerHTML = html;
+    console.log('✅ Tabla actualizada correctamente');
 }
 
-// ============================================
-// VISTA DETALLADA (MODAL)
-// ============================================
-
+// Ver ficha detallada
 function verFicha(index) {
+    // Buscar el vehículo en la base de datos completa, no solo en los resultados filtrados
     const vehiculo = vehiculosDB[index];
+    
     if (!vehiculo) {
+        console.error('❌ Vehículo no encontrado en índice:', index);
         mostrarAlerta('❌ Error al cargar ficha', 'error');
         return;
     }
     
+    console.log('👁️ Mostrando ficha de:', vehiculo.placa);
     vehiculoSeleccionado = vehiculo;
     
-    // Mapeo exacto de campos del CSV fichas_tecnicas
+    // Llenar modal con datos
     document.getElementById('modalMarca').textContent = vehiculo.marca || 'N/A';
     document.getElementById('modalModelo').textContent = vehiculo.modelo || 'N/A';
     document.getElementById('modalTipo').textContent = vehiculo.tipo || 'N/A';
@@ -207,28 +282,33 @@ function verFicha(index) {
         estatusEl.style.borderRadius = '4px';
     }
     
-    // Cargar fotos usando foto1_url, foto2_url, etc. del CSV
+    // Cargar fotos
     cargarFotosModal(vehiculo);
     
+    // Mostrar modal
     document.getElementById('fichaModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
 
-// Cargar fotos desde URLs de Supabase (foto1_url, foto2_url, etc.)
+// Cargar fotos
 function cargarFotosModal(vehiculo) {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('modalImg' + i);
         const box = document.getElementById('modalBox' + i);
         const span = box.querySelector('span');
         
-        // Usar las columnas foto1_url, foto2_url, etc. del CSV
+        // Usar foto1_url, foto2_url, etc. del CSV
         const fotoUrl = vehiculo[`foto${i}_url`];
+        
+        console.log(`📸 Foto ${i}:`, fotoUrl);
         
         if (fotoUrl && fotoUrl.trim() !== '' && fotoUrl !== 'null') {
             img.src = fotoUrl;
             img.style.display = 'block';
             span.style.display = 'none';
+            
             img.onerror = function() {
+                console.warn(`⚠️ No se pudo cargar foto ${i}:`, fotoUrl);
                 this.style.display = 'none';
                 span.style.display = 'block';
             };
@@ -254,12 +334,10 @@ function imprimirFichaDirecta(index) {
     setTimeout(() => window.print(), 500);
 }
 
-// ============================================
-// UTILIDADES
-// ============================================
-
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
+    if (!alertDiv) return;
+    
     alertDiv.textContent = mensaje;
     alertDiv.className = `alert alert-${tipo}`;
     alertDiv.style.display = 'block';
@@ -267,34 +345,44 @@ function mostrarAlerta(mensaje, tipo) {
 }
 
 function limpiarBusqueda() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('searchAlert').style.display = 'none';
-    document.getElementById('resultsBody').innerHTML = `
-        <tr>
-            <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                📭 No hay vehículos registrados.
-            </td>
-        </tr>
-    `;
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    const alertDiv = document.getElementById('searchAlert');
+    if (alertDiv) alertDiv.style.display = 'none';
+    
+    // Mostrar todos los vehículos
+    if (vehiculosDB.length > 0) {
+        mostrarResultados(vehiculosDB);
+    } else {
+        document.getElementById('resultsBody').innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
+                    📭 No hay vehículos registrados.
+                </td>
+            </tr>
+        `;
+    }
 }
 
 // Cerrar modal al hacer clic fuera
 window.onclick = function(event) {
-    if (event.target === document.getElementById('fichaModal')) {
+    const modal = document.getElementById('fichaModal');
+    if (event.target === modal) {
         cerrarModal();
     }
 }
 
-// Cerrar con tecla ESC
+// Cerrar con ESC
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') cerrarModal();
 });
 
-// ============================================
-// INICIALIZACIÓN
-// ============================================
-
+// Inicialización
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Iniciando consulta de fichas...');
+    
+    // Cargar base de datos
     cargarBaseDeDatos();
     
     // Buscar con Enter
@@ -316,36 +404,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Cargar usuario SOLO si Supabase está disponible
-    if (typeof supabase !== 'undefined' && supabase.auth) {
-        cargarUsuario();
-    }
+    console.log('✅ Sistema de consulta inicializado');
 });
-
-// Función segura para cargar usuario
-async function cargarUsuario() {
-    try {
-        if (typeof supabase === 'undefined' || !supabase.auth) {
-            console.log('⚠️ Supabase no disponible, usando usuario por defecto');
-            return;
-        }
-        
-        const { data } = await supabase.auth.getSession();
-        const session = data?.session;
-        
-        if (session?.user?.id) {
-            const {  perfilData } = await supabase
-                .from('perfiles')
-                .select('email')
-                .eq('id', session.user.id)
-                .single();
-            
-            if (perfilData?.email) {
-                document.getElementById('userEmail').textContent = perfilData.email;
-            }
-        }
-    } catch (error) {
-        console.warn('⚠️ No se pudo cargar usuario:', error.message);
-        // No romper la aplicación, continuar con usuario por defecto
-    }
-}
