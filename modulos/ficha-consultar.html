@@ -556,57 +556,202 @@ body {
     }
 }
 
-/* Impresión en horizontal */
+/* ============================================
+   ESTILOS DE IMPRESIÓN - HOJA CARTA HORIZONTAL
+   ============================================ */
 @media print {
     @page {
-        size: landscape;
-        margin: 1cm;
+        size: letter landscape;
+        margin: 0.5cm;
     }
     
     body {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        background: white !important;
+        font-size: 11px !important;
     }
     
+    /* Ocultar elementos no necesarios */
     .navbar, 
     .module-header, 
     .btn, 
     .search-section, 
     .results-section, 
     .modal-actions, 
-    .modal-close {
+    .modal-close,
+    .container > *:not(.modal) {
         display: none !important;
     }
     
+    /* Mostrar solo el modal/ficha */
     .modal {
-        position: absolute;
-        background: white;
-        padding: 0;
+        position: absolute !important;
+        background: white !important;
+        padding: 0 !important;
         display: block !important;
-        height: auto;
-        overflow: visible;
+        height: auto !important;
+        overflow: visible !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
     }
     
     .modal-content {
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        width: 100%;
-        max-width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
     }
     
+    /* Ficha técnica compacta para impresión */
     .ficha-tecnica {
-        border: 2px solid #003366;
-        padding: 20px;
-        width: 100%;
+        border: 2px solid #003366 !important;
+        padding: 15px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box;
     }
     
+    /* Header compacto */
+    .ficha-header {
+        margin-bottom: 12px !important;
+        padding-bottom: 10px !important;
+        gap: 10px !important;
+    }
+    
+    .ficha-logo,
+    .ficha-logo-right {
+        width: 80px !important;
+        height: auto !important;
+    }
+    
+    .ficha-title {
+        padding: 0 10px !important;
+    }
+    
+    .ficha-title h1 {
+        font-size: 12px !important;
+        margin-bottom: 3px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .ficha-title h2 {
+        font-size: 14px !important;
+        margin: 3px 0 !important;
+    }
+    
+    .ficha-title h3 {
+        font-size: 12px !important;
+        margin-top: 3px !important;
+    }
+    
+    /* Tabla compacta */
+    .ficha-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 10px !important;
+        table-layout: fixed !important;
+        font-size: 10px !important;
+    }
+    
+    .ficha-table th {
+        background: #4a7c9b !important;
+        color: white !important;
+        padding: 6px 5px !important;
+        text-align: left !important;
+        font-size: 10px !important;
+        border: 1px solid #003366 !important;
+        font-weight: 700 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .ficha-table td {
+        padding: 5px 4px !important;
+        border: 1px solid #003366 !important;
+        font-size: 10px !important;
+        line-height: 1.3 !important;
+        vertical-align: top !important;
+    }
+    
+    .ficha-table .label {
+        font-weight: 700 !important;
+        background: #f0f0f0 !important;
+        width: 16% !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .ficha-table .value {
+        width: 34% !important;
+    }
+    
+    /* Observaciones más compactas */
+    .observaciones-box {
+        min-height: 180px !important;
+        border: 1px solid #003366 !important;
+        padding: 8px !important;
+        background: #fafafa !important;
+        font-size: 10px !important;
+        line-height: 1.4 !important;
+        border-radius: 3px !important;
+        overflow: hidden !important;
+    }
+    
+    /* Fotos más pequeñas para impresión */
     .fotos-container {
-        grid-template-columns: repeat(4, 1fr);
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+        margin-top: 10px !important;
+        width: 100% !important;
     }
     
     .foto-box {
-        height: 140px;
+        border: 1px solid #4a7c9b !important;
+        height: 100px !important;  /* Reducido de 140px */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #4a7c9b !important;
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        border-radius: 3px !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .foto-box img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+    
+    .foto-box span {
+        display: none !important;  /* Ocultar placeholder al imprimir */
+    }
+    
+    /* Footer de la ficha */
+    .ficha-table tr:last-child td {
+        font-size: 9px !important;
+        padding-top: 8px !important;
+        border: none !important;
+    }
+    
+    /* Ajuste para que el estatus se vea bien */
+    #modalEstatus {
+        font-size: 11px !important;
+        padding: 4px 8px !important;
+        border-radius: 3px !important;
+        display: inline-block !important;
     }
 }
 </style>
