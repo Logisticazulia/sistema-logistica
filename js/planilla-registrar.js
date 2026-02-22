@@ -93,19 +93,17 @@ function showAlert(type, message) {
 }
 
 function validarFormulario() {
-    const camposObligatorios = ['placa', 'marca', 'modelo', 'tipo', 'clase'];
+    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase'];
     let isValid = true;
     let mensajeError = '';
     
     camposObligatorios.forEach(campo => {
         const input = document.getElementById(campo);
-        if (input && !input.value.trim()) {
+        if (!input.value.trim()) {
             isValid = false;
             input.style.borderColor = '#dc2626';
-            const label = input.previousElementSibling;
-            const campoNombre = label ? label.textContent.replace('*', '').trim() : campo;
-            mensajeError = `El campo "${campoNombre}" es obligatorio`;
-        } else if (input) {
+            mensajeError = `El campo "${input.previousElementSibling.textContent.replace('*', '')}" es obligatorio`;
+        } else {
             input.style.borderColor = '#ddd';
         }
     });
@@ -113,10 +111,8 @@ function validarFormulario() {
     if (!isValid) {
         showAlert('error', mensajeError);
     }
-    
     return isValid;
 }
-
 async function validarCampoUnico(campo, valor) {
     const input = document.getElementById(campo);
     if (!input) return true;
@@ -210,17 +206,16 @@ async function validarTodosCamposUnicos() {
     
     for (const campo of CAMPOS_UNICOS) {
         const input = document.getElementById(campo);
-        if (input) {
-            const valor = limpiarTexto(input.value);
-            if (valor) {
-                const esValido = await validarCampoUnico(campo, valor);
-                if (!esValido) {
-                    todosValidos = false;
-                }
+        const valor = input.value.trim().toUpperCase();
+        
+        // 🔹 Solo validar si el usuario ingresó un valor
+        if (valor) {
+            const esValido = await validarCampoUnico(campo, valor);
+            if (!esValido) {
+                todosValidos = false;
             }
         }
     }
-    
     return todosValidos;
 }
 
