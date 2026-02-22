@@ -506,8 +506,8 @@ placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>S/Carrocería</label>
-<input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN" disabled>
+  <label>S/Carrocería <span class="required">*</span></label>
+  <input type="text" id="s_carroceria" name="s_carroceria" class="form-input" placeholder="VIN" required disabled>
 </div>
 <div class="form-group">
 <label>S/Motor</label>
@@ -523,24 +523,22 @@ placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>Situación</label>
-<select id="situacion" name="situacion" class="form-select" disabled>
-<option value="">Seleccione...</option>
-<option value="OPERATIVA">OPERATIVA</option>
-<option value="INOPERATIVA">INOPERATIVA</option>
-<option value="REPARACION">REPARACION</option>
-<option value="TALLER">TALLER</option>
-<option value="DESINCORPORADA">DESINCORPORADA</option>
-</select>
+    <label>Situación <span class="required">*</span></label>
+    <select id="situacion" name="situacion" class="form-select" required disabled>
+        <option value="">Seleccione...</option>
+        <option value="REPARACION">REPARACION</option>
+        <option value="TALLER">TALLER</option>
+        <option value="DESINCORPORADA">DESINCORPORADA</option>
+    </select>
 </div>
 <div class="form-group">
-<label>Estatus</label>
-<select id="estatus" name="estatus" class="form-select" disabled>
-<option value="">Seleccione...</option>
-<option value="OPERATIVA">OPERATIVA</option>
-<option value="INOPERATIVA">INOPERATIVA</option>
-<option value="DESINCORPORADA">DESINCORPORADA</option>
-</select>
+    <label>Estatus <span class="required">*</span></label>
+    <select id="estatus" name="estatus" class="form-select" required disabled>
+        <option value="">Seleccione...</option>
+        <option value="OPERATIVA">OPERATIVA</option>
+        <option value="INOPERATIVA">INOPERATIVA</option>
+        <option value="DESINCORPORADA">DESINCORPORADA</option>
+    </select>
 </div>
 </div>
 </div>
@@ -555,7 +553,7 @@ placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>Placa <span class="required">*</span></label>
+<label>Placa</label>
 <input type="text" id="placa" name="placa" class="form-input" placeholder="AB123CD" required disabled>
 </div>
 <div class="form-group">
@@ -576,15 +574,15 @@ placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>Marca <span class="required">*</span></label>
+<label>Marca</label>
 <input type="text" id="marca" name="marca" class="form-input" placeholder="TOYOTA" required disabled>
 </div>
 <div class="form-group">
-<label>Modelo <span class="required">*</span></label>
+<label>Modelo</label>
 <input type="text" id="modelo" name="modelo" class="form-input" placeholder="HILUX" required disabled>
 </div>
 <div class="form-group">
-<label>Tipo <span class="required">*</span></label>
+<label>Tipo</label>
 <select id="tipo" name="tipo" class="form-select" required disabled>
 <option value="">Seleccione...</option>
 <option value="AUTOMOVIL">AUTOMOVIL</option>
@@ -603,7 +601,7 @@ placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
 </select>
 </div>
 <div class="form-group">
-<label>Clase <span class="required">*</span></label>
+<label>Clase</label>
 <select id="clase" name="clase" class="form-select" required disabled>
 <option value="">Seleccione...</option>
 <option value="AUTOBUS">AUTOBUS</option>
@@ -635,7 +633,7 @@ placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
 </div>
 <div class="form-fields-grid">
 <div class="form-group">
-<label>Unidad Administrativa <span class="required">*</span></label>
+<label>Unidad Administrativa</label>
 <select id="unidad_administrativa" name="unidad_administrativa" class="form-select" required disabled>
 <option value="">Seleccione...</option>
 <option value="NO">NO</option>
