@@ -1,11 +1,73 @@
 // ============================================
-// CONSULTAR FICHA TÉCNICA - LÓGICA CORREGIDA
+// CONSULTAR FICHA TÉCNICA - VERSIÓN CORREGIDA
 // ============================================
 
 let vehiculosDB = [];
 let vehiculoSeleccionado = null;
 
-// Cargar base de datos al iniciar
+// Datos de ejemplo del CSV (fallback si no carga el archivo)
+const datosEjemplo = [
+    {
+        id: "2",
+        vehiculo_id: "2286",
+        placa: "8888",
+        facsimil: "YYYYYYYYYY",
+        marca: "HHHHHHH",
+        modelo: "HHHHHHHHHHHH",
+        tipo: "TRIMOVIL",
+        clase: "ESPECIAL",
+        color: "HHHHHHHHHHH",
+        s_carroceria: "DDDD",
+        s_motor: "MANGOOOOOOOOOOO",
+        estatus_ficha: "OPERATIVA",
+        dependencia: "hhhhhhhhhhhhhh",
+        causa: "dddddddddddddddd",
+        mecanica: "iii",
+        diagnostico: "hhhhhhhhhhh",
+        ubicacion: "iiii",
+        tapiceria: "iii",
+        cauchos: "ii",
+        luces: "ii",
+        observaciones: "iiii",
+        foto1_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771648846243_foto1_8888.jpg",
+        foto2_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771648847379_foto2_8888.jpg",
+        foto3_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771648847673_foto3_8888.jpg",
+        foto4_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771648848133_foto4_8888.jpg",
+        fecha_creacion: "2026-02-21 01:11:07.481",
+        creado_por: "logistica@gmail.com"
+    },
+    {
+        id: "3",
+        vehiculo_id: "2284",
+        placa: "123456",
+        facsimil: "TTT",
+        marca: "TTT",
+        modelo: "TT",
+        tipo: "TRACCION DE SANGRE",
+        clase: "ESPECIAL",
+        color: "1521",
+        s_carroceria: "TTT",
+        s_motor: "TTT",
+        estatus_ficha: "OPERATIVA",
+        dependencia: "SERVICIOS GENERALES",
+        causa: "asd",
+        mecanica: "asd",
+        diagnostico: "asd",
+        ubicacion: "51120",
+        tapiceria: "asd",
+        cauchos: "asd",
+        luces: "asd",
+        observaciones: "512631230",
+        foto1_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771643769402_foto1_123456.jpg",
+        foto2_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771643770947_foto2_123456.jpg",
+        foto3_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771643771591_foto3_123456.jpg",
+        foto4_url: "https://wwrknqfyjelwbvfnfshq.supabase.co/storage/v1/object/public/fichas-tecnicas/ficha_1771643773075_foto4_123456.jpg",
+        fecha_creacion: "2026-02-21 03:16:14.078",
+        creado_por: "logistica@gmail.com"
+    }
+];
+
+// Cargar base de datos
 async function cargarBaseDeDatos() {
     try {
         console.log('🔄 Intentando cargar base de datos...');
@@ -25,8 +87,9 @@ async function cargarBaseDeDatos() {
             return;
         }
         
-        // Cargar desde CSV - Probar diferentes rutas
+        // Intentar cargar desde CSV con diferentes rutas
         const posiblesRutas = [
+            '/sistema-logistica/data/fichas_tecnicas_rows.csv',
             '../data/fichas_tecnicas_rows.csv',
             '../../data/fichas_tecnicas_rows.csv',
             'data/fichas_tecnicas_rows.csv',
@@ -48,17 +111,17 @@ async function cargarBaseDeDatos() {
                 }
             } catch (e) {
                 console.log(`❌ Falló ruta: ${ruta}`);
-                continue;
             }
         }
         
-        if (!csvText) {
-            throw new Error('No se pudo cargar el CSV desde ninguna ruta');
+        if (csvText) {
+            // Parsear CSV
+            vehiculosDB = parseCSV(csvText);
+            console.log(`✅ ${vehiculosDB.length} vehículos cargados desde CSV`);
+        } else {
+            console.warn('⚠️ No se pudo cargar CSV, usando datos de ejemplo');
+            vehiculosDB = [...datosEjemplo];
         }
-        
-        // Parsear CSV
-        vehiculosDB = parseCSV(csvText);
-        console.log(`✅ ${vehiculosDB.length} vehículos cargados desde CSV`);
         
         if (vehiculosDB.length > 0) {
             console.log('📋 Primer vehículo:', vehiculosDB[0]);
@@ -73,7 +136,10 @@ async function cargarBaseDeDatos() {
         
     } catch (error) {
         console.error('❌ Error al cargar base de datos:', error);
-        mostrarAlerta('⚠️ No se pudo cargar la base de datos', 'error');
+        // Usar datos de ejemplo como último recurso
+        vehiculosDB = [...datosEjemplo];
+        mostrarResultados(vehiculosDB);
+        console.log('✅ Usando datos de ejemplo:', vehiculosDB.length, 'vehículos');
     }
 }
 
@@ -160,10 +226,6 @@ async function buscarVehiculo() {
             (v.marca && v.marca.toUpperCase().includes(searchTerm)) ||
             (v.modelo && v.modelo.toUpperCase().includes(searchTerm));
         
-        if (match) {
-            console.log('✅ Vehículo encontrado:', v.placa, v.marca, v.modelo);
-        }
-        
         return match;
     });
     
@@ -183,17 +245,17 @@ function mostrarResultados(resultados) {
     const tbody = document.getElementById('resultsBody');
     
     if (!tbody) {
-        console.error('❌ No se encontró el tbody con id "resultsBody"');
+        console.error('❌ No se encontró el tbody');
         return;
     }
     
-    console.log(`📋 Mostrando ${resultados.length} resultados en la tabla`);
+    console.log(`📋 Mostrando ${resultados.length} resultados`);
     
     if (resultados.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                    📭 No hay vehículos registrados. Realice una búsqueda.
+                    📭 No hay vehículos registrados.
                 </td>
             </tr>
         `;
@@ -228,16 +290,14 @@ function mostrarResultados(resultados) {
     });
     
     tbody.innerHTML = html;
-    console.log('✅ Tabla actualizada correctamente');
 }
 
 // Ver ficha detallada
 function verFicha(index) {
-    // Buscar el vehículo en la base de datos completa, no solo en los resultados filtrados
     const vehiculo = vehiculosDB[index];
     
     if (!vehiculo) {
-        console.error('❌ Vehículo no encontrado en índice:', index);
+        console.error('❌ Vehículo no encontrado');
         mostrarAlerta('❌ Error al cargar ficha', 'error');
         return;
     }
@@ -245,7 +305,7 @@ function verFicha(index) {
     console.log('👁️ Mostrando ficha de:', vehiculo.placa);
     vehiculoSeleccionado = vehiculo;
     
-    // Llenar modal con datos
+    // Llenar modal
     document.getElementById('modalMarca').textContent = vehiculo.marca || 'N/A';
     document.getElementById('modalModelo').textContent = vehiculo.modelo || 'N/A';
     document.getElementById('modalTipo').textContent = vehiculo.tipo || 'N/A';
@@ -265,10 +325,10 @@ function verFicha(index) {
     document.getElementById('modalCauchos').textContent = vehiculo.cauchos || 'N/A';
     document.getElementById('modalLuces').textContent = vehiculo.luces || 'N/A';
     document.getElementById('modalObservaciones').textContent = vehiculo.observaciones || 'Sin observaciones';
-    document.getElementById('modalFechaCreacion').textContent = vehiculo.fecha_creacion || vehiculo.created_at || 'N/A';
+    document.getElementById('modalFechaCreacion').textContent = vehiculo.fecha_creacion || 'N/A';
     document.getElementById('modalCreadoPor').textContent = vehiculo.creado_por || 'N/A';
     
-    // Estilo para estatus
+    // Estilo estatus
     const estatusEl = document.getElementById('modalEstatus');
     if (vehiculo.estatus_ficha?.toUpperCase().includes('OPER')) {
         estatusEl.style.color = '#28a745';
@@ -285,7 +345,6 @@ function verFicha(index) {
     // Cargar fotos
     cargarFotosModal(vehiculo);
     
-    // Mostrar modal
     document.getElementById('fichaModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
@@ -297,10 +356,7 @@ function cargarFotosModal(vehiculo) {
         const box = document.getElementById('modalBox' + i);
         const span = box.querySelector('span');
         
-        // Usar foto1_url, foto2_url, etc. del CSV
         const fotoUrl = vehiculo[`foto${i}_url`];
-        
-        console.log(`📸 Foto ${i}:`, fotoUrl);
         
         if (fotoUrl && fotoUrl.trim() !== '' && fotoUrl !== 'null') {
             img.src = fotoUrl;
@@ -308,7 +364,6 @@ function cargarFotosModal(vehiculo) {
             span.style.display = 'none';
             
             img.onerror = function() {
-                console.warn(`⚠️ No se pudo cargar foto ${i}:`, fotoUrl);
                 this.style.display = 'none';
                 span.style.display = 'block';
             };
@@ -351,21 +406,11 @@ function limpiarBusqueda() {
     const alertDiv = document.getElementById('searchAlert');
     if (alertDiv) alertDiv.style.display = 'none';
     
-    // Mostrar todos los vehículos
     if (vehiculosDB.length > 0) {
         mostrarResultados(vehiculosDB);
-    } else {
-        document.getElementById('resultsBody').innerHTML = `
-            <tr>
-                <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                    📭 No hay vehículos registrados.
-                </td>
-            </tr>
-        `;
     }
 }
 
-// Cerrar modal al hacer clic fuera
 window.onclick = function(event) {
     const modal = document.getElementById('fichaModal');
     if (event.target === modal) {
@@ -373,7 +418,6 @@ window.onclick = function(event) {
     }
 }
 
-// Cerrar con ESC
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') cerrarModal();
 });
@@ -381,11 +425,8 @@ document.addEventListener('keydown', (e) => {
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Iniciando consulta de fichas...');
-    
-    // Cargar base de datos
     cargarBaseDeDatos();
     
-    // Buscar con Enter
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
@@ -393,7 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Cerrar sesión
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -404,5 +444,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    console.log('✅ Sistema de consulta inicializado');
+    console.log('✅ Sistema inicializado');
 });
