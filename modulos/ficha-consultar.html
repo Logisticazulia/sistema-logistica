@@ -20,11 +20,15 @@
 body {
     font-family: 'Roboto', sans-serif;
     background: #f5f5f5;
+    /* Asegurar que el body ocupe el ancho disponible */
+    min-width: 320px;
 }
 .container {
-    max-width: 1600px;
+    /* AJUSTE ESCRITORIO: Ancho más amplio para monitores grandes */
+    max-width: 1920px;
+    width: 95%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -32,31 +36,33 @@ body {
 /* ================= BARRA DE BÚSQUEDA ================= */
 .search-section {
     background: linear-gradient(135deg, #003366 0%, #004080 100%);
-    padding: 25px;
+    padding: 30px;
     border-radius: 8px;
     margin-bottom: 25px;
     box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
 .search-section h3 {
     color: white;
-    margin-bottom: 15px;
-    font-size: 16px;
+    margin-bottom: 20px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 .search-container {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 15px;
+    flex-wrap: nowrap; /* En escritorio no queremos que se rompa */
+    align-items: center;
 }
 .search-input {
     flex: 1;
-    min-width: 250px;
-    padding: 12px 16px;
+    /* En escritorio mínimo 400px para que se vea bien */
+    min-width: 400px;
+    padding: 14px 18px;
     border: 2px solid rgba(255,255,255,0.3);
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
     background: rgba(255,255,255,0.95);
     transition: all 0.3s ease;
 }
@@ -69,12 +75,12 @@ body {
     color: #666;
 }
 .btn-search {
-    padding: 12px 28px;
+    padding: 14px 32px;
     background: #28a745;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -94,12 +100,12 @@ body {
     transform: none;
 }
 .btn-clear {
-    padding: 12px 28px;
+    padding: 14px 32px;
     background: #ffc107;
     color: #000;
     border: none;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -115,10 +121,10 @@ body {
 }
 .search-hint {
     color: rgba(255,255,255,0.9);
-    font-size: 13px;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-top: 15px;
     display: flex;
-    gap: 20px;
+    gap: 25px;
     flex-wrap: wrap;
 }
 .search-hint span {
@@ -135,27 +141,29 @@ body {
 }
 .fichas-section h2 {
     color: #003366;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
     border-bottom: 3px solid #003366;
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 22px;
 }
 .fichas-list {
     display: grid;
-    gap: 15px;
+    gap: 20px;
 }
 .ficha-item {
     background: #f8f9fa;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
-    padding: 20px;
+    padding: 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    /* AJUSTE ESCRITORIO: Columnas más anchas para mejor lectura */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
 }
 .ficha-item:hover {
     border-color: #003366;
@@ -173,29 +181,30 @@ body {
     gap: 5px;
 }
 .ficha-field-label {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 .ficha-field-value {
-    font-size: 14px;
+    font-size: 15px;
     color: #003366;
-    font-weight: 500;
+    font-weight: 600;
 }
 .ficha-date {
-    font-size: 12px;
+    font-size: 13px;
     color: #999;
     grid-column: 1 / -1;
     text-align: right;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
     border-top: 1px solid #e0e0e0;
 }
 /* ================= VISTA DE FICHA ================= */
 .ficha-view-section {
     background: white;
-    padding: 30px;
+    padding: 40px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: none;
@@ -207,26 +216,26 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
     border-bottom: 3px solid #003366;
 }
 .ficha-view-title {
     color: #003366;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
 }
 .ficha-view-actions {
     display: flex;
-    gap: 10px;
+    gap: 15px;
 }
 .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -262,7 +271,7 @@ body {
 /* ================= FICHA TÉCNICA PREVIEW ================= */
 .ficha-tecnica {
     border: 2px solid #003366;
-    padding: 25px;
+    padding: 30px;
     background: white;
     width: 100%;
 }
@@ -270,12 +279,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
     border-bottom: 2px solid #003366;
 }
 .ficha-logo {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .ficha-title {
@@ -284,14 +293,15 @@ body {
     padding: 0 20px;
 }
 .ficha-title h1 {
-    font-size: 15px;
+    font-size: 16px;
     color: #003366;
     margin-bottom: 5px;
     line-height: 1.4;
     font-weight: 700;
+    text-transform: uppercase;
 }
 .ficha-title h2 {
-    font-size: 18px;
+    font-size: 20px;
     color: #003366;
     margin: 5px 0;
     font-weight: 700;
@@ -303,57 +313,61 @@ body {
     font-weight: 700;
 }
 .ficha-logo-right {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .ficha-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     table-layout: fixed;
 }
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 12px 10px;
+    padding: 14px 12px;
     text-align: left;
-    font-size: 13px;
+    font-size: 14px;
     border: 2px solid #003366;
     font-weight: 700;
 }
 .ficha-table td {
-    padding: 10px 8px;
+    padding: 12px 10px;
     border: 2px solid #003366;
-    font-size: 12px;
+    font-size: 13px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: top;
+    line-height: 1.4;
 }
 .ficha-table .label {
     font-weight: 700;
     background: #f0f0f0;
-    width: 18%;
+    /* Ajuste para escritorio: etiquetas un poco más estrechas para dar espacio al valor */
+    width: 15%;
 }
 .ficha-table .value {
-    width: 32%;
+    /* Ajuste para escritorio: valores más anchos */
+    width: 35%;
 }
 .fotos-container {
     display: grid;
+    /* 4 columnas fijas para escritorio */
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-top: 15px;
+    gap: 15px;
+    margin-top: 20px;
     width: 100%;
 }
 .foto-box {
     border: 2px solid #4a7c9b;
-    height: 140px;
+    height: 160px; /* Un poco más altas en escritorio */
     display: flex;
     align-items: center;
     justify-content: center;
     background: #4a7c9b;
     color: white;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
     border-radius: 4px;
     overflow: hidden;
     width: 100%;
@@ -365,23 +379,24 @@ body {
     display: none;
 }
 .observaciones-box {
-    min-height: 260px;
+    min-height: 300px;
     border: 2px solid #003366;
-    padding: 12px;
+    padding: 15px;
     background: #fafafa;
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.6;
     border-radius: 4px;
     color: #000000 !important;
     white-space: pre-wrap;
 }
 /* ================= ALERTAS ================= */
 .alert {
-    padding: 12px 16px;
+    padding: 15px 20px;
     border-radius: 6px;
-    margin: 15px 0;
+    margin: 20px 0;
     display: none;
     font-weight: 500;
+    font-size: 15px;
 }
 .alert-success {
     background: #d4edda;
@@ -405,28 +420,73 @@ body {
     }
     .ficha-view-section {
         display: block !important;
+        box-shadow: none;
+        padding: 0;
     }
     .ficha-tecnica {
         border: 2px solid #003366;
         width: 100%;
+        box-shadow: none;
+    }
+    body {
+        background: white;
+    }
+}
+@media (max-width: 1024px) {
+    .container {
+        width: 95%;
+        padding: 20px;
+    }
+    .search-container {
+        flex-wrap: wrap;
+    }
+    .search-input {
+        min-width: 100%;
+    }
+    .ficha-item {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .fotos-container {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 @media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 15px;
+    }
     .search-container {
         flex-direction: column;
     }
     .search-input {
         min-width: 100%;
     }
+    .btn-search, .btn-clear {
+        width: 100%;
+        justify-content: center;
+    }
     .ficha-item {
         grid-template-columns: 1fr;
     }
     .ficha-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+        text-align: center;
+    }
+    .ficha-logo, .ficha-logo-right {
+        width: 80px;
     }
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
+    }
+    .ficha-view-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .ficha-view-actions {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>
@@ -434,99 +494,99 @@ body {
 <body class="dashboard-page">
 <!-- ================= BARRA DE NAVEGACIÓN ================= -->
 <nav class="navbar" role="navigation">
-    <div class="nav-container">
-        <div class="nav-brand">
-            <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-            <span class="nav-title">Sistema de Logística</span>
-        </div>
-        <div class="nav-user">
-            <span class="user-email" id="userEmail">usuario@institucion.com</span>
-            <button class="btn-logout" id="logoutBtn">
-                <span class="logout-icon">🚪</span>
-                <span class="logout-text">Cerrar Sesión</span>
-            </button>
-        </div>
-    </div>
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema de Logística</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">usuario@institucion.com</span>
+<button class="btn-logout" id="logoutBtn">
+<span class="logout-icon">🚪</span>
+<span class="logout-text">Cerrar Sesión</span>
+</button>
+</div>
+</div>
 </nav>
 <!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main" role="main">
-    <!-- Header con Navegación de Migas -->
-    <header class="module-header">
-        <div class="breadcrumb">
-            <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-            <span class="breadcrumb-separator">/</span>
-            <a href="transporte.html" class="breadcrumb-link">Transporte</a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Consultar Fichas</span>
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
-            ← Volver a Transporte
-        </button>
-    </header>
-    <!-- Título del Módulo -->
-    <section class="module-title-section">
-        <h1 class="module-title">📋 Consultar Fichas Técnicas</h1>
-        <p class="module-subtitle">Busque y visualice las fichas técnicas registradas</p>
-    </section>
-    <div class="container">
-        <!-- SECCIÓN DE BÚSQUEDA (IGUAL A ficha-modificar.html) -->
-        <div class="search-section">
-            <h3>🔍 Buscar Ficha Técnica en Base de Datos</h3>
-            <div id="searchAlert" class="alert"></div>
-            <div class="search-container">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="search-input"
-                    placeholder="Ingrese placa, facsimilar, serial de carrocería o serial de motor..."
-                    autocomplete="off"
-                >
-                <button class="btn-search" onclick="buscarFichas()" id="btnSearch">
-                    <span>🔍</span>
-                    <span>Buscar</span>
-                </button>
-                <button class="btn-clear" onclick="limpiarBusqueda()">
-                    <span>🔄</span>
-                    <span>Limpiar</span>
-                </button>
-            </div>
-            <div class="search-hint">
-                <span>💡 Busque por:</span>
-                <span>🚗 Placa</span>
-                <span>📄 Facsimilar</span>
-                <span>🔢 Serial Carrocería</span>
-                <span>⚙️ Serial Motor</span>
-            </div>
-        </div>
-        <!-- LISTA DE FICHAS TÉCNICAS REGISTRADAS -->
-        <div class="fichas-section">
-            <h2>📄 Fichas Técnicas Registradas</h2>
-            <div id="fichasList" class="fichas-list">
-                <div style="text-align: center; padding: 40px; color: #666;">
-                    <p>🔍 Realice una búsqueda para ver las fichas disponibles</p>
-                </div>
-            </div>
-        </div>
-        <!-- VISTA DE FICHA SELECCIONADA -->
-        <div id="fichaViewSection" class="ficha-view-section">
-            <div class="ficha-view-header">
-                <h2 class="ficha-view-title">📋 Ficha Técnica Detallada</h2>
-                <div class="ficha-view-actions">
-                    <button class="btn btn-success" onclick="imprimirFicha()">
-                        <span>🖨️</span>
-                        <span>Imprimir</span>
-                    </button>
-                    <button class="btn btn-secondary" onclick="cerrarFicha()">
-                        <span>❌</span>
-                        <span>Cerrar</span>
-                    </button>
-                </div>
-            </div>
-            <div id="fichaDetalle" class="ficha-tecnica">
-                <!-- Contenido se carga dinámicamente -->
-            </div>
-        </div>
-    </div>
+<!-- Header con Navegación de Migas -->
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Consultar Fichas</span>
+</div>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
+← Volver a Transporte
+</button>
+</header>
+<!-- Título del Módulo -->
+<section class="module-title-section">
+<h1 class="module-title">📋 Consultar Fichas Técnicas</h1>
+<p class="module-subtitle">Busque y visualice las fichas técnicas registradas</p>
+</section>
+<div class="container">
+<!-- SECCIÓN DE BÚSQUEDA -->
+<div class="search-section">
+<h3>🔍 Buscar Ficha Técnica en Base de Datos</h3>
+<div id="searchAlert" class="alert"></div>
+<div class="search-container">
+<input
+type="text"
+id="searchInput"
+class="search-input"
+placeholder="Ingrese placa, facsimilar, serial de carrocería o serial de motor..."
+autocomplete="off"
+>
+<button class="btn-search" onclick="buscarFichas()" id="btnSearch">
+<span>🔍</span>
+<span>Buscar</span>
+</button>
+<button class="btn-clear" onclick="limpiarBusqueda()">
+<span>🔄</span>
+<span>Limpiar</span>
+</button>
+</div>
+<div class="search-hint">
+<span>💡 Busque por:</span>
+<span>🚗 Placa</span>
+<span>📄 Facsimilar</span>
+<span>🔢 Serial Carrocería</span>
+<span>⚙️ Serial Motor</span>
+</div>
+</div>
+<!-- LISTA DE FICHAS TÉCNICAS REGISTRADAS -->
+<div class="fichas-section">
+<h2>📄 Fichas Técnicas Registradas</h2>
+<div id="fichasList" class="fichas-list">
+<div style="text-align: center; padding: 40px; color: #666;">
+<p>🔍 Realice una búsqueda para ver las fichas disponibles</p>
+</div>
+</div>
+</div>
+<!-- VISTA DE FICHA SELECCIONADA -->
+<div id="fichaViewSection" class="ficha-view-section">
+<div class="ficha-view-header">
+<h2 class="ficha-view-title">📋 Ficha Técnica Detallada</h2>
+<div class="ficha-view-actions">
+<button class="btn btn-success" onclick="imprimirFicha()">
+<span>🖨️</span>
+<span>Imprimir</span>
+</button>
+<button class="btn btn-secondary" onclick="cerrarFicha()">
+<span>❌</span>
+<span>Cerrar</span>
+</button>
+</div>
+</div>
+<div id="fichaDetalle" class="ficha-tecnica">
+<!-- Contenido se carga dinámicamente -->
+</div>
+</div>
+</div>
 </main>
 <!-- ================= SCRIPTS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
