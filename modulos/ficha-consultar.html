@@ -616,7 +616,7 @@ body {
         box-sizing: border-box;
     }
     
-    /* ✅ HEADER CON LOGOS LATERALES - Igual que ficha-modificar.html */
+    /* ✅ HEADER CON LOGOS LATERALES - IZQUIERDA Y DERECHA DEL TÍTULO */
     .ficha-header {
         display: flex !important;
         justify-content: space-between !important;
@@ -625,19 +625,25 @@ body {
         padding-bottom: 10px !important;
         border-bottom: 2px solid #003366 !important;
         gap: 15px !important;
+        flex-wrap: nowrap !important;
     }
     
-    .ficha-logo,
-    .ficha-logo-right {
-        width: 90px !important;  /* ✅ Un poco más grandes */
+    /* Logo IZQUIERDO */
+    .ficha-logo {
+        width: 90px !important;
         height: auto !important;
         display: block !important;
+        flex-shrink: 0 !important;
+        order: 1 !important;  /* Primero a la izquierda */
     }
     
+    /* Título CENTRO */
     .ficha-title {
         text-align: center !important;
         flex: 1 !important;
         padding: 0 15px !important;
+        order: 2 !important;  /* Segundo al centro */
+        min-width: 0 !important;
     }
     
     .ficha-title h1 {
@@ -645,6 +651,7 @@ body {
         margin-bottom: 3px !important;
         line-height: 1.2 !important;
         font-weight: 700 !important;
+        white-space: normal !important;
     }
     
     .ficha-title h2 {
@@ -657,6 +664,15 @@ body {
         font-size: 12px !important;
         margin-top: 3px !important;
         font-weight: 700 !important;
+    }
+    
+    /* Logo DERECHO */
+    .ficha-logo-right {
+        width: 90px !important;
+        height: auto !important;
+        display: block !important;
+        flex-shrink: 0 !important;
+        order: 3 !important;  /* Tercero a la derecha */
     }
     
     /* Tabla compacta */
@@ -712,7 +728,7 @@ body {
         overflow: hidden !important;
     }
     
-    /* ✅ FOTOS MÁS GRANDES PARA IMPRESIÓN */
+    /* ✅ FOTOS MÁS GRANDES PARA IMPRESIÓN - 140px */
     .fotos-container {
         display: grid !important;
         grid-template-columns: repeat(4, 1fr) !important;
@@ -723,7 +739,7 @@ body {
     
     .foto-box {
         border: 2px solid #4a7c9b !important;
-        height: 140px !important;  /* ✅ Aumentado de 100px a 140px */
+        height: 140px !important;  /* ✅ Fotos grandes para apreciar bien */
         width: 100% !important;
         display: flex !important;
         align-items: center !important;
