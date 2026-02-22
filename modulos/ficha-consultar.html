@@ -358,74 +358,75 @@ body {
     transform: rotate(90deg);
 }
 
-/* Ficha técnica */
+/* Ficha técnica - ESTRUCTURA IDÉNTICA A ficha-modificar.html */
 .ficha-tecnica {
     border: 2px solid #003366;
-    padding: 30px;
+    padding: 25px;
     background: white;
-    width: 100%;
+    width: 95%;
+    max-width: 1500px;
+    display: inline-block;
     text-align: left;
-    border-radius: 4px;
 }
 
 .ficha-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid #003366;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #003366;
 }
 
 .ficha-logo {
-    width: 110px;
+    width: 100px;
     height: auto;
 }
 
 .ficha-logo-right {
-    width: 110px;
+    width: 100px;
     height: auto;
 }
 
 .ficha-title {
     text-align: center;
     flex: 1;
-    padding: 0 30px;
+    padding: 0 20px;
 }
 
 .ficha-title h1 {
-    font-size: 16px;
+    font-size: 15px;
     color: #003366;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     line-height: 1.4;
     font-weight: 700;
 }
 
 .ficha-title h2 {
-    font-size: 19px;
+    font-size: 18px;
     color: #003366;
-    margin: 6px 0;
+    margin: 5px 0;
     font-weight: 700;
 }
 
 .ficha-title h3 {
-    font-size: 17px;
+    font-size: 16px;
     color: #003366;
-    margin-top: 6px;
+    margin-top: 5px;
     font-weight: 700;
 }
 
 .ficha-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     table-layout: fixed;
 }
 
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 14px 12px;
+    padding: 12px 10px;
     text-align: left;
     font-size: 13px;
     border: 2px solid #003366;
@@ -433,33 +434,36 @@ body {
 }
 
 .ficha-table td {
-    padding: 12px 10px;
+    padding: 10px 8px;
     border: 2px solid #003366;
-    font-size: 13px;
+    font-size: 12px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: top;
-    line-height: 1.5;
 }
 
 .ficha-table .label {
     font-weight: 700;
     background: #f0f0f0;
-    width: 20%;
+    width: 18%;
 }
 
-/* CORRECCIÓN 1: Fotos más grandes */
+.ficha-table .value {
+    width: 32%;
+}
+
+/* Fotos - 140px de altura como en ficha-modificar */
 .fotos-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 15px;
     width: 100%;
 }
 
 .foto-box {
     border: 2px solid #4a7c9b;
-    height: 200px;  /* Aumentado de 140px a 200px */
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -469,11 +473,7 @@ body {
     font-size: 15px;
     border-radius: 4px;
     overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.foto-box:hover {
-    transform: scale(1.03);
+    width: 100%;
 }
 
 .foto-box img {
@@ -484,23 +484,22 @@ body {
 }
 
 .observaciones-box {
-    min-height: 280px;
+    min-height: 260px;
     border: 2px solid #003366;
-    padding: 15px;
+    padding: 12px;
     background: #fafafa;
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.5;
     border-radius: 4px;
-    overflow-y: auto;
+    color: #000000 !important;
+    white-space: pre-wrap;
 }
 
 .modal-actions {
-    margin-top: 25px;
+    margin-top: 20px;
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: flex-end;
-    padding-top: 20px;
-    border-top: 2px solid #e0e0e0;
 }
 
 /* Responsive */
@@ -536,7 +535,7 @@ body {
     
     .ficha-header {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
     }
     
     .ficha-title {
@@ -557,7 +556,7 @@ body {
     }
 }
 
-/* CORRECCIÓN 3: Impresión en horizontal (landscape) */
+/* Impresión en horizontal */
 @media print {
     @page {
         size: landscape;
@@ -607,7 +606,7 @@ body {
     }
     
     .foto-box {
-        height: 180px;
+        height: 140px;
     }
 }
 </style>
@@ -727,55 +726,45 @@ body {
                     </div>
                     <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
                 </div>
+                
+                <!-- ✅ TABLA CORREGIDA - ESTRUCTURA IDÉNTICA A ficha-modificar.html -->
                 <table class="ficha-table">
-                    <!-- CORRECCIÓN 1: Tabla reestructurada - TIPO a la izquierda de OBSERVACIONES -->
                     <tr>
-                        <th colspan="4">DATOS DEL VEHICULO</th>
-                        <th rowspan="6" style="width: 20%; vertical-align: top; text-align: center;">
+                        <th colspan="5">DATOS DEL VEHICULO</th>
+                        <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
                             OBSERVACIONES<br><br>
                             <div class="observaciones-box" id="modalObservaciones"></div>
-                        </th>
-                        <th rowspan="6" style="width: 18%; vertical-align: top; text-align: center; border-left: 2px solid #003366;">
-                            TIPO / CLASE<br><br>
-                            <div style="padding: 10px; background: #f0f0f0; border: 2px solid #003366; border-radius: 4px; min-height: 260px;">
-                                <strong>TIPO:</strong><br>
-                                <span id="modalTipo"></span><br><br>
-                                <strong>CLASE:</strong><br>
-                                <span id="modalClase"></span>
-                            </div>
                         </th>
                     </tr>
                     <tr>
                         <td class="label">MARCA</td>
-                        <td class="value" colspan="3" id="modalMarca"></td>
-                    </tr>
-                    <tr>
+                        <td class="value" id="modalMarca"></td>
                         <td class="label">MODELO</td>
-                        <td class="value" colspan="3" id="modalModelo"></td>
+                        <td class="value" id="modalModelo"></td>
+                        <td class="label">TIPO: <span id="modalTipo"></span></td>
                     </tr>
                     <tr>
                         <td class="label">SERIAL CARROCERIA</td>
-                        <td class="value" colspan="3" id="modalSerialCarroceria"></td>
+                        <td class="value" id="modalSerialCarroceria"></td>
+                        <td class="label">CLASE</td>
+                        <td class="value" id="modalClase"></td>
+                        <td class="label">COLOR: <span id="modalColor"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">PLACA</td>
+                        <td class="value" id="modalPlaca"></td>
+                        <td class="label">FACSIMIL</td>
+                        <td class="value" id="modalFacsimilar"></td>
+                        <td class="label">DEPENDENCIA:<br><span id="modalDependencia"></span></td>
                     </tr>
                     <tr>
                         <td class="label">SERIAL MOTOR</td>
-                        <td class="value" colspan="3" id="modalSerialMotor"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">COLOR</td>
-                        <td class="value" id="modalColor"></td>
-                        <td class="label">PLACA</td>
-                        <td class="value" id="modalPlaca"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">FACSIMIL</td>
-                        <td class="value" id="modalFacsimilar"></td>
-                        <td class="label">DEPENDENCIA</td>
-                        <td class="value" colspan="3" id="modalDependencia"></td>
+                        <td class="value" id="modalSerialMotor"></td>
+                        <td class="label" colspan="3"></td>
                     </tr>
                     <tr>
                         <td class="label">ESTATUS DEL VEHICULO</td>
-                        <td colspan="5" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
+                        <td colspan="4" style="text-align: center; font-weight: bold;" id="modalEstatus"></td>
                     </tr>
                     <tr>
                         <th colspan="6">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
@@ -823,12 +812,6 @@ body {
                                     <img id="modalImg4" alt="Foto 4">
                                 </div>
                             </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6" style="text-align: right; font-size: 12px; padding-top: 15px; color: #666;">
-                            <strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp; 
-                            <strong>Creado por:</strong> <span id="modalCreadoPor"></span>
                         </td>
                     </tr>
                 </table>
