@@ -23,7 +23,6 @@ body {
     background: #f5f5f5;
 }
 
-/* Container - mismo tamaño que ficha-crear */
 .container {
     max-width: 1600px;
     margin: 0 auto;
@@ -33,7 +32,7 @@ body {
     gap: 30px;
 }
 
-/* Sección de búsqueda - igual que ficha-crear */
+/* Sección de búsqueda */
 .search-section {
     background: linear-gradient(135deg, #003366 0%, #004080 100%);
     padding: 25px;
@@ -164,7 +163,7 @@ body {
     border: 1px solid #bee5eb;
 }
 
-/* Sección de resultados - igual que form-section */
+/* Sección de resultados */
 .results-section {
     background: white;
     padding: 30px;
@@ -261,7 +260,7 @@ body {
     box-shadow: 0 3px 8px rgba(40,167,69,0.3);
 }
 
-/* Botones - igual que ficha-crear */
+/* Botones */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -310,7 +309,7 @@ body {
     box-shadow: 0 4px 8px rgba(40,167,69,0.2);
 }
 
-/* Modal - optimizado para desktop */
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -359,7 +358,7 @@ body {
     transform: rotate(90deg);
 }
 
-/* Ficha técnica - igual que ficha-crear */
+/* Ficha técnica */
 .ficha-tecnica {
     border: 2px solid #003366;
     padding: 30px;
@@ -449,6 +448,7 @@ body {
     width: 20%;
 }
 
+/* CORRECCIÓN 1: Fotos más grandes */
 .fotos-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -459,7 +459,7 @@ body {
 
 .foto-box {
     border: 2px solid #4a7c9b;
-    height: 160px;
+    height: 200px;  /* Aumentado de 140px a 200px */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -503,7 +503,7 @@ body {
     border-top: 2px solid #e0e0e0;
 }
 
-/* Responsive - Desktop primero */
+/* Responsive */
 @media (max-width: 1200px) {
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
@@ -557,8 +557,18 @@ body {
     }
 }
 
-/* Estilos de impresión */
+/* CORRECCIÓN 3: Impresión en horizontal (landscape) */
 @media print {
+    @page {
+        size: landscape;
+        margin: 1cm;
+    }
+    
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
     .navbar, 
     .module-header, 
     .btn, 
@@ -573,6 +583,9 @@ body {
         position: absolute;
         background: white;
         padding: 0;
+        display: block !important;
+        height: auto;
+        overflow: visible;
     }
     
     .modal-content {
@@ -586,6 +599,15 @@ body {
     .ficha-tecnica {
         border: 2px solid #003366;
         padding: 20px;
+        width: 100%;
+    }
+    
+    .fotos-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .foto-box {
+        height: 180px;
     }
 }
 </style>
@@ -682,7 +704,7 @@ body {
                     <tbody id="resultsBody">
                         <tr>
                             <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                                📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
+                                📭 No hay vehículos registrados.
                             </td>
                         </tr>
                     </tbody>
@@ -706,45 +728,54 @@ body {
                     <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
                 </div>
                 <table class="ficha-table">
+                    <!-- CORRECCIÓN 1: Tabla reestructurada - TIPO a la izquierda de OBSERVACIONES -->
                     <tr>
-                        <th colspan="5">DATOS DEL VEHICULO</th>
-                        <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+                        <th colspan="4">DATOS DEL VEHICULO</th>
+                        <th rowspan="6" style="width: 20%; vertical-align: top; text-align: center;">
                             OBSERVACIONES<br><br>
                             <div class="observaciones-box" id="modalObservaciones"></div>
+                        </th>
+                        <th rowspan="6" style="width: 18%; vertical-align: top; text-align: center; border-left: 2px solid #003366;">
+                            TIPO / CLASE<br><br>
+                            <div style="padding: 10px; background: #f0f0f0; border: 2px solid #003366; border-radius: 4px; min-height: 260px;">
+                                <strong>TIPO:</strong><br>
+                                <span id="modalTipo"></span><br><br>
+                                <strong>CLASE:</strong><br>
+                                <span id="modalClase"></span>
+                            </div>
                         </th>
                     </tr>
                     <tr>
                         <td class="label">MARCA</td>
-                        <td class="value" id="modalMarca"></td>
+                        <td class="value" colspan="3" id="modalMarca"></td>
+                    </tr>
+                    <tr>
                         <td class="label">MODELO</td>
-                        <td class="value" id="modalModelo"></td>
-                        <td class="label">TIPO</td>
-                        <td class="value" id="modalTipo"></td>
+                        <td class="value" colspan="3" id="modalModelo"></td>
                     </tr>
                     <tr>
                         <td class="label">SERIAL CARROCERIA</td>
-                        <td class="value" id="modalSerialCarroceria"></td>
-                        <td class="label">CLASE</td>
-                        <td class="value" id="modalClase"></td>
-                        <td class="label">COLOR</td>
-                        <td class="value" id="modalColor"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">PLACA</td>
-                        <td class="value" id="modalPlaca"></td>
-                        <td class="label">FACSIMIL</td>
-                        <td class="value" id="modalFacsimilar"></td>
-                        <td class="label">DEPENDENCIA</td>
-                        <td class="value" id="modalDependencia"></td>
+                        <td class="value" colspan="3" id="modalSerialCarroceria"></td>
                     </tr>
                     <tr>
                         <td class="label">SERIAL MOTOR</td>
-                        <td class="value" id="modalSerialMotor"></td>
-                        <td class="label" colspan="3"></td>
+                        <td class="value" colspan="3" id="modalSerialMotor"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">COLOR</td>
+                        <td class="value" id="modalColor"></td>
+                        <td class="label">PLACA</td>
+                        <td class="value" id="modalPlaca"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">FACSIMIL</td>
+                        <td class="value" id="modalFacsimilar"></td>
+                        <td class="label">DEPENDENCIA</td>
+                        <td class="value" colspan="3" id="modalDependencia"></td>
                     </tr>
                     <tr>
                         <td class="label">ESTATUS DEL VEHICULO</td>
-                        <td colspan="4" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
+                        <td colspan="5" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
                     </tr>
                     <tr>
                         <th colspan="6">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
