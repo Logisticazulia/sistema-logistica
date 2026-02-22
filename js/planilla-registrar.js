@@ -1,9 +1,4 @@
-/**
-* REGISTRO DE VEHÍCULOS - PLANILLA
-* VERSIÓN CORREGIDA CON NORMALIZACIÓN CONSISTENTE
-*/
 
-// ================= CONFIGURACIÓN =================
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
 
@@ -14,7 +9,6 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ================= REFERENCIAS AL DOM =================
 const form = document.getElementById('vehicleForm');
 const btnSubmit = document.getElementById('btnSubmit');
 const alertSuccess = document.getElementById('alertSuccess');
@@ -24,10 +18,7 @@ const errorMessage = document.getElementById('errorMessage');
 const userEmail = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// ================= CAMPOS ÚNICOS =================
 const CAMPOS_UNICOS = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
-
-// ================= ESTADO DE VALIDACIÓN =================
 const validacionEstado = {
     placa: { valido: true, mensaje: '' },
     facsimil: { valido: true, mensaje: '' },
@@ -36,9 +27,6 @@ const validacionEstado = {
     n_identificacion: { valido: true, mensaje: '' }
 };
 
-// ================= FUNCIONES DE UTILIDAD =================
-
-// ✅ FUNCIÓN DE LIMPIEZA CONSISTENTE
 function limpiarTexto(texto) {
     if (!texto) return '';
     return texto
@@ -50,7 +38,6 @@ function limpiarTexto(texto) {
         .trim();
 }
 
-// Debounce para evitar consultas excesivas
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -130,30 +117,26 @@ function validarFormulario() {
     return isValid;
 }
 
-// ================= VALIDACIÓN DE CAMPOS ÚNICOS =================
 async function validarCampoUnico(campo, valor) {
     const input = document.getElementById(campo);
     if (!input) return true;
     
     const formGroup = input.closest('.form-group');
     
-    // Limpiar estados previos
     if (formGroup) {
         formGroup.classList.remove('error', 'success');
     }
     input.style.borderColor = '#e2e8f0';
     
-    // Si el campo está vacío, no validar
     if (!valor || valor.trim() === '') {
         validacionEstado[campo] = { valido: true, mensaje: '' };
         return true;
     }
     
-    // Mostrar indicador de carga
     input.classList.add('loading');
     
     try {
-        // ✅ USAR ILIKE PARA BÚSQUEDA INSENSIBLE
+
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('id')
@@ -167,7 +150,7 @@ async function validarCampoUnico(campo, valor) {
         }
         
         if (data && data.length > 0) {
-            // Campo duplicado
+     
             validacionEstado[campo] = {
                 valido: false,
                 mensaje: `⚠️ Este ${campo.replace('_', ' ')} ya está registrado`
@@ -177,7 +160,7 @@ async function validarCampoUnico(campo, valor) {
             mostrarMensajeErrorCampo(campo, validacionEstado[campo].mensaje);
             return false;
         } else {
-            // Campo único
+     
             validacionEstado[campo] = { valido: true, mensaje: '' };
             input.style.borderColor = '#059669';
             if (formGroup) formGroup.classList.add('success');
@@ -241,7 +224,6 @@ async function validarTodosCamposUnicos() {
     return todosValidos;
 }
 
-// ================= GUARDAR VEHÍCULO =================
 async function guardarVehiculo(event) {
     event.preventDefault();
     
@@ -249,21 +231,19 @@ async function guardarVehiculo(event) {
         return;
     }
     
-    // Validar campos únicos antes de guardar
     const camposUnicosValidos = await validarTodosCamposUnicos();
     if (!camposUnicosValidos) {
         showAlert('error', '❌ Hay campos duplicados. Por favor corríjalos antes de guardar.');
         return;
     }
     
-    // Estado de carga
     if (btnSubmit) {
         btnSubmit.classList.add('loading');
         btnSubmit.disabled = true;
     }
     
     try {
-        // ✅ RECOPILAR DATOS CON LIMPIEZA CONSISTENTE
+      
         const vehiculo = {
             placa: limpiarTexto(document.getElementById('placa')?.value),
             facsimil: limpiarTexto(document.getElementById('facsimil')?.value),
@@ -295,7 +275,6 @@ async function guardarVehiculo(event) {
         
         console.log('📝 Guardando vehículo:', vehiculo);
         
-        // Insertar en Supabase
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .insert([vehiculo])
@@ -315,10 +294,8 @@ async function guardarVehiculo(event) {
         console.log('✅ Vehículo guardado:', data);
         showAlert('success', '✅ Vehículo registrado exitosamente con Placa: ' + vehiculo.placa);
         
-        // Limpiar formulario
         if (form) form.reset();
         
-        // Limpiar estados de validación
         CAMPOS_UNICOS.forEach(campo => {
             const input = document.getElementById(campo);
             if (input) {
@@ -341,12 +318,11 @@ async function guardarVehiculo(event) {
     }
 }
 
-// ================= INICIALIZAR VALIDACIÓN EN TIEMPO REAL =================
 function inicializarValidacionTiempoReal() {
     CAMPOS_UNICOS.forEach(campo => {
         const input = document.getElementById(campo);
         if (input) {
-            // Validar cuando el usuario deja el campo (blur)
+        
             input.addEventListener('blur', () => {
                 const valor = limpiarTexto(input.value);
                 if (valor) {
@@ -354,7 +330,6 @@ function inicializarValidacionTiempoReal() {
                 }
             });
             
-            // Validar mientras escribe (con debounce)
             input.addEventListener('input', debounce(() => {
                 const valor = limpiarTexto(input.value);
                 if (valor && valor.length >= 3) {
@@ -365,11 +340,9 @@ function inicializarValidacionTiempoReal() {
     });
 }
 
-// ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando registro de vehículos...');
     
-    // Verificar elementos críticos
     if (!form || !btnSubmit) {
         console.error('❌ Elementos críticos del DOM no encontrados');
         showAlert('error', 'Error de inicialización. Recargue la página.');
@@ -379,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarUsuarioAutenticado();
     inicializarValidacionTiempoReal();
     
-    // Event listeners
     form.addEventListener('submit', guardarVehiculo);
     
     if (logoutBtn) {
