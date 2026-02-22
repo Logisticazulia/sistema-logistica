@@ -556,9 +556,6 @@ body {
     }
 }
 
-/* ============================================
-   ESTILOS DE IMPRESIÓN - HOJA CARTA HORIZONTAL
-   ============================================ */
 @media print {
     @page {
         size: letter landscape;
@@ -572,7 +569,7 @@ body {
         font-size: 11px !important;
     }
     
-    /* Ocultar elementos no necesarios */
+    /* Ocultar todo excepto el modal */
     .navbar, 
     .module-header, 
     .btn, 
@@ -584,7 +581,7 @@ body {
         display: none !important;
     }
     
-    /* Mostrar solo el modal/ficha */
+    /* Mostrar modal/ficha */
     .modal {
         position: absolute !important;
         background: white !important;
@@ -603,22 +600,18 @@ body {
         box-shadow: none !important;
         width: 100% !important;
         max-width: 100% !important;
-        border-radius: 0 !important;
     }
     
-    /* Ficha técnica compacta para impresión */
     .ficha-tecnica {
         border: 2px solid #003366 !important;
         padding: 15px !important;
         width: 100% !important;
-        max-width: 100% !important;
-        display: block !important;
-        box-sizing: border-box;
     }
     
-    /* ✅ HEADER CON LOGOS LATERALES - IZQUIERDA Y DERECHA DEL TÍTULO */
+    /* ✅ HEADER CON FLEXBOX FORZADO PARA IMPRESIÓN */
     .ficha-header {
         display: flex !important;
+        flex-direction: row !important;
         justify-content: space-between !important;
         align-items: center !important;
         margin-bottom: 12px !important;
@@ -628,21 +621,24 @@ body {
         flex-wrap: nowrap !important;
     }
     
-    /* Logo IZQUIERDO */
+    /* Logo IZQUIERDO - Forzar visualización */
     .ficha-logo {
         width: 90px !important;
         height: auto !important;
         display: block !important;
         flex-shrink: 0 !important;
-        order: 1 !important;  /* Primero a la izquierda */
+        order: 1 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     /* Título CENTRO */
     .ficha-title {
         text-align: center !important;
         flex: 1 !important;
+        flex-grow: 1 !important;
         padding: 0 15px !important;
-        order: 2 !important;  /* Segundo al centro */
+        order: 2 !important;
         min-width: 0 !important;
     }
     
@@ -651,7 +647,6 @@ body {
         margin-bottom: 3px !important;
         line-height: 1.2 !important;
         font-weight: 700 !important;
-        white-space: normal !important;
     }
     
     .ficha-title h2 {
@@ -666,16 +661,18 @@ body {
         font-weight: 700 !important;
     }
     
-    /* Logo DERECHO */
+    /* Logo DERECHO - Forzar visualización */
     .ficha-logo-right {
         width: 90px !important;
         height: auto !important;
         display: block !important;
         flex-shrink: 0 !important;
-        order: 3 !important;  /* Tercero a la derecha */
+        order: 3 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
-    /* Tabla compacta */
+    /* Tabla */
     .ficha-table {
         width: 100% !important;
         border-collapse: collapse !important;
@@ -688,10 +685,8 @@ body {
         background: #4a7c9b !important;
         color: white !important;
         padding: 6px 5px !important;
-        text-align: left !important;
         font-size: 10px !important;
         border: 1px solid #003366 !important;
-        font-weight: 700 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -701,7 +696,6 @@ body {
         border: 1px solid #003366 !important;
         font-size: 10px !important;
         line-height: 1.3 !important;
-        vertical-align: top !important;
     }
     
     .ficha-table .label {
@@ -716,7 +710,7 @@ body {
         width: 34% !important;
     }
     
-    /* Observaciones más compactas */
+    /* Observaciones */
     .observaciones-box {
         min-height: 180px !important;
         border: 1px solid #003366 !important;
@@ -724,32 +718,20 @@ body {
         background: #fafafa !important;
         font-size: 10px !important;
         line-height: 1.4 !important;
-        border-radius: 3px !important;
-        overflow: hidden !important;
     }
     
-    /* ✅ FOTOS MÁS GRANDES PARA IMPRESIÓN - 140px */
+    /* Fotos */
     .fotos-container {
         display: grid !important;
         grid-template-columns: repeat(4, 1fr) !important;
         gap: 10px !important;
         margin-top: 12px !important;
-        width: 100% !important;
     }
     
     .foto-box {
         border: 2px solid #4a7c9b !important;
-        height: 140px !important;  /* ✅ Fotos grandes para apreciar bien */
-        width: 100% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        height: 140px !important;
         background: #4a7c9b !important;
-        color: white !important;
-        font-weight: 700 !important;
-        font-size: 11px !important;
-        border-radius: 4px !important;
-        overflow: hidden !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -764,6 +746,7 @@ body {
     .foto-box span {
         display: none !important;
     }
+}
     
     /* Footer de la ficha */
     .ficha-table tr:last-child td {
