@@ -23,7 +23,7 @@ body {
     background: #f5f5f5;
 }
 
-/* Container con las mismas proporciones que ficha-crear */
+/* Container - mismo tamaño que ficha-crear */
 .container {
     max-width: 1600px;
     margin: 0 auto;
@@ -59,7 +59,7 @@ body {
 
 .search-input {
     flex: 1;
-    min-width: 250px;
+    min-width: 300px;
     padding: 12px 16px;
     border: 2px solid rgba(255,255,255,0.3);
     border-radius: 6px;
@@ -164,7 +164,7 @@ body {
     border: 1px solid #bee5eb;
 }
 
-/* Sección de resultados - igual que form-section en ficha-crear */
+/* Sección de resultados - igual que form-section */
 .results-section {
     background: white;
     padding: 30px;
@@ -182,25 +182,29 @@ body {
 
 .table-container {
     overflow-x: auto;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
 }
 
 .results-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    min-width: 1000px;
 }
 
 .results-table th {
     background: #003366;
     color: white;
-    padding: 12px 10px;
+    padding: 14px 12px;
     text-align: left;
     font-weight: 600;
     border: 1px solid #002244;
+    white-space: nowrap;
 }
 
 .results-table td {
-    padding: 10px 8px;
+    padding: 12px;
     border: 1px solid #ddd;
     vertical-align: middle;
 }
@@ -211,39 +215,50 @@ body {
 
 .results-table tr:hover {
     background: #e3f2fd;
+    transition: background 0.2s ease;
 }
 
 .btn-view {
-    padding: 6px 12px;
+    padding: 8px 16px;
     background: #003366;
     color: white;
     border: none;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-right: 5px;
+    margin-right: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .btn-view:hover {
     background: #004080;
     transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,51,102,0.3);
 }
 
 .btn-print {
-    padding: 6px 12px;
+    padding: 8px 16px;
     background: #28a745;
     color: white;
     border: none;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .btn-print:hover {
     background: #218838;
     transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(40,167,69,0.3);
 }
 
 /* Botones - igual que ficha-crear */
@@ -295,35 +310,45 @@ body {
     box-shadow: 0 4px 8px rgba(40,167,69,0.2);
 }
 
-/* Estadísticas - tamaño compacto como en ficha-crear */
+/* Estadísticas - mejoradas para desktop */
 .stats-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 20px;
+    margin-bottom: 25px;
 }
 
 .stat-card {
     background: white;
-    padding: 20px;
+    padding: 25px 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     text-align: center;
+    border-left: 4px solid #003366;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
 .stat-card .stat-number {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     color: #003366;
+    margin-bottom: 8px;
 }
 
 .stat-card .stat-label {
     font-size: 13px;
     color: #666;
-    margin-top: 5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Modal - igual que ficha-crear */
+/* Modal - optimizado para desktop */
 .modal {
     display: none;
     position: fixed;
@@ -332,102 +357,114 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     overflow-y: auto;
+    padding: 40px 20px;
 }
 
 .modal-content {
     background: white;
-    margin: 5% auto;
-    padding: 30px;
+    margin: 0 auto;
+    padding: 35px;
     border-radius: 8px;
     max-width: 1500px;
     width: 95%;
     position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
 .modal-close {
     position: absolute;
-    right: 20px;
-    top: 15px;
-    font-size: 28px;
+    right: 25px;
+    top: 20px;
+    font-size: 32px;
     font-weight: bold;
     color: #666;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f5f5f5;
 }
 
 .modal-close:hover {
     color: #003366;
+    background: #e0e0e0;
+    transform: rotate(90deg);
 }
 
 /* Ficha técnica - igual que ficha-crear */
 .ficha-tecnica {
     border: 2px solid #003366;
-    padding: 25px;
+    padding: 30px;
     background: white;
     width: 100%;
     text-align: left;
+    border-radius: 4px;
 }
 
 .ficha-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #003366;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #003366;
 }
 
 .ficha-logo {
-    width: 100px;
+    width: 110px;
     height: auto;
 }
 
 .ficha-logo-right {
-    width: 100px;
+    width: 110px;
     height: auto;
 }
 
 .ficha-title {
     text-align: center;
     flex: 1;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 .ficha-title h1 {
-    font-size: 15px;
+    font-size: 16px;
     color: #003366;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     line-height: 1.4;
     font-weight: 700;
 }
 
 .ficha-title h2 {
-    font-size: 18px;
+    font-size: 19px;
     color: #003366;
-    margin: 5px 0;
+    margin: 6px 0;
     font-weight: 700;
 }
 
 .ficha-title h3 {
-    font-size: 16px;
+    font-size: 17px;
     color: #003366;
-    margin-top: 5px;
+    margin-top: 6px;
     font-weight: 700;
 }
 
 .ficha-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     table-layout: fixed;
 }
 
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 12px 10px;
+    padding: 14px 12px;
     text-align: left;
     font-size: 13px;
     border: 2px solid #003366;
@@ -435,31 +472,32 @@ body {
 }
 
 .ficha-table td {
-    padding: 10px 8px;
+    padding: 12px 10px;
     border: 2px solid #003366;
-    font-size: 12px;
+    font-size: 13px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: top;
+    line-height: 1.5;
 }
 
 .ficha-table .label {
     font-weight: 700;
     background: #f0f0f0;
-    width: 18%;
+    width: 20%;
 }
 
 .fotos-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-top: 15px;
+    gap: 15px;
+    margin-top: 20px;
     width: 100%;
 }
 
 .foto-box {
     border: 2px solid #4a7c9b;
-    height: 140px;
+    height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -469,6 +507,11 @@ body {
     font-size: 15px;
     border-radius: 4px;
     overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.foto-box:hover {
+    transform: scale(1.03);
 }
 
 .foto-box img {
@@ -479,34 +522,48 @@ body {
 }
 
 .observaciones-box {
-    min-height: 260px;
+    min-height: 280px;
     border: 2px solid #003366;
-    padding: 12px;
+    padding: 15px;
     background: #fafafa;
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.6;
     border-radius: 4px;
+    overflow-y: auto;
 }
 
 .modal-actions {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 2px solid #e0e0e0;
 }
 
-/* Responsive - igual que ficha-crear */
-@media (max-width: 1200px) {
+/* Responsive - Desktop primero */
+@media (max-width: 1400px) {
     .stats-container {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+}
+
+@media (max-width: 1200px) {
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modal-content {
+        width: 98%;
+        padding: 30px;
     }
 }
 
 @media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
     .stats-container {
         grid-template-columns: 1fr;
     }
@@ -519,34 +576,64 @@ body {
         min-width: 100%;
     }
     
+    .btn-search,
+    .btn-clear {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .ficha-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+    }
+    
+    .ficha-title {
+        padding: 0;
     }
     
     .fotos-container {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+    }
+    
+    .results-table {
+        font-size: 13px;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 10px 8px;
     }
 }
 
+/* Estilos de impresión */
 @media print {
-    .navbar, .module-header, .btn, .search-section, .results-section, .modal-actions, .modal-close {
+    .navbar, 
+    .module-header, 
+    .btn, 
+    .search-section, 
+    .results-section, 
+    .modal-actions, 
+    .modal-close {
         display: none !important;
     }
     
     .modal {
         position: absolute;
         background: white;
+        padding: 0;
     }
     
     .modal-content {
         margin: 0;
         padding: 0;
         box-shadow: none;
+        width: 100%;
+        max-width: 100%;
     }
     
     .ficha-tecnica {
         border: 2px solid #003366;
+        padding: 20px;
     }
 }
 </style>
@@ -662,7 +749,7 @@ body {
                     </thead>
                     <tbody id="resultsBody">
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
+                            <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
                                 📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
                             </td>
                         </tr>
@@ -725,7 +812,7 @@ body {
                     </tr>
                     <tr>
                         <td class="label">ESTATUS DEL VEHICULO</td>
-                        <td colspan="4" style="text-align: center; font-weight: bold;" id="modalEstatus"></td>
+                        <td colspan="4" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
                     </tr>
                     <tr>
                         <th colspan="6">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th>
@@ -776,16 +863,16 @@ body {
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="6" style="text-align: right; font-size: 11px; padding-top: 15px;">
-                            Fecha de Creación: <span id="modalFechaCreacion"></span> | 
-                            Creado por: <span id="modalCreadoPor"></span>
+                        <td colspan="6" style="text-align: right; font-size: 12px; padding-top: 15px; color: #666;">
+                            <strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp; 
+                            <strong>Creado por:</strong> <span id="modalCreadoPor"></span>
                         </td>
                     </tr>
                 </table>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
-                <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir</button>
+                <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cerrar</button>
+                <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir Ficha</button>
             </div>
         </div>
     </div>
