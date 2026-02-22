@@ -22,43 +22,43 @@ body {
     background: #f5f5f5;
 }
 .container {
-    /* AJUSTADO: Más ancho para aprovechar pantallas grandes */
-    max-width: 1920px;
+    /* MÁXIMO ANCHO PARA PANTALLAS GRANDES */
+    max-width: 2400px;
     width: 98%;
     margin: 0 auto;
-    padding: 25px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 35px;
 }
 /* ================= BARRA DE BÚSQUEDA ================= */
 .search-section {
     background: linear-gradient(135deg, #003366 0%, #004080 100%);
-    padding: 30px;
+    padding: 35px;
     border-radius: 8px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
 .search-section h3 {
     color: white;
-    margin-bottom: 20px;
-    font-size: 18px;
+    margin-bottom: 25px;
+    font-size: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 .search-container {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 .search-input {
     flex: 1;
-    min-width: 400px;
-    padding: 14px 18px;
+    min-width: 500px;
+    padding: 16px 22px;
     border: 2px solid rgba(255,255,255,0.3);
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 17px;
     background: rgba(255,255,255,0.95);
     transition: all 0.3s ease;
 }
@@ -71,17 +71,17 @@ body {
     color: #666;
 }
 .btn-search {
-    padding: 14px 32px;
+    padding: 16px 40px;
     background: #28a745;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.3s ease;
     white-space: nowrap;
 }
@@ -96,17 +96,17 @@ body {
     transform: none;
 }
 .btn-clear {
-    padding: 14px 32px;
+    padding: 16px 40px;
     background: #ffc107;
     color: #000;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.3s ease;
     white-space: nowrap;
 }
@@ -117,49 +117,49 @@ body {
 }
 .search-hint {
     color: rgba(255,255,255,0.9);
-    font-size: 14px;
-    margin-top: 15px;
+    font-size: 15px;
+    margin-top: 20px;
     display: flex;
-    gap: 25px;
+    gap: 30px;
     flex-wrap: wrap;
 }
 .search-hint span {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 /* ================= LISTA DE FICHAS ================= */
 .fichas-section {
     background: white;
-    padding: 35px;
+    padding: 40px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .fichas-section h2 {
     color: #003366;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 18px;
     border-bottom: 3px solid #003366;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 22px;
+    gap: 12px;
+    font-size: 24px;
 }
 .fichas-list {
     display: grid;
-    gap: 20px;
+    gap: 25px;
 }
 .ficha-item {
     background: #f8f9fa;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
-    padding: 25px;
+    padding: 30px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: grid;
-    /* AJUSTADO: Columnas más anchas para escritorio */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    /* COLUMNAS MÁS ANCHAS PARA ESCRITORIO */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
 }
 .ficha-item:hover {
     border-color: #003366;
@@ -174,33 +174,33 @@ body {
 .ficha-field {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
 }
 .ficha-field-label {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 .ficha-field-value {
-    font-size: 16px;
+    font-size: 17px;
     color: #003366;
     font-weight: 600;
 }
 .ficha-date {
-    font-size: 13px;
+    font-size: 14px;
     color: #999;
     grid-column: 1 / -1;
     text-align: right;
-    margin-top: 15px;
-    padding-top: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
     border-top: 1px solid #e0e0e0;
 }
 /* ================= VISTA DE FICHA ================= */
 .ficha-view-section {
     background: white;
-    padding: 40px;
+    padding: 45px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: none;
@@ -212,29 +212,29 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    margin-bottom: 35px;
+    padding-bottom: 25px;
     border-bottom: 3px solid #003366;
 }
 .ficha-view-title {
     color: #003366;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
 }
 .ficha-view-actions {
     display: flex;
-    gap: 15px;
+    gap: 18px;
 }
 .btn {
-    padding: 14px 28px;
+    padding: 16px 32px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.3s ease;
 }
 .btn-primary {
@@ -264,14 +264,14 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-/* ================= FICHA TÉCNICA PREVIEW - ESTIRADA ================= */
+/* ================= FICHA TÉCNICA PREVIEW - SUPER ESTIRADA ================= */
 .ficha-tecnica {
     border: 2px solid #003366;
-    padding: 35px;
+    padding: 40px;
     background: white;
-    /* AJUSTADO: Más ancho para aprovechar la pantalla */
+    /* ANCHO MÁXIMO PARA PANTALLAS ULTRAWIDE */
     width: 100%;
-    max-width: 1850px;
+    max-width: 2300px;
     display: block;
     text-align: left;
 }
@@ -279,95 +279,93 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
     border-bottom: 2px solid #003366;
 }
 .ficha-logo {
-    width: 120px;
+    width: 140px;
     height: auto;
 }
 .ficha-title {
     text-align: center;
     flex: 1;
-    padding: 0 30px;
+    padding: 0 40px;
 }
 .ficha-title h1 {
-    font-size: 17px;
+    font-size: 19px;
     color: #003366;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     line-height: 1.5;
     font-weight: 700;
 }
 .ficha-title h2 {
-    font-size: 20px;
+    font-size: 22px;
     color: #003366;
-    margin: 8px 0;
+    margin: 10px 0;
     font-weight: 700;
 }
 .ficha-title h3 {
-    font-size: 18px;
+    font-size: 20px;
     color: #003366;
-    margin-top: 8px;
+    margin-top: 10px;
     font-weight: 700;
 }
 .ficha-logo-right {
-    width: 120px;
+    width: 140px;
     height: auto;
 }
 .ficha-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     table-layout: fixed;
 }
 .ficha-table th {
     background: #4a7c9b;
     color: white;
-    padding: 15px 12px;
+    padding: 18px 15px;
     text-align: left;
-    font-size: 14px;
+    font-size: 15px;
     border: 2px solid #003366;
     font-weight: 700;
 }
 .ficha-table td {
-    padding: 12px 10px;
+    padding: 14px 12px;
     border: 2px solid #003366;
-    font-size: 13px;
+    font-size: 14px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: top;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 .ficha-table .label {
     font-weight: 700;
     background: #f0f0f0;
-    /* AJUSTADO: Etiquetas un poco más estrechas para dar más espacio a valores */
-    width: 15%;
+    width: 14%;
 }
 .ficha-table .value {
-    /* AJUSTADO: Valores más anchos */
-    width: 35%;
+    width: 36%;
 }
 .fotos-container {
     display: grid;
-    /* 4 columnas más anchas */
+    /* 4 COLUMNAS MUY ANCHAS */
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-top: 20px;
+    gap: 20px;
+    margin-top: 25px;
     width: 100%;
 }
 .foto-box {
     border: 2px solid #4a7c9b;
-    /* AJUSTADO: Más altas */
-    height: 180px;
+    /* MÁS ALTAS PARA VER MEJOR LAS FOTOS */
+    height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #4a7c9b;
     color: white;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 18px;
     border-radius: 4px;
     overflow: hidden;
     width: 100%;
@@ -379,25 +377,25 @@ body {
     display: none;
 }
 .observaciones-box {
-    /* AJUSTADO: Más alta para más contenido */
-    min-height: 320px;
+    /* MÁS ALTA PARA MÁS CONTENIDO */
+    min-height: 380px;
     border: 2px solid #003366;
-    padding: 15px;
+    padding: 18px;
     background: #fafafa;
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.7;
     border-radius: 4px;
     color: #000000 !important;
     white-space: pre-wrap;
 }
 /* ================= ALERTAS ================= */
 .alert {
-    padding: 14px 18px;
+    padding: 16px 20px;
     border-radius: 6px;
-    margin: 15px 0;
+    margin: 18px 0;
     display: none;
     font-weight: 500;
-    font-size: 15px;
+    font-size: 16px;
 }
 .alert-success {
     background: #d4edda;
@@ -429,25 +427,25 @@ body {
         width: 100%;
     }
 }
-@media (max-width: 1400px) {
+@media (max-width: 1600px) {
     .container {
-        max-width: 1400px;
+        max-width: 1600px;
         width: 95%;
     }
     .ficha-tecnica {
-        max-width: 1350px;
+        max-width: 1550px;
     }
     .ficha-item {
         grid-template-columns: repeat(2, 1fr);
     }
 }
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     .container {
-        max-width: 100%;
-        padding: 20px;
+        max-width: 1200px;
+        padding: 25px;
     }
     .search-input {
-        min-width: 300px;
+        min-width: 350px;
     }
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
@@ -473,17 +471,17 @@ body {
     }
     .ficha-header {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
     }
     .ficha-logo, .ficha-logo-right {
-        width: 100px;
+        width: 120px;
     }
     .fotos-container {
         grid-template-columns: repeat(2, 1fr);
     }
     .ficha-view-header {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
         text-align: center;
     }
     .ficha-view-actions {
@@ -491,7 +489,7 @@ body {
         justify-content: center;
     }
     .ficha-tecnica {
-        padding: 20px;
+        padding: 25px;
     }
 }
 </style>
