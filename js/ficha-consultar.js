@@ -1,10 +1,10 @@
 // ============================================
-// CONSULTAR FICHA TÉCNICA - VERSIÓN FINAL CORREGIDA
+// CONSULTAR FICHA TÉCNICA - VERSIÓN FINAL
 // ============================================
 
 let vehiculosDB = [];
 let vehiculoSeleccionado = null;
-let resultadosActuales = []; // Para manejar índices correctamente
+let resultadosActuales = [];
 
 // Datos de ejemplo del CSV (fallback)
 const datosEjemplo = [
@@ -118,10 +118,6 @@ async function cargarBaseDeDatos() {
             vehiculosDB = [...datosEjemplo];
         }
         
-        if (vehiculosDB.length > 0) {
-            console.log('📋 Primer vehículo:', vehiculosDB[0]);
-        }
-        
         localStorage.setItem('vehiculosDB', JSON.stringify(vehiculosDB));
         localStorage.setItem('vehiculosDB_time', now.toString());
         
@@ -133,7 +129,6 @@ async function cargarBaseDeDatos() {
         vehiculosDB = [...datosEjemplo];
         resultadosActuales = [...vehiculosDB];
         mostrarResultados(resultadosActuales);
-        console.log('✅ Usando datos de ejemplo:', vehiculosDB.length, 'vehículos');
     }
 }
 
@@ -213,10 +208,7 @@ async function buscarVehiculo() {
 
 function mostrarResultados(resultados) {
     const tbody = document.getElementById('resultsBody');
-    if (!tbody) {
-        console.error('❌ No se encontró tbody');
-        return;
-    }
+    if (!tbody) return;
     
     if (resultados.length === 0) {
         tbody.innerHTML = `
@@ -239,9 +231,6 @@ function mostrarResultados(resultados) {
             (v.dependencia.length > 40 ? v.dependencia.substring(0, 40) + '...' : v.dependencia) 
             : 'N/A';
         
-        // ✅ IMPORTANTE: Guardamos el índice original del vehículo en vehiculosDB
-        const indiceOriginal = vehiculosDB.indexOf(v);
-        
         html += `
             <tr>
                 <td><strong>${v.placa || 'N/A'}</strong></td>
@@ -262,7 +251,6 @@ function mostrarResultados(resultados) {
     tbody.innerHTML = html;
 }
 
-// ✅ NUEVA FUNCIÓN: Buscar vehículo por placa para evitar problemas de índice
 function verFichaPorPlaca(placa) {
     const vehiculo = vehiculosDB.find(v => v.placa === placa);
     if (vehiculo) {
@@ -280,7 +268,6 @@ function imprimirFichaPorPlaca(placa) {
     }
 }
 
-// ✅ FUNCIÓN PRINCIPAL CORREGIDA: Recibe el objeto vehículo directamente
 function verFichaData(vehiculo) {
     if (!vehiculo) {
         console.error('❌ Vehículo no encontrado');
@@ -291,13 +278,11 @@ function verFichaData(vehiculo) {
     console.log('👁️ Mostrando ficha de:', vehiculo.placa);
     vehiculoSeleccionado = vehiculo;
     
-    // ✅ Verificar que cada elemento existe antes de asignar
     const setId = (id, value) => {
         const el = document.getElementById(id);
         if (el) el.textContent = value || 'N/A';
     };
     
-    // Llenar modal con datos del CSV
     setId('modalMarca', vehiculo.marca);
     setId('modalModelo', vehiculo.modelo);
     setId('modalTipo', vehiculo.tipo);
@@ -320,7 +305,6 @@ function verFichaData(vehiculo) {
     setId('modalFechaCreacion', vehiculo.fecha_creacion || vehiculo.created_at || 'N/A');
     setId('modalCreadoPor', vehiculo.creado_por || 'N/A');
     
-    // Estilo para estatus
     const estatusEl = document.getElementById('modalEstatus');
     if (estatusEl) {
         if (vehiculo.estatus_ficha?.toUpperCase().includes('OPER')) {
@@ -336,10 +320,8 @@ function verFichaData(vehiculo) {
         }
     }
     
-    // Cargar fotos
     cargarFotosModal(vehiculo);
     
-    // Mostrar modal
     const modal = document.getElementById('fichaModal');
     if (modal) {
         modal.style.display = 'block';
@@ -347,7 +329,6 @@ function verFichaData(vehiculo) {
     }
 }
 
-// Función legacy para compatibilidad (redirige a la nueva)
 function verFicha(index) {
     if (resultadosActuales[index]) {
         verFichaData(resultadosActuales[index]);
@@ -388,7 +369,38 @@ function cerrarModal() {
 }
 
 function imprimirFicha() {
-    window.print();
+    const images = document.querySelectorAll('#fichaModal img');
+    let loaded = 0;
+    
+    if (images.length === 0) {
+        window.print();
+        return;
+    }
+    
+    images.forEach(img => {
+        if (img.complete) {
+            loaded++;
+        } else {
+            img.onload = () => {
+                loaded++;
+                if (loaded === images.length) {
+                    setTimeout(() => window.print(), 100);
+                }
+            };
+            img.onerror = () => {
+                loaded++;
+                if (loaded === images.length) {
+                    setTimeout(() => window.print(), 100);
+                }
+            };
+        }
+    });
+    
+    setTimeout(() => {
+        if (loaded < images.length) {
+            window.print();
+        }
+    }, 2000);
 }
 
 function mostrarAlerta(mensaje, tipo) {
@@ -425,11 +437,98 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') cerrarModal();
 });
 
-// Inicialización
+// ============================================
+// ✅ FUNCIÓN CORREGIDA PARA CARGAR USUARIO
+// ============================================
+
+async function cargarUsuario() {
+    try {
+        console.log('🔍 Intentando cargar usuario...');
+        
+        // Opción 1: Intentar con Supabase si está disponible
+        if (typeof supabase !== 'undefined' && supabase.auth) {
+            console.log('✅ Supabase disponible, intentando obtener sesión...');
+            
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.warn('⚠️ Error al obtener sesión:', error.message);
+                } else if (data?.session?.user) {
+                    const email = data.session.user.email;
+                    console.log('✅ Usuario encontrado en sesión:', email);
+                    
+                    const userEmailEl = document.getElementById('userEmail');
+                    if (userEmailEl) {
+                        userEmailEl.textContent = email;
+                        // Guardar en localStorage para referencia futura
+                        localStorage.setItem('userEmail', email);
+                    }
+                    return;
+                }
+            } catch (supabaseError) {
+                console.warn('⚠️ Error con Supabase:', supabaseError.message);
+            }
+        }
+        
+        // Opción 2: Buscar en localStorage (sesión guardada previamente)
+        const storedEmail = localStorage.getItem('userEmail');
+        if (storedEmail) {
+            console.log('✅ Email cargado desde localStorage:', storedEmail);
+            const userEmailEl = document.getElementById('userEmail');
+            if (userEmailEl) {
+                userEmailEl.textContent = storedEmail;
+            }
+            return;
+        }
+        
+        // Opción 3: Buscar en sessionStorage
+        const sessionEmail = sessionStorage.getItem('userEmail');
+        if (sessionEmail) {
+            console.log('✅ Email cargado desde sessionStorage:', sessionEmail);
+            const userEmailEl = document.getElementById('userEmail');
+            if (userEmailEl) {
+                userEmailEl.textContent = sessionEmail;
+            }
+            return;
+        }
+        
+        // Opción 4: Usar email por defecto
+        console.log('⚠️ No se encontró sesión, usando email por defecto');
+        const userEmailEl = document.getElementById('userEmail');
+        if (userEmailEl) {
+            userEmailEl.textContent = 'usuario@institucion.com';
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al cargar usuario:', error);
+        // Fallback final
+        const userEmailEl = document.getElementById('userEmail');
+        if (userEmailEl) {
+            userEmailEl.textContent = 'usuario@institucion.com';
+        }
+    }
+}
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Iniciando consulta de fichas...');
+    
+    // Cargar base de datos
     cargarBaseDeDatos();
     
+    // Cargar información del usuario (con retry si falla)
+    cargarUsuario();
+    
+    // Reintentar carga de usuario después de 1 segundo (por si Supabase tarda en cargar)
+    setTimeout(() => {
+        cargarUsuario();
+    }, 1000);
+    
+    // Buscar con Enter
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
@@ -437,11 +536,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Cerrar sesión
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Cerrar sesión?')) {
+            if (confirm('¿Está seguro de cerrar sesión?')) {
                 localStorage.clear();
+                sessionStorage.clear();
                 window.location.href = '../index.html';
             }
         });
