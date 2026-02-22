@@ -93,7 +93,7 @@ function showAlert(type, message) {
 }
 
 function validarFormulario() {
-    const camposObligatorios = ['placa', 's_carroceria', 'marca', 'modelo', 'tipo', 'clase'];
+    const camposObligatorios = ['s_carroceria', 'marca', 'modelo', 'tipo', 'clase'];
     let isValid = true;
     let mensajeError = '';
     
@@ -102,7 +102,7 @@ function validarFormulario() {
         if (!input.value.trim()) {
             isValid = false;
             input.style.borderColor = '#dc2626';
-            mensajeError = `El campo "${input.previousElementSibling.textContent.replace('*', '')}" es obligatorio`;
+            mensajeError = `El campo "${input.previousElementSibling.textContent.replace('*', '').replace('(opcional)', '')}" es obligatorio`;
         } else {
             input.style.borderColor = '#ddd';
         }
