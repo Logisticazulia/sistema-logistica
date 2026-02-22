@@ -1,43 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- ================= METAETIQUETAS ESENCIALES ================= -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Acceso al sistema institucional - Login seguro">
 <meta name="theme-color" content="#003366">
-<!-- ================= TÍTULO E ICONOS ================= -->
 <title>Acceso | Sistema de Gestión Administrativa</title>
 <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" href="img/logo.png">
-<!-- ================= ESTILOS ================= -->
-<!-- Fuentes Google -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<!-- Hoja de estilos principal -->
 <link rel="stylesheet" href="css/style.css">
-
-<!-- ================= ESTILOS PARA LAYOUT DIVIDIDO ================= -->
 <style>
-    /* Reset básico para el layout de pantalla completa */
     html, body {
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow: hidden; /* Evitar scroll en escritorio */
+        overflow: hidden; 
     }
-
-    /* Contenedor Principal Dividido */
     .split-container {
         display: flex;
         height: 100vh;
         width: 100%;
     }
-
-    /* ================= LADO IZQUIERDO: VISOR DE IMÁGENES ================= */
     .visual-panel {
-        flex: 1; /* Ocupa el 50% */
+        flex: 1;
         position: relative;
         background-color: #003366;
         overflow: hidden;
@@ -62,14 +50,12 @@
         height: 100%;
         object-fit: cover;
         opacity: 0;
-        transition: opacity 1.5s ease-in-out; /* Transición suave */
+        transition: opacity 1.5s ease-in-out; 
     }
 
     .slide.active {
         opacity: 1;
     }
-
-    /* Capa oscura sobre las imágenes */
     .visual-overlay {
         position: absolute;
         top: 0;
@@ -100,20 +86,16 @@
         font-size: 1.1rem;
         opacity: 0.9;
     }
-
-    /* ================= LADO DERECHO: LOGIN (Mantiene tu diseño) ================= */
     .login-panel {
-        flex: 1; /* Ocupa el 50% */
+        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #f4f6f9; /* O el color de fondo que uses */
+        background-color: #f4f6f9;
         padding: 20px;
         position: relative;
         z-index: 10;
     }
-
-    /* Asegurar que tu login-wrapper original se centre bien */
     .login-wrapper {
         display: flex;
         flex-direction: column;
@@ -122,35 +104,27 @@
         width: 100%;
         max-width: 500px;
     }
-
-    /* ================= RESPONSIVE (MÓVILES) ================= */
     @media (max-width: 768px) {
         .split-container { 
             flex-direction: column; 
         }
         .visual-panel { 
-            display: none; /* Ocultar imágenes en móvil */ 
+            display: none; 
         }
         .login-panel { 
             width: 100%; 
             height: 100%; 
         }
         html, body { 
-            overflow: auto; /* Permitir scroll en móvil */ 
+            overflow: auto; 
         }
     }
 </style>
 </head>
 <body class="login-page">
-
-<!-- ================= CONTENEDOR PRINCIPAL DIVIDIDO ================= -->
 <div class="split-container">
-    
-    <!-- LADO IZQUIERDO: Visor de Imágenes (NUEVO) -->
     <section class="visual-panel">
         <div class="slider-container">
-            <!-- 🔧 REEMPLAZA: src con tus 4 imágenes reales -->
-            <!-- Ejemplo: img/slider1.jpg, img/slider2.jpg, etc. -->
             <img src="img/foto1.jpeg" alt="Imagen 1" class="slide active">
             <img src="img/foto2.jpeg" alt="Institucional 2" class="slide">
             <img src="img/foto3.jpeg" alt="Institucional 3" class="slide">
@@ -158,20 +132,15 @@
         </div>
         <div class="visual-overlay"></div>
         <div class="visual-text">
-            <h2>Sistema Automatizado de Gestión Administrativa</h2>
+            <h2>Sistema Automatizado de Gestión Administrativa (Logistica)</h2>
             <p>Cuerpo de Policia Nacional Bolivariana CCPE ZULIA</p>
         </div>
     </section>
-
-    <!-- LADO DERECHO: Login (DISEÑO ORIGINAL INTACTO) -->
     <section class="login-panel">
         <main class="login-wrapper" role="main">
-            <!-- Tarjeta de Login -->
             <article class="login-card" aria-labelledby="login-title">
-                <!-- Sección: Logo y Título -->
                 <header class="login-header">
                     <div class="logo-container">
-                        <!-- 🔧 REEMPLAZA: src con tu logo real -->
                         <img
                             src="img/logo.png"
                             alt="Logo Institucional"
@@ -184,9 +153,7 @@
                     <h1 id="login-title">Sistema Automatizado de Gestión Administrativa</h1>
                     <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
                 </header>
-                <!-- Sección: Formulario -->
                 <form id="loginForm" class="login-form" novalidate>
-                    <!-- Campo: Email -->
                     <div class="form-group">
                         <label for="email" class="form-label">
                             Correo Electrónico
@@ -202,7 +169,6 @@
                             aria-required="true"
                         >
                     </div>
-                    <!-- Campo: Contraseña -->
                     <div class="form-group">
                         <label for="password" class="form-label">
                             Contraseña
@@ -219,17 +185,13 @@
                             minlength="6"
                         >
                     </div>
-                    <!-- Mensajes de error/éxito -->
                     <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
-                    <!-- Botón de envío -->
                     <button type="submit" class="btn btn-primary btn-login" id="submitBtn">
                         <span class="btn-text">Ingresar</span>
                         <span class="btn-loader" hidden>Procesando...</span>
                     </button>
                 </form>
-                <!-- Footer: Mensaje de Seguridad Elegante -->
                 <footer class="login-footer">
-                    <!-- Badge de seguridad minimalista -->
                     <div class="security-badge">
                         <span class="security-icon">🔒</span>
                         <span class="security-label">Conexión segura y encriptada</span>
@@ -237,43 +199,29 @@
                     </div>
                 </footer>
             </article>
-            <!-- Pie de página institucional -->
             <p class="copyright">
                 &copy; <span id="currentYear"></span> OTIC ZULIA. Todos los derechos reservados.
             </p>
         </main>
     </section>
 </div>
-
-<!-- ================= SCRIPTS ================= -->
-<!-- Librería de Supabase (CDN) -->
 <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     defer
 ></script>
-<!-- Lógica de autenticación (archivo separado) -->
 <script src="js/auth.js" defer></script>
-<!-- Script pequeño para elementos dinámicos -->
 <script>
-    // Año automático en el copyright
     document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-    // Lógica del Slider de Imágenes (Carrusel Suave)
     document.addEventListener('DOMContentLoaded', () => {
         const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
-        const slideInterval = 5000; // 5 segundos por imagen
+        const slideInterval = 5000; 
 
         function nextSlide() {
-            // Quitar clase active de la actual
             slides[currentSlide].classList.remove('active');
-            // Calcular siguiente índice
             currentSlide = (currentSlide + 1) % slides.length;
-            // Poner clase active a la siguiente
             slides[currentSlide].classList.add('active');
         }
-
-        // Iniciar el intervalo si hay más de una imagen
         if (slides.length > 1) {
             setInterval(nextSlide, slideInterval);
         }
