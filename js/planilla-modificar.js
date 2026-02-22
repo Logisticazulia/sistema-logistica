@@ -267,7 +267,7 @@ async function buscarVehiculo() {
 
 // ================= VALIDACIÓN =================
 function validarFormulario() {
-    const camposObligatorios = ['placa', 'marca', 'modelo', 'tipo', 'clase'];
+    const camposObligatorios = ['s_carroceria', 'situacion', 'estatus'];
     let isValid = true;
     let mensajeError = '';
     
@@ -287,7 +287,6 @@ function validarFormulario() {
     if (!isValid) {
         showAlert('error', mensajeError);
     }
-    
     return isValid;
 }
 
