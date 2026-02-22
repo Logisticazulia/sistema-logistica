@@ -11,9 +11,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
-<!-- Librerías para exportar -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 * {
     margin: 0;
@@ -32,11 +29,12 @@ body {
     flex-direction: column;
     gap: 30px;
 }
-/* ================= BARRA DE BÚSQUEDA ================= */
+/* ================= BARRA DE BÚSQUEDA (IGUAL A ficha-modificar.html) ================= */
 .search-section {
     background: linear-gradient(135deg, #003366 0%, #004080 100%);
     padding: 25px;
     border-radius: 8px;
+    margin-bottom: 25px;
     box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
 .search-section h3 {
@@ -51,21 +49,10 @@ body {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
-    align-items: flex-end;
-}
-.search-group {
-    flex: 1;
-    min-width: 200px;
-}
-.search-group label {
-    display: block;
-    color: rgba(255,255,255,0.9);
-    font-size: 13px;
-    margin-bottom: 5px;
-    font-weight: 500;
 }
 .search-input {
-    width: 100%;
+    flex: 1;
+    min-width: 250px;
     padding: 12px 16px;
     border: 2px solid rgba(255,255,255,0.3);
     border-radius: 6px;
@@ -100,6 +87,11 @@ body {
     background: #218838;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+.btn-search:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
 }
 .btn-clear {
     padding: 12px 28px;
@@ -267,7 +259,7 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-/* ================= FICHA TÉCNICA PREVIEW (IDÉNTICA A ficha-crear.html) ================= */
+/* ================= FICHA TÉCNICA PREVIEW ================= */
 .ficha-tecnica {
     border: 2px solid #003366;
     padding: 25px;
@@ -423,7 +415,7 @@ body {
     .search-container {
         flex-direction: column;
     }
-    .search-group {
+    .search-input {
         min-width: 100%;
     }
     .ficha-item {
@@ -465,12 +457,10 @@ body {
             <span class="breadcrumb-separator">/</span>
             <a href="transporte.html" class="breadcrumb-link">Transporte</a>
             <span class="breadcrumb-separator">/</span>
-            <a href="ficha.html" class="breadcrumb-link">Ficha Técnica</a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Consultar</span>
+            <span class="breadcrumb-current">Consultar Fichas</span>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">
-            ← Volver a Ficha
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
+            ← Volver a Transporte
         </button>
     </header>
     <!-- Título del Módulo -->
@@ -479,27 +469,35 @@ body {
         <p class="module-subtitle">Busque y visualice las fichas técnicas registradas</p>
     </section>
     <div class="container">
-        <!-- SECCIÓN DE BÚSQUEDA -->
+        <!-- SECCIÓN DE BÚSQUEDA (IGUAL A ficha-modificar.html) -->
         <div class="search-section">
             <h3>🔍 Buscar Ficha Técnica</h3>
             <div id="searchAlert" class="alert"></div>
             <div class="search-container">
-                <div class="search-group">
-                    <label for="searchPlaca">Placa</label>
-                    <input type="text" id="searchPlaca" class="search-input" placeholder="Ej: 3P417">
-                </div>
-                <div class="search-group">
-                    <label for="searchFacsimil">Facsímil</label>
-                    <input type="text" id="searchFacsimil" class="search-input" placeholder="Ej: 3P417">
-                </div>
-                <div class="search-group">
-                    <label for="searchSerialCarroceria">Serial Carrocería</label>
-                    <input type="text" id="searchSerialCarroceria" class="search-input" placeholder="Ej: MMBJJKL10PH096515">
-                </div>
-                <div class="search-group">
-                    <label for="searchSerialMotor">Serial Motor</label>
-                    <input type="text" id="searchSerialMotor" class="search-input" placeholder="Ej: 4N15UKL1409">
-                </div>
+                <input
+                    type="text"
+                    id="searchPlaca"
+                    class="search-input"
+                    placeholder="Placa (Ej: 3P417)"
+                >
+                <input
+                    type="text"
+                    id="searchFacsimil"
+                    class="search-input"
+                    placeholder="Facsímil"
+                >
+                <input
+                    type="text"
+                    id="searchSerialCarroceria"
+                    class="search-input"
+                    placeholder="Serial Carrocería"
+                >
+                <input
+                    type="text"
+                    id="searchSerialMotor"
+                    class="search-input"
+                    placeholder="Serial Motor"
+                >
                 <button class="btn-search" onclick="buscarFichas()" id="btnSearch">
                     <span>🔍</span>
                     <span>Buscar</span>
@@ -513,7 +511,7 @@ body {
                 <span>💡 Puede buscar por uno o varios campos simultáneamente</span>
             </div>
         </div>
-        <!-- LISTA DE FICHAS -->
+        <!-- LISTA DE FICHAS TÉCNICAS REGISTRADAS -->
         <div class="fichas-section">
             <h2>📄 Fichas Técnicas Registradas</h2>
             <div id="fichasList" class="fichas-list">
@@ -522,7 +520,7 @@ body {
                 </div>
             </div>
         </div>
-        <!-- VISTA DE FICHA SELECCIONADA (IDÉNTICA A ficha-crear.html) -->
+        <!-- VISTA DE FICHA SELECCIONADA -->
         <div id="fichaViewSection" class="ficha-view-section">
             <div class="ficha-view-header">
                 <h2 class="ficha-view-title">📋 Ficha Técnica Detallada</h2>
