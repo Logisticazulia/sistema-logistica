@@ -11,427 +11,387 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
+<!-- Librerías para exportar -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    font-family: 'Roboto', sans-serif;
-    background: #f5f5f5;
-}
-.container {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-/* ================= BARRA DE BÚSQUEDA ================= */
-.search-section {
-    background: linear-gradient(135deg, #003366 0%, #004080 100%);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,51,102,0.2);
-}
-.search-section h3 {
-    color: white;
-    margin-bottom: 15px;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.search-container {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: flex-end;
-}
-.search-group {
-    flex: 1;
-    min-width: 200px;
-}
-.search-group label {
-    display: block;
-    color: rgba(255,255,255,0.9);
-    font-size: 13px;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-.search-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 6px;
-    font-size: 15px;
-    background: rgba(255,255,255,0.95);
-    transition: all 0.3s ease;
-}
-.search-input:focus {
-    outline: none;
-    border-color: #fff;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
-}
-.search-input::placeholder {
-    color: #666;
-}
-.btn-search {
-    padding: 12px 28px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-.btn-search:hover {
-    background: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-}
-.btn-clear {
-    padding: 12px 28px;
-    background: #ffc107;
-    color: #000;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-.btn-clear:hover {
-    background: #e0a800;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255,193,7,0.3);
-}
-.search-hint {
-    color: rgba(255,255,255,0.9);
-    font-size: 13px;
-    margin-top: 10px;
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-.search-hint span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-/* ================= LISTA DE FICHAS ================= */
-.fichas-section {
+.consultar-header {
     background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-.fichas-section h2 {
-    color: #003366;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #003366;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.fichas-list {
-    display: grid;
-    gap: 15px;
-}
-.ficha-item {
-    background: #f8f9fa;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
     padding: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+    margin-bottom: 20px;
+}
+.filters-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
+    margin-bottom: 15px;
 }
-.ficha-item:hover {
-    border-color: #003366;
-    box-shadow: 0 4px 12px rgba(0,51,102,0.15);
-    transform: translateY(-2px);
-}
-.ficha-item.selected {
-    border-color: #003366;
-    background: #e3f2fd;
-    box-shadow: 0 4px 12px rgba(0,51,102,0.2);
-}
-.ficha-field {
+.filter-group {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
-.ficha-field-label {
-    font-size: 12px;
+.filter-group label {
+    font-size: 0.75rem;
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
 }
-.ficha-field-value {
-    font-size: 14px;
-    color: #003366;
-    font-weight: 500;
-}
-.ficha-date {
-    font-size: 12px;
-    color: #999;
-    grid-column: 1 / -1;
-    text-align: right;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0;
-}
-/* ================= VISTA DE FICHA ================= */
-.ficha-view-section {
+.filter-select {
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.85rem;
     background: white;
-    padding: 30px;
+    cursor: pointer;
+}
+.filter-select:focus {
+    outline: none;
+    border-color: #005b96;
+}
+/* Nueva barra de búsqueda */
+.search-container {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    grid-column: 1 / -1;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    display: none;
 }
-.ficha-view-section.active {
-    display: block;
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    max-width: 400px;
 }
-.ficha-view-header {
+.search-input:focus {
+    outline: none;
+    border-color: #005b96;
+}
+.btn-buscar {
+    background: #005b96;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-buscar:hover {
+    background: #003366;
+}
+.btn-limpiar {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-limpiar:hover {
+    background: #5a6268;
+}
+.btn-exportar {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+}
+.btn-exportar:hover {
+    background: #218838;
+}
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+.table-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+    overflow: hidden;
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1200px;
+}
+.data-table thead {
+    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+}
+.data-table th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+.data-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e8eef5;
+    font-size: 0.85rem;
+}
+.data-table tbody tr {
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.data-table tbody tr:hover {
+    background: #e3f2fd;
+}
+.data-table tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+.data-table tbody tr:nth-child(even):hover {
+    background: #e3f2fd;
+}
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+.badge-operativa { background: #d1fae5; color: #059669; }
+.badge-inoperativa { background: #fee2e2; color: #dc2626; }
+.badge-reparacion { background: #fef3c7; color: #d97706; }
+.badge-desincorporada { background: #e5e7eb; color: #6b7280; }
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #e8eef5;
+}
+.pagination button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.pagination button:hover {
+    background: #005b96;
+    color: white;
+    border-color: #005b96;
+}
+.pagination button.active {
+    background: #003366;
+    color: white;
+    border-color: #003366;
+}
+.pagination button:disabled {
+    background: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+}
+.results-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid #003366;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 0.85rem;
 }
-.ficha-view-title {
-    color: #003366;
-    font-size: 20px;
-    font-weight: 700;
+/* Modal de Ficha */
+.modal-ficha {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    overflow-y: auto;
 }
-.ficha-view-actions {
+.modal-ficha-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 900px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    animation: modalFadeIn 0.3s;
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+    background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px 10px 0 0;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal-close:hover {
+    color: #ffc107;
+}
+.modal-body {
+    padding: 25px;
+}
+.ficha-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.ficha-logo img {
+    max-width: 150px;
+    height: auto;
+}
+.ficha-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.ficha-field {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #005b96;
+}
+.ficha-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.ficha-field span {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+.ficha-observacion {
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #ffc107;
+    margin-top: 15px;
+}
+.ficha-observacion label {
+    font-size: 0.75rem;
+    color: #856404;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+}
+.ficha-observacion span {
+    font-size: 0.9rem;
+    color: #856404;
+}
+.modal-footer {
+    padding: 15px 25px;
+    background: #f8f9fa;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    justify-content: flex-end;
     gap: 10px;
 }
-.btn {
+.btn-modal {
     padding: 10px 20px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.85rem;
     font-weight: 500;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    gap: 5px;
 }
-.btn-primary {
-    background: #003366;
+.btn-pdf {
+    background: #dc3545;
     color: white;
 }
-.btn-primary:hover {
-    background: #002244;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+.btn-pdf:hover {
+    background: #c82333;
 }
-.btn-secondary {
+.btn-imprimir {
+    background: #17a2b8;
+    color: white;
+}
+.btn-imprimir:hover {
+    background: #138496;
+}
+.btn-cerrar {
     background: #6c757d;
     color: white;
 }
-.btn-secondary:hover {
+.btn-cerrar:hover {
     background: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-.btn-success {
-    background: #28a745;
-    color: white;
-}
-.btn-success:hover {
-    background: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-/* ================= FICHA TÉCNICA PREVIEW ================= */
-.ficha-tecnica {
-    border: 2px solid #003366;
-    padding: 25px;
-    background: white;
-    width: 100%;
-}
-.ficha-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #003366;
-}
-.ficha-logo {
-    width: 100px;
-    height: auto;
-}
-.ficha-title {
-    text-align: center;
-    flex: 1;
-    padding: 0 20px;
-}
-.ficha-title h1 {
-    font-size: 15px;
-    color: #003366;
-    margin-bottom: 5px;
-    line-height: 1.4;
-    font-weight: 700;
-}
-.ficha-title h2 {
-    font-size: 18px;
-    color: #003366;
-    margin: 5px 0;
-    font-weight: 700;
-}
-.ficha-title h3 {
-    font-size: 16px;
-    color: #003366;
-    margin-top: 5px;
-    font-weight: 700;
-}
-.ficha-logo-right {
-    width: 100px;
-    height: auto;
-}
-.ficha-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 15px;
-    table-layout: fixed;
-}
-.ficha-table th {
-    background: #4a7c9b;
-    color: white;
-    padding: 12px 10px;
-    text-align: left;
-    font-size: 13px;
-    border: 2px solid #003366;
-    font-weight: 700;
-}
-.ficha-table td {
-    padding: 10px 8px;
-    border: 2px solid #003366;
-    font-size: 12px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    vertical-align: top;
-}
-.ficha-table .label {
-    font-weight: 700;
-    background: #f0f0f0;
-    width: 18%;
-}
-.ficha-table .value {
-    width: 32%;
-}
-.fotos-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-top: 15px;
-    width: 100%;
-}
-.foto-box {
-    border: 2px solid #4a7c9b;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #4a7c9b;
-    color: white;
-    font-weight: 700;
-    font-size: 15px;
-    border-radius: 4px;
-    overflow: hidden;
-    width: 100%;
-}
-.foto-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: none;
-}
-.observaciones-box {
-    min-height: 260px;
-    border: 2px solid #003366;
-    padding: 12px;
-    background: #fafafa;
-    font-size: 12px;
-    line-height: 1.5;
-    border-radius: 4px;
-    color: #000000 !important;
-    white-space: pre-wrap;
-}
-/* ================= ALERTAS ================= */
-.alert {
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin: 15px 0;
-    display: none;
-    font-weight: 500;
-}
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-.alert-info {
-    background: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-/* ================= RESPONSIVE ================= */
+/* Estilos para impresión */
 @media print {
-    .navbar, .module-header, .btn, .search-section, .fichas-section {
+    .modal-footer, .modal-close {
         display: none !important;
     }
-    .ficha-view-section {
-        display: block !important;
-    }
-    .ficha-tecnica {
-        border: 2px solid #003366;
+    .modal-ficha-content {
+        box-shadow: none;
+        margin: 0;
         width: 100%;
+        max-width: 100%;
     }
 }
 @media (max-width: 768px) {
-    .search-container {
-        flex-direction: column;
-    }
-    .search-group {
-        min-width: 100%;
-    }
-    .ficha-item {
+    .filters-row {
         grid-template-columns: 1fr;
     }
-    .ficha-header {
+    .search-container {
         flex-direction: column;
-        gap: 10px;
+        align-items: stretch;
     }
-    .fotos-container {
-        grid-template-columns: repeat(2, 1fr);
+    .search-input {
+        max-width: 100%;
+    }
+    .action-buttons {
+        flex-wrap: wrap;
     }
 }
 </style>
@@ -462,82 +422,147 @@ body {
             <span class="breadcrumb-separator">/</span>
             <a href="transporte.html" class="breadcrumb-link">Transporte</a>
             <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Consultar Fichas</span>
+            <a href="ficha.html" class="breadcrumb-link">Ficha Técnica</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Consultar</span>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
-            ← Volver a Transporte
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">
+            ← Volver a Ficha
         </button>
     </header>
     <!-- Título del Módulo -->
     <section class="module-title-section">
-        <h1 class="module-title">📋 Consultar Fichas Técnicas</h1>
-        <p class="module-subtitle">Busque y visualice las fichas técnicas registradas</p>
+        <h1 class="module-title">🔍 Consultar Fichas Técnicas</h1>
+        <p class="module-subtitle">Búsqueda y visualización de fichas técnicas registradas</p>
     </section>
-    <div class="container">
-        <!-- SECCIÓN DE BÚSQUEDA -->
-        <div class="search-section">
-            <h3>🔍 Buscar Ficha Técnica</h3>
-            <div id="searchAlert" class="alert"></div>
-            <div class="search-container">
-                <div class="search-group">
-                    <label for="searchPlaca">Placa</label>
-                    <input type="text" id="searchPlaca" class="search-input" placeholder="Ej: 3P417">
-                </div>
-                <div class="search-group">
-                    <label for="searchFacsimil">Facsímil</label>
-                    <input type="text" id="searchFacsimil" class="search-input" placeholder="Ej: 3P417">
-                </div>
-                <div class="search-group">
-                    <label for="searchSerialCarroceria">Serial Carrocería</label>
-                    <input type="text" id="searchSerialCarroceria" class="search-input" placeholder="Ej: MMBJJKL10PH096515">
-                </div>
-                <div class="search-group">
-                    <label for="searchSerialMotor">Serial Motor</label>
-                    <input type="text" id="searchSerialMotor" class="search-input" placeholder="Ej: 4N15UKL1409">
-                </div>
-                <button class="btn-search" onclick="buscarFichas()" id="btnSearch">
-                    <span>🔍</span>
-                    <span>Buscar</span>
+    <div class="consultar-header">
+        <!-- Barra de Búsqueda -->
+        <div class="search-container">
+            <div class="filter-group" style="flex: 1;">
+                <label for="searchInput">🔍 Buscar por Placa, Facsímil o Serial</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsímil o serial...">
+            </div>
+            <div class="action-buttons">
+                <button class="btn-buscar" onclick="buscarFichas()">
+                    🔍 Buscar
                 </button>
-                <button class="btn-clear" onclick="limpiarBusqueda()">
-                    <span>🔄</span>
-                    <span>Limpiar</span>
+                <button class="btn-limpiar" onclick="limpiarFiltros()">
+                    🧹 Limpiar
+                </button>
+                <button class="btn-exportar" onclick="exportarExcel()">
+                    📊 Exportar Excel
                 </button>
             </div>
-            <div class="search-hint">
-                <span>💡 Puede buscar por uno o varios campos simultáneamente</span>
+        </div>
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="filterTipo">Tipo</label>
+                <select id="filterTipo" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="AUTOMOVIL">AUTOMOVIL</option>
+                    <option value="BUS">BUS</option>
+                    <option value="CAMION">CAMION</option>
+                    <option value="CAMIONETA">CAMIONETA</option>
+                    <option value="ENDURO">ENDURO</option>
+                    <option value="ESPECIAL">ESPECIAL</option>
+                    <option value="MACHITO">MACHITO</option>
+                    <option value="MINIBUS">MINIBUS</option>
+                    <option value="MOTO">MOTO</option>
+                    <option value="PICKUP">PICKUP</option>
+                    <option value="SPORTWAGON">SPORTWAGON</option>
+                    <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+                    <option value="TRIMOVIL">TRIMOVIL</option>
+                    <option value="VAM">VAM</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterClase">Clase</label>
+                <select id="filterClase" class="filter-select">
+                    <option value="">Todas</option>
+                    <option value="AUTOBUS">AUTOBUS</option>
+                    <option value="AUTOMOVIL">AUTOMOVIL</option>
+                    <option value="BLINDADO">BLINDADO</option>
+                    <option value="CAMION">CAMION</option>
+                    <option value="CAMIONETA">CAMIONETA</option>
+                    <option value="ESPECIAL">ESPECIAL</option>
+                    <option value="MOTO">MOTO</option>
+                    <option value="TRACCIONDESANGRE">TRACCIONDESANGRE</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterEstatus">Estatus</label>
+                <select id="filterEstatus" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="COMODATO">COMODATO</option>
+                    <option value="DENUNCIADA">DENUNCIADA</option>
+                    <option value="DESINCORPORADA">DESINCORPORADA</option>
+                    <option value="DONACION">DONACION</option>
+                    <option value="INOPERATIVA">INOPERATIVA</option>
+                    <option value="OPERATIVA">OPERATIVA</option>
+                    <option value="REPARACION">REPARACION</option>
+                    <option value="TALLER">TALLER</option>
+                </select>
             </div>
         </div>
-        <!-- LISTA DE FICHAS -->
-        <div class="fichas-section">
-            <h2>📄 Fichas Técnicas Registradas</h2>
-            <div id="fichasList" class="fichas-list">
-                <div style="text-align: center; padding: 40px; color: #666;">
-                    <p>🔍 Realice una búsqueda para ver las fichas disponibles</p>
-                </div>
-            </div>
+        <div class="results-info">
+            <span id="resultsCount">Cargando...</span>
+            <span id="pageInfo"></span>
         </div>
-        <!-- VISTA DE FICHA SELECCIONADA -->
-        <div id="fichaViewSection" class="ficha-view-section">
-            <div class="ficha-view-header">
-                <h2 class="ficha-view-title">📋 Ficha Técnica Detallada</h2>
-                <div class="ficha-view-actions">
-                    <button class="btn btn-success" onclick="imprimirFicha()">
-                        <span>🖨️</span>
-                        <span>Imprimir</span>
-                    </button>
-                    <button class="btn btn-secondary" onclick="cerrarFicha()">
-                        <span>❌</span>
-                        <span>Cerrar</span>
-                    </button>
-                </div>
-            </div>
-            <div id="fichaDetalle" class="ficha-tecnica">
-                <!-- Contenido se carga dinámicamente -->
-            </div>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Facsímil</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Tipo</th>
+                    <th>Clase</th>
+                    <th>Serial Carrocería</th>
+                    <th>Serial Motor</th>
+                    <th>Estatus</th>
+                </tr>
+            </thead>
+            <tbody id="fichasTableBody">
+            </tbody>
+        </table>
+        <div class="pagination" id="pagination">
         </div>
     </div>
 </main>
+<!-- Modal de Ficha del Vehículo -->
+<div id="modalFicha" class="modal-ficha">
+    <div class="modal-ficha-content" id="fichaContent">
+        <div class="modal-header">
+            <h2>📋 Ficha Técnica Detallada</h2>
+            <button class="modal-close" onclick="cerrarFicha()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="ficha-logo">
+                <img src="../img/logo.png" alt="Logo Institucional">
+            </div>
+            <div class="ficha-grid" id="fichaData">
+                <!-- Datos se llenan dinámicamente -->
+            </div>
+            <div class="ficha-observacion" id="fichaObservacion" style="display: none;">
+                <label>📝 Observación:</label>
+                <span id="observacionText"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-pdf" onclick="exportarPDF()">
+                📄 Exportar PDF
+            </button>
+            <button class="btn-modal btn-imprimir" onclick="imprimirFicha()">
+                🖨️ Imprimir
+            </button>
+            <button class="btn-modal btn-cerrar" onclick="cerrarFicha()">
+                ❌ Cerrar
+            </button>
+        </div>
+    </div>
+</div>
 <!-- ================= SCRIPTS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
