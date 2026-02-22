@@ -1,7 +1,6 @@
 // ============================================
 // CONSULTAR FICHAS TÉCNICAS - LÓGICA
 // ============================================
-
 // Configuración de Supabase
 const supabaseClient = window.supabase.createClient(
     window.SUPABASE_URL,
@@ -69,7 +68,12 @@ async function buscarFichas() {
 }
 
 function limpiarBusqueda() {
-    document.getElementById('searchInput').value = '';
+    // ✅ CORREGIDO: Usar searchInput en lugar de campos individuales
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
     document.getElementById('searchAlert').style.display = 'none';
     fichasEncontradas = [];
     fichaSeleccionada = null;
@@ -80,10 +84,10 @@ function limpiarBusqueda() {
     `;
     document.getElementById('fichaViewSection').classList.remove('active');
 }
+
 // ============================================
 // RENDERIZAR LISTA DE FICHAS
 // ============================================
-
 function renderizarListaFichas() {
     const container = document.getElementById('fichasList');
     
@@ -137,7 +141,6 @@ function renderizarListaFichas() {
 // ============================================
 // SELECCIONAR Y MOSTRAR FICHA
 // ============================================
-
 function seleccionarFicha(id) {
     const ficha = fichasEncontradas.find(f => f.id == id);
     if (!ficha) {
@@ -290,30 +293,9 @@ function mostrarFichaDetalle(ficha) {
 // ============================================
 // FUNCIONES DE UTILIDAD
 // ============================================
-
-function limpiarBusqueda() {
-    document.getElementById('searchPlaca').value = '';
-    document.getElementById('searchFacsimil').value = '';
-    document.getElementById('searchSerialCarroceria').value = '';
-    document.getElementById('searchSerialMotor').value = '';
-    document.getElementById('searchAlert').style.display = 'none';
-    
-    fichasEncontradas = [];
-    fichaSeleccionada = null;
-    
-    document.getElementById('fichasList').innerHTML = `
-        <div style="text-align: center; padding: 40px; color: #666;">
-            <p>🔍 Realice una búsqueda para ver las fichas disponibles</p>
-        </div>
-    `;
-    
-    document.getElementById('fichaViewSection').classList.remove('active');
-}
-
 function cerrarFicha() {
     document.getElementById('fichaViewSection').classList.remove('active');
     fichaSeleccionada = null;
-    
     document.querySelectorAll('.ficha-item').forEach(item => {
         item.classList.remove('selected');
     });
@@ -341,22 +323,18 @@ function mostrarAlerta(mensaje, tipo) {
 // ============================================
 // INICIALIZACIÓN Y EVENTOS
 // ============================================
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando consulta de fichas técnicas...');
     
-    // Permitir buscar con Enter
-    const inputs = ['searchPlaca', 'searchFacsimil', 'searchSerialCarroceria', 'searchSerialMotor'];
-    inputs.forEach(inputId => {
-        const input = document.getElementById(inputId);
-        if (input) {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    buscarFichas();
-                }
-            });
-        }
-    });
+    // ✅ CORREGIDO: Usar searchInput en lugar de campos individuales
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buscarFichas();
+            }
+        });
+    }
     
     // Cerrar sesión
     const logoutBtn = document.getElementById('logoutBtn');
@@ -384,13 +362,4 @@ async function cargarUsuario() {
     } catch (error) {
         console.error('Error al cargar usuario:', error);
     }
-}
-// Permitir buscar con Enter
-const searchInput = document.getElementById('searchInput');
-if (searchInput) {
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            buscarFichas();
-        }
-    });
 }
