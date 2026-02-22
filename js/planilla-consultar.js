@@ -88,22 +88,21 @@ function populateFilters() {
 // Buscar por Placa o Facsímil
 function buscarPorPlacaFacsímil() {
     if (!searchInput) getDOMElements();
-    
     const searchTerm = searchInput ? searchInput.value.trim().toUpperCase() : '';
-    
     if (!searchTerm) {
         aplicarFiltros();
         return;
     }
-    
-    console.log('Búsqueda por placa/facsímil:', searchTerm);
-    
+    console.log('Búsqueda por placa/facsímil/seriales:', searchTerm);
     filteredVehicles = allVehicles.filter(v => {
         const placaMatch = v.placa && v.placa.trim().toUpperCase().includes(searchTerm);
         const facsimilMatch = v.facsimil && v.facsimil.trim().toUpperCase().includes(searchTerm);
-        return placaMatch || facsimilMatch;
+        // 🔹 NUEVO: Búsqueda por serial de carrocería
+        const carroceriaMatch = v.s_carroceria && v.s_carroceria.trim().toUpperCase().includes(searchTerm);
+        // 🔹 NUEVO: Búsqueda por serial de motor
+        const motorMatch = v.s_motor && v.s_motor.trim().toUpperCase().includes(searchTerm);
+        return placaMatch || facsimilMatch || carroceriaMatch || motorMatch;
     });
-    
     console.log(`Vehículos encontrados: ${filteredVehicles.length}`);
     currentPage = 1;
     renderTable();
