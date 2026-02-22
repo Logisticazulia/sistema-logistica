@@ -469,48 +469,45 @@ body {
         <p class="module-subtitle">Busque y visualice las fichas técnicas registradas</p>
     </section>
     <div class="container">
-        <!-- SECCIÓN DE BÚSQUEDA (IGUAL A ficha-modificar.html) -->
-        <div class="search-section">
-            <h3>🔍 Buscar Ficha Técnica</h3>
-            <div id="searchAlert" class="alert"></div>
-            <div class="search-container">
-                <input
-                    type="text"
-                    id="searchPlaca"
-                    class="search-input"
-                    placeholder="Placa (Ej: 3P417)"
-                >
-                <input
-                    type="text"
-                    id="searchFacsimil"
-                    class="search-input"
-                    placeholder="Facsímil"
-                >
-                <input
-                    type="text"
-                    id="searchSerialCarroceria"
-                    class="search-input"
-                    placeholder="Serial Carrocería"
-                >
-                <input
-                    type="text"
-                    id="searchSerialMotor"
-                    class="search-input"
-                    placeholder="Serial Motor"
-                >
-                <button class="btn-search" onclick="buscarFichas()" id="btnSearch">
-                    <span>🔍</span>
-                    <span>Buscar</span>
-                </button>
-                <button class="btn-clear" onclick="limpiarBusqueda()">
-                    <span>🔄</span>
-                    <span>Limpiar</span>
-                </button>
-            </div>
-            <div class="search-hint">
-                <span>💡 Puede buscar por uno o varios campos simultáneamente</span>
-            </div>
+    <!-- SECCIÓN DE BÚSQUEDA (IGUAL A ficha-modificar.html) -->
+<div class="search-section">
+    <h3>🔍 Buscar Ficha Técnica en Base de Datos</h3>
+    <div id="searchAlert" class="alert"></div>
+    <div class="search-container">
+        <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Ingrese placa, facsimilar, serial de carrocería o serial de motor..."
+            autocomplete="off"
+        >
+        <button class="btn-search" onclick="buscarFichas()" id="btnSearch">
+            <span>🔍</span>
+            <span>Buscar</span>
+        </button>
+        <button class="btn-clear" onclick="limpiarBusqueda()">
+            <span>🔄</span>
+            <span>Limpiar</span>
+        </button>
+    </div>
+    <div class="search-hint">
+        <span>💡 Busque por:</span>
+        <span>🚗 Placa</span>
+        <span>📄 Facsimilar</span>
+        <span>🔢 Serial Carrocería</span>
+        <span>⚙️ Serial Motor</span>
+    </div>
+</div>
+
+<!-- LISTA DE FICHAS TÉCNICAS REGISTRADAS -->
+<div class="fichas-section">
+    <h2>📄 Fichas Técnicas Registradas</h2>
+    <div id="fichasList" class="fichas-list">
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <p>🔍 Realice una búsqueda para ver las fichas disponibles</p>
         </div>
+    </div>
+</div>
         <!-- LISTA DE FICHAS TÉCNICAS REGISTRADAS -->
         <div class="fichas-section">
             <h2>📄 Fichas Técnicas Registradas</h2>
