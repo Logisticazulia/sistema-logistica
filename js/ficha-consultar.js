@@ -7,7 +7,7 @@ let vehiculosDB = [];
 let vehiculoSeleccionado = null;
 
 // ============================================
-// CARGA DE DATOS
+// CARGA DE DATOS DESDE CSV
 // ============================================
 
 async function cargarBaseDeDatos() {
@@ -20,8 +20,10 @@ async function cargarBaseDeDatos() {
             return;
         }
         
-        // Si no hay en localStorage, cargar desde CSV
+        // Cargar desde CSV con el nombre correcto de tu tabla
         const response = await fetch('../data/fichas_tecnicas_rows.csv');
+        if (!response.ok) throw new Error('CSV no encontrado');
+        
         const csvText = await response.text();
         vehiculosDB = parseCSV(csvText);
         
@@ -30,7 +32,7 @@ async function cargarBaseDeDatos() {
         console.log('✅ Base de datos cargada desde CSV:', vehiculosDB.length, 'vehículos');
     } catch (error) {
         console.error('❌ Error al cargar base de datos:', error);
-        mostrarAlerta('⚠️ No se pudo cargar la base de datos de vehículos', 'error');
+        mostrarAlerta('⚠️ No se pudo cargar la base de datos', 'error');
     }
 }
 
@@ -41,6 +43,7 @@ function parseCSV(csvText) {
     const result = [];
     
     for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
         const values = parseCSVLine(lines[i]);
         const obj = {};
         headers.forEach((header, index) => {
@@ -51,7 +54,7 @@ function parseCSV(csvText) {
     return result;
 }
 
-// Parsear una línea de CSV considerando comillas
+// Parsear línea CSV con soporte para comillas
 function parseCSVLine(line) {
     const result = [];
     let current = '';
@@ -73,7 +76,7 @@ function parseCSVLine(line) {
 }
 
 // ============================================
-// BÚSQUEDA
+// BÚSQUEDA DE VEHÍCULOS
 // ============================================
 
 async function buscarVehiculo() {
@@ -85,13 +88,12 @@ async function buscarVehiculo() {
         return;
     }
     
-    // Cargar base de datos si no está cargada
     if (vehiculosDB.length === 0) {
         mostrarAlerta('⏳ Cargando base de datos...', 'info');
         await cargarBaseDeDatos();
     }
     
-    // Buscar en todos los campos relevantes (usando nombres del CSV)
+    // Buscar usando los nombres exactos del CSV fichas_tecnicas
     const resultados = vehiculosDB.filter(v =>
         (v.placa && v.placa.toUpperCase().includes(searchTerm)) ||
         (v.facsimil && v.facsimil.toUpperCase().includes(searchTerm)) ||
@@ -106,11 +108,11 @@ async function buscarVehiculo() {
         mostrarAlerta(`✅ Se encontraron ${resultados.length} vehículo(s)`, 'success');
     } else {
         mostrarResultados([]);
-        mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+        mostrarAlerta(`❌ No se encontró: ${searchTerm}`, 'error');
     }
 }
 
-// Mostrar resultados en la tabla
+// Mostrar resultados en tabla
 function mostrarResultados(resultados) {
     const tbody = document.getElementById('resultsBody');
     
@@ -118,7 +120,7 @@ function mostrarResultados(resultados) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                    📭 No se encontraron vehículos que coincidan con la búsqueda.
+                    📭 No se encontraron vehículos.
                 </td>
             </tr>
         `;
@@ -128,8 +130,8 @@ function mostrarResultados(resultados) {
     let html = '';
     resultados.forEach((v, index) => {
         const estatusClass = v.estatus_ficha && v.estatus_ficha.toUpperCase().includes('OPER') 
-            ? 'style="color: #28a745; font-weight: bold; font-size: 15px;"' 
-            : 'style="color: #dc3545; font-weight: bold; font-size: 15px;"';
+            ? 'style="color: #28a745; font-weight: bold;"' 
+            : 'style="color: #dc3545; font-weight: bold;"';
         
         const dependenciaCorta = v.dependencia ? 
             (v.dependencia.length > 40 ? v.dependencia.substring(0, 40) + '...' : v.dependencia) 
@@ -137,16 +139,16 @@ function mostrarResultados(resultados) {
         
         html += `
             <tr>
-                <td style="font-size: 15px;"><strong>${v.placa || 'N/A'}</strong></td>
-                <td style="font-size: 14px;">${v.marca || 'N/A'}</td>
-                <td style="font-size: 14px;">${v.modelo || 'N/A'}</td>
-                <td style="font-size: 14px;">${v.tipo || 'N/A'}</td>
-                <td style="font-size: 14px;">${v.color || 'N/A'}</td>
+                <td><strong>${v.placa || 'N/A'}</strong></td>
+                <td>${v.marca || 'N/A'}</td>
+                <td>${v.modelo || 'N/A'}</td>
+                <td>${v.tipo || 'N/A'}</td>
+                <td>${v.color || 'N/A'}</td>
                 <td ${estatusClass}>${v.estatus_ficha || 'N/A'}</td>
-                <td style="font-size: 14px;">${dependenciaCorta}</td>
+                <td>${dependenciaCorta}</td>
                 <td>
-                    <button class="btn-view" onclick="verFicha(${index})">👁️ Ver Ficha</button>
-                    <button class="btn-print" onclick="imprimirFichaDirecta(${index})">🖨️ Imprimir</button>
+                    <button class="btn-view" onclick="verFicha(${index})">👁️ Ver</button>
+                    <button class="btn-print" onclick="imprimirFichaDirecta(${index})">🖨️</button>
                 </td>
             </tr>
         `;
@@ -162,13 +164,13 @@ function mostrarResultados(resultados) {
 function verFicha(index) {
     const vehiculo = vehiculosDB[index];
     if (!vehiculo) {
-        mostrarAlerta('❌ No se pudo cargar la ficha', 'error');
+        mostrarAlerta('❌ Error al cargar ficha', 'error');
         return;
     }
     
     vehiculoSeleccionado = vehiculo;
     
-    // Llenar el modal con los datos (usando nombres del CSV)
+    // Mapeo exacto de campos del CSV fichas_tecnicas
     document.getElementById('modalMarca').textContent = vehiculo.marca || 'N/A';
     document.getElementById('modalModelo').textContent = vehiculo.modelo || 'N/A';
     document.getElementById('modalTipo').textContent = vehiculo.tipo || 'N/A';
@@ -191,9 +193,9 @@ function verFicha(index) {
     document.getElementById('modalFechaCreacion').textContent = vehiculo.fecha_creacion || vehiculo.created_at || 'N/A';
     document.getElementById('modalCreadoPor').textContent = vehiculo.creado_por || 'N/A';
     
-    // Colores para estatus
+    // Estilo para estatus
     const estatusEl = document.getElementById('modalEstatus');
-    if (vehiculo.estatus_ficha && vehiculo.estatus_ficha.toUpperCase().includes('OPER')) {
+    if (vehiculo.estatus_ficha?.toUpperCase().includes('OPER')) {
         estatusEl.style.color = '#28a745';
         estatusEl.style.background = '#d4edda';
         estatusEl.style.padding = '8px';
@@ -205,23 +207,22 @@ function verFicha(index) {
         estatusEl.style.borderRadius = '4px';
     }
     
-    // Cargar fotos (usando URLs de Supabase del CSV: foto1_url, foto2_url, etc.)
+    // Cargar fotos usando foto1_url, foto2_url, etc. del CSV
     cargarFotosModal(vehiculo);
     
-    // Mostrar modal
     document.getElementById('fichaModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
 
-// Cargar fotos en el modal
+// Cargar fotos desde URLs de Supabase (foto1_url, foto2_url, etc.)
 function cargarFotosModal(vehiculo) {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('modalImg' + i);
         const box = document.getElementById('modalBox' + i);
         const span = box.querySelector('span');
         
-        // Usar las URLs de Supabase del CSV (foto1_url, foto2_url, etc.)
-        const fotoUrl = vehiculo['foto' + i + '_url'] || vehiculo['foto' + i];
+        // Usar las columnas foto1_url, foto2_url, etc. del CSV
+        const fotoUrl = vehiculo[`foto${i}_url`];
         
         if (fotoUrl && fotoUrl.trim() !== '' && fotoUrl !== 'null') {
             img.src = fotoUrl;
@@ -238,24 +239,19 @@ function cargarFotosModal(vehiculo) {
     }
 }
 
-// Cerrar modal
 function cerrarModal() {
     document.getElementById('fichaModal').style.display = 'none';
     document.body.style.overflow = 'auto';
     vehiculoSeleccionado = null;
 }
 
-// Imprimir ficha desde modal
 function imprimirFicha() {
     window.print();
 }
 
-// Imprimir ficha directamente desde la tabla
 function imprimirFichaDirecta(index) {
     verFicha(index);
-    setTimeout(() => {
-        window.print();
-    }, 500);
+    setTimeout(() => window.print(), 500);
 }
 
 // ============================================
@@ -265,23 +261,18 @@ function imprimirFichaDirecta(index) {
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
     alertDiv.textContent = mensaje;
-    alertDiv.className = 'alert alert-' + tipo;
+    alertDiv.className = `alert alert-${tipo}`;
     alertDiv.style.display = 'block';
-    
-    setTimeout(() => {
-        alertDiv.style.display = 'none';
-    }, 5000);
+    setTimeout(() => { alertDiv.style.display = 'none'; }, 5000);
 }
 
 function limpiarBusqueda() {
     document.getElementById('searchInput').value = '';
     document.getElementById('searchAlert').style.display = 'none';
-    
-    const tbody = document.getElementById('resultsBody');
-    tbody.innerHTML = `
+    document.getElementById('resultsBody').innerHTML = `
         <tr>
             <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
+                📭 No hay vehículos registrados.
             </td>
         </tr>
     `;
@@ -289,17 +280,14 @@ function limpiarBusqueda() {
 
 // Cerrar modal al hacer clic fuera
 window.onclick = function(event) {
-    const modal = document.getElementById('fichaModal');
-    if (event.target === modal) {
+    if (event.target === document.getElementById('fichaModal')) {
         cerrarModal();
     }
 }
 
-// Cerrar modal con tecla ESC
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        cerrarModal();
-    }
+// Cerrar con tecla ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarModal();
 });
 
 // ============================================
@@ -307,16 +295,13 @@ document.addEventListener('keydown', function(event) {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Cargar base de datos al iniciar
     cargarBaseDeDatos();
     
-    // Permitir buscar con Enter
+    // Buscar con Enter
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                buscarVehiculo();
-            }
+            if (e.key === 'Enter') buscarVehiculo();
         });
     }
     
@@ -324,37 +309,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Está seguro de cerrar sesión?')) {
+            if (confirm('¿Cerrar sesión?')) {
                 localStorage.clear();
                 window.location.href = '../index.html';
             }
         });
     }
     
-    // Cargar información del usuario
-    cargarUsuario();
+    // Cargar usuario SOLO si Supabase está disponible
+    if (typeof supabase !== 'undefined' && supabase.auth) {
+        cargarUsuario();
+    }
 });
 
-// Función para cargar información del usuario
+// Función segura para cargar usuario
 async function cargarUsuario() {
     try {
-        if (typeof supabase !== 'undefined') {
-            const { data } = await supabase.auth.getSession();
-            const session = data?.session;
+        if (typeof supabase === 'undefined' || !supabase.auth) {
+            console.log('⚠️ Supabase no disponible, usando usuario por defecto');
+            return;
+        }
+        
+        const { data } = await supabase.auth.getSession();
+        const session = data?.session;
+        
+        if (session?.user?.id) {
+            const {  perfilData } = await supabase
+                .from('perfiles')
+                .select('email')
+                .eq('id', session.user.id)
+                .single();
             
-            if (session) {
-                const {  perfilData, error: perfilError } = await supabase
-                    .from('perfiles')
-                    .select('email')
-                    .eq('id', session.user.id)
-                    .single();
-                
-                if (perfilData) {
-                    document.getElementById('userEmail').textContent = perfilData.email || 'usuario@institucion.com';
-                }
+            if (perfilData?.email) {
+                document.getElementById('userEmail').textContent = perfilData.email;
             }
         }
     } catch (error) {
-        console.error('Error al cargar usuario:', error);
+        console.warn('⚠️ No se pudo cargar usuario:', error.message);
+        // No romper la aplicación, continuar con usuario por defecto
     }
 }
