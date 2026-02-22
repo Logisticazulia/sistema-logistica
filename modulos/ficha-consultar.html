@@ -616,37 +616,47 @@ body {
         box-sizing: border-box;
     }
     
-    /* Header compacto */
+    /* ✅ HEADER CON LOGOS LATERALES - Igual que ficha-modificar.html */
     .ficha-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
         margin-bottom: 12px !important;
         padding-bottom: 10px !important;
-        gap: 10px !important;
+        border-bottom: 2px solid #003366 !important;
+        gap: 15px !important;
     }
     
     .ficha-logo,
     .ficha-logo-right {
-        width: 80px !important;
+        width: 90px !important;  /* ✅ Un poco más grandes */
         height: auto !important;
+        display: block !important;
     }
     
     .ficha-title {
-        padding: 0 10px !important;
+        text-align: center !important;
+        flex: 1 !important;
+        padding: 0 15px !important;
     }
     
     .ficha-title h1 {
         font-size: 12px !important;
         margin-bottom: 3px !important;
         line-height: 1.2 !important;
+        font-weight: 700 !important;
     }
     
     .ficha-title h2 {
         font-size: 14px !important;
         margin: 3px 0 !important;
+        font-weight: 700 !important;
     }
     
     .ficha-title h3 {
         font-size: 12px !important;
         margin-top: 3px !important;
+        font-weight: 700 !important;
     }
     
     /* Tabla compacta */
@@ -702,18 +712,19 @@ body {
         overflow: hidden !important;
     }
     
-    /* Fotos más pequeñas para impresión */
+    /* ✅ FOTOS MÁS GRANDES PARA IMPRESIÓN */
     .fotos-container {
         display: grid !important;
         grid-template-columns: repeat(4, 1fr) !important;
-        gap: 8px !important;
-        margin-top: 10px !important;
+        gap: 10px !important;
+        margin-top: 12px !important;
         width: 100% !important;
     }
     
     .foto-box {
-        border: 1px solid #4a7c9b !important;
-        height: 100px !important;  /* Reducido de 140px */
+        border: 2px solid #4a7c9b !important;
+        height: 140px !important;  /* ✅ Aumentado de 100px a 140px */
+        width: 100% !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -721,9 +732,8 @@ body {
         color: white !important;
         font-weight: 700 !important;
         font-size: 11px !important;
-        border-radius: 3px !important;
+        border-radius: 4px !important;
         overflow: hidden !important;
-        width: 100% !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -736,7 +746,7 @@ body {
     }
     
     .foto-box span {
-        display: none !important;  /* Ocultar placeholder al imprimir */
+        display: none !important;
     }
     
     /* Footer de la ficha */
