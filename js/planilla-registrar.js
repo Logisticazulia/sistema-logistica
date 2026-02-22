@@ -93,7 +93,7 @@ function showAlert(type, message) {
 }
 
 function validarFormulario() {
-    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase'];
+    const camposObligatorios = ['placa', 's_carroceria', 'marca', 'modelo', 'tipo', 'clase'];
     let isValid = true;
     let mensajeError = '';
     
