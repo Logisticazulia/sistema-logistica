@@ -134,13 +134,7 @@ async function buscarVehiculo() {
 }
 
 // ================= LLENAR FORMULARIO =================
-
-/**
- * Llena el formulario con los datos del vehículo encontrado
- * @param {Object} vehiculo - Datos del vehículo desde la BD
- */
 function llenarFormulario(vehiculo) {
-    // Mapeo de campos de la BD al formulario
     const mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
@@ -153,36 +147,30 @@ function llenarFormulario(vehiculo) {
         'facsimil': 'facsimilar',
         'situacion': 'estatus',
         'unidad_administrativa': 'dependencia',
-        'observacion': 'observaciones',
-        'ubicacion_fisica': 'ubicacion',
-        'ano': 'ano'
+        'observacion': 'observaciones'
     };
     
-    // Llenar cada campo
     Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
         const element = document.getElementById(formField);
-        if (element && vehiculo[dbField] !== undefined && vehiculo[dbField] !== null) {
-            const valor = vehiculo[dbField];
-            
+        if (element && vehiculo[dbField]) {
             if (element.tagName === 'SELECT') {
-                // Para selects, buscar la opción que coincida (case-insensitive)
-                const options = Array.from(element.options);
-                const matchingOption = options.find(opt => 
-                    opt.value.toUpperCase() === limpiarTexto(valor)
+                const matchingOption = Array.from(element.options).find(opt =>
+                    opt.value.toUpperCase() === vehiculo[dbField].toUpperCase()
                 );
-                if (matchingOption) {
-                    element.value = matchingOption.value;
-                }
+                if (matchingOption) element.value = matchingOption.value;
             } else {
-                element.value = valor;
+                element.value = vehiculo[dbField];
             }
+            // 🔹 BLOQUEAR CAMPO DESPUÉS DE LLENAR
+            element.disabled = true;
+            element.style.backgroundColor = '#f3f4f6';
+            element.style.cursor = 'not-allowed';
         }
     });
     
-    // Actualizar vista previa
     actualizarVistaPrevia();
+    mostrarAlerta('✅ Vehículo encontrado. Los campos principales están bloqueados.', 'success');
 }
-
 // ================= LIMPIAR BÚSQUEDA Y FORMULARIO =================
 
 /**
