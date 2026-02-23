@@ -1,6 +1,6 @@
 /**
  * ============================================
- * FICHA TÉCNICA DE VEHÍCULOS - VALIDACIÓN PREDICTIVA
+ * FICHA TÉCNICA DE VEHÍCULOS - VALIDACIÓN PREDICTIVA REAL
  * ============================================
  */
 
@@ -21,15 +21,15 @@ const CAMPOS_BLOQUEADOS = [
 ];
 
 // ================= ESTADO DE DUPLICADOS =================
-const duplicadosEncontrados = {
+var duplicadosEncontrados = {
     placa: false,
     facsimil: false,
     s_carroceria: false,
     s_motor: false
 };
 
-// ================= DEBOUNCE PARA BÚSQUEDA =================
-let debounceTimers = {};
+// ================= DEBOUNCE PARA EVITAR MÚLTIPLES CONSULTAS =================
+var debounceTimers = {};
 
 function debounce(func, delay, field) {
     if (debounceTimers[field]) {
@@ -40,7 +40,7 @@ function debounce(func, delay, field) {
 
 // ================= FUNCIONES DE UTILIDAD =================
 function mostrarAlerta(mensaje, tipo) {
-    const alertDiv = document.getElementById('searchAlert');
+    var alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
     
     alertDiv.textContent = mensaje;
@@ -59,21 +59,21 @@ function mostrarAlerta(mensaje, tipo) {
 }
 
 function mostrarAlertaDuplicado(campo, mensaje, existe) {
-    const input = document.getElementById(campo);
+    var input = document.getElementById(campo);
     if (!input) return;
     
-    const formGroup = input.closest('.form-group');
+    var formGroup = input.closest('.form-group');
     if (!formGroup) return;
     
     // Remover alerta previa
-    let alertaExistente = formGroup.querySelector('.duplicate-alert');
+    var alertaExistente = formGroup.querySelector('.duplicate-alert');
     if (alertaExistente) {
         alertaExistente.remove();
     }
     
     if (existe) {
-        // ✅ CREAR ALERTA DE DUPLICADO
-        const alerta = document.createElement('div');
+        // ✅ CREAR ALERTA DE DUPLICADO DEBAJO DEL CAMPO
+        var alerta = document.createElement('div');
         alerta.className = 'duplicate-alert';
         alerta.style.cssText = 'color: #dc2626; font-size: 12px; margin-top: 5px; font-weight: 600; display: flex; align-items: center; gap: 5px;';
         alerta.innerHTML = '⚠️ ' + mensaje;
@@ -95,10 +95,16 @@ function mostrarAlertaDuplicado(campo, mensaje, existe) {
 }
 
 function actualizarEstadoBotonGuardar() {
-    const btnGuardar = document.getElementById('btnGuardar');
+    var btnGuardar = document.getElementById('btnGuardar');
     if (!btnGuardar) return;
     
-    const hayDuplicados = Object.values(duplicadosEncontrados).some(function(v) { return v === true; });
+    var hayDuplicados = false;
+    for (var key in duplicadosEncontrados) {
+        if (duplicadosEncontrados[key] === true) {
+            hayDuplicados = true;
+            break;
+        }
+    }
     
     if (hayDuplicados) {
         btnGuardar.disabled = true;
@@ -154,6 +160,8 @@ async function verificarDuplicadoEnTiempoReal(campo, valor, nombreCampo) {
     
     valor = limpiarTexto(valor);
     
+    console.log('🔍 Verificando duplicado para ' + nombreCampo + ':', valor);
+    
     try {
         var result = await supabaseClient
             .from('fichas_tecnicas')
@@ -165,6 +173,8 @@ async function verificarDuplicadoEnTiempoReal(campo, valor, nombreCampo) {
             console.error('Error verificando duplicado:', result.error);
             return;
         }
+        
+        console.log('📊 Resultado verificación:', result.data ? result.data.length : 0, 'registro(s)');
         
         if (result.data && result.data.length > 0) {
             mostrarAlertaDuplicado(campo, '¡' + nombreCampo + ' YA REGISTRADO! No se puede duplicar.', true);
@@ -419,14 +429,14 @@ function limpiarBusqueda() {
     
     // Limpiar alertas de duplicados
     var alertas = document.querySelectorAll('.duplicate-alert');
-    alertas.forEach(function(alerta) {
-        alerta.remove();
-    });
+    for (var i = 0; i < alertas.length; i++) {
+        alertas[i].remove();
+    }
     
-    for (var i = 1; i <= 4; i++) {
-        var input = document.getElementById('foto' + i);
-        var img = document.getElementById('previewFoto' + i);
-        var container = document.getElementById('previewFoto' + i + 'Container');
+    for (var j = 1; j <= 4; j++) {
+        var input = document.getElementById('foto' + j);
+        var img = document.getElementById('previewFoto' + j);
+        var container = document.getElementById('previewFoto' + j + 'Container');
         var placeholder = container ? container.querySelector('.placeholder') : null;
         
         if (input) input.value = '';
@@ -437,7 +447,7 @@ function limpiarBusqueda() {
         if (placeholder) {
             placeholder.style.display = 'flex';
         }
-        fotosData['foto' + i] = null;
+        fotosData['foto' + j] = null;
     }
     
     // Resetear estado de duplicados
@@ -568,6 +578,20 @@ async function guardarFicha() {
     var s_carroceria = (document.getElementById('serialCarroceria')?.value || '').toUpperCase().trim();
     var s_motor = (document.getElementById('serialMotor')?.value || '').toUpperCase().trim();
     
+    // ✅ VERIFICAR SI HAY DUPLICADOS MARCADOS
+    var hayDuplicados = false;
+    for (var key in duplicadosEncontrados) {
+        if (duplicadosEncontrados[key] === true) {
+            hayDuplicados = true;
+            break;
+        }
+    }
+    
+    if (hayDuplicados) {
+        mostrarAlerta('❌ No se puede guardar: Hay campos duplicados', 'error');
+        return;
+    }
+    
     // ✅ VERIFICAR DUPLICADOS ANTES DE GUARDAR (última verificación)
     mostrarAlerta('⏳ Verificando duplicados en base de datos...', 'info');
     
@@ -583,7 +607,7 @@ async function guardarFicha() {
     mostrarAlerta('⏳ Guardando ficha técnica en Supabase...', 'info');
     
     try {
-        // ✅ PREPARAR DATOS PARA SUPABASE
+        // ✅ PREPARAR DATOS PARA SUPABASE (mapeo correcto según CSV)
         var fichaData = {
             vehiculo_id: null,
             placa: placa,
@@ -715,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', actualizarVistaPrevia);
     });
     
-    // ✅ VALIDACIÓN PREDICTIVA DE DUPLICADOS
+    // ✅ VALIDACIÓN PREDICTIVA DE DUPLICADOS - CAMPOS CLAVE
     var camposPredictivos = [
         { id: 'placa', nombre: 'Placa', campo: 'placa' },
         { id: 'facsimil', nombre: 'Facsimil', campo: 'facsimil' },
@@ -726,9 +750,9 @@ document.addEventListener('DOMContentLoaded', function() {
     camposPredictivos.forEach(function(campo) {
         var input = document.getElementById(campo.id);
         if (input) {
+            // ✅ VERIFICAR AL ESCRIBIR (CON DEBOUNCE DE 800MS)
             input.addEventListener('input', function(e) {
                 var valor = e.target.value;
-                // ✅ DEBOUNCE DE 800MS PARA EVITAR MÚLTIPLES CONSULTAS
                 debounce(function() {
                     verificarDuplicadoEnTiempoReal(campo.campo, valor, campo.nombre);
                 }, 800, campo.id);
