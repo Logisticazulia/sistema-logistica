@@ -111,6 +111,12 @@ async function buscarVehiculo() {
     }
 
     console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
+           if (!data || data.length === 0) {
+            // ✅ LIMPIAR FORMULARIO ANTES DE MOSTRAR ERROR
+            limpiarBusqueda();
+            mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+            return;
+        }
 
     if (!data || data.length === 0) {
       mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
