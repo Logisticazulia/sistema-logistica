@@ -184,25 +184,30 @@ function renderTable() {
 }
 
 // ================= FUNCIÓN SEGURA PARA SETEAR TEXTO =================
-function setTexto(idElemento, valor) {
+function setTexto(idElemento, valor, esOpcional) {
     var el = document.getElementById(idElemento);
     if (el) {
         el.textContent = valor !== undefined && valor !== null ? valor : 'N/A';
         return true;
     } else {
-        console.warn('⚠️ Elemento no encontrado:', idElemento);
+        // Solo mostrar warning si NO es opcional
+        if (!esOpcional) {
+            console.warn('⚠️ Elemento requerido no encontrado:', idElemento);
+        }
         return false;
     }
 }
 
 // ================= FUNCIÓN SEGURA PARA SETEAR HTML =================
-function setHtml(idElemento, valor) {
+function setHtml(idElemento, valor, esOpcional) {
     var el = document.getElementById(idElemento);
     if (el) {
         el.innerHTML = valor !== undefined && valor !== null ? valor : 'N/A';
         return true;
     } else {
-        console.warn('⚠️ Elemento no encontrado:', idElemento);
+        if (!esOpcional) {
+            console.warn('⚠️ Elemento requerido no encontrado:', idElemento);
+        }
         return false;
     }
 }
@@ -213,7 +218,7 @@ function verFicha(id) {
     
     var ficha = null;
     for (var i = 0; i < allFichas.length; i++) {
-        if (allFichas[i].id == id || String(allFichas[i].id) === String(id)) {
+        if (String(allFichas[i].id) === String(id)) {
             ficha = allFichas[i];
             break;
         }
@@ -226,7 +231,7 @@ function verFicha(id) {
     
     console.log('✅ Ficha encontrada:', ficha.placa);
     
-    // ✅ Llenar datos del modal con función segura
+    // ✅ Llenar datos del modal - campos REQUERIDOS (sin esOpcional)
     setTexto('modalMarca', ficha.marca);
     setTexto('modalModelo', ficha.modelo);
     setTexto('modalTipo', ficha.tipo);
@@ -251,22 +256,24 @@ function verFicha(id) {
     // Observaciones
     setHtml('modalObservaciones', ficha.observaciones || 'Sin observaciones');
     
-    // Fecha y creador
-    var fechaCreacion = ficha.fecha_creacion ? new Date(ficha.fecha_creacion).toLocaleString('es-VE') : 'N/A';
-    setTexto('modalFechaCreacion', fechaCreacion);
-    setTexto('modalCreadoPor', ficha.creado_por);
+    // ✅ Fecha y creador - campos OPCIONALES (con esOpcional=true)
+    if (ficha.fecha_creacion) {
+        var fechaCreacion = new Date(ficha.fecha_creacion).toLocaleString('es-VE');
+        setTexto('modalFechaCreacion', fechaCreacion, true);
+    }
+    setTexto('modalCreadoPor', ficha.creado_por, true);
     
     // ✅ CARGAR FOTOS CON VERIFICACIÓN
     cargarFotosModal(ficha);
     
-    // ✅ MOSTRAR MODAL
-    var modal = document.getElementById('fichaModal');
-    if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    } else {
-        console.error('❌ Modal #fichaModal no encontrado');
-    }
+    // ✅ MOSTRAR MODAL - con pequeño delay para asegurar renderizado
+    setTimeout(function() {
+        var modal = document.getElementById('fichaModal');
+        if (modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+    }, 50);
 }
 
 // ================= CARGAR FOTOS EN MODAL =================
@@ -299,14 +306,8 @@ function cerrarModal() {
 }
 
 // ================= IMPRIMIR FICHA =================
-function imprimirFicha(id) {
-    if (id) {
-        verFicha(id);
-    }
-    
-    setTimeout(function() {
-        window.print();
-    }, 500);
+function imprimirFicha() {
+    window.print();
 }
 
 // ================= CARGAR USUARIO =================
