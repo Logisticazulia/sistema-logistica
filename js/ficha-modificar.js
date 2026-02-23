@@ -47,7 +47,7 @@ const camposNoEditables = [
     'tipo',
     'clase',
     'estatus'
-    'color' 
+    'color'
 ];
 
 // ============================================
