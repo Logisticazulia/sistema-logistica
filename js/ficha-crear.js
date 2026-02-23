@@ -46,7 +46,7 @@ const fotosData = {
 // Campos que se bloquean después de buscar
 const CAMPOS_BLOQUEADOS = [
     'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
-    'serialMotor', 'color', 'placa', 'facsimilar', 'estatus', 'dependencia'
+    'serialMotor', 'color', 'placa', 'facsimil', 'estatus', 'dependencia'
 ];
 
 // ================= FUNCIONES DE UTILIDAD =================
