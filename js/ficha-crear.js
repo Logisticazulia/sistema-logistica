@@ -1,9 +1,9 @@
 /**
- * ============================================
- * FICHA TÉCNICA DE VEHÍCULOS - LÓGICA COMPLETA
- * Versión corregida y optimizada
- * ============================================
- */
+* ============================================
+* FICHA TÉCNICA DE VEHÍCULOS - BÚSQUEDA EXACTA
+* Versión con coincidencia exacta en todos los campos
+* ============================================
+*/
 
 // ================= CONFIGURACIÓN =================
 let supabaseClient = null;
@@ -45,15 +45,15 @@ const fotosData = {
 
 // Campos que se bloquean después de buscar
 const CAMPOS_BLOQUEADOS = [
-    'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 
+    'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
     'serialMotor', 'color', 'placa', 'facsimilar', 'estatus', 'dependencia'
 ];
 
 // ================= FUNCIONES DE UTILIDAD =================
 
 /**
- * Muestra alertas en la interfaz
- */
+* Muestra alertas en la interfaz
+*/
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
@@ -68,8 +68,8 @@ function mostrarAlerta(mensaje, tipo) {
 }
 
 /**
- * Limpia y formatea texto
- */
+* Limpia y formatea texto
+*/
 function limpiarTexto(texto) {
     if (!texto) return '';
     return texto.toString().trim().toUpperCase();
@@ -78,9 +78,8 @@ function limpiarTexto(texto) {
 // ================= BÚSQUEDA DESDE SUPABASE =================
 
 /**
- * Busca un vehículo en la base de datos por placa, facsímil o seriales
- */
-// ✅ DESPUÉS (Búsqueda EXACTA)
+* Busca un vehículo en la base de datos con COINCIDENCIA EXACTA
+*/
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) {
@@ -91,12 +90,12 @@ async function buscarVehiculo() {
     // ✅ LIMPIAR Y NORMALIZAR EL TÉRMINO DE BÚSQUEDA
     const searchTerm = limpiarTexto(searchInput.value);
     
-    // ✅ VALIDAR MÍNIMO DE CARACTERES (OPCIONAL)
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
+    // ✅ VALIDAR MÍNIMO DE CARACTERES
     if (searchTerm.length < 3) {
         mostrarAlerta('⚠️ Ingrese al menos 3 caracteres para búsqueda exacta', 'error');
         return;
@@ -106,7 +105,7 @@ async function buscarVehiculo() {
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
     try {
-        // ✅ CONSULTA EXACTA - SOLO .eq. (EQUALS)
+        // ✅ CONSULTA EXACTA - SOLO .eq. (EQUALS) - SIN .ilike
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
@@ -149,6 +148,9 @@ async function buscarVehiculo() {
         mostrarAlerta('❌ Error: ' + error.message, 'error');
     }
 }
+
+// ================= LLENAR FORMULARIO =================
+
 function llenarFormulario(vehiculo) {
     const mapeoCampos = {
         'marca': 'marca',
@@ -179,7 +181,7 @@ function llenarFormulario(vehiculo) {
         }
     });
     
-    // ✅ NUEVO: Cargar Estatus específicamente (priorizar 'estatus' sobre 'situacion')
+    // ✅ Cargar Estatus específicamente (priorizar 'estatus' sobre 'situacion')
     const estatusInput = document.getElementById('estatus');
     if (estatusInput) {
         const valorEstatus = vehiculo.estatus || vehiculo.situacion || '';
@@ -196,7 +198,6 @@ function llenarFormulario(vehiculo) {
             if (matchingOption) {
                 estatusInput.value = matchingOption.value;
             } else {
-                // Si no hay match exacto, intentar con el valor original
                 estatusInput.value = valorEstatus.toUpperCase();
             }
         }
@@ -204,11 +205,9 @@ function llenarFormulario(vehiculo) {
     
     actualizarVistaPrevia();
 }
+
 // ================= BLOQUEAR CAMPOS =================
 
-/**
- * Bloquea los campos principales después de buscar
- */
 function bloquearCamposPrincipales() {
     CAMPOS_BLOQUEADOS.forEach(campo => {
         const element = document.getElementById(campo);
@@ -217,7 +216,6 @@ function bloquearCamposPrincipales() {
             element.style.backgroundColor = '#f3f4f6';
             element.style.cursor = 'not-allowed';
             
-            // Agregar clase para mostrar ícono de candado
             const formGroup = element.closest('.form-group');
             if (formGroup) {
                 formGroup.classList.add('locked');
@@ -228,9 +226,6 @@ function bloquearCamposPrincipales() {
 
 // ================= DESBLOQUEAR CAMPOS =================
 
-/**
- * Desbloquea todos los campos al limpiar
- */
 function desbloquearCampos() {
     CAMPOS_BLOQUEADOS.forEach(campo => {
         const element = document.getElementById(campo);
@@ -239,7 +234,6 @@ function desbloquearCampos() {
             element.style.backgroundColor = 'white';
             element.style.cursor = 'auto';
             
-            // Remover clase de candado
             const formGroup = element.closest('.form-group');
             if (formGroup) {
                 formGroup.classList.remove('locked');
@@ -250,29 +244,19 @@ function desbloquearCampos() {
 
 // ================= LIMPIAR BÚSQUEDA =================
 
-/**
- * Limpia la búsqueda y el formulario
- */
 function limpiarBusqueda() {
-    // Limpiar input de búsqueda
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
     
-    // Ocultar alertas
     const searchAlert = document.getElementById('searchAlert');
     if (searchAlert) searchAlert.style.display = 'none';
     
-    // Limpiar formulario
     const form = document.getElementById('fichaForm');
     if (form) form.reset();
     
-    // 🔓 DESBLOQUEAR TODOS LOS CAMPOS
     desbloquearCampos();
-    
-    // Limpiar vista previa
     actualizarVistaPrevia();
     
-    // Limpiar fotos
     for (let i = 1; i <= 4; i++) {
         const input = document.getElementById('foto' + i);
         const img = document.getElementById('previewFoto' + i);
@@ -288,26 +272,20 @@ function limpiarBusqueda() {
         fotosData['foto' + i] = null;
     }
     actualizarFotosPreview();
-    
     mostrarAlerta('🔄 Formulario limpiado', 'info');
 }
 
 // ================= VISTA PREVIA DE FOTOS =================
 
-/**
- * Previsualiza imagen seleccionada
- */
 function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
         
-        // Validar tipo de archivo
         if (!file.type.startsWith('image/')) {
             mostrarAlerta('⚠️ Por favor seleccione un archivo de imagen válido', 'error');
             return;
         }
         
-        // Validar tamaño (máx 5MB)
         if (file.size > 5 * 1024 * 1024) {
             mostrarAlerta('⚠️ La imagen no debe superar los 5MB', 'error');
             return;
@@ -316,7 +294,6 @@ function previewImage(input, previewId) {
         const reader = new FileReader();
         
         reader.onload = function(e) {
-            // Actualizar vista previa en el formulario
             const img = document.getElementById(previewId);
             const container = document.getElementById(previewId + 'Container');
             const placeholder = container?.querySelector('.placeholder');
@@ -327,11 +304,8 @@ function previewImage(input, previewId) {
             }
             if (placeholder) placeholder.style.display = 'none';
             
-            // Guardar en base64
             const fotoNum = previewId.replace('previewFoto', 'foto');
             fotosData[fotoNum] = e.target.result;
-            
-            // Actualizar vista previa en la ficha
             actualizarFotosPreview();
         };
         
@@ -343,9 +317,6 @@ function previewImage(input, previewId) {
     }
 }
 
-/**
- * Actualiza las fotos en la vista previa de la ficha
- */
 function actualizarFotosPreview() {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewImg' + i);
@@ -365,9 +336,6 @@ function actualizarFotosPreview() {
 
 // ================= ACTUALIZAR VISTA PREVIA =================
 
-/**
- * Actualiza en tiempo real la vista previa con los valores del formulario
- */
 function actualizarVistaPrevia() {
     const campos = [
         'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
@@ -380,7 +348,6 @@ function actualizarVistaPrevia() {
         const input = document.getElementById(campo);
         const previewId = 'preview' + campo.charAt(0).toUpperCase() + campo.slice(1);
         const preview = document.getElementById(previewId);
-        
         if (preview && input) {
             preview.textContent = input.value || 'N/A';
         }
@@ -389,20 +356,14 @@ function actualizarVistaPrevia() {
 
 // ================= GUARDAR FICHA =================
 
-/**
- * Guarda la ficha técnica en localStorage
- */
 function guardarFicha() {
     const form = document.getElementById('fichaForm');
-    
-    // Validación básica del formulario
     if (form && !form.checkValidity()) {
         form.reportValidity();
         mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
         return;
     }
     
-    // Validar campos obligatorios específicos
     const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
     let camposFaltantes = [];
     
@@ -418,9 +379,8 @@ function guardarFicha() {
         return;
     }
     
-    // Recopilar datos del formulario
     const fichaData = {
-        id: Date.now(), // ID único temporal
+        id: Date.now(),
         marca: document.getElementById('marca')?.value || '',
         modelo: document.getElementById('modelo')?.value || '',
         tipo: document.getElementById('tipo')?.value || '',
@@ -445,17 +405,12 @@ function guardarFicha() {
         creadoPor: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com'
     };
     
-    // Guardar en localStorage
     try {
         let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
         fichas.push(fichaData);
         localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
-        
         mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
-        
-        // 🔹 LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
         limpiarBusqueda();
-        
     } catch (error) {
         console.error('❌ Error al guardar ficha:', error);
         mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
@@ -464,15 +419,11 @@ function guardarFicha() {
 
 // ================= CARGAR USUARIO =================
 
-/**
- * Carga y muestra la información del usuario autenticado
- */
 async function cargarUsuario() {
     try {
         if (supabaseClient) {
             const { data } = await supabaseClient.auth.getSession();
             const session = data?.session;
-            
             if (session?.user?.email) {
                 const userEmail = document.getElementById('userEmail');
                 if (userEmail) {
@@ -487,9 +438,6 @@ async function cargarUsuario() {
 
 // ================= CERRAR SESIÓN =================
 
-/**
- * Cierra la sesión del usuario
- */
 async function cerrarSesion() {
     if (confirm('¿Está seguro de cerrar sesión?')) {
         try {
@@ -510,22 +458,18 @@ async function cerrarSesion() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando ficha técnica...');
     
-    // 1. Inicializar Supabase primero
     if (!inicializarSupabase()) {
         console.warn('⚠️ Supabase no disponible');
     }
     
-    // 2. Inicializar vista previa
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    // 3. Event listeners para inputs (vista previa en tiempo real)
     const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
     inputs.forEach(input => {
         input.addEventListener('input', actualizarVistaPrevia);
     });
     
-    // 4. Configurar botones principales
     const btnGuardar = document.getElementById('btnGuardar');
     const btnLimpiar = document.getElementById('btnLimpiar');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -534,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnGuardar) btnGuardar.addEventListener('click', guardarFicha);
     if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarBusqueda);
     
-    // 5. Permitir buscar con Enter
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -544,13 +487,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // 6. Configurar logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', cerrarSesion);
     }
     
-    // 7. Cargar usuario
     cargarUsuario();
-    
     console.log('✅ Inicialización completada');
 });
