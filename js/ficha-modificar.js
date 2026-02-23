@@ -47,6 +47,7 @@ const camposNoEditables = [
     'tipo',
     'clase',
     'estatus'
+    'color' 
 ];
 
 // ============================================
@@ -241,7 +242,6 @@ function limpiarBusqueda() {
 // ✅ TOGGLE FORM FIELDS EXCLUYE CAMPOS NO EDITABLES
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
-    
     fields.forEach(function(field) {
         // ✅ NUNCA HABILITAR CAMPOS DE IDENTIFICACIÓN ÚNICA
         if (camposNoEditables.includes(field.id)) {
