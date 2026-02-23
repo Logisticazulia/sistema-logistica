@@ -20,6 +20,8 @@ function inicializarSupabase() {
     
     if (!url || !key) {
         console.error('❌ Configuración de Supabase no encontrada');
+        console.log('SUPABASE_URL:', url);
+        console.log('SUPABASE_KEY:', key ? '***' : 'undefined');
         return false;
     }
     
@@ -33,7 +35,7 @@ function inicializarSupabase() {
     }
 }
 
-// ================= ESTADO GLOBAL =================
+// ================= ESTADO =================
 const fotosData = {
     foto1: null,
     foto2: null,
@@ -41,12 +43,16 @@ const fotosData = {
     foto4: null
 };
 
+// Campos que se bloquean después de buscar
+const CAMPOS_BLOQUEADOS = [
+    'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 
+    'serialMotor', 'color', 'placa', 'facsimilar', 'estatus', 'dependencia'
+];
+
 // ================= FUNCIONES DE UTILIDAD =================
 
 /**
  * Muestra alertas en la interfaz
- * @param {string} mensaje - Texto a mostrar
- * @param {string} tipo - 'success', 'error' o 'info'
  */
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
@@ -62,9 +68,7 @@ function mostrarAlerta(mensaje, tipo) {
 }
 
 /**
- * Limpia y formatea texto para consistencia
- * @param {string} texto - Texto a limpiar
- * @returns {string} Texto formateado
+ * Limpia y formatea texto
  */
 function limpiarTexto(texto) {
     if (!texto) return '';
@@ -84,27 +88,20 @@ async function buscarVehiculo() {
     }
     
     const searchTerm = limpiarTexto(searchInput.value);
-    
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
-    console.log('🔍 Buscando vehículo:', searchTerm);
+    console.log('🔍 Buscando vehículo en Supabase:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
     try {
-        // Consulta optimizada: busca en múltiples campos
+        // ✅ CONSULTA A SUPABASE - BUSCA EN LOS 4 CAMPOS
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
-            .or(
-                `placa.eq.${searchTerm},` +
-                `placa.ilike.%${searchTerm}%,` +
-                `facsimil.ilike.%${searchTerm}%,` +
-                `s_carroceria.ilike.%${searchTerm}%,` +
-                `s_motor.ilike.%${searchTerm}%`
-            )
+            .or(`placa.eq.${searchTerm},placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%`)
             .limit(1);
         
         if (error) {
@@ -113,18 +110,23 @@ async function buscarVehiculo() {
             return;
         }
         
-        console.log('📊 Resultados:', data?.length || 0, 'vehículo(s)');
+        console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
         
         if (!data || data.length === 0) {
             mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
             return;
         }
         
-        // Vehículo encontrado
+        // ✅ VEHÍCULO ENCONTRADO
         const vehiculo = data[0];
         console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
         
+        // Llenar formulario con los datos encontrados
         llenarFormulario(vehiculo);
+        
+        // 🔒 BLOQUEAR CAMPOS PRINCIPALES
+        bloquearCamposPrincipales();
+        
         mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo} - Placa: ${vehiculo.placa}`, 'success');
         
     } catch (error) {
@@ -134,6 +136,10 @@ async function buscarVehiculo() {
 }
 
 // ================= LLENAR FORMULARIO =================
+
+/**
+ * Llena el formulario con los datos del vehículo encontrado
+ */
 function llenarFormulario(vehiculo) {
     const mapeoCampos = {
         'marca': 'marca',
@@ -161,26 +167,67 @@ function llenarFormulario(vehiculo) {
             } else {
                 element.value = vehiculo[dbField];
             }
-            // 🔹 BLOQUEAR CAMPO DESPUÉS DE LLENAR
-            element.disabled = true;
-            element.style.backgroundColor = '#f3f4f6';
-            element.style.cursor = 'not-allowed';
         }
     });
     
     actualizarVistaPrevia();
-    mostrarAlerta('✅ Vehículo encontrado. Los campos principales están bloqueados.', 'success');
 }
-// ================= LIMPIAR BÚSQUEDA Y FORMULARIO =================
+
+// ================= BLOQUEAR CAMPOS =================
+
+/**
+ * Bloquea los campos principales después de buscar
+ */
+function bloquearCamposPrincipales() {
+    CAMPOS_BLOQUEADOS.forEach(campo => {
+        const element = document.getElementById(campo);
+        if (element) {
+            element.disabled = true;
+            element.style.backgroundColor = '#f3f4f6';
+            element.style.cursor = 'not-allowed';
+            
+            // Agregar clase para mostrar ícono de candado
+            const formGroup = element.closest('.form-group');
+            if (formGroup) {
+                formGroup.classList.add('locked');
+            }
+        }
+    });
+}
+
+// ================= DESBLOQUEAR CAMPOS =================
+
+/**
+ * Desbloquea todos los campos al limpiar
+ */
+function desbloquearCampos() {
+    CAMPOS_BLOQUEADOS.forEach(campo => {
+        const element = document.getElementById(campo);
+        if (element) {
+            element.disabled = false;
+            element.style.backgroundColor = 'white';
+            element.style.cursor = 'auto';
+            
+            // Remover clase de candado
+            const formGroup = element.closest('.form-group');
+            if (formGroup) {
+                formGroup.classList.remove('locked');
+            }
+        }
+    });
+}
+
+// ================= LIMPIAR BÚSQUEDA =================
 
 /**
  * Limpia la búsqueda y el formulario
  */
-// ================= LIMPIAR BÚSQUEDA =================
 function limpiarBusqueda() {
+    // Limpiar input de búsqueda
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
     
+    // Ocultar alertas
     const searchAlert = document.getElementById('searchAlert');
     if (searchAlert) searchAlert.style.display = 'none';
     
@@ -188,21 +235,8 @@ function limpiarBusqueda() {
     const form = document.getElementById('fichaForm');
     if (form) form.reset();
     
-    // 🔹 DESBLOQUEAR TODOS LOS CAMPOS
-    const camposABloquear = [
-        'marca', 'modelo', 'tipo', 'clase', 'color',
-        'serialCarroceria', 'serialMotor', 'placa', 'facsimilar',
-        'estatus', 'dependencia'
-    ];
-    
-    camposABloquear.forEach(campo => {
-        const element = document.getElementById(campo);
-        if (element) {
-            element.disabled = false;
-            element.style.backgroundColor = 'white';
-            element.style.cursor = 'auto';
-        }
-    });
+    // 🔓 DESBLOQUEAR TODOS LOS CAMPOS
+    desbloquearCampos();
     
     // Limpiar vista previa
     actualizarVistaPrevia();
@@ -223,14 +257,14 @@ function limpiarBusqueda() {
         fotosData['foto' + i] = null;
     }
     actualizarFotosPreview();
+    
     mostrarAlerta('🔄 Formulario limpiado', 'info');
 }
+
 // ================= VISTA PREVIA DE FOTOS =================
 
 /**
  * Previsualiza imagen seleccionada
- * @param {HTMLInputElement} input - Input file
- * @param {string} previewId - ID del elemento img de preview
  */
 function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
@@ -262,11 +296,11 @@ function previewImage(input, previewId) {
             }
             if (placeholder) placeholder.style.display = 'none';
             
-            // Guardar en base64 para guardar después
+            // Guardar en base64
             const fotoNum = previewId.replace('previewFoto', 'foto');
             fotosData[fotoNum] = e.target.result;
             
-            // Actualizar vista previa en la ficha final
+            // Actualizar vista previa en la ficha
             actualizarFotosPreview();
         };
         
@@ -279,7 +313,7 @@ function previewImage(input, previewId) {
 }
 
 /**
- * Actualiza las fotos en la vista previa de la ficha final
+ * Actualiza las fotos en la vista previa de la ficha
  */
 function actualizarFotosPreview() {
     for (let i = 1; i <= 4; i++) {
@@ -298,7 +332,7 @@ function actualizarFotosPreview() {
     }
 }
 
-// ================= ACTUALIZAR VISTA PREVIA DE TEXTOS =================
+// ================= ACTUALIZAR VISTA PREVIA =================
 
 /**
  * Actualiza en tiempo real la vista previa con los valores del formulario
@@ -308,7 +342,7 @@ function actualizarVistaPrevia() {
         'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
         'color', 'placa', 'facsimilar', 'serialMotor', 'dependencia',
         'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
-        'tapiceria', 'cauchos', 'luces', 'observaciones', 'ano'
+        'tapiceria', 'cauchos', 'luces', 'observaciones'
     ];
     
     campos.forEach(campo => {
@@ -337,6 +371,22 @@ function guardarFicha() {
         return;
     }
     
+    // Validar campos obligatorios específicos
+    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
+    let camposFaltantes = [];
+    
+    camposObligatorios.forEach(campo => {
+        const input = document.getElementById(campo);
+        if (input && !input.value.trim()) {
+            camposFaltantes.push(campo);
+        }
+    });
+    
+    if (camposFaltantes.length > 0) {
+        mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
+        return;
+    }
+    
     // Recopilar datos del formulario
     const fichaData = {
         id: Date.now(), // ID único temporal
@@ -359,7 +409,6 @@ function guardarFicha() {
         cauchos: document.getElementById('cauchos')?.value || '',
         luces: document.getElementById('luces')?.value || '',
         observaciones: document.getElementById('observaciones')?.value || '',
-        ano: document.getElementById('ano')?.value || '',
         fotos: { ...fotosData },
         fechaCreacion: new Date().toISOString(),
         creadoPor: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com'
@@ -373,8 +422,8 @@ function guardarFicha() {
         
         mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
         
-        // Opcional: limpiar formulario después de guardar
-        // limpiarBusqueda();
+        // 🔹 LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
+        limpiarBusqueda();
         
     } catch (error) {
         console.error('❌ Error al guardar ficha:', error);
@@ -382,16 +431,7 @@ function guardarFicha() {
     }
 }
 
-// ================= IMPRIMIR FICHA =================
-
-/**
- * Imprime la ficha técnica
- */
-function imprimirFicha() {
-    window.print();
-}
-
-// ================= CARGAR USUARIO AUTENTICADO =================
+// ================= CARGAR USUARIO =================
 
 /**
  * Carga y muestra la información del usuario autenticado
@@ -437,18 +477,18 @@ async function cerrarSesion() {
 // ================= INICIALIZACIÓN =================
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Inicializando ficha técnica de vehículos...');
+    console.log('🚀 Inicializando ficha técnica...');
     
-    // 1. Inicializar Supabase
+    // 1. Inicializar Supabase primero
     if (!inicializarSupabase()) {
-        console.warn('⚠️ Supabase no disponible, algunas funciones pueden estar limitadas');
+        console.warn('⚠️ Supabase no disponible');
     }
     
     // 2. Inicializar vista previa
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    // 3. Configurar event listeners para inputs (vista previa en tiempo real)
+    // 3. Event listeners para inputs (vista previa en tiempo real)
     const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
     inputs.forEach(input => {
         input.addEventListener('input', actualizarVistaPrevia);
@@ -456,16 +496,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 4. Configurar botones principales
     const btnGuardar = document.getElementById('btnGuardar');
-    const btnImprimir = document.getElementById('btnImprimir');
     const btnLimpiar = document.getElementById('btnLimpiar');
-    const btnBuscar = document.getElementById('btnBuscar');
     const logoutBtn = document.getElementById('logoutBtn');
     const searchInput = document.getElementById('searchInput');
     
     if (btnGuardar) btnGuardar.addEventListener('click', guardarFicha);
-    if (btnImprimir) btnImprimir.addEventListener('click', imprimirFicha);
     if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarBusqueda);
-    if (btnBuscar) btnBuscar.addEventListener('click', buscarVehiculo);
     
     // 5. Permitir buscar con Enter
     if (searchInput) {
@@ -482,37 +518,8 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', cerrarSesion);
     }
     
-    // 7. Cargar información del usuario
+    // 7. Cargar usuario
     cargarUsuario();
     
     console.log('✅ Inicialización completada');
 });
-// ================= LIMPIAR BÚSQUEDA =================
-function limpiarBusqueda() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    const searchAlert = document.getElementById('searchAlert');
-    if (searchAlert) searchAlert.style.display = 'none';
-    
-    // Limpiar formulario
-    const form = document.getElementById('fichaForm');
-    if (form) form.reset();
-    
-    // 🔹 DESBLOQUEAR TODOS LOS CAMPOS
-    const camposABloquear = [
-        'marca', 'modelo', 'tipo', 'clase', 'color',
-        'serialCarroceria', 'serialMotor', 'placa', 'facsimilar',
-        'estatus', 'dependencia'
-    ];
-    
-    camposABloquear.forEach(campo => {
-        const element = document.getElementById(campo);
-        if (element) {
-            element.disabled = false;
-            element.style.backgroundColor = 'white';
-            element.style.cursor = 'auto';
-        }
-    });
-    
- 
