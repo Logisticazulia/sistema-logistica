@@ -46,10 +46,9 @@ const camposNoEditables = [
     'modelo',
     'tipo',
     'clase',
-    'estatus'
-    'color'
+    'estatus',
+    'color'  // ✅ AGREGADO
 ];
-
 // ============================================
 // FUNCIONES DE BÚSQUEDA
 // ============================================
