@@ -171,7 +171,7 @@ function llenarFormulario(vehiculo) {
         's_carroceria': 'serialCarroceria',
         's_motor': 'serialMotor',
         'placa': 'placa',
-        'facsimil': 'facsimilar',
+        'facsimil': 'facsimil',
         'unidad_administrativa': 'dependencia',
         'observacion': 'observaciones'
     };
@@ -347,7 +347,7 @@ function actualizarFotosPreview() {
 function actualizarVistaPrevia() {
     const campos = [
         'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
-        'color', 'placa', 'facsimilar', 'serialMotor', 'dependencia',
+        'color', 'placa', 'facsimil', 'serialMotor', 'dependencia',
         'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
         'tapiceria', 'cauchos', 'luces', 'observaciones'
     ];
@@ -403,7 +403,7 @@ async function guardarFicha() {
     const fichaData = {
         vehiculo_id: null, // Relacionar con vehículo si es necesario
         placa: document.getElementById('placa')?.value?.trim().toUpperCase() || '',
-        facsimil: document.getElementById('facsimilar')?.value?.trim().toUpperCase() || '',
+        facsimil: document.getElementById('facsimil')?.value?.trim().toUpperCase() || '',
         marca: document.getElementById('marca')?.value?.trim().toUpperCase() || '',
         modelo: document.getElementById('modelo')?.value?.trim().toUpperCase() || '',
         tipo: document.getElementById('tipo')?.value?.trim().toUpperCase() || '',
