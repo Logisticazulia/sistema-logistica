@@ -342,103 +342,71 @@ function actualizarFotosPreview() {
     }
 }
 
-// ================= ACTUALIZAR VISTA PREVIA =================
-
-function actualizarVistaPrevia() {
-    const campos = [
-        'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
-        'color', 'placa', 'facsimil', 'serialMotor', 'dependencia',
-        'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
-        'tapiceria', 'cauchos', 'luces', 'observaciones'
-    ];
-    
-    campos.forEach(campo => {
-        const input = document.getElementById(campo);
-        const previewId = 'preview' + campo.charAt(0).toUpperCase() + campo.slice(1);
-        const preview = document.getElementById(previewId);
-        
-        if (preview && input) {
-            preview.textContent = input.value || 'N/A';
-        }
-    });
-}
-
-/**
-* Guarda la ficha técnica en localStorage
-*/
-function guardarFicha() {
+async function guardarFicha() {
     const form = document.getElementById('fichaForm');
     
-    // Validación básica del formulario
+    // Validaciones...
     if (form && !form.checkValidity()) {
         form.reportValidity();
         mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
         return;
     }
 
-    // Validar campos obligatorios específicos
-    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
-    let camposFaltantes = [];
-    
-    camposObligatorios.forEach(campo => {
-        const input = document.getElementById(campo);
-        if (input && !input.value.trim()) {
-            camposFaltantes.push(campo);
-        }
-    });
-    
-    if (camposFaltantes.length > 0) {
-        mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
-        return;
-    }
-
-    // Recopilar datos del formulario
+    // Recopilar datos
     const fichaData = {
-        id: Date.now(),
-        marca: document.getElementById('marca')?.value || '',
-        modelo: document.getElementById('modelo')?.value || '',
-        tipo: document.getElementById('tipo')?.value || '',
-        clase: document.getElementById('clase')?.value || '',
-        serialCarroceria: document.getElementById('serialCarroceria')?.value || '',
-        serialMotor: document.getElementById('serialMotor')?.value || '',
-        color: document.getElementById('color')?.value || '',
-        placa: document.getElementById('placa')?.value || '',
-        facsimil: document.getElementById('facsimil')?.value || '',
-        estatus: document.getElementById('estatus')?.value || '',
-        dependencia: document.getElementById('dependencia')?.value || '',
-        causa: document.getElementById('causa')?.value || '',
-        mecanica: document.getElementById('mecanica')?.value || '',
-        diagnostico: document.getElementById('diagnostico')?.value || '',
-        ubicacion: document.getElementById('ubicacion')?.value || '',
-        tapiceria: document.getElementById('tapiceria')?.value || '',
-        cauchos: document.getElementById('cauchos')?.value || '',
-        luces: document.getElementById('luces')?.value || '',
-        observaciones: document.getElementById('observaciones')?.value || '',
-        fotos: { ...fotosData },
-        fechaCreacion: new Date().toISOString(),
-        creadoPor: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
-        vehiculo_id: null // ✅ Columna nullable según tu configuración
+        vehiculo_id: null, // Si tienes el ID del vehículo, agrégalo aquí
+        placa: limpiarTexto(document.getElementById('placa')?.value),
+        facsimil: limpiarTexto(document.getElementById('facsimil')?.value), // ✅ Corregido
+        marca: limpiarTexto(document.getElementById('marca')?.value),
+        modelo: limpiarTexto(document.getElementById('modelo')?.value),
+        tipo: limpiarTexto(document.getElementById('tipo')?.value),
+        clase: limpiarTexto(document.getElementById('clase')?.value),
+        color: limpiarTexto(document.getElementById('color')?.value),
+        s_carroceria: limpiarTexto(document.getElementById('serialCarroceria')?.value),
+        s_motor: limpiarTexto(document.getElementById('serialMotor')?.value),
+        estatus_ficha: limpiarTexto(document.getElementById('estatus')?.value),
+        dependencia: limpiarTexto(document.getElementById('dependencia')?.value),
+        causa: limpiarTexto(document.getElementById('causa')?.value),
+        mecanica: limpiarTexto(document.getElementById('mecanica')?.value),
+        diagnostico: limpiarTexto(document.getElementById('diagnostico')?.value),
+        ubicacion: limpiarTexto(document.getElementById('ubicacion')?.value),
+        tapiceria: limpiarTexto(document.getElementById('tapiceria')?.value),
+        cauchos: limpiarTexto(document.getElementById('cauchos')?.value),
+        luces: limpiarTexto(document.getElementById('luces')?.value),
+        observaciones: document.getElementById('observaciones')?.value?.trim() || '',
+        foto1: fotosData.foto1 || null,
+        foto2: fotosData.foto2 || null,
+        foto3: fotosData.foto3 || null,
+        foto4: fotosData.foto4 || null,
+        fecha_creacion: new Date().toISOString(),
+        creado_por: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com'
     };
 
-    // Guardar en localStorage
     try {
+        // ✅ INSERTAR EN SUPABASE - tabla fichas_tecnicas
+        const { data, error } = await supabaseClient
+            .from('fichas_tecnicas')
+            .insert([fichaData])
+            .select();
+
+        if (error) {
+            console.error('❌ Error al guardar en Supabase:', error);
+            throw error;
+        }
+
+        console.log('✅ Ficha guardada en Supabase:', data);
+        
+        // También guardar en localStorage como respaldo
         let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
-        fichas.push(fichaData);
+        fichas.push({ ...fichaData, id: data[0]?.id || Date.now() });
         localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
-        
-        // ✅ MOSTRAR MENSAJE DE ÉXITO Y HACER SCROLL
+
         mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        // 🔹 LIMPIAR FORMULARIO SILENCIOSAMENTE DESPUÉS DE 2 SEGUNDOS
-        setTimeout(() => {
-            limpiarFormularioSilencioso();
-        }, 2000);
-        
+        limpiarBusqueda();
+
     } catch (error) {
-        console.error('❌ Error al guardar ficha:', error);
+        console.error('❌ Error en guardarFicha:', error);
         mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
