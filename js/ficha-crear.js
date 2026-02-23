@@ -99,11 +99,11 @@ async function buscarVehiculo() {
     
     try {
         // ✅ CONSULTA A SUPABASE - BUSCA EN LOS 4 CAMPOS
-        const { data, error } = await supabaseClient
-            .from('vehiculos')
-            .select('*')
-            .or(`placa.eq.${searchTerm},placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%`)
-            .limit(1);
+       const { data, error } = await supabaseClient
+    .from('vehiculos')
+    .select('*')
+    .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm},n_identificacion.eq.${searchTerm}`)
+    .limit(1);
         
         if (error) {
             console.error('❌ Error en Supabase:', error);
