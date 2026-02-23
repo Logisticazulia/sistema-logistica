@@ -290,27 +290,22 @@ function validarFormulario() {
     return isValid;
 }
 
-// ================= ACTUALIZACIÓN =================
+// ✅ DESPUÉS
 async function actualizarVehiculo(event) {
     event.preventDefault();
-    
     if (!validarFormulario()) {
         return;
     }
-    
     const vehicleIdInput = document.getElementById('vehicleId');
     const vehicleId = vehicleIdInput ? vehicleIdInput.value : null;
-    
     if (!vehicleId) {
         showAlert('error', 'Error: No se encontró el ID del vehículo');
         return;
     }
-    
     if (btnSubmit) {
         btnSubmit.classList.add('loading');
         btnSubmit.disabled = true;
     }
-    
     try {
         const vehiculoActualizado = {
             placa: limpiarTexto(document.getElementById('placa')?.value),
@@ -340,31 +335,26 @@ async function actualizarVehiculo(event) {
             observacion: document.getElementById('observacion')?.value?.trim() || '',
             observacion_extra: document.getElementById('observacion_extra')?.value?.trim() || ''
         };
-        
         console.log('📝 Actualizando vehículo ID:', vehicleId);
-        
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .update(vehiculoActualizado)
             .eq('id', parseInt(vehicleId))
             .select();
-        
         if (error) {
             console.error('❌ Error al actualizar:', error);
             throw error;
         }
-        
         console.log('✅ Vehículo actualizado:', data);
         showAlert('success', '✅ Vehículo ' + (vehiculoActualizado.placa || vehicleId) + ' actualizado exitosamente');
-        
         // ✅ ACTUALIZAR EN MEMORIA
         const index = allVehicles.findIndex(v => v.id == vehicleId);
         if (index !== -1) {
             allVehicles[index] = { ...allVehicles[index], ...vehiculoActualizado };
         }
-        
+        // 🔹 NUEVO: LIMPIAR FORMULARIO COMPLETAMENTE
+        limpiarFormulario();
         toggleFormFields(false);
-        
     } catch (error) {
         console.error('❌ Error en actualizarVehiculo:', error);
         showAlert('error', '❌ Error al actualizar: ' + (error.message || 'Verifique su conexión'));
@@ -375,7 +365,6 @@ async function actualizarVehiculo(event) {
         }
     }
 }
-
 function cancelarEdicion() {
     if (vehicleData) {
         cargarDatosVehiculo(vehicleData);
