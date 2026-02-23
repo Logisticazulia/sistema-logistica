@@ -213,23 +213,29 @@ function actualizarFotosPreview() {
 
 // ================= ACTUALIZAR VISTA PREVIA =================
 function actualizarVistaPrevia() {
-    const campos = [
-        'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 
-        'color', 'placa', 'facsimilar', 'serialMotor', 'dependencia',
-        'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
-        'tapiceria', 'cauchos', 'luces', 'observaciones'
-    ];
+    // Datos básicos
+    document.getElementById('previewMarca').textContent = document.getElementById('marca').value || '';
+    document.getElementById('previewModelo').textContent = document.getElementById('modelo').value || '';
+    document.getElementById('previewTipo').textContent = document.getElementById('tipo').value || '';
+    document.getElementById('previewClase').textContent = document.getElementById('clase').value || '';
+    document.getElementById('previewSerialCarroceria').textContent = document.getElementById('serialCarroceria').value || '';
+    document.getElementById('previewColor').textContent = document.getElementById('color').value || '';
+    document.getElementById('previewPlaca').textContent = document.getElementById('placa').value || '';
+    document.getElementById('previewFacsimilar').textContent = document.getElementById('facsimilar').value || '';
+    document.getElementById('previewSerialMotor').textContent = document.getElementById('serialMotor').value || '';
+    document.getElementById('previewDependencia').textContent = document.getElementById('dependencia').value || '';
+    document.getElementById('previewEstatus').textContent = document.getElementById('estatus').value || '';
+    document.getElementById('previewObservaciones').textContent = document.getElementById('observaciones').value || '';
     
-    campos.forEach(campo => {
-        const input = document.getElementById(campo);
-        const preview = document.getElementById('preview' + campo.charAt(0).toUpperCase() + campo.slice(1));
-        if (preview && input) {
-            preview.textContent = input.value || '';
-        }
-    });
-}
-
-// ================= GUARDAR FICHA =================
+    // ✅ NUEVO: Información Técnico Mecánica
+    document.getElementById('previewCausa').textContent = document.getElementById('causa').value || '';
+    document.getElementById('previewMecanica').textContent = document.getElementById('mecanica').value || '';
+    document.getElementById('previewDiagnostico').textContent = document.getElementById('diagnostico').value || '';
+    document.getElementById('previewUbicacion').textContent = document.getElementById('ubicacion').value || '';
+    document.getElementById('previewTapiceria').textContent = document.getElementById('tapiceria').value || '';
+    document.getElementById('previewCauchos').textContent = document.getElementById('cauchos').value || '';
+    document.getElementById('previewLuces').textContent = document.getElementById('luces').value || '';
+} ================= GUARDAR FICHA =================
 function guardarFicha() {
     const form = document.getElementById('fichaForm');
     if (form && !form.checkValidity()) {
@@ -328,6 +334,16 @@ async function cargarUsuario() {
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando ficha técnica...');
+        const camposMecanicos = ['causa', 'mecanica', 'diagnostico', 'ubicacion', 'tapiceria', 'cauchos', 'luces'];
+    camposMecanicos.forEach(campo => {
+        const input = document.getElementById(campo);
+        if (input) {
+            input.addEventListener('input', actualizarVistaPrevia);
+        }
+    });
+    
+    console.log('✅ Inicialización completada');
+});
     
     // Inicializar Supabase primero
     if (!inicializarSupabase()) {
