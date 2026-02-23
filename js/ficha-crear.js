@@ -1,12 +1,11 @@
 /**
- * FICHA TÉCNICA DE VEHÍCULOS - LÓGICA CORREGIDA
- * Versión compatible con Supabase y localStorage
+ * FICHA TÉCNICA DE VEHÍCULOS - BÚSQUEDA DESDE SUPABASE
  */
 
 // ================= CONFIGURACIÓN =================
 let supabaseClient = null;
 
-// Función para inicializar Supabase de forma segura
+// Función para inicializar Supabase
 function inicializarSupabase() {
     if (typeof window.supabase === 'undefined') {
         console.error('❌ Librería Supabase no cargada');
@@ -18,8 +17,6 @@ function inicializarSupabase() {
     
     if (!url || !key) {
         console.error('❌ Configuración de Supabase no encontrada');
-        console.log('SUPABASE_URL:', url);
-        console.log('SUPABASE_KEY:', key ? '***' : 'undefined');
         return false;
     }
     
@@ -35,7 +32,6 @@ function inicializarSupabase() {
 
 // ================= ESTADO =================
 const fotosData = { foto1: null, foto2: null, foto3: null, foto4: null };
-let vehiculosDB = [];
 
 // ================= FUNCIONES DE UTILIDAD =================
 function mostrarAlerta(mensaje, tipo) {
@@ -51,74 +47,7 @@ function mostrarAlerta(mensaje, tipo) {
     }, 5000);
 }
 
-function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current);
-            current = '';
-        } else {
-            current += char;
-        }
-    }
-    result.push(current);
-    return result;
-}
-
-function parseCSV(csvText) {
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const result = [];
-    
-    for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        const obj = {};
-        headers.forEach((header, index) => {
-            obj[header] = values[index] ? values[index].trim() : '';
-        });
-        result.push(obj);
-    }
-    return result;
-}
-
-// ================= CARGAR BASE DE DATOS =================
-async function cargarBaseDeDatos() {
-    try {
-        // Intentar cargar desde localStorage primero
-        const stored = localStorage.getItem('vehiculosDB');
-        if (stored) {
-            vehiculosDB = JSON.parse(stored);
-            console.log('✅ Base de datos cargada desde localStorage:', vehiculosDB.length, 'vehículos');
-            return true;
-        }
-        
-        // Cargar desde CSV
-        console.log('📥 Cargando desde CSV...');
-        const response = await fetch('../data/vehiculos_rows.csv');
-        if (!response.ok) throw new Error('No se pudo cargar el CSV');
-        
-        const csvText = await response.text();
-        vehiculosDB = parseCSV(csvText);
-        
-        // Guardar en localStorage
-        localStorage.setItem('vehiculosDB', JSON.stringify(vehiculosDB));
-        console.log('✅ Base de datos cargada desde CSV:', vehiculosDB.length, 'vehículos');
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Error al cargar base de datos:', error);
-        mostrarAlerta('⚠️ No se pudo cargar la base de datos', 'error');
-        return false;
-    }
-}
-
-// ================= BÚSQUEDA DE VEHÍCULO =================
+// ================= BÚSQUEDA DESDE SUPABASE =================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) {
@@ -132,35 +61,41 @@ async function buscarVehiculo() {
         return;
     }
     
-    console.log('🔍 Buscando vehículo:', searchTerm);
+    console.log('🔍 Buscando vehículo en Supabase:', searchTerm);
+    mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
-    // Cargar base de datos si no está cargada
-    if (vehiculosDB.length === 0) {
-        mostrarAlerta('⏳ Cargando base de datos...', 'info');
-        const cargado = await cargarBaseDeDatos();
-        if (!cargado) return;
-    }
-    
-    // Buscar en todos los campos relevantes
-    const vehiculo = vehiculosDB.find(v => {
-        const placa = (v.placa || '').toString().toUpperCase();
-        const facsimil = (v.facsimil || '').toString().toUpperCase();
-        const sCarroceria = (v.s_carroceria || '').toString().toUpperCase();
-        const sMotor = (v.s_motor || '').toString().toUpperCase();
-        const id = (v.id || '').toString();
+    try {
+        // ✅ CONSULTA A SUPABASE - BUSCA EN LOS 4 CAMPOS
+        const { data, error } = await supabaseClient
+            .from('vehiculos')
+            .select('*')
+            .or(`placa.eq.${searchTerm},placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%`)
+            .limit(1);
         
-        return placa === searchTerm || placa.includes(searchTerm) ||
-               facsimil === searchTerm || facsimil.includes(searchTerm) ||
-               sCarroceria === searchTerm || sCarroceria.includes(searchTerm) ||
-               sMotor === searchTerm || sMotor.includes(searchTerm) ||
-               id === searchTerm;
-    });
-    
-    if (vehiculo) {
+        if (error) {
+            console.error('❌ Error en Supabase:', error);
+            mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
+            return;
+        }
+        
+        console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
+        
+        if (!data || data.length === 0) {
+            mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+            return;
+        }
+        
+        // ✅ VEHÍCULO ENCONTRADO
+        const vehiculo = data[0];
+        console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
+        
+        // Llenar formulario con los datos encontrados
         llenarFormulario(vehiculo);
-        mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo}`, 'success');
-    } else {
-        mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+        mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo} - Placa: ${vehiculo.placa}`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Error en buscarVehiculo:', error);
+        mostrarAlerta('❌ Error: ' + error.message, 'error');
     }
 }
 
@@ -181,16 +116,16 @@ function llenarFormulario(vehiculo) {
         'observacion': 'observaciones'
     };
     
-    Object.entries(mapeoCampos).forEach(([csvField, formField]) => {
+    Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
         const element = document.getElementById(formField);
-        if (element && vehiculo[csvField]) {
+        if (element && vehiculo[dbField]) {
             if (element.tagName === 'SELECT') {
                 const matchingOption = Array.from(element.options).find(opt =>
-                    opt.value.toUpperCase() === vehiculo[csvField].toUpperCase()
+                    opt.value.toUpperCase() === vehiculo[dbField].toUpperCase()
                 );
                 if (matchingOption) element.value = matchingOption.value;
             } else {
-                element.value = vehiculo[csvField];
+                element.value = vehiculo[dbField];
             }
         }
     });
@@ -365,17 +300,39 @@ function imprimirFicha() {
     window.print();
 }
 
+// ================= CARGAR USUARIO =================
+async function cargarUsuario() {
+    try {
+        if (supabaseClient) {
+            const { data } = await supabaseClient.auth.getSession();
+            const session = data?.session;
+            
+            if (session) {
+                const { data: perfilData } = await supabaseClient
+                    .from('perfiles')
+                    .select('email')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (perfilData?.email) {
+                    const userEmail = document.getElementById('userEmail');
+                    if (userEmail) userEmail.textContent = perfilData.email;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error al cargar usuario:', error);
+    }
+}
+
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando ficha técnica...');
     
     // Inicializar Supabase primero
     if (!inicializarSupabase()) {
-        console.warn('⚠️ Supabase no disponible, usando solo CSV/localStorage');
+        console.warn('⚠️ Supabase no disponible');
     }
-    
-    // Cargar base de datos
-    cargarBaseDeDatos();
     
     // Inicializar vista previa
     actualizarVistaPrevia();
@@ -414,28 +371,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✅ Inicialización completada');
 });
-
-// ================= CARGAR USUARIO =================
-async function cargarUsuario() {
-    try {
-        if (supabaseClient) {
-            const { data } = await supabaseClient.auth.getSession();
-            const session = data?.session;
-            
-            if (session) {
-                const { data: perfilData } = await supabaseClient
-                    .from('perfiles')
-                    .select('email')
-                    .eq('id', session.user.id)
-                    .single();
-                
-                if (perfilData?.email) {
-                    const userEmail = document.getElementById('userEmail');
-                    if (userEmail) userEmail.textContent = perfilData.email;
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error al cargar usuario:', error);
-    }
-}
