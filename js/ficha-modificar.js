@@ -37,12 +37,21 @@ let fichaSeleccionada = null;
 let isEditing = false;
 
 // ✅ CAMPOS QUE NO SE PUEDEN MODIFICAR (siempre disabled)
-const camposNoEditables = ['placa', 'facsimilar', 'serialCarroceria', 'serialMotor', 'marca', 'modelo'];
+const camposNoEditables = [
+    'placa', 
+    'facsimilar', 
+    'serialCarroceria', 
+    'serialMotor', 
+    'marca', 
+    'modelo',
+    'tipo',
+    'clase',
+    'estatus'
+];
 
 // ============================================
 // FUNCIONES DE BÚSQUEDA
 // ============================================
-
 async function buscarFicha() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
@@ -81,12 +90,10 @@ async function buscarFicha() {
         
         fichaSeleccionada = data[0];
         console.log('✅ Ficha encontrada:', fichaSeleccionada);
-        
         llenarFormulario(fichaSeleccionada);
-        
         mostrarAlerta('✅ Ficha técnica encontrada: ' + fichaSeleccionada.marca + ' ' + fichaSeleccionada.modelo + ' - Placa: ' + fichaSeleccionada.placa, 'success');
-        
         actualizarVistaPrevia();
+        
     } catch (error) {
         console.error('❌ Error en buscarFicha:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
@@ -98,7 +105,6 @@ async function buscarFicha() {
 // ============================================
 // FUNCIONES DE LLENADO DE FORMULARIO
 // ============================================
-
 function llenarFormulario(ficha) {
     console.log('📝 Llenando formulario con ficha:', ficha);
     
@@ -128,12 +134,13 @@ function llenarFormulario(ficha) {
         const dbField = pair[0];
         const formField = pair[1];
         const element = document.getElementById(formField);
+        
         if (element && ficha[dbField]) {
             if (element.tagName === 'SELECT') {
                 const options = Array.from(element.options);
                 const dbValue = ficha[dbField].toUpperCase().trim();
                 
-                // Búsqueda flexible para Clase (con/sin espacios)
+                // Búsqueda flexible para Clase y Tipo (con/sin espacios)
                 let matchingOption = options.find(function(opt) {
                     const optValue = opt.value.toUpperCase().trim();
                     if (optValue === dbValue) return true;
@@ -162,7 +169,6 @@ function llenarFormulario(ficha) {
     document.getElementById('fichaId').value = ficha.id;
     cargarFotosExistentes(ficha);
     actualizarVistaPrevia();
-    
     console.log('✅ Formulario llenado correctamente');
 }
 
@@ -177,7 +183,6 @@ function cargarFotosExistentes(ficha) {
             fotosUrlsExistentes['foto' + i] = ficha['foto' + i + '_url'];
             fotosData['foto' + i] = ficha['foto' + i + '_url'];
             fotosModificadas['foto' + i] = false;
-            
             img.src = ficha['foto' + i + '_url'];
             img.style.display = 'block';
             placeholder.style.display = 'none';
@@ -186,7 +191,6 @@ function cargarFotosExistentes(ficha) {
             fotosUrlsExistentes['foto' + i] = null;
             fotosData['foto' + i] = null;
             fotosModificadas['foto' + i] = false;
-            
             img.src = '';
             img.style.display = 'none';
             placeholder.style.display = 'flex';
@@ -234,15 +238,25 @@ function limpiarBusqueda() {
 // FUNCIONES DE EDICIÓN
 // ============================================
 
-// ✅ CAMBIO 4: TOGGLE FORM FIELDS EXCLUYE CAMPOS NO EDITABLES
+// ✅ TOGGLE FORM FIELDS EXCLUYE CAMPOS NO EDITABLES
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
+    
     fields.forEach(function(field) {
         // ✅ NUNCA HABILITAR CAMPOS DE IDENTIFICACIÓN ÚNICA
         if (camposNoEditables.includes(field.id)) {
             field.disabled = true;
+            // Agregar clase visual para campos bloqueados
+            const formGroup = field.closest('.form-group');
+            if (formGroup) {
+                formGroup.classList.add('locked');
+            }
         } else if (field.id !== 'fichaId') {
             field.disabled = !enable;
+            const formGroup = field.closest('.form-group');
+            if (formGroup) {
+                formGroup.classList.toggle('locked', !enable);
+            }
         }
     });
     
@@ -258,12 +272,11 @@ function editarFicha() {
     }
     
     toggleFormFields(true);
-    
     document.getElementById('btnEditar').style.display = 'none';
     document.getElementById('btnGuardar').style.display = 'inline-flex';
     document.getElementById('btnCancelar').disabled = false;
     
-    mostrarAlerta('ℹ️ Editando ficha. Los campos Placa, Facsímil, Serial Carrocería y Serial Motor NO se pueden modificar.', 'info');
+    mostrarAlerta('ℹ️ Editando ficha. Los campos marcados con 🔒 NO se pueden modificar.', 'info');
 }
 
 function cancelarEdicion() {
@@ -271,18 +284,15 @@ function cancelarEdicion() {
         llenarFormulario(fichaSeleccionada);
     }
     toggleFormFields(false);
-    
     document.getElementById('btnEditar').style.display = 'inline-flex';
     document.getElementById('btnGuardar').style.display = 'none';
     document.getElementById('btnCancelar').disabled = true;
-    
     mostrarAlerta('ℹ️ Edición cancelada. Los cambios no fueron guardados.', 'info');
 }
 
 // ============================================
 // FUNCIONES DE VISTA PREVIA
 // ============================================
-
 function actualizarVistaPrevia() {
     const campos = {
         'marca': 'previewMarca',
@@ -310,6 +320,7 @@ function actualizarVistaPrevia() {
         const previewField = campos[formField];
         const element = document.getElementById(formField);
         const preview = document.getElementById(previewField);
+        
         if (element && preview) {
             preview.textContent = element.value || '';
             if (formField === 'observaciones') {
@@ -348,7 +359,6 @@ function previewImage(input, previewId) {
             const fotoNum = previewId.replace('previewFoto', 'foto');
             fotosData[fotoNum] = e.target.result;
             fotosModificadas[fotoNum] = true;
-            
             actualizarFotosPreview();
         };
         reader.readAsDataURL(file);
@@ -371,7 +381,6 @@ function removeFoto(numero) {
     fotosData['foto' + numero] = null;
     fotosUrlsExistentes['foto' + numero] = null;
     fotosModificadas['foto' + numero] = true;
-    
     actualizarFotosPreview();
 }
 
@@ -395,7 +404,6 @@ function actualizarFotosPreview() {
 // ============================================
 // FUNCIONES DE GUARDADO
 // ============================================
-
 async function guardarFicha(event) {
     event.preventDefault();
     
@@ -425,6 +433,7 @@ async function guardarFicha(event) {
         
         const bucketName = 'fichas-tecnicas';
         
+        // Subir fotos modificadas
         for (let i = 1; i <= 4; i++) {
             if (fotosModificadas['foto' + i] && fotosData['foto' + i]) {
                 const base64Data = fotosData['foto' + i];
@@ -463,16 +472,7 @@ async function guardarFicha(event) {
         }
         
         const fichaActualizada = {
-            marca: document.getElementById('marca').value.trim().toUpperCase(),
-            modelo: document.getElementById('modelo').value.trim().toUpperCase(),
-            tipo: document.getElementById('tipo').value.trim().toUpperCase(),
-            clase: document.getElementById('clase').value.trim().toUpperCase(),
             color: document.getElementById('color').value.trim().toUpperCase(),
-            s_carroceria: document.getElementById('serialCarroceria').value.trim().toUpperCase(),
-            s_motor: document.getElementById('serialMotor').value.trim().toUpperCase(),
-            placa: document.getElementById('placa').value.trim().toUpperCase(),
-            facsimil: document.getElementById('facsimilar').value.trim().toUpperCase(),
-            estatus_ficha: document.getElementById('estatus').value.trim().toUpperCase(),
             dependencia: document.getElementById('dependencia').value.trim(),
             causa: document.getElementById('causa').value.trim() || null,
             mecanica: document.getElementById('mecanica').value.trim() || null,
@@ -505,10 +505,8 @@ async function guardarFicha(event) {
         
         console.log('✅ Ficha actualizada:', data);
         mostrarAlerta('✅ Ficha técnica actualizada exitosamente', 'success');
-        
         fichaSeleccionada = Object.assign({}, fichaSeleccionada, data[0]);
         
-        // ✅ CAMBIO 5: LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
         setTimeout(function() {
             limpiarTodoParaNuevaBusqueda();
         }, 2000);
@@ -522,33 +520,25 @@ async function guardarFicha(event) {
     }
 }
 
-// ✅ NUEVA FUNCIÓN: LIMPIAR TODO PARA NUEVA BÚSQUEDA
+// NUEVA FUNCIÓN: LIMPIAR TODO PARA NUEVA BÚSQUEDA
 function limpiarTodoParaNuevaBusqueda() {
     console.log('🧹 Limpiando formulario para nueva búsqueda...');
-    
     document.getElementById('searchInput').value = '';
     document.getElementById('fichaForm').reset();
     document.getElementById('fichaId').value = '';
-    
     toggleFormFields(false);
-    
     document.getElementById('btnEditar').style.display = 'inline-flex';
     document.getElementById('btnGuardar').style.display = 'none';
     document.getElementById('btnCancelar').disabled = true;
-    
     fichaSeleccionada = null;
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     mostrarAlerta('ℹ️ Ingrese placa, facsímil o serial para buscar una ficha', 'info');
-    
     console.log('✅ Formulario limpiado, listo para nueva búsqueda');
 }
 
 // ============================================
 // FUNCIONES DE UTILIDAD
 // ============================================
-
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
@@ -556,7 +546,6 @@ function mostrarAlerta(mensaje, tipo) {
     alertDiv.textContent = mensaje;
     alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     setTimeout(function() {
@@ -567,7 +556,6 @@ function mostrarAlerta(mensaje, tipo) {
 // ============================================
 // INICIALIZACIÓN Y EVENTOS
 // ============================================
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando modificación de fichas técnicas...');
     
@@ -615,7 +603,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     cargarUsuario();
-    
     console.log('✅ Modificación de fichas inicializada');
 });
 
