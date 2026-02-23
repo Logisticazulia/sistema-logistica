@@ -1,6 +1,6 @@
 /**
  * ============================================
- * FICHA TÉCNICA DE VEHÍCULOS - VALIDACIÓN PREDICTIVA REAL
+ * FICHA TÉCNICA DE VEHÍCULOS - VALIDACIÓN PREDICTIVA COMPLETA
  * ============================================
  */
 
@@ -312,6 +312,18 @@ async function buscarVehiculo() {
         
         var vehiculo = data[0];
         console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
+        
+        // ✅ VERIFICAR SI YA EXISTE FICHA PARA ESTE VEHÍCULO
+        var verificacionFicha = await supabaseClient
+            .from('fichas_tecnicas')
+            .select('id, placa')
+            .or('placa.eq.' + (vehiculo.placa || '') + ',facsimil.eq.' + (vehiculo.facsimil || '') + ',s_carroceria.eq.' + (vehiculo.s_carroceria || '') + ',s_motor.eq.' + (vehiculo.s_motor || ''))
+            .limit(1);
+        
+        if (verificacionFicha.data && verificacionFicha.data.length > 0) {
+            mostrarAlerta('⚠️ ESTE VEHÍCULO YA TIENE FICHA TÉCNICA REGISTRADA (Placa: ' + (verificacionFicha.data[0].placa || 'N/A') + ')', 'error');
+            return;
+        }
         
         llenarFormulario(vehiculo);
         bloquearCamposPrincipales();
