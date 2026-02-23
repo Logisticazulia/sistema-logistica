@@ -351,10 +351,8 @@ function actualizarVistaPrevia() {
 }
 
 async function guardarFicha() {
-    // ... validaciones ...
-
+ 
     const fichaData = {
-        vehiculo_id: vehiculoEncontradoId, // ← CAMPO OBLIGATORIO
         placa: document.getElementById('placa')?.value || '',
         facsimil: document.getElementById('facsimilar')?.value || '',
         marca: document.getElementById('marca')?.value || '',
