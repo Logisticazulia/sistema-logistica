@@ -1,5 +1,8 @@
 /**
- * FICHA TÉCNICA DE VEHÍCULOS - BÚSQUEDA DESDE SUPABASE
+ * ============================================
+ * FICHA TÉCNICA DE VEHÍCULOS - LÓGICA COMPLETA
+ * Versión corregida y optimizada
+ * ============================================
  */
 
 // ================= CONFIGURACIÓN =================
@@ -30,10 +33,21 @@ function inicializarSupabase() {
     }
 }
 
-// ================= ESTADO =================
-const fotosData = { foto1: null, foto2: null, foto3: null, foto4: null };
+// ================= ESTADO GLOBAL =================
+const fotosData = {
+    foto1: null,
+    foto2: null,
+    foto3: null,
+    foto4: null
+};
 
 // ================= FUNCIONES DE UTILIDAD =================
+
+/**
+ * Muestra alertas en la interfaz
+ * @param {string} mensaje - Texto a mostrar
+ * @param {string} tipo - 'success', 'error' o 'info'
+ */
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
@@ -47,7 +61,21 @@ function mostrarAlerta(mensaje, tipo) {
     }, 5000);
 }
 
+/**
+ * Limpia y formatea texto para consistencia
+ * @param {string} texto - Texto a limpiar
+ * @returns {string} Texto formateado
+ */
+function limpiarTexto(texto) {
+    if (!texto) return '';
+    return texto.toString().trim().toUpperCase();
+}
+
 // ================= BÚSQUEDA DESDE SUPABASE =================
+
+/**
+ * Busca un vehículo en la base de datos por placa, facsímil o seriales
+ */
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) {
@@ -55,21 +83,28 @@ async function buscarVehiculo() {
         return;
     }
     
-    const searchTerm = searchInput.value.trim().toUpperCase();
+    const searchTerm = limpiarTexto(searchInput.value);
+    
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
-    console.log('🔍 Buscando vehículo en Supabase:', searchTerm);
+    console.log('🔍 Buscando vehículo:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
     try {
-        // ✅ CONSULTA A SUPABASE - BUSCA EN LOS 4 CAMPOS
+        // Consulta optimizada: busca en múltiples campos
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
-            .or(`placa.eq.${searchTerm},placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%`)
+            .or(
+                `placa.eq.${searchTerm},` +
+                `placa.ilike.%${searchTerm}%,` +
+                `facsimil.ilike.%${searchTerm}%,` +
+                `s_carroceria.ilike.%${searchTerm}%,` +
+                `s_motor.ilike.%${searchTerm}%`
+            )
             .limit(1);
         
         if (error) {
@@ -78,18 +113,17 @@ async function buscarVehiculo() {
             return;
         }
         
-        console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
+        console.log('📊 Resultados:', data?.length || 0, 'vehículo(s)');
         
         if (!data || data.length === 0) {
             mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
             return;
         }
         
-        // ✅ VEHÍCULO ENCONTRADO
+        // Vehículo encontrado
         const vehiculo = data[0];
         console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
         
-        // Llenar formulario con los datos encontrados
         llenarFormulario(vehiculo);
         mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo} - Placa: ${vehiculo.placa}`, 'success');
         
@@ -100,7 +134,13 @@ async function buscarVehiculo() {
 }
 
 // ================= LLENAR FORMULARIO =================
+
+/**
+ * Llena el formulario con los datos del vehículo encontrado
+ * @param {Object} vehiculo - Datos del vehículo desde la BD
+ */
 function llenarFormulario(vehiculo) {
+    // Mapeo de campos de la BD al formulario
     const mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
@@ -113,31 +153,47 @@ function llenarFormulario(vehiculo) {
         'facsimil': 'facsimilar',
         'situacion': 'estatus',
         'unidad_administrativa': 'dependencia',
-        'observacion': 'observaciones'
+        'observacion': 'observaciones',
+        'ubicacion_fisica': 'ubicacion',
+        'ano': 'ano'
     };
     
+    // Llenar cada campo
     Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
         const element = document.getElementById(formField);
-        if (element && vehiculo[dbField]) {
+        if (element && vehiculo[dbField] !== undefined && vehiculo[dbField] !== null) {
+            const valor = vehiculo[dbField];
+            
             if (element.tagName === 'SELECT') {
-                const matchingOption = Array.from(element.options).find(opt =>
-                    opt.value.toUpperCase() === vehiculo[dbField].toUpperCase()
+                // Para selects, buscar la opción que coincida (case-insensitive)
+                const options = Array.from(element.options);
+                const matchingOption = options.find(opt => 
+                    opt.value.toUpperCase() === limpiarTexto(valor)
                 );
-                if (matchingOption) element.value = matchingOption.value;
+                if (matchingOption) {
+                    element.value = matchingOption.value;
+                }
             } else {
-                element.value = vehiculo[dbField];
+                element.value = valor;
             }
         }
     });
     
+    // Actualizar vista previa
     actualizarVistaPrevia();
 }
 
-// ================= LIMPIAR BÚSQUEDA =================
+// ================= LIMPIAR BÚSQUEDA Y FORMULARIO =================
+
+/**
+ * Limpia la búsqueda y el formulario
+ */
 function limpiarBusqueda() {
+    // Limpiar input de búsqueda
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
     
+    // Ocultar alertas
     const searchAlert = document.getElementById('searchAlert');
     if (searchAlert) searchAlert.style.display = 'none';
     
@@ -145,7 +201,7 @@ function limpiarBusqueda() {
     const form = document.getElementById('fichaForm');
     if (form) form.reset();
     
-    // Limpiar vista previa
+    // Limpiar vista previa de textos
     actualizarVistaPrevia();
     
     // Limpiar fotos
@@ -163,16 +219,38 @@ function limpiarBusqueda() {
         if (placeholder) placeholder.style.display = 'flex';
         fotosData['foto' + i] = null;
     }
+    
     actualizarFotosPreview();
+    mostrarAlerta('🔄 Formulario limpiado', 'success');
 }
 
 // ================= VISTA PREVIA DE FOTOS =================
+
+/**
+ * Previsualiza imagen seleccionada
+ * @param {HTMLInputElement} input - Input file
+ * @param {string} previewId - ID del elemento img de preview
+ */
 function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
+        
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+            mostrarAlerta('⚠️ Por favor seleccione un archivo de imagen válido', 'error');
+            return;
+        }
+        
+        // Validar tamaño (máx 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            mostrarAlerta('⚠️ La imagen no debe superar los 5MB', 'error');
+            return;
+        }
+        
         const reader = new FileReader();
         
         reader.onload = function(e) {
+            // Actualizar vista previa en el formulario
             const img = document.getElementById(previewId);
             const container = document.getElementById(previewId + 'Container');
             const placeholder = container?.querySelector('.placeholder');
@@ -183,17 +261,25 @@ function previewImage(input, previewId) {
             }
             if (placeholder) placeholder.style.display = 'none';
             
-            // Guardar en base64
+            // Guardar en base64 para guardar después
             const fotoNum = previewId.replace('previewFoto', 'foto');
             fotosData[fotoNum] = e.target.result;
             
+            // Actualizar vista previa en la ficha final
             actualizarFotosPreview();
+        };
+        
+        reader.onerror = function() {
+            mostrarAlerta('❌ Error al leer la imagen', 'error');
         };
         
         reader.readAsDataURL(file);
     }
 }
 
+/**
+ * Actualiza las fotos en la vista previa de la ficha final
+ */
 function actualizarFotosPreview() {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewImg' + i);
@@ -211,40 +297,48 @@ function actualizarFotosPreview() {
     }
 }
 
-// ================= ACTUALIZAR VISTA PREVIA =================
+// ================= ACTUALIZAR VISTA PREVIA DE TEXTOS =================
+
+/**
+ * Actualiza en tiempo real la vista previa con los valores del formulario
+ */
 function actualizarVistaPrevia() {
-    // Datos básicos
-    document.getElementById('previewMarca').textContent = document.getElementById('marca').value || '';
-    document.getElementById('previewModelo').textContent = document.getElementById('modelo').value || '';
-    document.getElementById('previewTipo').textContent = document.getElementById('tipo').value || '';
-    document.getElementById('previewClase').textContent = document.getElementById('clase').value || '';
-    document.getElementById('previewSerialCarroceria').textContent = document.getElementById('serialCarroceria').value || '';
-    document.getElementById('previewColor').textContent = document.getElementById('color').value || '';
-    document.getElementById('previewPlaca').textContent = document.getElementById('placa').value || '';
-    document.getElementById('previewFacsimilar').textContent = document.getElementById('facsimilar').value || '';
-    document.getElementById('previewSerialMotor').textContent = document.getElementById('serialMotor').value || '';
-    document.getElementById('previewDependencia').textContent = document.getElementById('dependencia').value || '';
-    document.getElementById('previewEstatus').textContent = document.getElementById('estatus').value || '';
-    document.getElementById('previewObservaciones').textContent = document.getElementById('observaciones').value || '';
+    const campos = [
+        'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
+        'color', 'placa', 'facsimilar', 'serialMotor', 'dependencia',
+        'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
+        'tapiceria', 'cauchos', 'luces', 'observaciones', 'ano'
+    ];
     
-    // ✅ NUEVO: Información Técnico Mecánica
-    document.getElementById('previewCausa').textContent = document.getElementById('causa').value || '';
-    document.getElementById('previewMecanica').textContent = document.getElementById('mecanica').value || '';
-    document.getElementById('previewDiagnostico').textContent = document.getElementById('diagnostico').value || '';
-    document.getElementById('previewUbicacion').textContent = document.getElementById('ubicacion').value || '';
-    document.getElementById('previewTapiceria').textContent = document.getElementById('tapiceria').value || '';
-    document.getElementById('previewCauchos').textContent = document.getElementById('cauchos').value || '';
-    document.getElementById('previewLuces').textContent = document.getElementById('luces').value || '';
-} ================= GUARDAR FICHA =================
+    campos.forEach(campo => {
+        const input = document.getElementById(campo);
+        const previewId = 'preview' + campo.charAt(0).toUpperCase() + campo.slice(1);
+        const preview = document.getElementById(previewId);
+        
+        if (preview && input) {
+            preview.textContent = input.value || 'N/A';
+        }
+    });
+}
+
+// ================= GUARDAR FICHA =================
+
+/**
+ * Guarda la ficha técnica en localStorage
+ */
 function guardarFicha() {
     const form = document.getElementById('fichaForm');
+    
+    // Validación básica del formulario
     if (form && !form.checkValidity()) {
         form.reportValidity();
         mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
         return;
     }
     
+    // Recopilar datos del formulario
     const fichaData = {
+        id: Date.now(), // ID único temporal
         marca: document.getElementById('marca')?.value || '',
         modelo: document.getElementById('modelo')?.value || '',
         tipo: document.getElementById('tipo')?.value || '',
@@ -264,65 +358,53 @@ function guardarFicha() {
         cauchos: document.getElementById('cauchos')?.value || '',
         luces: document.getElementById('luces')?.value || '',
         observaciones: document.getElementById('observaciones')?.value || '',
+        ano: document.getElementById('ano')?.value || '',
         fotos: { ...fotosData },
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
+        creadoPor: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com'
     };
     
     // Guardar en localStorage
-    let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
-    fichas.push(fichaData);
-    localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
-    
-    mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
-}
-
-// ================= LIMPIAR FORMULARIO =================
-function limpiarFormulario() {
-    if (confirm('¿Está seguro de limpiar el formulario?')) {
-        actualizarVistaPrevia();
+    try {
+        let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
+        fichas.push(fichaData);
+        localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
         
-        for (let i = 1; i <= 4; i++) {
-            const input = document.getElementById('foto' + i);
-            const img = document.getElementById('previewFoto' + i);
-            const container = document.getElementById('previewFoto' + i + 'Container');
-            const placeholder = container?.querySelector('.placeholder');
-            
-            if (input) input.value = '';
-            if (img) {
-                img.src = '';
-                img.style.display = 'none';
-            }
-            if (placeholder) placeholder.style.display = 'flex';
-            fotosData['foto' + i] = null;
-        }
+        mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
         
-        actualizarFotosPreview();
-        mostrarAlerta('🔄 Formulario limpiado', 'success');
+        // Opcional: limpiar formulario después de guardar
+        // limpiarBusqueda();
+        
+    } catch (error) {
+        console.error('❌ Error al guardar ficha:', error);
+        mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
     }
 }
 
-// ================= IMPRIMIR =================
+// ================= IMPRIMIR FICHA =================
+
+/**
+ * Imprime la ficha técnica
+ */
 function imprimirFicha() {
     window.print();
 }
 
-// ================= CARGAR USUARIO =================
+// ================= CARGAR USUARIO AUTENTICADO =================
+
+/**
+ * Carga y muestra la información del usuario autenticado
+ */
 async function cargarUsuario() {
     try {
         if (supabaseClient) {
             const { data } = await supabaseClient.auth.getSession();
             const session = data?.session;
             
-            if (session) {
-                const { data: perfilData } = await supabaseClient
-                    .from('perfiles')
-                    .select('email')
-                    .eq('id', session.user.id)
-                    .single();
-                
-                if (perfilData?.email) {
-                    const userEmail = document.getElementById('userEmail');
-                    if (userEmail) userEmail.textContent = perfilData.email;
+            if (session?.user?.email) {
+                const userEmail = document.getElementById('userEmail');
+                if (userEmail) {
+                    userEmail.textContent = session.user.email;
                 }
             }
         }
@@ -331,58 +413,75 @@ async function cargarUsuario() {
     }
 }
 
-// ================= INICIALIZACIÓN =================
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Inicializando ficha técnica...');
-        const camposMecanicos = ['causa', 'mecanica', 'diagnostico', 'ubicacion', 'tapiceria', 'cauchos', 'luces'];
-    camposMecanicos.forEach(campo => {
-        const input = document.getElementById(campo);
-        if (input) {
-            input.addEventListener('input', actualizarVistaPrevia);
+// ================= CERRAR SESIÓN =================
+
+/**
+ * Cierra la sesión del usuario
+ */
+async function cerrarSesion() {
+    if (confirm('¿Está seguro de cerrar sesión?')) {
+        try {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            localStorage.clear();
+            window.location.href = '../index.html';
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            window.location.href = '../index.html';
         }
-    });
+    }
+}
+
+// ================= INICIALIZACIÓN =================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Inicializando ficha técnica de vehículos...');
     
-    console.log('✅ Inicialización completada');
-});
-    
-    // Inicializar Supabase primero
+    // 1. Inicializar Supabase
     if (!inicializarSupabase()) {
-        console.warn('⚠️ Supabase no disponible');
+        console.warn('⚠️ Supabase no disponible, algunas funciones pueden estar limitadas');
     }
     
-    // Inicializar vista previa
+    // 2. Inicializar vista previa
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    // Event listeners para botones
+    // 3. Configurar event listeners para inputs (vista previa en tiempo real)
+    const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', actualizarVistaPrevia);
+    });
+    
+    // 4. Configurar botones principales
     const btnGuardar = document.getElementById('btnGuardar');
     const btnImprimir = document.getElementById('btnImprimir');
     const btnLimpiar = document.getElementById('btnLimpiar');
+    const btnBuscar = document.getElementById('btnBuscar');
     const logoutBtn = document.getElementById('logoutBtn');
     const searchInput = document.getElementById('searchInput');
     
     if (btnGuardar) btnGuardar.addEventListener('click', guardarFicha);
     if (btnImprimir) btnImprimir.addEventListener('click', imprimirFicha);
-    if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFormulario);
+    if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarBusqueda);
+    if (btnBuscar) btnBuscar.addEventListener('click', buscarVehiculo);
     
-    // Permitir buscar con Enter
+    // 5. Permitir buscar con Enter
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') buscarVehiculo();
-        });
-    }
-    
-    // Cerrar sesión
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Está seguro de cerrar sesión?')) {
-                localStorage.clear();
-                window.location.href = '../index.html';
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarVehiculo();
             }
         });
     }
     
-    // Cargar usuario
+    // 6. Configurar logout
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', cerrarSesion);
+    }
+    
+    // 7. Cargar información del usuario
     cargarUsuario();
     
     console.log('✅ Inicialización completada');
