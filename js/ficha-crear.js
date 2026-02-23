@@ -463,7 +463,7 @@ async function guardarFicha() {
         return;
     }
     
-    mostrarAlerta('⏳ Guardando ficha técnica en Supabase...', 'info');
+    mostrarAlerta('⏳ Guardando ficha técnica en la Base de Datos...', 'info');
     
     try {
         // ✅ PREPARAR DATOS PARA SUPABASE (mapeo correcto según CSV)
