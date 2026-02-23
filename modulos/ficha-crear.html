@@ -514,6 +514,34 @@ font-weight: 600;
         min-width: 100%;
     }
 }
+    /* ✅ ALERTAS DE DUPLICADO EN CAMPOS */
+.duplicate-alert {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Campo con duplicado */
+.form-group input.duplicate {
+    border-color: #dc2626 !important;
+    background-color: #fef2f2 !important;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Botón deshabilitado por duplicados */
+#btnGuardar:disabled {
+    background: #9ca3af !important;
+    cursor: not-allowed !important;
+}
 </style>
 </head>
 <body class="dashboard-page">
