@@ -372,7 +372,36 @@ function cancelarEdicion() {
     toggleFormFields(false);
     showAlert('info', 'Edición cancelada. Los cambios no fueron guardados.');
 }
-
+// ✅ NUEVA FUNCIÓN: LIMPIAR FORMULARIO COMPLETAMENTE
+function limpiarFormulario() {
+    // Limpiar el input de búsqueda
+    if (searchUniversal) {
+        searchUniversal.value = '';
+    }
+    // Limpiar todos los campos del formulario
+    const fields = form.querySelectorAll('.form-input, .form-select, .form-textarea');
+    fields.forEach(field => {
+        if (field.id !== 'vehicleId') {
+            field.value = '';
+        }
+    });
+    // Limpiar el ID oculto
+    const vehicleIdInput = document.getElementById('vehicleId');
+    if (vehicleIdInput) {
+        vehicleIdInput.value = '';
+    }
+    // Resetear vehicleData
+    vehicleData = null;
+    // Limpiar bordes de error/éxito
+    fields.forEach(field => {
+        field.style.borderColor = '#e2e8f0';
+        const formGroup = field.closest('.form-group');
+        if (formGroup) {
+            formGroup.classList.remove('error', 'success');
+        }
+    });
+    console.log('🧹 Formulario limpiado correctamente');
+}
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Inicializando modificación de vehículos...');
