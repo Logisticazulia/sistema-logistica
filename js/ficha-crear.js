@@ -1,6 +1,6 @@
 /**
  * ============================================
- * FICHA TÉCNICA DE VEHÍCULOS - SUPABASE REAL
+ * FICHA TÉCNICA DE VEHÍCULOS - VALIDACIÓN PREDICTIVA
  * ============================================
  */
 
@@ -20,6 +20,24 @@ const CAMPOS_BLOQUEADOS = [
     'serialMotor', 'color', 'placa', 'facsimil', 'estatus', 'dependencia'
 ];
 
+// ================= ESTADO DE DUPLICADOS =================
+const duplicadosEncontrados = {
+    placa: false,
+    facsimil: false,
+    s_carroceria: false,
+    s_motor: false
+};
+
+// ================= DEBOUNCE PARA BÚSQUEDA =================
+let debounceTimers = {};
+
+function debounce(func, delay, field) {
+    if (debounceTimers[field]) {
+        clearTimeout(debounceTimers[field]);
+    }
+    debounceTimers[field] = setTimeout(func, delay);
+}
+
 // ================= FUNCIONES DE UTILIDAD =================
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
@@ -38,6 +56,61 @@ function mostrarAlerta(mensaje, tipo) {
     setTimeout(function() {
         alertDiv.style.display = 'none';
     }, 5000);
+}
+
+function mostrarAlertaDuplicado(campo, mensaje, existe) {
+    const input = document.getElementById(campo);
+    if (!input) return;
+    
+    const formGroup = input.closest('.form-group');
+    if (!formGroup) return;
+    
+    // Remover alerta previa
+    let alertaExistente = formGroup.querySelector('.duplicate-alert');
+    if (alertaExistente) {
+        alertaExistente.remove();
+    }
+    
+    if (existe) {
+        // ✅ CREAR ALERTA DE DUPLICADO
+        const alerta = document.createElement('div');
+        alerta.className = 'duplicate-alert';
+        alerta.style.cssText = 'color: #dc2626; font-size: 12px; margin-top: 5px; font-weight: 600; display: flex; align-items: center; gap: 5px;';
+        alerta.innerHTML = '⚠️ ' + mensaje;
+        formGroup.appendChild(alerta);
+        
+        // Marcar campo como duplicado
+        input.style.borderColor = '#dc2626';
+        input.style.backgroundColor = '#fef2f2';
+        duplicadosEncontrados[campo] = true;
+    } else {
+        // Limpiar estilo
+        input.style.borderColor = '#ddd';
+        input.style.backgroundColor = 'white';
+        duplicadosEncontrados[campo] = false;
+    }
+    
+    // Actualizar estado del botón guardar
+    actualizarEstadoBotonGuardar();
+}
+
+function actualizarEstadoBotonGuardar() {
+    const btnGuardar = document.getElementById('btnGuardar');
+    if (!btnGuardar) return;
+    
+    const hayDuplicados = Object.values(duplicadosEncontrados).some(function(v) { return v === true; });
+    
+    if (hayDuplicados) {
+        btnGuardar.disabled = true;
+        btnGuardar.style.opacity = '0.6';
+        btnGuardar.style.cursor = 'not-allowed';
+        btnGuardar.innerHTML = '⛔ Hay Duplicados - No se puede guardar';
+    } else {
+        btnGuardar.disabled = false;
+        btnGuardar.style.opacity = '1';
+        btnGuardar.style.cursor = 'pointer';
+        btnGuardar.innerHTML = '💾 Guardar Ficha';
+    }
 }
 
 function limpiarTexto(texto) {
@@ -69,6 +142,38 @@ function inicializarSupabase() {
     } catch (error) {
         console.error('❌ Error al inicializar Supabase:', error);
         return false;
+    }
+}
+
+// ================= VERIFICAR DUPLICADO EN TIEMPO REAL =================
+async function verificarDuplicadoEnTiempoReal(campo, valor, nombreCampo) {
+    if (!valor || valor.trim() === '') {
+        mostrarAlertaDuplicado(campo, '', false);
+        return;
+    }
+    
+    valor = limpiarTexto(valor);
+    
+    try {
+        var result = await supabaseClient
+            .from('fichas_tecnicas')
+            .select('id, placa, facsimil, s_carroceria, s_motor')
+            .eq(campo, valor)
+            .limit(1);
+        
+        if (result.error) {
+            console.error('Error verificando duplicado:', result.error);
+            return;
+        }
+        
+        if (result.data && result.data.length > 0) {
+            mostrarAlertaDuplicado(campo, '¡' + nombreCampo + ' YA REGISTRADO! No se puede duplicar.', true);
+        } else {
+            mostrarAlertaDuplicado(campo, '', false);
+        }
+        
+    } catch (error) {
+        console.error('Error en verificación:', error);
     }
 }
 
@@ -312,6 +417,12 @@ function limpiarBusqueda() {
     desbloquearCampos();
     actualizarVistaPrevia();
     
+    // Limpiar alertas de duplicados
+    var alertas = document.querySelectorAll('.duplicate-alert');
+    alertas.forEach(function(alerta) {
+        alerta.remove();
+    });
+    
     for (var i = 1; i <= 4; i++) {
         var input = document.getElementById('foto' + i);
         var img = document.getElementById('previewFoto' + i);
@@ -329,16 +440,55 @@ function limpiarBusqueda() {
         fotosData['foto' + i] = null;
     }
     
+    // Resetear estado de duplicados
+    duplicadosEncontrados.placa = false;
+    duplicadosEncontrados.facsimil = false;
+    duplicadosEncontrados.s_carroceria = false;
+    duplicadosEncontrados.s_motor = false;
+    
     actualizarFotosPreview();
+    actualizarEstadoBotonGuardar();
     mostrarAlerta('🔄 Formulario limpiado', 'info');
 }
 
-// ================= VERIFICAR DUPLICADOS =================
-async function verificarDuplicados(placa, facsimil, s_carroceria, s_motor) {
+// ================= SUBIR FOTO A SUPABASE =================
+async function subirFotoSupabase(file, placa, numeroFoto) {
+    try {
+        var bucketName = 'fichas-tecnicas';
+        var fileName = 'ficha_' + Date.now() + '_foto' + numeroFoto + '_' + (placa || 'sinplaca') + '.jpg';
+        
+        var result = await supabaseClient
+            .storage
+            .from(bucketName)
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+        
+        if (result.error) {
+            console.error('❌ Error subiendo foto ' + numeroFoto + ':', result.error);
+            return null;
+        }
+        
+        var urlResult = supabaseClient
+            .storage
+            .from(bucketName)
+            .getPublicUrl(fileName);
+        
+        console.log('✅ Foto ' + numeroFoto + ' subida:', urlResult.data.publicUrl);
+        return urlResult.data.publicUrl;
+        
+    } catch (error) {
+        console.error('❌ Error en subirFotoSupabase:', error);
+        return null;
+    }
+}
+
+// ================= VERIFICAR DUPLICADOS ANTES DE GUARDAR =================
+async function verificarDuplicadosAntesDeGuardar(placa, facsimil, s_carroceria, s_motor) {
     var duplicados = [];
-    
-    // Construir condición OR para verificar duplicados
     var condiciones = [];
+    
     if (placa && placa.trim() !== '') {
         condiciones.push('placa.eq.' + placa.trim());
     }
@@ -386,39 +536,6 @@ async function verificarDuplicados(placa, facsimil, s_carroceria, s_motor) {
     }
 }
 
-// ================= SUBIR FOTO A SUPABASE =================
-async function subirFotoSupabase(file, placa, numeroFoto) {
-    try {
-        var bucketName = 'fichas-tecnicas';
-        var fileName = 'ficha_' + Date.now() + '_foto' + numeroFoto + '_' + (placa || 'sinplaca') + '.jpg';
-        
-        var result = await supabaseClient
-            .storage
-            .from(bucketName)
-            .upload(fileName, file, {
-                cacheControl: '3600',
-                upsert: false
-            });
-        
-        if (result.error) {
-            console.error('❌ Error subiendo foto ' + numeroFoto + ':', result.error);
-            return null;
-        }
-        
-        var urlResult = supabaseClient
-            .storage
-            .from(bucketName)
-            .getPublicUrl(fileName);
-        
-        console.log('✅ Foto ' + numeroFoto + ' subida:', urlResult.data.publicUrl);
-        return urlResult.data.publicUrl;
-        
-    } catch (error) {
-        console.error('❌ Error en subirFotoSupabase:', error);
-        return null;
-    }
-}
-
 // ================= GUARDAR FICHA EN SUPABASE =================
 async function guardarFicha() {
     var form = document.getElementById('fichaForm');
@@ -451,10 +568,10 @@ async function guardarFicha() {
     var s_carroceria = (document.getElementById('serialCarroceria')?.value || '').toUpperCase().trim();
     var s_motor = (document.getElementById('serialMotor')?.value || '').toUpperCase().trim();
     
-    // ✅ VERIFICAR DUPLICADOS ANTES DE GUARDAR
+    // ✅ VERIFICAR DUPLICADOS ANTES DE GUARDAR (última verificación)
     mostrarAlerta('⏳ Verificando duplicados en base de datos...', 'info');
     
-    var verificacion = await verificarDuplicados(placa, facsimil, s_carroceria, s_motor);
+    var verificacion = await verificarDuplicadosAntesDeGuardar(placa, facsimil, s_carroceria, s_motor);
     
     if (verificacion.error) {
         mostrarAlerta('⚠️ Error verificando duplicados, pero continuando...', 'info');
@@ -463,10 +580,10 @@ async function guardarFicha() {
         return;
     }
     
-    mostrarAlerta('⏳ Guardando ficha técnica en la Base de Datos...', 'info');
+    mostrarAlerta('⏳ Guardando ficha técnica en Supabase...', 'info');
     
     try {
-        // ✅ PREPARAR DATOS PARA SUPABASE (mapeo correcto según CSV)
+        // ✅ PREPARAR DATOS PARA SUPABASE
         var fichaData = {
             vehiculo_id: null,
             placa: placa,
@@ -598,6 +715,35 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', actualizarVistaPrevia);
     });
     
+    // ✅ VALIDACIÓN PREDICTIVA DE DUPLICADOS
+    var camposPredictivos = [
+        { id: 'placa', nombre: 'Placa', campo: 'placa' },
+        { id: 'facsimil', nombre: 'Facsimil', campo: 'facsimil' },
+        { id: 'serialCarroceria', nombre: 'Serial Carrocería', campo: 's_carroceria' },
+        { id: 'serialMotor', nombre: 'Serial Motor', campo: 's_motor' }
+    ];
+    
+    camposPredictivos.forEach(function(campo) {
+        var input = document.getElementById(campo.id);
+        if (input) {
+            input.addEventListener('input', function(e) {
+                var valor = e.target.value;
+                // ✅ DEBOUNCE DE 800MS PARA EVITAR MÚLTIPLES CONSULTAS
+                debounce(function() {
+                    verificarDuplicadoEnTiempoReal(campo.campo, valor, campo.nombre);
+                }, 800, campo.id);
+            });
+            
+            // ✅ VERIFICAR AL PERDER EL FOCO
+            input.addEventListener('blur', function(e) {
+                var valor = e.target.value;
+                if (valor && valor.trim() !== '') {
+                    verificarDuplicadoEnTiempoReal(campo.campo, valor, campo.nombre);
+                }
+            });
+        }
+    });
+    
     var btnGuardar = document.getElementById('btnGuardar');
     var btnLimpiar = document.getElementById('btnLimpiar');
     var logoutBtn = document.getElementById('logoutBtn');
@@ -625,5 +771,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     cargarUsuario();
+    actualizarEstadoBotonGuardar();
     console.log('✅ Inicialización completada');
 });
