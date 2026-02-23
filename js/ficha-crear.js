@@ -330,90 +330,119 @@ function limpiarBusqueda() {
 
 // ================= GUARDAR FICHA =================
 
-function guardarFicha() {
-    const form = document.getElementById('fichaForm');
-    
-    if (form && !form.checkValidity()) {
-        form.reportValidity();
-        mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
-        return;
-    }
-    
-    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
-    let camposFaltantes = [];
-    
-    camposObligatorios.forEach(campo => {
-        const input = document.getElementById(campo);
-        if (input && !input.value.trim()) {
-            camposFaltantes.push(campo);
-        }
-    });
-    
-    if (camposFaltantes.length > 0) {
-        mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
-        return;
-    }
-    
-    const fichaData = {
-        id: Date.now(),
-        marca: document.getElementById('marca')?.value || '',
-        modelo: document.getElementById('modelo')?.value || '',
-        tipo: document.getElementById('tipo')?.value || '',
-        clase: document.getElementById('clase')?.value || '',
-        serialCarroceria: document.getElementById('serialCarroceria')?.value || '',
-        serialMotor: document.getElementById('serialMotor')?.value || '',
-        color: document.getElementById('color')?.value || '',
-        placa: document.getElementById('placa')?.value || '',
-        facsimilar: document.getElementById('facsimilar')?.value || '',
-        estatus: document.getElementById('estatus')?.value || '',
-        dependencia: document.getElementById('dependencia')?.value || '',
-        causa: document.getElementById('causa')?.value || '',
-        mecanica: document.getElementById('mecanica')?.value || '',
-        diagnostico: document.getElementById('diagnostico')?.value || '',
-        ubicacion: document.getElementById('ubicacion')?.value || '',
-        tapiceria: document.getElementById('tapiceria')?.value || '',
-        cauchos: document.getElementById('cauchos')?.value || '',
-        luces: document.getElementById('luces')?.value || '',
-        observaciones: document.getElementById('observaciones')?.value || '',
-        fotos: { ...fotosData },
-        fechaCreacion: new Date().toISOString(),
-        creadoPor: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com'
-    };
-    
-    try {
-        let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
-        fichas.push(fichaData);
-        localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
-        
-        mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
-        limpiarBusqueda();
-        
-    } catch (error) {
-        console.error('❌ Error al guardar ficha:', error);
-        mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
-    }
+// ================= GUARDAR FICHA =================
+async function guardarFicha() {
+const form = document.getElementById('fichaForm');
+if (form && !form.checkValidity()) {
+form.reportValidity();
+mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
+return;
 }
 
-// ================= CARGAR USUARIO =================
+const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
+let camposFaltantes = [];
+camposObligatorios.forEach(campo => {
+const input = document.getElementById(campo);
+if (input && !input.value.trim()) {
+camposFaltantes.push(campo);
+}
+});
 
-async function cargarUsuario() {
-    try {
-        if (supabaseClient) {
-            const { data } = await supabaseClient.auth.getSession();
-            const session = data?.session;
-            
-            if (session?.user?.email) {
-                const userEmail = document.getElementById('userEmail');
-                if (userEmail) {
-                    userEmail.textContent = session.user.email;
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error al cargar usuario:', error);
-    }
+if (camposFaltantes.length > 0) {
+mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
+return;
 }
 
+mostrarAlerta('⏳ Guardando ficha técnica...', 'info');
+
+try {
+// 1. Preparar datos para Supabase (mapeo de campos)
+const fichaData = {
+vehiculo_id: null, // Se puede obtener si buscas el vehículo primero
+placa: document.getElementById('placa')?.value?.toUpperCase() || '',
+facsimil: document.getElementById('facsimil')?.value?.toUpperCase() || '',
+marca: document.getElementById('marca')?.value?.toUpperCase() || '',
+modelo: document.getElementById('modelo')?.value?.toUpperCase() || '',
+tipo: document.getElementById('tipo')?.value?.toUpperCase() || '',
+clase: document.getElementById('clase')?.value?.toUpperCase() || '',
+color: document.getElementById('color')?.value?.toUpperCase() || '',
+s_carroceria: document.getElementById('serialCarroceria')?.value?.toUpperCase() || '',
+s_motor: document.getElementById('serialMotor')?.value?.toUpperCase() || '',
+estatus_ficha: document.getElementById('estatus')?.value?.toUpperCase() || '',
+dependencia: document.getElementById('dependencia')?.value?.toUpperCase() || '',
+causa: document.getElementById('causa')?.value || '',
+mecanica: document.getElementById('mecanica')?.value || '',
+diagnostico: document.getElementById('diagnostico')?.value || '',
+ubicacion: document.getElementById('ubicacion')?.value || '',
+tapiceria: document.getElementById('tapiceria')?.value || '',
+cauchos: document.getElementById('cauchos')?.value || '',
+luces: document.getElementById('luces')?.value || '',
+observaciones: document.getElementById('observaciones')?.value || '',
+creado_por: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
+fecha_creacion: new Date().toISOString()
+};
+
+// 2. Subir fotos a Supabase Storage (si existen)
+const fotoUrls = { foto1_url: null, foto2_url: null, foto3_url: null, foto4_url: null };
+const bucketName = 'fichas-tecnicas';
+
+for (let i = 1; i <= 4; i++) {
+const input = document.getElementById('foto' + i);
+if (input && input.files && input.files[0]) {
+const file = input.files[0];
+const fileName = `ficha_${Date.now()}_foto${i}_${fichaData.placa || 'sinplaca'}.jpg`;
+
+const { data: uploadData, error: uploadError } = await supabaseClient
+.storage
+.from(bucketName)
+.upload(fileName, file, {
+cacheControl: '3600',
+upsert: false
+});
+
+if (uploadError) {
+console.error(`❌ Error subiendo foto ${i}:`, uploadError);
+mostrarAlerta(`⚠️ Foto ${i} no se pudo subir, pero la ficha se guardará`, 'info');
+} else {
+// Obtener URL pública
+const { data: { publicUrl } } = supabaseClient
+.storage
+.from(bucketName)
+.getPublicUrl(fileName);
+
+fotoUrls['foto' + i + '_url'] = publicUrl;
+}
+}
+}
+
+// 3. Insertar en Supabase
+const { data, error } = await supabaseClient
+.from('fichas_tecnicas')
+.insert([{
+...fichaData,
+...fotoUrls
+}])
+.select();
+
+if (error) {
+console.error('❌ Error en Supabase:', error);
+mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+return;
+}
+
+console.log('✅ Ficha guardada exitosamente:', data);
+mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
+
+// 4. Limpiar formulario después de guardar
+setTimeout(() => {
+limpiarBusqueda();
+}, 1500);
+
+} catch (error) {
+console.error('❌ Error al guardar ficha:', error);
+mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+}
+}
 // ================= CERRAR SESIÓN =================
 
 async function cerrarSesion() {
