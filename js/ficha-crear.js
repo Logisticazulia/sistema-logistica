@@ -80,6 +80,7 @@ function limpiarTexto(texto) {
 /**
  * Busca un vehículo en la base de datos por placa, facsímil o seriales
  */
+// ✅ DESPUÉS (Búsqueda EXACTA)
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) {
@@ -87,21 +88,35 @@ async function buscarVehiculo() {
         return;
     }
     
+    // ✅ LIMPIAR Y NORMALIZAR EL TÉRMINO DE BÚSQUEDA
     const searchTerm = limpiarTexto(searchInput.value);
+    
+    // ✅ VALIDAR MÍNIMO DE CARACTERES (OPCIONAL)
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
-    console.log('🔍 Buscando vehículo en Supabase:', searchTerm);
+    if (searchTerm.length < 3) {
+        mostrarAlerta('⚠️ Ingrese al menos 3 caracteres para búsqueda exacta', 'error');
+        return;
+    }
+    
+    console.log('🔍 [BÚSQUEDA EXACTA] Término:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
     try {
-        // ✅ CONSULTA A SUPABASE - BUSCA EN LOS 4 CAMPOS
+        // ✅ CONSULTA EXACTA - SOLO .eq. (EQUALS)
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
-            .or(`placa.eq.${searchTerm},placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%`)
+            .or(`
+                placa.eq.${searchTerm},
+                facsimil.eq.${searchTerm},
+                s_carroceria.eq.${searchTerm},
+                s_motor.eq.${searchTerm},
+                n_identificacion.eq.${searchTerm}
+            `)
             .limit(1);
         
         if (error) {
@@ -134,7 +149,6 @@ async function buscarVehiculo() {
         mostrarAlerta('❌ Error: ' + error.message, 'error');
     }
 }
-
 function llenarFormulario(vehiculo) {
     const mapeoCampos = {
         'marca': 'marca',
