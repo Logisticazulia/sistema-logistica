@@ -428,6 +428,21 @@ border-radius: 4px;
 ::-webkit-scrollbar-thumb:hover {
 background: #a1a1a1;
 }
+    /* ✅ Campos bloqueados con candado */
+.form-group.locked label::after {
+    content: ' 🔒';
+    font-size: 0.9em;
+    color: #dc2626;
+}
+
+.form-group.locked input,
+.form-group.locked select,
+.form-group.locked textarea {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    border-color: #ddd !important;
+}
 </style>
 </head>
 <body class="dashboard-page">
@@ -624,9 +639,10 @@ background: #a1a1a1;
 <label>Año</label>
 <input type="number" id="ano" name="ano" class="form-input" placeholder="2023" min="1900" max="2030" disabled>
 </div>
-<div class="form-group">
-<label>Color</label>
-<input type="text" id="color" name="color" class="form-input" placeholder="BLANCO" disabled>
+    <div class="form-group">
+        <label>Color * 🔒</label>  <!-- ✅ AGREGADO EL CANDADO -->
+        <input type="text" id="color" name="color" required placeholder="Ej: BLANCO" disabled>
+    </div>
 </div>
 </div>
 </div>
