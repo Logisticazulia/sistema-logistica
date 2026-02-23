@@ -1,8 +1,8 @@
 /**
-* ============================================
-* FICHA TÉCNICA DE VEHÍCULOS - VERSIÓN SUPABASE
-* ============================================
-*/
+ * ============================================
+ * FICHA TÉCNICA DE VEHÍCULOS
+ * ============================================
+ */
 
 // ================= CONFIGURACIÓN =================
 let supabaseClient = null;
@@ -26,7 +26,7 @@ function mostrarAlerta(mensaje, tipo) {
     if (!alertDiv) return;
     
     alertDiv.textContent = mensaje;
-    alertDiv.className = `alert alert-${tipo}`;
+    alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
     
     // ✅ SCROLL AUTOMÁTICO HACIA LA ALERTA
@@ -35,9 +35,14 @@ function mostrarAlerta(mensaje, tipo) {
         block: 'center' 
     });
     
-    setTimeout(() => {
+    setTimeout(function() {
         alertDiv.style.display = 'none';
     }, 5000);
+}
+
+function limpiarTexto(texto) {
+    if (!texto) return '';
+    return texto.toString().trim().toUpperCase();
 }
 
 // ================= INICIALIZAR SUPABASE =================
@@ -46,12 +51,17 @@ function inicializarSupabase() {
         console.error('❌ Librería Supabase no cargada');
         return false;
     }
-    const url = window.SUPABASE_URL;
-    const key = window.SUPABASE_KEY;
+    
+    var url = window.SUPABASE_URL;
+    var key = window.SUPABASE_KEY;
+    
     if (!url || !key) {
         console.error('❌ Configuración de Supabase no encontrada');
+        console.log('SUPABASE_URL:', url);
+        console.log('SUPABASE_KEY:', key ? '***' : 'undefined');
         return false;
     }
+    
     try {
         supabaseClient = window.supabase.createClient(url, key);
         console.log('✅ Supabase inicializado correctamente');
@@ -64,16 +74,17 @@ function inicializarSupabase() {
 
 // ================= ACTUALIZAR VISTA PREVIA =================
 function actualizarVistaPrevia() {
-    const campos = [
+    var campos = [
         'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
         'color', 'placa', 'facsimil', 'serialMotor', 'dependencia',
         'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
         'tapiceria', 'cauchos', 'luces', 'observaciones'
     ];
-    campos.forEach(campo => {
-        const input = document.getElementById(campo);
-        const previewId = 'preview' + campo.charAt(0).toUpperCase() + campo.slice(1);
-        const preview = document.getElementById(previewId);
+    
+    campos.forEach(function(campo) {
+        var input = document.getElementById(campo);
+        var previewId = 'preview' + campo.charAt(0).toUpperCase() + campo.slice(1);
+        var preview = document.getElementById(previewId);
         if (preview && input) {
             preview.textContent = input.value || 'N/A';
         }
@@ -82,10 +93,11 @@ function actualizarVistaPrevia() {
 
 // ================= ACTUALIZAR FOTOS PREVIEW =================
 function actualizarFotosPreview() {
-    for (let i = 1; i <= 4; i++) {
-        const img = document.getElementById('previewImg' + i);
-        const box = document.getElementById('previewBox' + i);
-        const span = box?.querySelector('span');
+    for (var i = 1; i <= 4; i++) {
+        var img = document.getElementById('previewImg' + i);
+        var box = document.getElementById('previewBox' + i);
+        var span = box ? box.querySelector('span') : null;
+        
         if (fotosData['foto' + i] && img && box && span) {
             img.src = fotosData['foto' + i];
             img.style.display = 'block';
@@ -100,71 +112,96 @@ function actualizarFotosPreview() {
 // ================= PREVIEW IMAGEN =================
 function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
-        const file = input.files[0];
+        var file = input.files[0];
+        
         if (!file.type.startsWith('image/')) {
             mostrarAlerta('⚠️ Por favor seleccione un archivo de imagen válido', 'error');
             return;
         }
+        
         if (file.size > 5 * 1024 * 1024) {
             mostrarAlerta('⚠️ La imagen no debe superar los 5MB', 'error');
             return;
         }
-        const reader = new FileReader();
+        
+        var reader = new FileReader();
+        
         reader.onload = function(e) {
-            const img = document.getElementById(previewId);
-            const container = document.getElementById(previewId + 'Container');
-            const placeholder = container?.querySelector('.placeholder');
+            var img = document.getElementById(previewId);
+            var container = document.getElementById(previewId + 'Container');
+            var placeholder = container ? container.querySelector('.placeholder') : null;
+            
             if (img) {
                 img.src = e.target.result;
                 img.style.display = 'block';
             }
-            if (placeholder) placeholder.style.display = 'none';
-            const fotoNum = previewId.replace('previewFoto', 'foto');
+            
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            
+            var fotoNum = previewId.replace('previewFoto', 'foto');
             fotosData[fotoNum] = e.target.result;
             actualizarFotosPreview();
         };
+        
         reader.onerror = function() {
             mostrarAlerta('❌ Error al leer la imagen', 'error');
         };
+        
         reader.readAsDataURL(file);
     }
 }
 
 // ================= BUSCAR VEHÍCULO =================
 async function buscarVehiculo() {
-    const searchInput = document.getElementById('searchInput');
+    var searchInput = document.getElementById('searchInput');
+    
     if (!searchInput) {
         mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
         return;
     }
-    const searchTerm = limpiarTexto(searchInput.value);
+    
+    var searchTerm = limpiarTexto(searchInput.value);
+    
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
+    
     console.log('🔍 Buscando vehículo en Supabase:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
+    
     try {
-        const { data, error } = await supabaseClient
+        var result = await supabaseClient
             .from('vehiculos')
             .select('*')
-            .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm}`)
+            .or('placa.eq.' + searchTerm + ',facsimil.eq.' + searchTerm + ',s_carroceria.eq.' + searchTerm + ',s_motor.eq.' + searchTerm)
             .limit(1);
+        
+        var data = result.data;
+        var error = result.error;
+        
         if (error) {
             console.error('❌ Error en Supabase:', error);
             mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
             return;
         }
-        console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
+        
+        console.log('📊 Resultado:', data ? data.length : 0, 'vehículo(s) encontrado(s)');
+        
         if (!data || data.length === 0) {
-            mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+            mostrarAlerta('❌ No se encontró ningún vehículo con: ' + searchTerm, 'error');
             return;
         }
-        const vehiculo = data[0];
+        
+        var vehiculo = data[0];
         console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
+        
         llenarFormulario(vehiculo);
         bloquearCamposPrincipales();
-        mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo} - Placa: ${vehiculo.placa}`, 'success');
+        mostrarAlerta('✅ Vehículo encontrado: ' + vehiculo.marca + ' ' + vehiculo.modelo + ' - Placa: ' + vehiculo.placa, 'success');
+        
     } catch (error) {
         console.error('❌ Error en buscarVehiculo:', error);
         mostrarAlerta('❌ Error: ' + error.message, 'error');
@@ -173,7 +210,7 @@ async function buscarVehiculo() {
 
 // ================= LLENAR FORMULARIO =================
 function llenarFormulario(vehiculo) {
-    const mapeoCampos = {
+    var mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
         'tipo': 'tipo',
@@ -186,30 +223,38 @@ function llenarFormulario(vehiculo) {
         'unidad_administrativa': 'dependencia',
         'observacion': 'observaciones'
     };
-    Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
-        const element = document.getElementById(formField);
+    
+    Object.keys(mapeoCampos).forEach(function(dbField) {
+        var formField = mapeoCampos[dbField];
+        var element = document.getElementById(formField);
+        
         if (element && vehiculo[dbField]) {
             if (element.tagName === 'SELECT') {
-                const matchingOption = Array.from(element.options).find(opt =>
-                    opt.value.toUpperCase() === vehiculo[dbField].toUpperCase()
-                );
-                if (matchingOption) element.value = matchingOption.value;
+                var matchingOption = Array.from(element.options).find(function(opt) {
+                    return opt.value.toUpperCase() === vehiculo[dbField].toUpperCase();
+                });
+                if (matchingOption) {
+                    element.value = matchingOption.value;
+                }
             } else {
                 element.value = vehiculo[dbField];
             }
         }
     });
-    const estatusInput = document.getElementById('estatus');
+    
+    var estatusInput = document.getElementById('estatus');
     if (estatusInput) {
-        const valorEstatus = vehiculo.estatus || vehiculo.situacion || '';
+        var valorEstatus = vehiculo.estatus || vehiculo.situacion || '';
         if (valorEstatus) {
-            const valorNormalizado = valorEstatus.toUpperCase()
+            var valorNormalizado = valorEstatus.toUpperCase()
                 .replace('OPERATIVA', 'OPERATIVO')
                 .replace('INOPERATIVA', 'INOPERATIVO')
                 .replace('DESINCORPORADA', 'DESINCORPORADO');
-            const matchingOption = Array.from(estatusInput.options).find(opt =>
-                opt.value.toUpperCase() === valorNormalizado
-            );
+            
+            var matchingOption = Array.from(estatusInput.options).find(function(opt) {
+                return opt.value.toUpperCase() === valorNormalizado;
+            });
+            
             if (matchingOption) {
                 estatusInput.value = matchingOption.value;
             } else {
@@ -217,18 +262,19 @@ function llenarFormulario(vehiculo) {
             }
         }
     }
+    
     actualizarVistaPrevia();
 }
 
 // ================= BLOQUEAR CAMPOS =================
 function bloquearCamposPrincipales() {
-    CAMPOS_BLOQUEADOS.forEach(campo => {
-        const element = document.getElementById(campo);
+    CAMPOS_BLOQUEADOS.forEach(function(campo) {
+        var element = document.getElementById(campo);
         if (element) {
             element.disabled = true;
             element.style.backgroundColor = '#f3f4f6';
             element.style.cursor = 'not-allowed';
-            const formGroup = element.closest('.form-group');
+            var formGroup = element.closest('.form-group');
             if (formGroup) {
                 formGroup.classList.add('locked');
             }
@@ -238,13 +284,13 @@ function bloquearCamposPrincipales() {
 
 // ================= DESBLOQUEAR CAMPOS =================
 function desbloquearCampos() {
-    CAMPOS_BLOQUEADOS.forEach(campo => {
-        const element = document.getElementById(campo);
+    CAMPOS_BLOQUEADOS.forEach(function(campo) {
+        var element = document.getElementById(campo);
         if (element) {
             element.disabled = false;
             element.style.backgroundColor = 'white';
             element.style.cursor = 'auto';
-            const formGroup = element.closest('.form-group');
+            var formGroup = element.closest('.form-group');
             if (formGroup) {
                 formGroup.classList.remove('locked');
             }
@@ -254,155 +300,102 @@ function desbloquearCampos() {
 
 // ================= LIMPIAR BÚSQUEDA =================
 function limpiarBusqueda() {
-    const searchInput = document.getElementById('searchInput');
+    var searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
-    const searchAlert = document.getElementById('searchAlert');
+    
+    var searchAlert = document.getElementById('searchAlert');
     if (searchAlert) searchAlert.style.display = 'none';
-    const form = document.getElementById('fichaForm');
+    
+    var form = document.getElementById('fichaForm');
     if (form) form.reset();
+    
     desbloquearCampos();
     actualizarVistaPrevia();
-    for (let i = 1; i <= 4; i++) {
-        const input = document.getElementById('foto' + i);
-        const img = document.getElementById('previewFoto' + i);
-        const container = document.getElementById('previewFoto' + i + 'Container');
-        const placeholder = container?.querySelector('.placeholder');
+    
+    for (var i = 1; i <= 4; i++) {
+        var input = document.getElementById('foto' + i);
+        var img = document.getElementById('previewFoto' + i);
+        var container = document.getElementById('previewFoto' + i + 'Container');
+        var placeholder = container ? container.querySelector('.placeholder') : null;
+        
         if (input) input.value = '';
         if (img) {
             img.src = '';
             img.style.display = 'none';
         }
-        if (placeholder) placeholder.style.display = 'flex';
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+        }
         fotosData['foto' + i] = null;
     }
+    
     actualizarFotosPreview();
     mostrarAlerta('🔄 Formulario limpiado', 'info');
 }
 
-// ================= SUBIR FOTO A SUPABASE =================
-async function subirFotoSupabase(file, placa, numeroFoto) {
-    try {
-        const bucketName = 'fichas-tecnicas';
-        const fileName = `ficha_${Date.now()}_foto${numeroFoto}_${placa || 'sinplaca'}.jpg`;
-        
-        const { data: uploadData, error: uploadError } = await supabaseClient
-            .storage
-            .from(bucketName)
-            .upload(fileName, file, {
-                cacheControl: '3600',
-                upsert: false
-            });
-        
-        if (uploadError) {
-            console.error(`❌ Error subiendo foto ${numeroFoto}:`, uploadError);
-            return null;
-        }
-        
-        const { data: { publicUrl } } = supabaseClient
-            .storage
-            .from(bucketName)
-            .getPublicUrl(fileName);
-        
-        console.log(`✅ Foto ${numeroFoto} subida:`, publicUrl);
-        return publicUrl;
-    } catch (error) {
-        console.error(`❌ Error en subirFotoSupabase:`, error);
-        return null;
-    }
-}
-
-// ================= GUARDAR FICHA EN SUPABASE =================
-async function guardarFicha() {
-    const form = document.getElementById('fichaForm');
+// ================= GUARDAR FICHA (TU VERSIÓN ORIGINAL) =================
+function guardarFicha() {
+    var form = document.getElementById('fichaForm');
+    
     if (form && !form.checkValidity()) {
         form.reportValidity();
         mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
         return;
     }
-
-    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
-    let camposFaltantes = [];
-    camposObligatorios.forEach(campo => {
-        const input = document.getElementById(campo);
+    
+    var camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
+    var camposFaltantes = [];
+    
+    camposObligatorios.forEach(function(campo) {
+        var input = document.getElementById(campo);
         if (input && !input.value.trim()) {
             camposFaltantes.push(campo);
         }
     });
-
+    
     if (camposFaltantes.length > 0) {
         mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
         return;
     }
-
-    mostrarAlerta('⏳ Guardando ficha técnica...', 'info');
-
+    
+    var fichaData = {
+        id: Date.now(),
+        marca: document.getElementById('marca') ? document.getElementById('marca').value : '',
+        modelo: document.getElementById('modelo') ? document.getElementById('modelo').value : '',
+        tipo: document.getElementById('tipo') ? document.getElementById('tipo').value : '',
+        clase: document.getElementById('clase') ? document.getElementById('clase').value : '',
+        serialCarroceria: document.getElementById('serialCarroceria') ? document.getElementById('serialCarroceria').value : '',
+        serialMotor: document.getElementById('serialMotor') ? document.getElementById('serialMotor').value : '',
+        color: document.getElementById('color') ? document.getElementById('color').value : '',
+        placa: document.getElementById('placa') ? document.getElementById('placa').value : '',
+        facsimil: document.getElementById('facsimil') ? document.getElementById('facsimil').value : '',
+        estatus: document.getElementById('estatus') ? document.getElementById('estatus').value : '',
+        dependencia: document.getElementById('dependencia') ? document.getElementById('dependencia').value : '',
+        causa: document.getElementById('causa') ? document.getElementById('causa').value : '',
+        mecanica: document.getElementById('mecanica') ? document.getElementById('mecanica').value : '',
+        diagnostico: document.getElementById('diagnostico') ? document.getElementById('diagnostico').value : '',
+        ubicacion: document.getElementById('ubicacion') ? document.getElementById('ubicacion').value : '',
+        tapiceria: document.getElementById('tapiceria') ? document.getElementById('tapiceria').value : '',
+        cauchos: document.getElementById('cauchos') ? document.getElementById('cauchos').value : '',
+        luces: document.getElementById('luces') ? document.getElementById('luces').value : '',
+        observaciones: document.getElementById('observaciones') ? document.getElementById('observaciones').value : '',
+        fotos: Object.assign({}, fotosData),
+        fechaCreacion: new Date().toISOString(),
+        creadoPor: document.getElementById('userEmail') ? document.getElementById('userEmail').textContent : 'usuario@institucion.com'
+    };
+    
     try {
-        // 1. Preparar datos para Supabase (mapeo correcto de columnas)
-        const placaValue = (document.getElementById('placa')?.value || '').toUpperCase();
+        var fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
+        fichas.push(fichaData);
+        localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
         
-        const fichaData = {
-            vehiculo_id: null,
-            placa: placaValue,
-            facsimil: (document.getElementById('facsimil')?.value || '').toUpperCase(),
-            marca: (document.getElementById('marca')?.value || '').toUpperCase(),
-            modelo: (document.getElementById('modelo')?.value || '').toUpperCase(),
-            tipo: (document.getElementById('tipo')?.value || '').toUpperCase(),
-            clase: (document.getElementById('clase')?.value || '').toUpperCase(),
-            color: (document.getElementById('color')?.value || '').toUpperCase(),
-            s_carroceria: (document.getElementById('serialCarroceria')?.value || '').toUpperCase(),
-            s_motor: (document.getElementById('serialMotor')?.value || '').toUpperCase(),
-            estatus_ficha: (document.getElementById('estatus')?.value || '').toUpperCase(),
-            dependencia: (document.getElementById('dependencia')?.value || '').toUpperCase(),
-            causa: document.getElementById('causa')?.value || '',
-            mecanica: document.getElementById('mecanica')?.value || '',
-            diagnostico: document.getElementById('diagnostico')?.value || '',
-            ubicacion: document.getElementById('ubicacion')?.value || '',
-            tapiceria: document.getElementById('tapiceria')?.value || '',
-            cauchos: document.getElementById('cauchos')?.value || '',
-            luces: document.getElementById('luces')?.value || '',
-            observaciones: document.getElementById('observaciones')?.value || '',
-            creado_por: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
-            fecha_creacion: new Date().toISOString()
-        };
-
-        // 2. Subir fotos a Supabase Storage
-        const fotoUrls = {
-            foto1_url: null,
-            foto2_url: null,
-            foto3_url: null,
-            foto4_url: null
-        };
-
-        for (let i = 1; i <= 4; i++) {
-            const input = document.getElementById('foto' + i);
-            if (input && input.files && input.files[0]) {
-                const url = await subirFotoSupabase(input.files[0], placaValue, i);
-                fotoUrls['foto' + i + '_url'] = url;
-            }
-        }
-
-        // 3. Insertar en Supabase
-        const { data, error } = await supabaseClient
-            .from('fichas_tecnicas')
-            .insert([{
-                ...fichaData,
-                ...fotoUrls
-            }])
-            .select();
-
-        if (error) {
-            console.error('❌ Error en Supabase:', error);
-            mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
-            return;
-        }
-
-        console.log('✅ Ficha guardada exitosamente:', data);
-        mostrarAlerta('✅ Ficha técnica guardada exitosamente en Supabase', 'success');
-
-        setTimeout(() => {
+        // ✅ MENSAJE DE ÉXITO CON SCROLL
+        mostrarAlerta('✅ ¡FICHA TÉCNICA GUARDADA EXITOSAMENTE!', 'success');
+        
+        setTimeout(function() {
             limpiarBusqueda();
-        }, 1500);
-
+        }, 2000);
+        
     } catch (error) {
         console.error('❌ Error al guardar ficha:', error);
         mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
@@ -413,10 +406,11 @@ async function guardarFicha() {
 async function cargarUsuario() {
     try {
         if (supabaseClient) {
-            const { data } = await supabaseClient.auth.getSession();
-            const session = data?.session;
-            if (session?.user?.email) {
-                const userEmail = document.getElementById('userEmail');
+            var result = await supabaseClient.auth.getSession();
+            var session = result.data ? result.data.session : null;
+            
+            if (session && session.user && session.user.email) {
+                var userEmail = document.getElementById('userEmail');
                 if (userEmail) {
                     userEmail.textContent = session.user.email;
                 }
@@ -444,7 +438,7 @@ async function cerrarSesion() {
 }
 
 // ================= INICIALIZACIÓN =================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando ficha técnica...');
     
     if (!inicializarSupabase()) {
@@ -454,21 +448,26 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
-    inputs.forEach(input => {
+    var inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
+    inputs.forEach(function(input) {
         input.addEventListener('input', actualizarVistaPrevia);
     });
     
-    const btnGuardar = document.getElementById('btnGuardar');
-    const btnLimpiar = document.getElementById('btnLimpiar');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const searchInput = document.getElementById('searchInput');
+    var btnGuardar = document.getElementById('btnGuardar');
+    var btnLimpiar = document.getElementById('btnLimpiar');
+    var logoutBtn = document.getElementById('logoutBtn');
+    var searchInput = document.getElementById('searchInput');
     
-    if (btnGuardar) btnGuardar.addEventListener('click', guardarFicha);
-    if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarBusqueda);
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', guardarFicha);
+    }
+    
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', limpiarBusqueda);
+    }
     
     if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => {
+        searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 buscarVehiculo();
