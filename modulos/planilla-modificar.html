@@ -479,14 +479,26 @@ background: #a1a1a1;
 </div>
 <!-- ================= BUSCADOR UNIVERSAL ================= -->
 <div class="search-container">
-<div class="search-group">
-<label for="searchUniversal">🔍 Búsqueda Universal</label>
-<input
-type="text"
-id="searchUniversal"
-class="search-input"
-placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
-<span class="search-hint">Busca por: Placa, ID, Facsímil, S/Carrocería o S/Motor</span>
+    <div class="search-group">
+        <label for="searchUniversal">🔍 Búsqueda Universal</label>
+        <input
+            type="text"
+            id="searchUniversal"
+            class="search-input"
+            placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
+        <div class="search-hint">
+            <span>💡 Busque por:</span>
+            <span>🚗 Placa</span>
+            <span>📄 Facsímil</span>
+            <span>🔢 Serial Carrocería</span>
+            <span>⚙️ Serial Motor</span>
+            <span>🏷️ Marca/Modelo</span>
+        </div>
+    </div>
+    <button type="button" class="btn-search" id="btnSearch">
+        <span class="btn-search-text">🔍 Buscar Vehículo</span>
+        <span class="btn-search-loader">⏳ Buscando...</span>
+    </button>
 </div>
 <button type="button" class="btn-search" id="btnSearch">
 <span class="btn-search-text">🔍 Buscar Vehículo</span>
