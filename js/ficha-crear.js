@@ -1,5 +1,6 @@
 /**
- * FICHA TÉCNICA DE VEHÍCULOS - VERSIÓN CORREGIDA
+ * FICHA TÉCNICA DE VEHÍCULOS - LÓGICA CORREGIDA
+ * Versión compatible con Supabase y localStorage
  */
 
 // ================= CONFIGURACIÓN =================
