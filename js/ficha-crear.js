@@ -8,7 +8,7 @@
 // ================= CONFIGURACIÓN =================
 let supabaseClient = null;
 
-// Función para inicializar Supabase
+// Función para inicializar S
 function inicializarSupabase() {
     if (typeof window.supabase === 'undefined') {
         console.error('❌ Librería Supabase no cargada');
