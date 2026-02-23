@@ -1,6 +1,7 @@
 /**
  * ============================================
  * CONSULTA DE FICHAS TÉCNICAS - SUPABASE
+ * VERSIÓN CORREGIDA
  * ============================================
  */
 
@@ -8,7 +9,6 @@
 let supabaseClient = null;
 let allFichas = [];
 let filteredFichas = [];
-let currentFicha = null;
 
 // ================= INICIALIZAR SUPABASE =================
 function inicializarSupabase() {
@@ -52,7 +52,7 @@ async function cargarFichas() {
         }
         
         allFichas = result.data || [];
-        filteredFichas = [...allFichas];
+        filteredFichas = [].concat(allFichas);
         
         console.log('✅ Fichas cargadas:', allFichas.length);
         renderTable();
@@ -64,7 +64,7 @@ async function cargarFichas() {
 }
 
 // ================= BUSCAR FICHA =================
-async function buscarFicha() {
+async function buscarVehiculo() {
     var searchInput = document.getElementById('searchInput');
     
     if (!searchInput) {
@@ -75,7 +75,7 @@ async function buscarFicha() {
     var searchTerm = searchInput.value.trim().toUpperCase();
     
     if (!searchTerm) {
-        filteredFichas = [...allFichas];
+        filteredFichas = [].concat(allFichas);
         renderTable();
         return;
     }
@@ -109,7 +109,7 @@ async function buscarFicha() {
         renderTable();
         
     } catch (error) {
-        console.error('❌ Error en buscarFicha:', error);
+        console.error('❌ Error en buscarVehiculo:', error);
         mostrarAlerta('Error: ' + error.message, 'error');
     }
 }
@@ -122,7 +122,7 @@ function limpiarBusqueda() {
     var searchAlert = document.getElementById('searchAlert');
     if (searchAlert) searchAlert.style.display = 'none';
     
-    filteredFichas = [...allFichas];
+    filteredFichas = [].concat(allFichas);
     renderTable();
     mostrarAlerta('🔄 Búsqueda limpiada', 'info');
 }
@@ -152,80 +152,110 @@ function renderTable() {
         return;
     }
     
-    var html = filteredFichas.map(function(ficha) {
-        var estatusClass = 'badge-operativa';
+    var html = '';
+    for (var i = 0; i < filteredFichas.length; i++) {
+        var ficha = filteredFichas[i];
+        var estatusClass = 'badge badge-operativa';
         var estatusText = ficha.estatus_ficha || 'N/A';
         
-        if (estatusText.toUpperCase().includes('INOPERATIVO')) {
-            estatusClass = 'badge-inoperativa';
-        } else if (estatusText.toUpperCase().includes('DESINCORPORADO')) {
-            estatusClass = 'badge-desincorporada';
+        if (estatusText.toUpperCase().indexOf('INOPERATIVO') !== -1) {
+            estatusClass = 'badge badge-inoperativa';
         }
         
-        return '<tr>' +
+        html += '<tr>' +
             '<td><strong>' + (ficha.placa || 'N/A') + '</strong></td>' +
             '<td>' + (ficha.marca || 'N/A') + '</td>' +
             '<td>' + (ficha.modelo || 'N/A') + '</td>' +
             '<td>' + (ficha.tipo || 'N/A') + '</td>' +
             '<td>' + (ficha.color || 'N/A') + '</td>' +
-            '<td><span class="badge ' + estatusClass + '">' + estatusText + '</span></td>' +
+            '<td><span class="' + estatusClass + '">' + estatusText + '</span></td>' +
             '<td>' + (ficha.dependencia || 'N/A').substring(0, 30) + '...</td>' +
             '<td>' +
             '<button class="btn-view" onclick="verFicha(\'' + (ficha.id || '') + '\')">👁️ Ver</button>' +
-            '<button class="btn-print" onclick="imprimirFicha(\'' + (ficha.id || '') + '\')">🖨️ Imprimir</button>' +
+            '<button class="btn-print" onclick="imprimirFicha(\'' + (ficha.id || '') + '\')">🖨️</button>' +
             '</td>' +
             '</tr>';
-    }).join('');
+    }
     
     tbody.innerHTML = html;
 }
 
 // ================= VER FICHA DETALLADA =================
 function verFicha(id) {
-    var ficha = allFichas.find(function(f) { return f.id == id; });
+    console.log('🔍 Buscando ficha con ID:', id);
+    
+    var ficha = null;
+    for (var i = 0; i < allFichas.length; i++) {
+        if (allFichas[i].id == id) {
+            ficha = allFichas[i];
+            break;
+        }
+    }
     
     if (!ficha) {
         mostrarAlerta('❌ Ficha no encontrada', 'error');
         return;
     }
     
-    currentFicha = ficha;
+    console.log('✅ Ficha encontrada:', ficha.placa);
     
-    // Llenar datos del modal
-    document.getElementById('modalMarca').textContent = ficha.marca || 'N/A';
-    document.getElementById('modalModelo').textContent = ficha.modelo || 'N/A';
-    document.getElementById('modalTipo').textContent = ficha.tipo || 'N/A';
-    document.getElementById('modalClase').textContent = ficha.clase || 'N/A';
-    document.getElementById('modalColor').textContent = ficha.color || 'N/A';
-    document.getElementById('modalSerialCarroceria').textContent = ficha.s_carroceria || 'N/A';
-    document.getElementById('modalSerialMotor').textContent = ficha.s_motor || 'N/A';
-    document.getElementById('modalPlaca').textContent = ficha.placa || 'N/A';
-    document.getElementById('modalFacsimilar').textContent = ficha.facsimil || 'N/A';
-    document.getElementById('modalDependencia').textContent = ficha.dependencia || 'N/A';
-    document.getElementById('modalEstatus').textContent = ficha.estatus_ficha || 'N/A';
+    // ✅ FUNCIÓN SEGURA PARA SETEAR TEXTO
+    function setTexto(idElemento, valor) {
+        var el = document.getElementById(idElemento);
+        if (el) {
+            el.textContent = valor || 'N/A';
+        } else {
+            console.warn('⚠️ Elemento no encontrado:', idElemento);
+        }
+    }
+    
+    // ✅ FUNCIÓN SEGURA PARA SETEAR HTML
+    function setHtml(idElemento, valor) {
+        var el = document.getElementById(idElemento);
+        if (el) {
+            el.innerHTML = valor || 'N/A';
+        }
+    }
+    
+    // Llenar datos del modal con función segura
+    setTexto('modalMarca', ficha.marca);
+    setTexto('modalModelo', ficha.modelo);
+    setTexto('modalTipo', ficha.tipo);
+    setTexto('modalClase', ficha.clase);
+    setTexto('modalColor', ficha.color);
+    setTexto('modalSerialCarroceria', ficha.s_carroceria);
+    setTexto('modalSerialMotor', ficha.s_motor);
+    setTexto('modalPlaca', ficha.placa);
+    setTexto('modalFacsimilar', ficha.facsimil);
+    setTexto('modalDependencia', ficha.dependencia);
+    setTexto('modalEstatus', ficha.estatus_ficha);
     
     // Información técnico mecánica
-    document.getElementById('modalCausa').textContent = ficha.causa || 'N/A';
-    document.getElementById('modalMecanica').textContent = ficha.mecanica || 'N/A';
-    document.getElementById('modalDiagnostico').textContent = ficha.diagnostico || 'N/A';
-    document.getElementById('modalUbicacion').textContent = ficha.ubicacion || 'N/A';
-    document.getElementById('modalTapiceria').textContent = ficha.tapiceria || 'N/A';
-    document.getElementById('modalCauchos').textContent = ficha.cauchos || 'N/A';
-    document.getElementById('modalLuces').textContent = ficha.luces || 'N/A';
+    setTexto('modalCausa', ficha.causa);
+    setTexto('modalMecanica', ficha.mecanica);
+    setTexto('modalDiagnostico', ficha.diagnostico);
+    setTexto('modalUbicacion', ficha.ubicacion);
+    setTexto('modalTapiceria', ficha.tapiceria);
+    setTexto('modalCauchos', ficha.cauchos);
+    setTexto('modalLuces', ficha.luces);
     
     // Observaciones
-    document.getElementById('modalObservaciones').textContent = ficha.observaciones || 'Sin observaciones';
+    setHtml('modalObservaciones', ficha.observaciones || 'Sin observaciones');
     
     // Fecha y creador
-    document.getElementById('modalFechaCreacion').textContent = ficha.fecha_creacion ? new Date(ficha.fecha_creacion).toLocaleString() : 'N/A';
-    document.getElementById('modalCreadoPor').textContent = ficha.creado_por || 'N/A';
+    var fechaCreacion = ficha.fecha_creacion ? new Date(ficha.fecha_creacion).toLocaleString('es-VE') : 'N/A';
+    setTexto('modalFechaCreacion', fechaCreacion);
+    setTexto('modalCreadoPor', ficha.creado_por);
     
-    // Fotos
+    // ✅ CARGAR FOTOS CON VERIFICACIÓN
     cargarFotosModal(ficha);
     
-    // Mostrar modal
-    document.getElementById('fichaModal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    // ✅ MOSTRAR MODAL
+    var modal = document.getElementById('fichaModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 // ================= CARGAR FOTOS EN MODAL =================
@@ -237,24 +267,24 @@ function cargarFotosModal(ficha) {
         
         var fotoUrl = ficha['foto' + i + '_url'];
         
-        if (fotoUrl && fotoUrl.trim() !== '') {
-            if (img) {
-                img.src = fotoUrl;
-                img.style.display = 'block';
-            }
-            if (span) span.style.display = 'none';
-        } else {
+        if (fotoUrl && fotoUrl.trim() !== '' && img && box && span) {
+            img.src = fotoUrl;
+            img.style.display = 'block';
+            span.style.display = 'none';
+        } else if (span) {
             if (img) img.style.display = 'none';
-            if (span) span.style.display = 'block';
+            span.style.display = 'block';
         }
     }
 }
 
 // ================= CERRAR MODAL =================
 function cerrarModal() {
-    document.getElementById('fichaModal').style.display = 'none';
+    var modal = document.getElementById('fichaModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
     document.body.style.overflow = 'auto';
-    currentFicha = null;
 }
 
 // ================= IMPRIMIR FICHA =================
@@ -294,7 +324,9 @@ async function cerrarSesion() {
             if (supabaseClient) {
                 await supabaseClient.auth.signOut();
             }
-            localStorage.clear();
+            if (typeof localStorage !== 'undefined') {
+                localStorage.clear();
+            }
             window.location.href = '../index.html';
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
@@ -320,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                buscarFicha();
+                buscarVehiculo();
             }
         });
     }
