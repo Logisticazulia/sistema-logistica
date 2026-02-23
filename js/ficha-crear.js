@@ -363,11 +363,10 @@ function actualizarVistaPrevia() {
     });
 }
 
-// ================= GUARDAR FICHA =================
 /**
-* Guarda la ficha técnica en Supabase (tabla fichas_tecnicas)
+* Guarda la ficha técnica en localStorage
 */
-async function guardarFicha() {
+function guardarFicha() {
     const form = document.getElementById('fichaForm');
     
     // Validación básica del formulario
@@ -376,7 +375,7 @@ async function guardarFicha() {
         mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
         return;
     }
-    
+
     // Validar campos obligatorios específicos
     const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
     let camposFaltantes = [];
@@ -392,77 +391,97 @@ async function guardarFicha() {
         mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
         return;
     }
-    
-    // ✅ VERIFICAR QUE SUPABASE ESTÉ INICIALIZADO
-    if (!supabaseClient) {
-        mostrarAlerta('❌ Error: Conexión con la base de datos no disponible', 'error');
-        return;
-    }
-    
+
     // Recopilar datos del formulario
     const fichaData = {
-        vehiculo_id: null, // Relacionar con vehículo si es necesario
-        placa: document.getElementById('placa')?.value?.trim().toUpperCase() || '',
-        facsimil: document.getElementById('facsimil')?.value?.trim().toUpperCase() || '',
-        marca: document.getElementById('marca')?.value?.trim().toUpperCase() || '',
-        modelo: document.getElementById('modelo')?.value?.trim().toUpperCase() || '',
-        tipo: document.getElementById('tipo')?.value?.trim().toUpperCase() || '',
-        clase: document.getElementById('clase')?.value?.trim().toUpperCase() || '',
-        color: document.getElementById('color')?.value?.trim().toUpperCase() || '',
-        s_carroceria: document.getElementById('serialCarroceria')?.value?.trim().toUpperCase() || '',
-        s_motor: document.getElementById('serialMotor')?.value?.trim().toUpperCase() || '',
-        estatus_ficha: document.getElementById('estatus')?.value?.trim().toUpperCase() || '',
-        dependencia: document.getElementById('dependencia')?.value?.trim() || '',
-        causa: document.getElementById('causa')?.value?.trim() || '',
-        mecanica: document.getElementById('mecanica')?.value?.trim() || '',
-        diagnostico: document.getElementById('diagnostico')?.value?.trim() || '',
-        ubicacion: document.getElementById('ubicacion')?.value?.trim() || '',
-        tapiceria: document.getElementById('tapiceria')?.value?.trim() || '',
-        cauchos: document.getElementById('cauchos')?.value?.trim() || '',
-        luces: document.getElementById('luces')?.value?.trim() || '',
-        observaciones: document.getElementById('observaciones')?.value?.trim() || '',
-        foto1: fotosData.foto1 || null,
-        foto2: fotosData.foto2 || null,
-        foto3: fotosData.foto3 || null,
-        foto4: fotosData.foto4 || null,
-        fecha_creacion: new Date().toISOString(),
-        creado_por: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com'
+        id: Date.now(),
+        marca: document.getElementById('marca')?.value || '',
+        modelo: document.getElementById('modelo')?.value || '',
+        tipo: document.getElementById('tipo')?.value || '',
+        clase: document.getElementById('clase')?.value || '',
+        serialCarroceria: document.getElementById('serialCarroceria')?.value || '',
+        serialMotor: document.getElementById('serialMotor')?.value || '',
+        color: document.getElementById('color')?.value || '',
+        placa: document.getElementById('placa')?.value || '',
+        facsimil: document.getElementById('facsimil')?.value || '',
+        estatus: document.getElementById('estatus')?.value || '',
+        dependencia: document.getElementById('dependencia')?.value || '',
+        causa: document.getElementById('causa')?.value || '',
+        mecanica: document.getElementById('mecanica')?.value || '',
+        diagnostico: document.getElementById('diagnostico')?.value || '',
+        ubicacion: document.getElementById('ubicacion')?.value || '',
+        tapiceria: document.getElementById('tapiceria')?.value || '',
+        cauchos: document.getElementById('cauchos')?.value || '',
+        luces: document.getElementById('luces')?.value || '',
+        observaciones: document.getElementById('observaciones')?.value || '',
+        fotos: { ...fotosData },
+        fechaCreacion: new Date().toISOString(),
+        creadoPor: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
+        vehiculo_id: null // ✅ Columna nullable según tu configuración
     };
-    
-    console.log('📝 Guardando ficha en Supabase:', fichaData);
-    mostrarAlerta('⏳ Guardando ficha técnica...', 'info');
-    
+
+    // Guardar en localStorage
     try {
-        // ✅ INSERTAR EN SUPABASE - TABLA fichas_tecnicas
-        const { data, error } = await supabaseClient
-            .from('fichas_tecnicas')
-            .insert([fichaData])
-            .select();
-        
-        if (error) {
-            console.error('❌ Error al insertar en Supabase:', error);
-            mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
-            return;
-        }
-        
-        console.log('✅ Ficha guardada en Supabase:', data);
-        
-        // ✅ Guardar en localStorage como respaldo
         let fichas = JSON.parse(localStorage.getItem('fichasTecnicas') || '[]');
-        fichas.push({ ...fichaData, id: data[0]?.id || Date.now() });
+        fichas.push(fichaData);
         localStorage.setItem('fichasTecnicas', JSON.stringify(fichas));
         
-        mostrarAlerta('✅ Ficha técnica guardada exitosamente en la base de datos', 'success');
+        // ✅ MOSTRAR MENSAJE DE ÉXITO Y HACER SCROLL
+        mostrarAlerta('✅ Ficha técnica guardada exitosamente', 'success');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
-        // 🔹 LIMPIAR FORMULARIO DESPUÉS DE GUARDAR
-        limpiarBusqueda();
+        // 🔹 LIMPIAR FORMULARIO SILENCIOSAMENTE DESPUÉS DE 2 SEGUNDOS
+        setTimeout(() => {
+            limpiarFormularioSilencioso();
+        }, 2000);
         
     } catch (error) {
-        console.error('❌ Error en guardarFicha:', error);
+        console.error('❌ Error al guardar ficha:', error);
         mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
+/**
+* ✅ NUEVA FUNCIÓN: Limpia el formulario SIN mostrar mensaje de alerta
+*/
+function limpiarFormularioSilencioso() {
+    // Limpiar input de búsqueda
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    // Ocultar alertas existentes
+    const searchAlert = document.getElementById('searchAlert');
+    if (searchAlert) searchAlert.style.display = 'none';
+    
+    // Limpiar formulario
+    const form = document.getElementById('fichaForm');
+    if (form) form.reset();
+    
+    // Desbloquear campos
+    desbloquearCampos();
+    
+    // Limpiar vista previa
+    actualizarVistaPrevia();
+    
+    // Limpiar fotos (sin mostrar mensaje)
+    for (let i = 1; i <= 4; i++) {
+        const input = document.getElementById('foto' + i);
+        const img = document.getElementById('previewFoto' + i);
+        const container = document.getElementById('previewFoto' + i + 'Container');
+        const placeholder = container?.querySelector('.placeholder');
+        
+        if (input) input.value = '';
+        if (img) {
+            img.src = '';
+            img.style.display = 'none';
+        }
+        if (placeholder) placeholder.style.display = 'flex';
+        fotosData['foto' + i] = null;
+    }
+    actualizarFotosPreview();
+    // ⚠️ NO mostrar alerta aquí para no sobrescribir el mensaje de éxito
+}
 // ================= INICIALIZACIÓN =================
 
 document.addEventListener('DOMContentLoaded', () => {
