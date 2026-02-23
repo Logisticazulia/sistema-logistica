@@ -474,3 +474,52 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✅ Inicialización completada');
 });
+// ================= LIMPIAR BÚSQUEDA =================
+function limpiarBusqueda() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    const searchAlert = document.getElementById('searchAlert');
+    if (searchAlert) searchAlert.style.display = 'none';
+    
+    // Limpiar formulario
+    const form = document.getElementById('fichaForm');
+    if (form) form.reset();
+    
+    // 🔹 DESBLOQUEAR TODOS LOS CAMPOS
+    const camposABloquear = [
+        'marca', 'modelo', 'tipo', 'clase', 'color',
+        'serialCarroceria', 'serialMotor', 'placa', 'facsimilar',
+        'estatus', 'dependencia'
+    ];
+    
+    camposABloquear.forEach(campo => {
+        const element = document.getElementById(campo);
+        if (element) {
+            element.disabled = false;
+            element.style.backgroundColor = 'white';
+            element.style.cursor = 'auto';
+        }
+    });
+    
+    // Limpiar vista previa
+    actualizarVistaPrevia();
+    
+    // Limpiar fotos
+    for (let i = 1; i <= 4; i++) {
+        const input = document.getElementById('foto' + i);
+        const img = document.getElementById('previewFoto' + i);
+        const container = document.getElementById('previewFoto' + i + 'Container');
+        const placeholder = container?.querySelector('.placeholder');
+        
+        if (input) input.value = '';
+        if (img) {
+            img.src = '';
+            img.style.display = 'none';
+        }
+        if (placeholder) placeholder.style.display = 'flex';
+        fotosData['foto' + i] = null;
+    }
+    actualizarFotosPreview();
+    mostrarAlerta('🔄 Formulario limpiado', 'info');
+}
