@@ -841,8 +841,14 @@
         </div>
     </main>
 
-    <!-- ================= SCRIPTS ================= -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="../js/ficha-crear.js" defer></script>
+  <!-- ✅ DESPUÉS (ORDEN CORRECTO) -->
+<!-- 1. Librería Supabase (sin defer para carga inmediata) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 2. Configuración con credenciales (DEBE ir ANTES que ficha-crear.js) -->
+<script src="../js/config.js"></script>
+
+<!-- 3. Tu script principal -->
+<script src="../js/ficha-crear.js" defer></script>
 </body>
 </html>
