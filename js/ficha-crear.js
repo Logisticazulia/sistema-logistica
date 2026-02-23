@@ -21,62 +21,157 @@ const CAMPOS_BLOQUEADOS = [
 ];
 
 // ================= FUNCIONES DE UTILIDAD =================
+// ================= FUNCIONES DE UTILIDAD =================
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
+    
     alertDiv.textContent = mensaje;
     alertDiv.className = `alert alert-${tipo}`;
     alertDiv.style.display = 'block';
+    
+    // ✅ SCROLL AUTOMÁTICO HACIA LA ALERTA
+    alertDiv.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+    });
+    
     setTimeout(() => {
         alertDiv.style.display = 'none';
     }, 5000);
 }
 
-function limpiarTexto(texto) {
-    if (!texto) return '';
-    return texto.toString().trim().toUpperCase();
-}
+// ================= GUARDAR FICHA =================
+async function guardarFicha() {
+    const form = document.getElementById('fichaForm');
+    if (form && !form.checkValidity()) {
+        form.reportValidity();
+        mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
+        return;
+    }
 
-// ================= INICIALIZAR SUPABASE =================
-function inicializarSupabase() {
-    if (typeof window.supabase === 'undefined') {
-        console.error('❌ Librería Supabase no cargada');
-        return false;
-    }
-    const url = window.SUPABASE_URL;
-    const key = window.SUPABASE_KEY;
-    if (!url || !key) {
-        console.error('❌ Configuración de Supabase no encontrada');
-        return false;
-    }
-    try {
-        supabaseClient = window.supabase.createClient(url, key);
-        console.log('✅ Supabase inicializado correctamente');
-        return true;
-    } catch (error) {
-        console.error('❌ Error al inicializar Supabase:', error);
-        return false;
-    }
-}
-
-// ================= ACTUALIZAR VISTA PREVIA =================
-function actualizarVistaPrevia() {
-    const campos = [
-        'marca', 'modelo', 'tipo', 'clase', 'serialCarroceria',
-        'color', 'placa', 'facsimil', 'serialMotor', 'dependencia',
-        'estatus', 'causa', 'mecanica', 'diagnostico', 'ubicacion',
-        'tapiceria', 'cauchos', 'luces', 'observaciones'
-    ];
-    campos.forEach(campo => {
+    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
+    let camposFaltantes = [];
+    camposObligatorios.forEach(campo => {
         const input = document.getElementById(campo);
-        const previewId = 'preview' + campo.charAt(0).toUpperCase() + campo.slice(1);
-        const preview = document.getElementById(previewId);
-        if (preview && input) {
-            preview.textContent = input.value || 'N/A';
+        if (input && !input.value.trim()) {
+            camposFaltantes.push(campo);
         }
     });
-}
 
+    if (camposFaltantes.length > 0) {
+        mostrarAlerta('⚠️ Los siguientes campos son obligatorios: ' + camposFaltantes.join(', '), 'error');
+        return;
+    }
+
+    // ✅ MENSAJE DE "GUARDANDO..."
+    mostrarAlerta('⏳ Guardando ficha técnica en base de datos...', 'info');
+
+    try {
+        // 1. Preparar datos para Supabase
+        const placaValue = (document.getElementById('placa')?.value || '').toUpperCase();
+        
+        const fichaData = {
+            vehiculo_id: null,
+            placa: placaValue,
+            facsimil: (document.getElementById('facsimil')?.value || '').toUpperCase(),
+            marca: (document.getElementById('marca')?.value || '').toUpperCase(),
+            modelo: (document.getElementById('modelo')?.value || '').toUpperCase(),
+            tipo: (document.getElementById('tipo')?.value || '').toUpperCase(),
+            clase: (document.getElementById('clase')?.value || '').toUpperCase(),
+            color: (document.getElementById('color')?.value || '').toUpperCase(),
+            s_carroceria: (document.getElementById('serialCarroceria')?.value || '').toUpperCase(),
+            s_motor: (document.getElementById('serialMotor')?.value || '').toUpperCase(),
+            estatus_ficha: (document.getElementById('estatus')?.value || '').toUpperCase(),
+            dependencia: (document.getElementById('dependencia')?.value || '').toUpperCase(),
+            causa: document.getElementById('causa')?.value || '',
+            mecanica: document.getElementById('mecanica')?.value || '',
+            diagnostico: document.getElementById('diagnostico')?.value || '',
+            ubicacion: document.getElementById('ubicacion')?.value || '',
+            tapiceria: document.getElementById('tapiceria')?.value || '',
+            cauchos: document.getElementById('cauchos')?.value || '',
+            luces: document.getElementById('luces')?.value || '',
+            observaciones: document.getElementById('observaciones')?.value || '',
+            creado_por: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
+            fecha_creacion: new Date().toISOString()
+        };
+
+        // 2. Subir fotos a Supabase Storage
+        const fotoUrls = {
+            foto1_url: null,
+            foto2_url: null,
+            foto3_url: null,
+            foto4_url: null
+        };
+
+        const bucketName = 'fichas-tecnicas';
+        
+        for (let i = 1; i <= 4; i++) {
+            const input = document.getElementById('foto' + i);
+            if (input && input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileName = `ficha_${Date.now()}_foto${i}_${placaValue || 'sinplaca'}.jpg`;
+                
+                const { data: uploadData, error: uploadError } = await supabaseClient
+                    .storage
+                    .from(bucketName)
+                    .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                
+                if (!uploadError) {
+                    const { data: urlData } = supabaseClient
+                        .storage
+                        .from(bucketName)
+                        .getPublicUrl(fileName);
+                    
+                    fotoUrls['foto' + i + '_url'] = urlData.publicUrl;
+                }
+            }
+        }
+
+        // 3. Insertar en Supabase
+        const { data, error } = await supabaseClient
+            .from('fichas_tecnicas')
+            .insert([{
+                ...fichaData,
+                ...fotoUrls
+            }])
+            .select();
+
+        if (error) {
+            console.error('❌ Error en Supabase:', error);
+            mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+            return;
+        }
+
+        console.log('✅ Ficha guardada exitosamente:', data);
+        
+        // ✅ MENSAJE DE ÉXITO CON SCROLL
+        mostrarAlerta('✅ ¡FICHA TÉCNICA GUARDADA EXITOSAMENTE EN BASE DE DATOS!', 'success');
+        
+        // ✅ SCROLL ADICIONAL PARA ASEGURAR VISIBILIDAD
+        setTimeout(() => {
+            const alertDiv = document.getElementById('searchAlert');
+            if (alertDiv) {
+                alertDiv.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }, 100);
+
+        // 4. Limpiar formulario después de guardar
+        setTimeout(() => {
+            limpiarBusqueda();
+        }, 2000);
+
+    } catch (error) {
+        console.error('❌ Error al guardar ficha:', error);
+        mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+    }
+}
 // ================= ACTUALIZAR FOTOS PREVIEW =================
 function actualizarFotosPreview() {
     for (let i = 1; i <= 4; i++) {
