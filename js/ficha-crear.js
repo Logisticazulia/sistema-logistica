@@ -135,11 +135,6 @@ async function buscarVehiculo() {
     }
 }
 
-// ================= LLENAR FORMULARIO =================
-
-/**
- * Llena el formulario con los datos del vehículo encontrado
- */
 function llenarFormulario(vehiculo) {
     const mapeoCampos = {
         'marca': 'marca',
@@ -151,11 +146,11 @@ function llenarFormulario(vehiculo) {
         's_motor': 'serialMotor',
         'placa': 'placa',
         'facsimil': 'facsimilar',
-        'situacion': 'estatus',
         'unidad_administrativa': 'dependencia',
         'observacion': 'observaciones'
     };
     
+    // Mapear campos básicos
     Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
         const element = document.getElementById(formField);
         if (element && vehiculo[dbField]) {
@@ -170,9 +165,31 @@ function llenarFormulario(vehiculo) {
         }
     });
     
+    // ✅ NUEVO: Cargar Estatus específicamente (priorizar 'estatus' sobre 'situacion')
+    const estatusInput = document.getElementById('estatus');
+    if (estatusInput) {
+        const valorEstatus = vehiculo.estatus || vehiculo.situacion || '';
+        if (valorEstatus) {
+            // Normalizar valor (OPERATIVA → OPERATIVO, INOPERATIVA → INOPERATIVO)
+            const valorNormalizado = valorEstatus.toUpperCase()
+                .replace('OPERATIVA', 'OPERATIVO')
+                .replace('INOPERATIVA', 'INOPERATIVO')
+                .replace('DESINCORPORADA', 'DESINCORPORADO');
+            
+            const matchingOption = Array.from(estatusInput.options).find(opt =>
+                opt.value.toUpperCase() === valorNormalizado
+            );
+            if (matchingOption) {
+                estatusInput.value = matchingOption.value;
+            } else {
+                // Si no hay match exacto, intentar con el valor original
+                estatusInput.value = valorEstatus.toUpperCase();
+            }
+        }
+    }
+    
     actualizarVistaPrevia();
 }
-
 // ================= BLOQUEAR CAMPOS =================
 
 /**
