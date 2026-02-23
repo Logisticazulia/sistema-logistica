@@ -81,74 +81,55 @@ function limpiarTexto(texto) {
 * Busca un vehículo en la base de datos con COINCIDENCIA EXACTA
 */
 async function buscarVehiculo() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) {
-        mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
-        return;
-    }
-    
-    // ✅ LIMPIAR Y NORMALIZAR EL TÉRMINO DE BÚSQUEDA
-    const searchTerm = limpiarTexto(searchInput.value);
-    
-    if (!searchTerm) {
-        mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
-        return;
-    }
-    
-    // ✅ VALIDAR MÍNIMO DE CARACTERES
-    if (searchTerm.length < 3) {
-        mostrarAlerta('⚠️ Ingrese al menos 3 caracteres para búsqueda exacta', 'error');
-        return;
-    }
-    
-    console.log('🔍 [BÚSQUEDA EXACTA] Término:', searchTerm);
-    mostrarAlerta('⏳ Buscando en base de datos...', 'info');
-    
-    try {
-        // ✅ CONSULTA EXACTA - SOLO .eq. (EQUALS) - SIN .ilike
-        const { data, error } = await supabaseClient
-            .from('vehiculos')
-            .select('*')
-            .or(`
-                placa.eq.${searchTerm},
-                facsimil.eq.${searchTerm},
-                s_carroceria.eq.${searchTerm},
-                s_motor.eq.${searchTerm},
-                n_identificacion.eq.${searchTerm}
-            `)
-            .limit(1);
-        
-        if (error) {
-            console.error('❌ Error en Supabase:', error);
-            mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
-            return;
-        }
-        
-        console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
-        
-        if (!data || data.length === 0) {
-            mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
-            return;
-        }
-        
-        // ✅ VEHÍCULO ENCONTRADO
-        const vehiculo = data[0];
-        console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
-        
-        // Llenar formulario con los datos encontrados
-        llenarFormulario(vehiculo);
-        
-        // 🔒 BLOQUEAR CAMPOS PRINCIPALES
-        bloquearCamposPrincipales();
-        
-        mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo} - Placa: ${vehiculo.placa}`, 'success');
-        
-    } catch (error) {
-        console.error('❌ Error en buscarVehiculo:', error);
-        mostrarAlerta('❌ Error: ' + error.message, 'error');
-    }
-}
+  const searchInput = document.getElementById('searchInput');
+  if (!searchInput) {
+    mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
+    return;
+  }
 
+  const searchTerm = limpiarTexto(searchInput.value);
+  if (!searchTerm) {
+    mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
+    return;
+  }
+
+  console.log('🔍 Buscando vehículo:', searchTerm);
+  mostrarAlerta('⏳ Buscando en base de datos...', 'info');
+
+  try {
+    // ✅ CONSULTA CORREGIDA: SIN saltos de línea ni espacios extra
+    const { data, error } = await supabaseClient
+      .from('vehiculos')
+      .select('*')
+      .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm},n_identificacion.eq.${searchTerm}`)
+      .limit(1);
+
+    if (error) {
+      console.error('❌ Error en Supabase:', error);
+      mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
+      return;
+    }
+
+    console.log('📊 Resultado:', data?.length || 0, 'vehículo(s) encontrado(s)');
+
+    if (!data || data.length === 0) {
+      mostrarAlerta(`❌ No se encontró ningún vehículo con: ${searchTerm}`, 'error');
+      return;
+    }
+
+    // ✅ VEHÍCULO ENCONTRADO
+    const vehiculo = data[0];
+    console.log('✅ Vehículo encontrado:', vehiculo.placa || vehiculo.id);
+    
+    llenarFormulario(vehiculo);
+    bloquearCamposPrincipales();
+    mostrarAlerta(`✅ Vehículo encontrado: ${vehiculo.marca} ${vehiculo.modelo}`, 'success');
+
+  } catch (error) {
+    console.error('❌ Error en buscarVehiculo:', error);
+    mostrarAlerta('❌ Error: ' + error.message, 'error');
+  }
+}
 // ================= LLENAR FORMULARIO =================
 
 function llenarFormulario(vehiculo) {
