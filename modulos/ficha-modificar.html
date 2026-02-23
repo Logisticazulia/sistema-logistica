@@ -84,7 +84,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 @media print { .navbar, .module-header, .btn, .fotos-upload-section, .search-section { display: none !important; } .container { display: block; } .preview-section { box-shadow: none; padding: 0; } .ficha-tecnica { border: 2px solid #003366; width: 100%; } }
 @media (max-width: 1200px) { .form-row-4 { grid-template-columns: repeat(2, 1fr); } .form-row-3 { grid-template-columns: repeat(2, 1fr); } .fotos-upload-container { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) { .form-row-4, .form-row-3, .form-row-2 { grid-template-columns: 1fr; } .fotos-container, .fotos-upload-container { grid-template-columns: repeat(2, 1fr); } .ficha-header { flex-direction: column; gap: 10px; } .search-container { flex-direction: column; } .search-input { min-width: 100%; } }
+/* ✅ Campos bloqueados con candado */
+.form-group.locked label::after {
+    content: ' 🔒';
+    font-size: 0.9em;
+    color: #dc2626;
+}
+
+.form-group.locked input,
+.form-group.locked select,
+.form-group.locked textarea {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    border-color: #ddd !important;
+}
 </style>
+
 </head>
 <body class="dashboard-page">
 <!-- ================= BARRA DE NAVEGACIÓN ================= -->
@@ -154,52 +170,51 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <form id="fichaForm" class="form-disabled">
                 <!-- Campo oculto para el ID de la ficha -->
                 <input type="hidden" id="fichaId" name="fichaId">
-                <!-- FILA 1: 4 CAMPOS -->
-                <div class="form-row-4">
-                    <div class="form-group">
-                        <label>Marca *</label>
-                        <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Modelo *</label>
-                        <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo *</label>
-                        <select id="tipo" name="tipo" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="AUTOMOVIL">AUTOMOVIL</option>
-                            <option value="BUS">BUS</option>
-                            <option value="CAMION">CAMION</option>
-                            <option value="CAMIONETA">CAMIONETA</option>
-                            <option value="ENDURO">ENDURO</option>
-                            <option value="ESPECIAL">ESPECIAL</option>
-                            <option value="MACHITO">MACHITO</option>
-                            <option value="MINIBUS">MINIBUS</option>
-                            <option value="MOTO">MOTO</option>
-                            <option value="PICKUP">PICKUP</option>
-                            <option value="SPORTWAGON">SPORTWAGON</option>
-                            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
-                            <option value="TRIMOVIL">TRIMOVIL</option>
-                            <option value="VAM">VAM</option>
-                        </select>
-                    </div>
-                    <!-- ✅ CAMBIO 1: CLASE AHORA ES SELECT CON 8 OPCIONES -->
-                    <div class="form-group">
-                        <label>Clase *</label>
-                        <select id="clase" name="clase" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="AUTOBUS">AUTOBUS</option>
-                            <option value="AUTOMOVIL">AUTOMOVIL</option>
-                            <option value="BLINDADO">BLINDADO</option>
-                            <option value="CAMION">CAMION</option>
-                            <option value="CAMIONETA">CAMIONETA</option>
-                            <option value="ESPECIAL">ESPECIAL</option>
-                            <option value="MOTO">MOTO</option>
-                            <option value="TRACCIONDESANGRE">TRACCIONDESANGRE</option>
-                        </select>
-                    </div>
-                </div>
+           <!-- FILA 1: 4 CAMPOS -->
+<div class="form-row-4">
+    <div class="form-group">
+        <label>Marca * 🔒</label>
+        <input type="text" id="marca" name="marca" required placeholder="Ej: MITSUBISHI" disabled>
+    </div>
+    <div class="form-group">
+        <label>Modelo * 🔒</label>
+        <input type="text" id="modelo" name="modelo" required placeholder="Ej: L200" disabled>
+    </div>
+    <div class="form-group">
+        <label>Tipo * 🔒</label>
+        <select id="tipo" name="tipo" required disabled>
+            <option value="">Seleccione...</option>
+            <option value="AUTOMOVIL">AUTOMOVIL</option>
+            <option value="BUS">BUS</option>
+            <option value="CAMION">CAMION</option>
+            <option value="CAMIONETA">CAMIONETA</option>
+            <option value="ENDURO">ENDURO</option>
+            <option value="ESPECIAL">ESPECIAL</option>
+            <option value="MACHITO">MACHITO</option>
+            <option value="MINIBUS">MINIBUS</option>
+            <option value="MOTO">MOTO</option>
+            <option value="PICKUP">PICKUP</option>
+            <option value="SPORTWAGON">SPORTWAGON</option>
+            <option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option>
+            <option value="TRIMOVIL">TRIMOVIL</option>
+            <option value="VAM">VAM</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Clase * 🔒</label>
+        <select id="clase" name="clase" required disabled>
+            <option value="">Seleccione...</option>
+            <option value="AUTOBUS">AUTOBUS</option>
+            <option value="AUTOMOVIL">AUTOMOVIL</option>
+            <option value="BLINDADO">BLINDADO</option>
+            <option value="CAMION">CAMION</option>
+            <option value="CAMIONETA">CAMIONETA</option>
+            <option value="ESPECIAL">ESPECIAL</option>
+            <option value="MOTO">MOTO</option>
+            <option value="TRACCIONDESANGRE">TRACCIONDESANGRE</option>
+        </select>
+    </div>
+</div>
                 <!-- FILA 2: 3 CAMPOS -->
                 <div class="form-row-3">
                     <!-- ✅ CAMBIO 2: CAMPOS NO EDITABLES (siempre disabled) -->
@@ -218,30 +233,31 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
                 </div>
                 <!-- FILA 3: 3 CAMPOS -->
                 <div class="form-row-3">
-                    <!-- ✅ CAMBIO 3: CAMPOS NO EDITABLES (siempre disabled) -->
-                    <div class="form-group">
-                        <label>Placa * 🔒</label>
-                        <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Facsímil 🔒</label>
-                        <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Estatus del Vehículo *</label>
-                        <select id="estatus" name="estatus" required disabled>
-                            <option value="">Seleccione...</option>
-                            <option value="OPERATIVA">OPERATIVA</option>
-                            <option value="INOPERATIVA">INOPERATIVA</option>
-                            <option value="REPARACION">REPARACION</option>
-                            <option value="TALLER">TALLER</option>
-                            <option value="DESINCORPORADA">DESINCORPORADA</option>
-                            <option value="DONACION">DONACION</option>
-                            <option value="COMODATO">COMODATO</option>
-                            <option value="DENUNCIADA">DENUNCIADA</option>
-                        </select>
-                    </div>
-                </div>
+                 <!-- FILA 3: 3 CAMPOS -->
+<div class="form-row-3">
+    <div class="form-group">
+        <label>Placa * 🔒</label>
+        <input type="text" id="placa" name="placa" required placeholder="Ej: 3P417" disabled>
+    </div>
+    <div class="form-group">
+        <label>Facsímil 🔒</label>
+        <input type="text" id="facsimilar" name="facsimilar" placeholder="Ej: 3P417" disabled>
+    </div>
+    <div class="form-group">
+        <label>Estatus del Vehículo * 🔒</label>
+        <select id="estatus" name="estatus" required disabled>
+            <option value="">Seleccione...</option>
+            <option value="OPERATIVA">OPERATIVA</option>
+            <option value="INOPERATIVA">INOPERATIVA</option>
+            <option value="REPARACION">REPARACION</option>
+            <option value="TALLER">TALLER</option>
+            <option value="DESINCORPORADA">DESINCORPORADA</option>
+            <option value="DONACION">DONACION</option>
+            <option value="COMODATO">COMODATO</option>
+            <option value="DENUNCIADA">DENUNCIADA</option>
+        </select>
+    </div>
+</div>
                 <!-- DEPENDENCIA -->
                 <div class="form-group">
                     <label>Dependencia *</label>
