@@ -308,6 +308,63 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(40,167,69,0.2);
 }
+  /* ✅ BADGES DE ESTATUS */
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-operativa {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-inoperativa {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.badge-desincorporada {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* ✅ BOTONES DE ACCIÓN */
+.btn-view {
+    padding: 6px 12px;
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-view:hover {
+    background: #004080;
+    transform: translateY(-2px);
+}
+
+.btn-print {
+    padding: 6px 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-print:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}  
 
 /* Modal */
 .modal {
@@ -979,7 +1036,8 @@ body {
 </main>
 
 <!-- ================= SCRIPTS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
 <script src="../js/ficha-consultar.js" defer></script>
 </body>
 </html>
