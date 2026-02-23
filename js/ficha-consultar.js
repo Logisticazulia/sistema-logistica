@@ -1,7 +1,7 @@
 /**
  * ============================================
  * CONSULTA DE FICHAS TÉCNICAS - SUPABASE
- * VERSIÓN CORREGIDA
+ * VERSIÓN COMPATIBLE CON ficha-consulta.html
  * ============================================
  */
 
@@ -145,7 +145,10 @@ function mostrarAlerta(mensaje, tipo) {
 function renderTable() {
     var tbody = document.getElementById('resultsBody');
     
-    if (!tbody) return;
+    if (!tbody) {
+        console.error('❌ tbody#resultsBody no encontrado');
+        return;
+    }
     
     if (filteredFichas.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 50px; color: #666;">📭 No hay fichas técnicas registradas</td></tr>';
@@ -180,13 +183,37 @@ function renderTable() {
     tbody.innerHTML = html;
 }
 
+// ================= FUNCIÓN SEGURA PARA SETEAR TEXTO =================
+function setTexto(idElemento, valor) {
+    var el = document.getElementById(idElemento);
+    if (el) {
+        el.textContent = valor !== undefined && valor !== null ? valor : 'N/A';
+        return true;
+    } else {
+        console.warn('⚠️ Elemento no encontrado:', idElemento);
+        return false;
+    }
+}
+
+// ================= FUNCIÓN SEGURA PARA SETEAR HTML =================
+function setHtml(idElemento, valor) {
+    var el = document.getElementById(idElemento);
+    if (el) {
+        el.innerHTML = valor !== undefined && valor !== null ? valor : 'N/A';
+        return true;
+    } else {
+        console.warn('⚠️ Elemento no encontrado:', idElemento);
+        return false;
+    }
+}
+
 // ================= VER FICHA DETALLADA =================
 function verFicha(id) {
     console.log('🔍 Buscando ficha con ID:', id);
     
     var ficha = null;
     for (var i = 0; i < allFichas.length; i++) {
-        if (allFichas[i].id == id) {
+        if (allFichas[i].id == id || String(allFichas[i].id) === String(id)) {
             ficha = allFichas[i];
             break;
         }
@@ -199,25 +226,7 @@ function verFicha(id) {
     
     console.log('✅ Ficha encontrada:', ficha.placa);
     
-    // ✅ FUNCIÓN SEGURA PARA SETEAR TEXTO
-    function setTexto(idElemento, valor) {
-        var el = document.getElementById(idElemento);
-        if (el) {
-            el.textContent = valor || 'N/A';
-        } else {
-            console.warn('⚠️ Elemento no encontrado:', idElemento);
-        }
-    }
-    
-    // ✅ FUNCIÓN SEGURA PARA SETEAR HTML
-    function setHtml(idElemento, valor) {
-        var el = document.getElementById(idElemento);
-        if (el) {
-            el.innerHTML = valor || 'N/A';
-        }
-    }
-    
-    // Llenar datos del modal con función segura
+    // ✅ Llenar datos del modal con función segura
     setTexto('modalMarca', ficha.marca);
     setTexto('modalModelo', ficha.modelo);
     setTexto('modalTipo', ficha.tipo);
@@ -255,6 +264,8 @@ function verFicha(id) {
     if (modal) {
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+    } else {
+        console.error('❌ Modal #fichaModal no encontrado');
     }
 }
 
