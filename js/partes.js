@@ -789,7 +789,36 @@ window.refreshPartesData = async function() {
         alert('❌ Error recargando datos:\n' + err.message);
     }
 };
-
+function imprimirGraficos() {
+    console.log('🖨️ Iniciando impresión de gráficos...');
+    
+    // Ocultar elementos no deseados temporalmente
+    const elementosOcultar = document.querySelectorAll('.navbar, .btn-volver, .btn-print, .btn-logout, .breadcrumb, .module-subtitle');
+    elementosOcultar.forEach(el => el.style.display = 'none');
+    
+    // Forzar actualización de gráficos antes de imprimir
+    if (window.Chart) {
+        Object.values(charts).forEach(chart => {
+            if (chart) chart.resize();
+        });
+    }
+    
+    // Esperar un momento para que se renderice y luego imprimir
+    setTimeout(() => {
+        window.print();
+        
+        // Restaurar elementos después de imprimir
+        setTimeout(() => {
+            elementosOcultar.forEach(el => el.style.display = '');
+            // Redimensionar gráficos después de imprimir
+            if (window.Chart) {
+                Object.values(charts).forEach(chart => {
+                    if (chart) chart.resize();
+                });
+            }
+        }, 500);
+    }, 300);
+}
 // ========================================
 // FIN DEL MÓDULO
 // ========================================
