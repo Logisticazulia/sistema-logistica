@@ -287,7 +287,6 @@ async function guardarFicha(event) {
             n_tramite: document.getElementById('n_tramite').value.trim(),
             ubicacion_titulo: document.getElementById('ubicacion_titulo').value.trim(),
             observacion_extra: document.getElementById('observacion_extra').value.trim(),
-            updated_at: new Date().toISOString()
         };
         
         console.log('📝 Actualizando vehículo ID:', vehiculoSeleccionado.id);
