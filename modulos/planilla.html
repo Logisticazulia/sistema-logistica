@@ -1,170 +1,104 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Planilla de Datos de Vehículos - Sistema de Logística">
-<meta name="theme-color" content="#003366">
-<title>Planilla de Vehículos | Transporte</title>
-<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css">
-<style>
-/* ================= ESTILOS PARA LOS BOTONES ================= */
-.modules-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-  margin-top: 30px;
-}
-.module-card {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 51, 102, 0.1);
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s ease;
-  border-left: 5px solid #003366;
-  display: block;
-}
-.module-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 51, 102, 0.2);
-}
-.module-icon {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-}
-.module-title {
-  font-size: 1.3rem;
-  color: #003366;
-  margin-bottom: 10px;
-  font-weight: 700;
-}
-.module-description {
-  color: #64748b;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-.module-arrow {
-  position: absolute;
-  right: 30px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.5rem;
-  color: #003366;
-  transition: transform 0.3s ease;
-}
-.module-card:hover .module-arrow {
-  transform: translateY(-50%) translateX(5px);
-}
-.planilla-btn {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 51, 102, 0.1);
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s ease;
-  border-left: 5px solid #059669;
-  display: block;
-  position: relative;
-}
-.planilla-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 51, 102, 0.2);
-}
-.btn-icon {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-}
-.btn-title {
-  font-size: 1.3rem;
-  color: #003366;
-  margin-bottom: 10px;
-  font-weight: 700;
-}
-@media (max-width: 768px) {
-  .modules-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Planilla de Datos de Vehículos - Sistema de Logística">
+    <meta name="theme-color" content="#003366">
+    
+    <title>Planilla de Vehículos | Transporte</title>
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="dashboard-page">
-<!-- ================= BARRA DE NAVEGACIÓN ================= -->
-<nav class="navbar" role="navigation">
-<div class="nav-container">
-<div class="nav-brand">
-<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-<span class="nav-title">Sistema de Logística</span>
-</div>
-<div class="nav-user">
-<span class="user-email" id="userEmail">usuario@institucion.com</span>
-<button class="btn-logout" id="logoutBtn">
-<span class="logout-icon">🚪</span>
-<span class="logout-text">Cerrar Sesión</span>
-</button>
-</div>
-</div>
-</nav>
-<!-- ================= CONTENIDO PRINCIPAL ================= -->
-<main class="dashboard-main" role="main">
-<!-- Header con Navegación de Migas -->
-<header class="module-header">
-<div class="breadcrumb">
-<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-<span class="breadcrumb-separator">/</span>
-<a href="transporte.html" class="breadcrumb-link">Transporte</a>
-<span class="breadcrumb-separator">/</span>
-<span class="breadcrumb-current">Planilla de Vehículos</span>
-</div>
-<button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
-← Volver a Transporte
-</button>
-</header>
-<!-- Título del Módulo -->
-<section class="module-title-section">
-<h1 class="module-title">📋 Planilla de Datos de Vehículos</h1>
-<p class="module-subtitle">Seleccione una opción para gestionar el registro de vehículos</p>
-</section>
-<!-- 4 Botones Estilo Dashboard -->
-<section class="modules-grid">
-<!-- Botón 1: Consultar -->
-<a href="planilla-consultar.html" class="planilla-btn">
-<div class="btn-icon">🔍</div>
-<h3 class="btn-title">Consultar</h3>
-<p class="module-description">Búsqueda y visualización de todos los vehículos registrados en el sistema</p>
-<div class="module-arrow">→</div>
-</a>
-<!-- Botón 2: Registrar -->
-<a href="planilla-registrar.html" class="module-card" style="border-left-color: #2a9d8f;">
-<div class="module-icon" style="color: #2a9d8f;">➕</div>
-<h2 class="module-title">Registrar Vehículo</h2>
-<p class="module-description">Ingreso de nuevos vehículos al parque automotor institucional</p>
-<div class="module-arrow">→</div>
-</a>
-<!-- Botón 3: Modificar -->
-<a href="planilla-modificar.html" class="module-card" style="border-left-color: #e9c46a;">
-<div class="module-icon" style="color: #e9c46a;">✏️</div>
-<h2 class="module-title">Modificar Vehículo</h2>
-<p class="module-description">Actualización y edición de datos de vehículos existentes</p>
-<div class="module-arrow">→</div>
-</a>
-<!-- Botón 4: Partes Generales ✅ CORREGIDO -->
-<a href="partes-generales.html" class="module-card" style="border-left-color: #e76f51;">
-<div class="module-icon" style="color: #e76f51;">📊</div>
-<h2 class="module-title">Partes Generales</h2>
-<p class="module-description">Estadísticas y reportes del parque automotor</p>
-<div class="module-arrow">→</div>
-</a>
-</section>
-</main>
-<!-- ================= SCRIPTS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="../js/planilla.js" defer></script>
+
+    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema de Logística</span>
+            </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">usuario@institucion.com</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="dashboard-main" role="main">
+        
+        <!-- Header con Navegación de Migas -->
+        <header class="module-header">
+            <div class="breadcrumb">
+                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Planilla de Vehículos</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">
+                ← Volver a Transporte
+            </button>
+        </header>
+
+        <!-- Título del Módulo -->
+        <section class="module-title-section">
+            <h1 class="module-title">📋 Planilla de Datos de Vehículos</h1>
+            <p class="module-subtitle">Seleccione una opción para gestionar el registro de vehículos</p>
+        </section>
+
+        <!-- 4 Botones Estilo Dashboard -->
+        <section class="modules-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 30px;">
+            
+            <!-- Botón 1: Consultar -->
+       <a href="planilla-consultar.html" class="planilla-btn">
+    <div class="btn-icon">🔍</div>
+    <h3 class="btn-title">Consultar</h3>
+ <p class="module-description">Búsqueda y visualización de todos los vehículos registrados en el sistema</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Botón 2: Registrar -->
+            <a href="planilla-registrar.html" class="module-card" style="border-left-color: #2a9d8f;">
+                <div class="module-icon" style="color: #2a9d8f;">➕</div>
+                <h2 class="module-title">Registrar Vehículo</h2>
+                <p class="module-description">Ingreso de nuevos vehículos al parque automotor institucional</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Botón 3: Modificar -->
+            <a href="planilla-modificar.html" class="module-card" style="border-left-color: #e9c46a;">
+                <div class="module-icon" style="color: #e9c46a;">✏️</div>
+                <h2 class="module-title">Modificar Vehículo</h2>
+                <p class="module-description">Actualización y edición de datos de vehículos existentes</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+            <!-- Botón 4: Partes Generales -->
+            <a href="planilla-partes.html" class="module-card" style="border-left-color: #e76f51;">
+                <div class="module-icon" style="color: #e76f51;">📄</div>
+                <h2 class="module-title">Partes Generales</h2>
+                <p class="module-description">Gestión de partes, incidencias y novedades de los vehículos</p>
+                <div class="module-arrow">→</div>
+            </a>
+
+        </section>
+
+    </main>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../js/planilla.js" defer></script>
+
 </body>
 </html>
