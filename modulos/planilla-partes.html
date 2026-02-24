@@ -48,7 +48,7 @@
         /* Grid de tarjetas resumen */
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -72,10 +72,10 @@
             font-size: 0.8rem;
             color: #666;
         }
-        /* Grid de gráficos */
+        /* ✅ GRID DE GRÁFICOS - 3 POR FILA */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-top: 20px;
         }
@@ -85,17 +85,23 @@
             padding: 18px;
             box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
             border: 2px solid #e8eef5;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 51, 102, 0.12);
+            border-color: #005b96;
         }
         .chart-card h4 {
             margin: 0 0 12px 0;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #003366;
             font-weight: 600;
             text-align: center;
         }
         .chart-container {
             position: relative;
-            height: 260px;
+            height: 240px;
             width: 100%;
         }
         /* Botón Volver */
@@ -115,13 +121,24 @@
         /* Loader */
         .loading { font-size: 1.2rem; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        /* Responsive */
+        
+        /* ✅ RESPONSIVE - Ajuste para tablets y móviles */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 por fila en tablets */
+            }
+        }
         @media (max-width: 768px) {
             .stats-inline { flex-direction: column; gap: 10px; padding: 12px 15px; }
             .stat-separator { display: none; }
             .stat-item { width: 100%; display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-            .charts-grid { grid-template-columns: 1fr; }
-            .chart-container { height: 240px; }
+            .charts-grid { grid-template-columns: 1fr; /* 1 por fila en móviles */ }
+            .chart-container { height: 220px; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .chart-container { height: 200px; }
+            .chart-card h4 { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -160,7 +177,7 @@
             <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
         </section>
 
-        <!-- ✅ ESTADÍSTICAS PRINCIPALES -->
+        <!-- ESTADÍSTICAS PRINCIPALES -->
         <section class="stats-inline">
             <div class="stat-item"><span class="stat-value" id="totalVehiculos">⏳</span><span class="stat-label">Total</span></div>
             <span class="stat-separator">|</span>
@@ -170,85 +187,61 @@
             <span class="stat-separator">|</span>
             <div class="stat-item"><span class="stat-value" id="inoperativos">⏳</span><span class="stat-label">Inoperativos</span></div>
             <span class="stat-separator">|</span>
-            <div class="stat-item"><span class="stat-value" id="desincorporados">⏳</span><span class="stat-label">Desincorporados</span></div>
+            <div class="stat-item"><span class="stat-value" id="desincorporados">⏳</span><span class="stat-label">Desinc.</span></div>
         </section>
 
-        <!-- ✅ TARJETAS RESUMEN -->
+        <!-- TARJETAS RESUMEN -->
         <section class="summary-grid">
-            <div class="summary-card motos">
-                <div class="summary-value" id="countMoto">-</div>
-                <div class="summary-label">🏍️ Motos</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countCamioneta">-</div>
-                <div class="summary-label">🚙 Camionetas</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countAutomovil">-</div>
-                <div class="summary-label">🚗 Automóviles</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countCamion">-</div>
-                <div class="summary-label">🚚 Camiones</div>
-            </div>
-            <div class="summary-card ubic">
-                <div class="summary-value" id="countCCPEM">-</div>
-                <div class="summary-label">📍 CCPEM</div>
-            </div>
-            <div class="summary-card desinc">
-                <div class="summary-value" id="countDesincorporada">-</div>
-                <div class="summary-label">⚠️ Desincorporados</div>
-            </div>
+            <div class="summary-card motos"><div class="summary-value" id="countMoto">-</div><div class="summary-label">🏍️ Motos</div></div>
+            <div class="summary-card"><div class="summary-value" id="countCamioneta">-</div><div class="summary-label">🚙 Camionetas</div></div>
+            <div class="summary-card"><div class="summary-value" id="countAutomovil">-</div><div class="summary-label">🚗 Automóviles</div></div>
+            <div class="summary-card"><div class="summary-value" id="countCamion">-</div><div class="summary-label">🚚 Camiones</div></div>
+            <div class="summary-card ubic"><div class="summary-value" id="countCCPEM">-</div><div class="summary-label">📍 CCPEM</div></div>
+            <div class="summary-card desinc"><div class="summary-value" id="countDesincorporada">-</div><div class="summary-label">⚠️ Desinc.</div></div>
         </section>
 
-        <!-- ✅ GRÁFICOS PRINCIPALES -->
+        <!-- ✅ GRÁFICOS - 3 POR FILA -->
         <section class="charts-grid">
-            <!-- 1. Estado del Vehículo -->
+            <!-- Fila 1 -->
             <div class="chart-card">
                 <h4>📊 Estado del Parque</h4>
                 <div class="chart-container"><canvas id="chartEstatus"></canvas></div>
             </div>
-            
-            <!-- 2. Situación Operativa -->
             <div class="chart-card">
                 <h4>🔧 Situación Actual</h4>
                 <div class="chart-container"><canvas id="chartSituacion"></canvas></div>
             </div>
-            
-            <!-- 3. Por Clase -->
             <div class="chart-card">
-                <h4>🚗 Distribución por Clase</h4>
+                <h4>🚗 Por Clase</h4>
                 <div class="chart-container"><canvas id="chartClase"></canvas></div>
             </div>
             
-            <!-- 4. Por Tipo -->
+            <!-- Fila 2 -->
             <div class="chart-card">
-                <h4>🏁 Distribución por Tipo</h4>
+                <h4>🏁 Por Tipo</h4>
                 <div class="chart-container"><canvas id="chartTipo"></canvas></div>
             </div>
-            
-            <!-- 5. Marcas Principales -->
             <div class="chart-card">
-                <h4>🏷️ Marcas Más Comunes</h4>
+                <h4>🏷️ Marcas Top 10</h4>
                 <div class="chart-container"><canvas id="chartMarcas"></canvas></div>
             </div>
-            
-            <!-- 6. Ubicación Física -->
             <div class="chart-card">
                 <h4>📍 Ubicación Física</h4>
                 <div class="chart-container"><canvas id="chartUbicacion"></canvas></div>
             </div>
             
-            <!-- 7. Vehículos por Año -->
+            <!-- Fila 3 -->
             <div class="chart-card">
-                <h4>📅 Vehículos por Año</h4>
+                <h4>📅 Por Año</h4>
                 <div class="chart-container"><canvas id="chartAno"></canvas></div>
             </div>
-            
-            <!-- 8. Unidad Administrativa -->
             <div class="chart-card">
-                <h4>🏢 Por Unidad Administrativa</h4>
+                <h4>🏢 Unidad Admin.</h4>
                 <div class="chart-container"><canvas id="chartUnidad"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h4>🎨 Por Color</h4>
+                <div class="chart-container"><canvas id="chartColor"></canvas></div>
             </div>
         </section>
     </main>
