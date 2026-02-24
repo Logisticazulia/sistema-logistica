@@ -1,7 +1,7 @@
 /**
-* PARTES GENERALES - REPORTES Y ESTADÍSTICAS
-* Muestra gráficos y estadísticas del parque automotor
-*/
+ * PARTES GENERALES - REPORTES Y ESTADÍSTICAS
+ * Muestra gráficos y estadísticas del parque automotor
+ */
 
 // Variables globales para los gráficos
 let chartEstatus, chartTipos, chartUnidades, chartAnos;
@@ -109,12 +109,6 @@ function calcularEstadisticas(vehiculos) {
     document.getElementById('porcentajeMantenimiento').textContent = `${pctMantenimiento}% del total`;
     document.getElementById('porcentajeAsignados').textContent = `${pctAsignados}% del total`;
     
-    // Actualizar total general
-    const totalElement = document.getElementById('totalVehiculos');
-    if (totalElement) {
-        totalElement.textContent = total;
-    }
-    
     console.log('📊 Estadísticas calculadas:', { total, operativos, inoperativos, mantenimiento, asignados });
 }
 
@@ -127,14 +121,13 @@ function generarGraficos(vehiculos) {
     if (chartAnos) chartAnos.destroy();
     
     // ============================================
-    // GRÁFICO DE ESTATUS (Solo valores válidos)
+    // GRÁFICO DE ESTATUS
     // ============================================
     const estatusValidos = ['OPERATIVA', 'INOPERATIVA', 'REPARACION', 'TALLER', 'DESINCORPORADA', 'DONACION', 'COMODATO', 'DENUNCIADA'];
     const estatusData = {};
     
     vehiculos.forEach(v => {
         const estatus = v.estatus?.trim().toUpperCase();
-        // ✅ Solo incluir estatus válidos, excluir vacíos/null
         if (estatus && estatusValidos.includes(estatus)) {
             estatusData[estatus] = (estatusData[estatus] || 0) + 1;
         }
@@ -147,14 +140,8 @@ function generarGraficos(vehiculos) {
             datasets: [{
                 data: Object.values(estatusData),
                 backgroundColor: [
-                    '#059669', // OPERATIVA - Verde
-                    '#dc2626', // INOPERATIVA - Rojo
-                    '#f59e0b', // REPARACION - Amarillo
-                    '#d97706', // TALLER - Naranja
-                    '#6b7280', // DESINCORPORADA - Gris
-                    '#3b82f6', // DONACION - Azul
-                    '#10b981', // COMODATO - Verde claro
-                    '#ef4444'  // DENUNCIADA - Rojo claro
+                    '#059669', '#dc2626', '#f59e0b', '#d97706',
+                    '#6b7280', '#3b82f6', '#10b981', '#ef4444'
                 ]
             }]
         },
@@ -162,21 +149,13 @@ function generarGraficos(vehiculos) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            family: 'Roboto',
-                            size: 11
-                        }
-                    }
-                },
+                legend: { position: 'bottom' },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return `${context.label}: ${context.parsed} vehículos (${percentage}%)`;
+                            return `${context.label}: ${context.parsed} (${percentage}%)`;
                         }
                     }
                 }
@@ -190,7 +169,6 @@ function generarGraficos(vehiculos) {
     const tiposData = {};
     vehiculos.forEach(v => {
         const tipo = v.tipo?.trim() || 'SIN TIPO';
-        // ✅ Excluir tipos vacíos
         if (tipo && tipo !== 'SIN TIPO') {
             tiposData[tipo] = (tiposData[tipo] || 0) + 1;
         }
@@ -209,29 +187,9 @@ function generarGraficos(vehiculos) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        font: {
-                            family: 'Roboto'
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            family: 'Roboto',
-                            size: 10
-                        }
-                    }
-                }
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
             }
         }
     });
@@ -242,18 +200,14 @@ function generarGraficos(vehiculos) {
     const unidadesData = {};
     vehiculos.forEach(v => {
         const unidad = v.unidad_administrativa?.trim();
-        // ✅ Solo incluir unidades válidas, excluir vacíos, null, 'NO'
         if (unidad && unidad !== '' && unidad !== 'NO' && unidad !== 'null') {
             unidadesData[unidad] = (unidadesData[unidad] || 0) + 1;
         }
     });
     
-    // ✅ Ordenar y tomar TOP 15
     const sortedUnidades = Object.entries(unidadesData)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 15);
-    
-    console.log('📊 Top 15 Unidades:', sortedUnidades);
     
     chartUnidades = new Chart(document.getElementById('chartUnidades'), {
         type: 'pie',
@@ -273,25 +227,7 @@ function generarGraficos(vehiculos) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        font: {
-                            family: 'Roboto',
-                            size: 10
-                        },
-                        boxWidth: 12
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return `${context.label}: ${context.parsed} vehículos (${percentage}%)`;
-                        }
-                    }
-                }
+                legend: { position: 'right' }
             }
         }
     });
@@ -302,7 +238,6 @@ function generarGraficos(vehiculos) {
     const anosData = {};
     vehiculos.forEach(v => {
         const ano = v.ano?.toString()?.trim();
-        // ✅ Solo incluir años válidos (números entre 1900 y 2030)
         if (ano && !isNaN(ano) && parseInt(ano) >= 1900 && parseInt(ano) <= 2030) {
             anosData[ano] = (anosData[ano] || 0) + 1;
         }
@@ -322,38 +257,15 @@ function generarGraficos(vehiculos) {
                 borderColor: '#005b96',
                 backgroundColor: 'rgba(0, 91, 150, 0.1)',
                 fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#005b96',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2
+                tension: 0.4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        font: {
-                            family: 'Roboto'
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            family: 'Roboto',
-                            size: 10
-                        }
-                    }
-                }
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
             }
         }
     });
@@ -366,22 +278,12 @@ function generarTablaResumen(vehiculos) {
     vehiculos.forEach(v => {
         const unidad = v.unidad_administrativa?.trim() || 'SIN ASIGNAR';
         if (!unidadesData[unidad]) {
-            unidadesData[unidad] = {
-                total: 0,
-                operativos: 0,
-                inoperativos: 0,
-                mantenimiento: 0
-            };
+            unidadesData[unidad] = { total: 0, operativos: 0, inoperativos: 0, mantenimiento: 0 };
         }
         unidadesData[unidad].total++;
-        if (v.estatus === 'OPERATIVA') {
-            unidadesData[unidad].operativos++;
-        } else if (v.estatus === 'INOPERATIVA') {
-            unidadesData[unidad].inoperativos++;
-        }
-        if (v.situacion === 'REPARACION' || v.situacion === 'TALLER') {
-            unidadesData[unidad].mantenimiento++;
-        }
+        if (v.estatus === 'OPERATIVA') unidadesData[unidad].operativos++;
+        else if (v.estatus === 'INOPERATIVA') unidadesData[unidad].inoperativos++;
+        if (v.situacion === 'REPARACION' || v.situacion === 'TALLER') unidadesData[unidad].mantenimiento++;
     });
     
     const tbody = document.getElementById('tbodyResumen');
@@ -390,10 +292,7 @@ function generarTablaResumen(vehiculos) {
     Object.entries(unidadesData)
         .sort((a, b) => b[1].total - a[1].total)
         .forEach(([unidad, datos]) => {
-            const porcentaje = datos.total > 0 
-                ? ((datos.operativos / datos.total) * 100).toFixed(1) 
-                : 0;
-            
+            const porcentaje = datos.total > 0 ? ((datos.operativos / datos.total) * 100).toFixed(1) : 0;
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><strong>${unidad}</strong></td>
@@ -415,37 +314,26 @@ function imprimirReporte() {
 // ================= EXPORTAR A PDF =================
 async function exportarPDF() {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'mm', 'a4'); // Horizontal
+    const pdf = new jsPDF('l', 'mm', 'a4');
     
     try {
-        // Capturar el contenido del reporte
         const element = document.getElementById('reportContent');
-        
-        // Mostrar mensaje de carga
         const btnPdf = document.querySelector('.btn-pdf');
         const originalText = btnPdf.innerHTML;
         btnPdf.innerHTML = '⏳ Generando PDF...';
         btnPdf.disabled = true;
         
-        // Usar html2canvas para capturar el contenido
-        const canvas = await html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            logging: false
-        });
-        
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
         const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 297; // A4 horizontal en mm
+        const imgWidth = 297;
         const pageHeight = 210;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         let heightLeft = imgHeight;
         let position = 0;
         
-        // Primera página
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
         
-        // Páginas adicionales si es necesario
         while (heightLeft >= 0) {
             position = heightLeft - imgHeight;
             pdf.addPage();
@@ -453,19 +341,15 @@ async function exportarPDF() {
             heightLeft -= pageHeight;
         }
         
-        // Guardar PDF
         const fecha = new Date().toISOString().split('T')[0];
         pdf.save(`partes-generales-${fecha}.pdf`);
         
-        // Restaurar botón
         btnPdf.innerHTML = originalText;
         btnPdf.disabled = false;
-        
         console.log('✅ PDF generado correctamente');
     } catch (error) {
         console.error('❌ Error al generar PDF:', error);
         alert('Error al generar el PDF. Intente nuevamente.');
-        // Restaurar botón
         const btnPdf = document.querySelector('.btn-pdf');
         btnPdf.innerHTML = '📄 Exportar a PDF';
         btnPdf.disabled = false;
