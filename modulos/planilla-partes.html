@@ -301,23 +301,27 @@
 
     <!-- Contenido Principal -->
     <main class="dashboard-main">
-        <header class="module-header">
-            <div class="breadcrumb">
-                <a href="../dashboard.html">🏠 Dashboard</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="transporte.html">Transporte</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="planilla.html">Planilla</a>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-current">Partes Generales</span>
-            </div>
-            <button class="btn-volver" onclick="window.location.href='planilla.html'">← Volver</button>
-        </header>
+     <!-- ================= HEADER CON BREADCRUMB ================= -->
+<header class="module-header">
+    <div class="breadcrumb">
+        <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="planilla.html" class="breadcrumb-link">Planilla</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">Partes Generales</span>
+    </div>
+    <button class="btn-volver" onclick="window.location.href='planilla.html'">
+        ← Volver a Planilla
+    </button>
+</header>
 
-        <section class="module-title-section">
-            <h1 class="module-title">📊 Partes Generales</h1>
-            <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
-        </section>
+<!-- ================= TÍTULO DEL MÓDULO ================= -->
+<section class="module-title-section">
+    <h1 class="module-title">📊 Partes Generales</h1>
+    <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
+</section>
 
         <!-- ✅ ESTADÍSTICAS PRINCIPALES (6 indicadores incluyendo Total Vehículos) -->
         <section class="stats-inline">
