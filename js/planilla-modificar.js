@@ -263,7 +263,6 @@ async function guardarVehiculo(event) {
             fecha_inspeccion: document.getElementById('fecha_inspeccion').value || null,
             n_tramite: document.getElementById('n_tramite').value.trim() || null,
             ubicacion_titulo: document.getElementById('ubicacion_titulo').value.trim() || null,
-            updated_at: new Date().toISOString()
         };
         
         console.log('📝 Actualizando vehículo ID:', vehiculoSeleccionado.id);
