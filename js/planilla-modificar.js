@@ -1,6 +1,6 @@
 // ============================================
 // MODIFICAR VEHÍCULO - TABLA VEHICULOS
-// SIN FOTOS - BÚSQUEDA EXACTA
+// TODOS LOS CAMPOS EDITABLES + BÚSQUEDA EXACTA
 // ============================================
 
 // Configuración de Supabase
@@ -13,18 +13,8 @@ const supabaseClient = window.supabase.createClient(
 let vehiculoSeleccionado = null;
 let isEditing = false;
 
-// ✅ CAMPOS QUE NO SE PUEDEN MODIFICAR (identificación única)
-const camposNoEditables = [
-    'placa',
-    'facsimil',
-    's_carroceria',
-    's_motor',
-    'marca',
-    'modelo',
-    'tipo',
-    'clase',
-    'color'
-];
+// ✅ TODOS LOS CAMPOS SON EDITABLES (array vacío)
+const camposNoEditables = [];
 
 // ============================================
 // FUNCIONES DE BÚSQUEDA EXACTA
@@ -46,7 +36,7 @@ async function buscarFicha() {
     btnSearch.classList.add('searching');
     
     try {
-        // ✅ BÚSQUEDA EXACTA EN TABLA vehiculos
+        // ✅ BÚSQUEDA EXACTA EN TABLA vehiculos CON .eq.
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
@@ -102,6 +92,7 @@ async function buscarFicha() {
 function llenarFormulario(vehiculo) {
     console.log('📝 Llenando formulario con vehículo:', vehiculo);
     
+    // ✅ MAPEO DE CAMPOS SEGÚN TABLA vehiculos
     const mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
@@ -123,11 +114,11 @@ function llenarFormulario(vehiculo) {
         'epp': 'epp',
         'ubicacion_fisica': 'ubicacion_fisica',
         'asignacion': 'asignacion',
+        'observacion': 'observacion',
         'certificado_origen': 'certificado_origen',
         'fecha_inspeccion': 'fecha_inspeccion',
         'n_tramite': 'n_tramite',
         'ubicacion_titulo': 'ubicacion_titulo',
-        'observacion': 'observacion',
         'observacion_extra': 'observacion_extra'
     };
     
@@ -141,6 +132,7 @@ function llenarFormulario(vehiculo) {
                 const options = Array.from(element.options);
                 const dbValue = String(vehiculo[dbField]).toUpperCase().trim();
                 
+                // Búsqueda flexible para selects (con/sin espacios)
                 let matchingOption = options.find(function(opt) {
                     const optValue = opt.value.toUpperCase().trim();
                     if (optValue === dbValue) return true;
@@ -152,6 +144,7 @@ function llenarFormulario(vehiculo) {
                     element.value = matchingOption.value;
                     console.log('✅ Select asignado:', formField, '=', matchingOption.value);
                 } else {
+                    // Si no encuentra, agregar la opción dinámicamente
                     const newOption = document.createElement('option');
                     newOption.value = dbValue;
                     newOption.textContent = dbValue;
@@ -160,6 +153,7 @@ function llenarFormulario(vehiculo) {
                     console.log('⚠️ Opción agregada dinámicamente:', formField, '=', dbValue);
                 }
             } else if (element.type === 'date' && vehiculo[dbField]) {
+                // Manejo especial para fechas
                 const fecha = new Date(vehiculo[dbField]);
                 if (!isNaN(fecha.getTime())) {
                     element.value = fecha.toISOString().split('T')[0];
@@ -194,12 +188,13 @@ function limpiarBusqueda() {
 }
 
 // ============================================
-// FUNCIONES DE EDICIÓN
+// FUNCIONES DE EDICIÓN - TODOS LOS CAMPOS EDITABLES
 // ============================================
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#vehicleForm input, #vehicleForm select, #vehicleForm textarea');
     
     fields.forEach(function(field) {
+        // ✅ TODOS LOS CAMPOS SON EDITABLES (camposNoEditables está vacío)
         if (camposNoEditables.includes(field.id)) {
             field.disabled = true;
             const formGroup = field.closest('.form-group');
@@ -233,7 +228,7 @@ function editarFicha() {
     document.getElementById('btnSubmit').style.display = 'inline-flex';
     document.getElementById('btnCancel').disabled = false;
     
-    mostrarAlerta('ℹ️ Editando vehículo. Los campos marcados con 🔒 NO se pueden modificar.', 'info');
+    mostrarAlerta('ℹ️ Editando vehículo. TODOS los campos pueden ser modificados.', 'info');
 }
 
 function cancelarEdicion() {
@@ -248,7 +243,7 @@ function cancelarEdicion() {
 }
 
 // ============================================
-// FUNCIONES DE GUARDADO
+// FUNCIONES DE GUARDADO - ACTUALIZA TODOS LOS CAMPOS
 // ============================================
 async function guardarFicha(event) {
     event.preventDefault();
@@ -264,8 +259,19 @@ async function guardarFicha(event) {
     btnSubmit.querySelector('.btn-loader').style.display = 'inline';
     
     try {
-        // ✅ ACTUALIZAR TODOS LOS CAMPOS EDITABLES
+        // ✅ ACTUALIZAR TODOS LOS CAMPOS DE LA TABLA vehiculos
         const vehiculoActualizado = {
+            marca: document.getElementById('marca').value.trim().toUpperCase(),
+            modelo: document.getElementById('modelo').value.trim().toUpperCase(),
+            tipo: document.getElementById('tipo').value.trim().toUpperCase(),
+            clase: document.getElementById('clase').value.trim().toUpperCase(),
+            color: document.getElementById('color').value.trim().toUpperCase(),
+            ano: document.getElementById('ano').value.trim(),
+            s_carroceria: document.getElementById('s_carroceria').value.trim().toUpperCase(),
+            s_motor: document.getElementById('s_motor').value.trim().toUpperCase(),
+            placa: document.getElementById('placa').value.trim().toUpperCase(),
+            facsimil: document.getElementById('facsimil').value.trim().toUpperCase(),
+            n_identificacion: document.getElementById('n_identificacion').value.trim().toUpperCase(),
             situacion: document.getElementById('situacion').value.trim().toUpperCase(),
             estatus: document.getElementById('estatus').value.trim().toUpperCase(),
             unidad_administrativa: document.getElementById('unidad_administrativa').value.trim(),
@@ -275,11 +281,11 @@ async function guardarFicha(event) {
             epp: document.getElementById('epp').value.trim(),
             ubicacion_fisica: document.getElementById('ubicacion_fisica').value.trim(),
             asignacion: document.getElementById('asignacion').value.trim(),
+            observacion: document.getElementById('observacion').value.trim(),
             certificado_origen: document.getElementById('certificado_origen').value.trim(),
             fecha_inspeccion: document.getElementById('fecha_inspeccion').value,
             n_tramite: document.getElementById('n_tramite').value.trim(),
             ubicacion_titulo: document.getElementById('ubicacion_titulo').value.trim(),
-            observacion: document.getElementById('observacion').value.trim(),
             observacion_extra: document.getElementById('observacion_extra').value.trim(),
             updated_at: new Date().toISOString()
         };
@@ -344,6 +350,7 @@ function mostrarAlerta(mensaje, tipo) {
         messageSpan.textContent = mensaje;
     }
     
+    // Ocultar todas las alertas primero
     document.querySelectorAll('.alert').forEach(function(alert) {
         alert.style.display = 'none';
     });
@@ -362,7 +369,7 @@ function mostrarAlerta(mensaje, tipo) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando modificación de vehículos...');
     
-    // ✅ NO LLAMAR funciones de fotos - NO EXISTEN EN ESTE HTML
+    toggleFormFields(false);
     
     const btnEdit = document.getElementById('btnEdit');
     const btnSubmit = document.getElementById('btnSubmit');
