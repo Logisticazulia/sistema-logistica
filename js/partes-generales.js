@@ -6,26 +6,30 @@
 // Variables globales para los gráficos
 let chartEstatus, chartTipos, chartUnidades, chartAnos;
 
+// ================= CLIENTE SUPABASE =================
+// ✅ USAR LA VARIABLE GLOBAL DE config.js (supabaseClient)
+const db = window.supabaseClient || window.supabase;
+
 // ================= ELEMENTOS DEL DOM =================
 const userEmail = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// ================= VERIFICAR SESIÓN (OPCIONAL) =================
+// ================= VERIFICAR SESIÓN =================
 async function verificarSesion() {
   try {
-    // Verificar si supabaseClient está disponible
-    if (typeof supabaseClient === 'undefined') {
-      console.warn('⚠️ Supabase client no disponible, cargando datos sin autenticación');
+    // ✅ Verificar si el cliente está disponible
+    if (!db) {
+      console.warn('⚠️ Cliente Supabase no disponible');
       if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-      return true;
+      return true; // Continuar sin autenticación
     }
     
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    const { data: { session }, error } = await db.auth.getSession();
     
     if (error) {
-      console.warn('⚠️ Error verificando sesión:', error.message);
+      console.warn('⚠️ Error en sesión:', error.message);
       if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-      return true; // Continuar sin sesión
+      return true;
     }
     
     if (session && session.user && session.user.email) {
@@ -36,9 +40,9 @@ async function verificarSesion() {
     
     return true;
   } catch (err) {
-    console.warn('⚠️ Error en verificarSesion:', err.message);
+    console.warn('⚠️ Error verificando sesión:', err.message);
     if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-    return true; // Continuar sin sesión
+    return true; // Continuar sin autenticación
   }
 }
 
@@ -46,8 +50,8 @@ async function verificarSesion() {
 async function cerrarSesion() {
   if (confirm('¿Está seguro de cerrar sesión?')) {
     try {
-      if (typeof supabaseClient !== 'undefined') {
-        await supabaseClient.auth.signOut();
+      if (db) {
+        await db.auth.signOut();
       }
       window.location.href = '../index.html';
     } catch (error) {
@@ -60,15 +64,17 @@ async function cerrarSesion() {
 // ================= CARGAR DATOS =================
 async function cargarDatos() {
   try {
-    // Verificar si supabaseClient está disponible
-    if (typeof supabaseClient === 'undefined') {
-      console.error('❌ Supabase client no disponible');
+    // ✅ Verificar si el cliente está disponible
+    if (!db) {
+      console.error('❌ Cliente Supabase no disponible');
       alert('Error: No se pudo conectar a la base de datos');
       return;
     }
     
+    console.log('🔗 Conectando a Supabase...');
+    
     // Obtener todos los vehículos
-    const { data: vehiculos, error } = await supabaseClient
+    const { data: vehiculos, error } = await db
       .from('vehiculos')
       .select('*');
     
@@ -88,6 +94,7 @@ async function cargarDatos() {
     
     // Generar tabla de resumen
     generarTablaResumen(vehiculos);
+    
   } catch (error) {
     console.error('❌ Error al cargar datos:', error);
     alert('Error al cargar los datos del reporte: ' + error.message);
@@ -165,7 +172,7 @@ function generarGraficos(vehiculos) {
   });
   
   const chartEstatusEl = document.getElementById('chartEstatus');
-  if (chartEstatusEl) {
+  if (chartEstatusEl && Object.keys(estatusData).length > 0) {
     chartEstatus = new Chart(chartEstatusEl, {
       type: 'doughnut',
       data: {
@@ -224,7 +231,7 @@ function generarGraficos(vehiculos) {
   });
   
   const chartTiposEl = document.getElementById('chartTipos');
-  if (chartTiposEl) {
+  if (chartTiposEl && Object.keys(tiposData).length > 0) {
     chartTipos = new Chart(chartTiposEl, {
       type: 'bar',
       data: {
@@ -286,7 +293,7 @@ function generarGraficos(vehiculos) {
   console.log('📊 Top 15 Unidades:', sortedUnidades);
   
   const chartUnidadesEl = document.getElementById('chartUnidades');
-  if (chartUnidadesEl) {
+  if (chartUnidadesEl && sortedUnidades.length > 0) {
     chartUnidades = new Chart(chartUnidadesEl, {
       type: 'pie',
       data: {
@@ -346,7 +353,7 @@ function generarGraficos(vehiculos) {
     .slice(0, 15);
   
   const chartAnosEl = document.getElementById('chartAnos');
-  if (chartAnosEl) {
+  if (chartAnosEl && sortedAnos.length > 0) {
     chartAnos = new Chart(chartAnosEl, {
       type: 'line',
       data: {
@@ -491,6 +498,7 @@ async function exportarPDF() {
     
     btnPdf.innerHTML = originalText;
     btnPdf.disabled = false;
+    
   } catch (error) {
     console.error('Error al generar PDF:', error);
     alert('Error al generar el PDF. Intente nuevamente.');
@@ -504,7 +512,12 @@ async function exportarPDF() {
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Inicializando Partes Generales...');
   
-  // Verificar sesión (sin redirección)
+  // ✅ Verificar que el cliente Supabase esté disponible
+  if (!window.supabaseClient && !window.supabase) {
+    console.error('❌ Cliente Supabase no inicializado. Verifica config.js');
+  }
+  
+  // Verificar sesión
   await verificarSesion();
   
   // Establecer fecha del reporte
