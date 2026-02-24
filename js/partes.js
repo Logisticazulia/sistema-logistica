@@ -6,7 +6,7 @@
  */
 
 let globalVehicles = [];
-const charts = {}; // Almacena instancias de gráficos
+const charts = {};
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
@@ -34,10 +34,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log(`✅ ${data.length} vehículos cargados`);
         globalVehicles = data;
         
-        // Calcular y mostrar estadísticas
         calculateStats(data);
-        
-        // Renderizar todos los gráficos
         renderAllCharts(data);
         
     } catch (error) {
@@ -76,7 +73,6 @@ function calculateStats(vehicles) {
     safeUpdate('inoperativos', inoperativos);
     safeUpdate('desincorporados', desincorporados);
     
-    // Resumen por clase
     safeUpdate('countMoto', vehicles.filter(v => (v.tipo || v.clase)?.toUpperCase() === 'MOTO').length);
     safeUpdate('countCamioneta', vehicles.filter(v => v.clase === 'CAMIONETA').length);
     safeUpdate('countAutomovil', vehicles.filter(v => v.clase === 'AUTOMOVIL').length);
@@ -99,6 +95,7 @@ function renderAllCharts(vehicles) {
     renderChartUbicacion(vehicles);
     renderChartAno(vehicles);
     renderChartUnidad(vehicles);
+    renderChartColor(vehicles); // ✅ Nuevo gráfico de color
 }
 
 // 📊 1. Estado (estatus) - Doughnut
@@ -119,7 +116,7 @@ function renderChartEstatus(vehicles) {
         }]
     }, {
         plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 9 } } },
+            legend: { position: 'bottom', labels: { font: { size: 8 } } },
             tooltip: {
                 callbacks: {
                     label: ctx => `${ctx.label}: ${ctx.raw} (${((ctx.raw/vehicles.length)*100).toFixed(1)}%)`
@@ -138,7 +135,6 @@ function renderChartSituacion(vehicles) {
         counts[key] = (counts[key] || 0) + 1;
     });
     
-    // Ordenar por cantidad descendente y tomar top 8
     const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 8);
     
     createChart('chartSituacion', 'bar', {
@@ -153,8 +149,8 @@ function renderChartSituacion(vehicles) {
         indexAxis: 'y',
         plugins: { legend: { display: false } },
         scales: {
-            x: { beginAtZero: true, ticks: { font: { size: 9 } } },
-            y: { ticks: { font: { size: 9 } } }
+            x: { beginAtZero: true, ticks: { font: { size: 8 } } },
+            y: { ticks: { font: { size: 8 } } }
         }
     });
 }
@@ -177,12 +173,7 @@ function renderChartClase(vehicles) {
         }]
     }, {
         plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 9 } } },
-            tooltip: {
-                callbacks: {
-                    label: ctx => `${ctx.label}: ${ctx.raw}`
-                }
-            }
+            legend: { position: 'bottom', labels: { font: { size: 8 } } }
         }
     });
 }
@@ -208,8 +199,8 @@ function renderChartTipo(vehicles) {
     }, {
         plugins: { legend: { display: false } },
         scales: {
-            y: { beginAtZero: true, ticks: { font: { size: 9 } } },
-            x: { ticks: { font: { size: 8 }, maxRotation: 45, minRotation: 45 } }
+            y: { beginAtZero: true, ticks: { font: { size: 8 } } },
+            x: { ticks: { font: { size: 7 }, maxRotation: 45, minRotation: 45 } }
         }
     });
 }
@@ -236,13 +227,13 @@ function renderChartMarcas(vehicles) {
         indexAxis: 'y',
         plugins: { legend: { display: false } },
         scales: {
-            x: { beginAtZero: true, ticks: { font: { size: 9 } } },
-            y: { ticks: { font: { size: 9 } } }
+            x: { beginAtZero: true, ticks: { font: { size: 8 } } },
+            y: { ticks: { font: { size: 8 } } }
         }
     });
 }
 
-// 📍 6. Ubicación Física - Doughnut (Top 6 + Otros)
+// 📍 6. Ubicación Física - Doughnut
 function renderChartUbicacion(vehicles) {
     const counts = {};
     vehicles.forEach(v => {
@@ -267,9 +258,7 @@ function renderChartUbicacion(vehicles) {
             borderColor: '#fff'
         }]
     }, {
-        plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 9 } } }
-        },
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 8 } } } },
         cutout: '60%'
     });
 }
@@ -282,7 +271,6 @@ function renderChartAno(vehicles) {
         counts[ano] = (counts[ano] || 0) + 1;
     });
     
-    // Ordenar por año (numérico si es posible)
     const sorted = Object.entries(counts).sort((a, b) => {
         const na = parseInt(a[0]), nb = parseInt(b[0]);
         if (!isNaN(na) && !isNaN(nb)) return na - nb;
@@ -304,18 +292,17 @@ function renderChartAno(vehicles) {
     }, {
         plugins: { legend: { display: false } },
         scales: {
-            y: { beginAtZero: true, ticks: { font: { size: 9 }, stepSize: 50 } },
-            x: { ticks: { font: { size: 9 } } }
+            y: { beginAtZero: true, ticks: { font: { size: 8 } } },
+            x: { ticks: { font: { size: 8 } } }
         }
     });
 }
 
-// 🏢 8. Unidad Administrativa - Bar Horizontal (Top 8)
+// 🏢 8. Unidad Administrativa - Bar Horizontal
 function renderChartUnidad(vehicles) {
     const counts = {};
     vehicles.forEach(v => {
         let key = v.unidad_administrativa || 'SIN_UNIDAD';
-        // Agrupar nombres similares
         if (key.toUpperCase().includes('BRIGADA MOTORIZADA')) key = 'BRIM';
         else if (key.toUpperCase().includes('ESTACION PARROQUIAL')) key = 'Est. Parroquial';
         else if (key.toUpperCase().includes('ESTACION MUNICIPAL')) key = 'Est. Municipal';
@@ -337,20 +324,44 @@ function renderChartUnidad(vehicles) {
         indexAxis: 'y',
         plugins: { legend: { display: false } },
         scales: {
-            x: { beginAtZero: true, ticks: { font: { size: 9 } } },
-            y: { ticks: { font: { size: 8 } } }
+            x: { beginAtZero: true, ticks: { font: { size: 8 } } },
+            y: { ticks: { font: { size: 7 } } }
+        }
+    });
+}
+
+// 🎨 9. Color de Vehículos - Pie (NUEVO)
+function renderChartColor(vehicles) {
+    const counts = {};
+    vehicles.forEach(v => {
+        const key = v.color?.toUpperCase().trim() || 'SIN_COLOR';
+        counts[key] = (counts[key] || 0) + 1;
+    });
+    
+    const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 8);
+    
+    createChart('chartColor', 'pie', {
+        labels: sorted.map(([k]) => k),
+        datasets: [{
+            data: sorted.map(([,v]) => v),
+            backgroundColor: ['#ffffff', '#000000', '#c0c0c0', '#e76f51', '#2a9d8f', '#005b96', '#e9c46a', '#6c757d'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    }, {
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 8 } } }
         }
     });
 }
 
 /**
- * Función genérica para crear gráficos Chart.js
+ * Función genérica para crear gráficos
  */
 function createChart(canvasId, type, dataConfig, optionsConfig) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
     
-    // Destruir instancia previa si existe
     if (charts[canvasId]) {
         charts[canvasId].destroy();
     }
@@ -361,14 +372,14 @@ function createChart(canvasId, type, dataConfig, optionsConfig) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 800, easing: 'easeOutQuart' },
+            animation: { duration: 600, easing: 'easeOutQuart' },
             ...optionsConfig
         }
     });
 }
 
 /**
- * 🔁 Función para recargar datos manualmente
+ * 🔁 Recargar datos manualmente
  */
 window.refreshPartesData = async function() {
     console.log('🔄 Recargando datos...');
