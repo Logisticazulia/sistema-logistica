@@ -198,86 +198,187 @@
             }
         }
         
-        /* === ESTILOS DE IMPRESIÓN === */
-        @media print {
-            /* Ocultar elementos no necesarios */
-            .navbar,
-            .btn-volver,
-            .btn-print,
-            .btn-logout,
-            .breadcrumb,
-            .module-subtitle {
-                display: none !important;
-            }
-            
-            /* Ajustar contenedor principal */
-            .dashboard-main {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            
-            /* Mostrar título en impresión */
-            .module-title-section {
-                margin-bottom: 20px !important;
-                page-break-after: avoid;
-            }
-            .module-title {
-                font-size: 1.5rem !important;
-                color: #003366 !important;
-                margin-bottom: 5px !important;
-            }
-            
-            /* Ajustar estadísticas */
-            .stats-inline {
-                background: #f8f9fa !important;
-                box-shadow: none !important;
-                margin: 10px 0 !important;
-                padding: 15px !important;
-                page-break-after: avoid;
-            }
-            .stat-value {
-                color: #003366 !important;
-                font-size: 1.5rem !important;
-            }
-            .stat-label {
-                color: #666 !important;
-            }
-            .stat-separator {
-                color: #ccc !important;
-            }
-            
-            /* Ajustar gráficos para impresión */
-            .charts-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 15px !important;
-                margin-top: 15px !important;
-            }
-            .chart-card {
-                box-shadow: none !important;
-                border: 1px solid #ddd !important;
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-            .chart-card h4 {
-                font-size: 0.9rem !important;
-                margin-bottom: 8px !important;
-            }
-            .chart-container {
-                height: 200px !important;
-            }
-            
-            /* Forzar colores de fondo en impresión */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            
-            /* Configurar márgenes de página */
-            @page {
-                margin: 1.5cm;
-                size: A4 landscape;
-            }
-        }
+     /* === ESTILOS DE IMPRESIÓN - TAMAÑO CARTA === */
+@media print {
+    /* Configuración de página - TAMAÑO CARTA */
+    @page {
+        size: letter portrait; /* 8.5" x 11" */
+        margin: 1.2cm;
+    }
+    
+    /* Forzar colores de fondo en impresión */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* Ocultar elementos no necesarios */
+    .navbar,
+    .btn-volver,
+    .btn-print,
+    .btn-logout,
+    .breadcrumb,
+    .module-subtitle {
+        display: none !important;
+    }
+    
+    /* Ajustar contenedor principal */
+    body, html {
+        width: 21.59cm !important; /* Ancho carta */
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 11pt !important;
+    }
+    
+    .dashboard-main {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Título del módulo */
+    .module-title-section {
+        margin: 0 0 15px 0 !important;
+        padding: 0 !important;
+        page-break-after: avoid;
+    }
+    .module-title {
+        font-size: 14pt !important;
+        font-weight: 700 !important;
+        color: #003366 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* ✅ BARRA DE ESTADÍSTICAS - AJUSTADA PARA IMPRESIÓN */
+    .stats-inline {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px 5px !important;
+        margin: 10px 0 15px 0 !important;
+        background: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        page-break-after: avoid;
+        width: 100% !important;
+    }
+    
+    .stat-item {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: baseline !important;
+        gap: 4px !important;
+        min-width: auto !important;
+        padding: 3px 8px !important;
+        border: none !important;
+        border-right: 1px solid #ccc !important;
+    }
+    
+    .stat-item:last-child {
+        border-right: none !important;
+    }
+    
+    .stat-value {
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        color: #003366 !important;
+        line-height: 1 !important;
+    }
+    
+    .stat-label {
+        font-size: 9pt !important;
+        color: #444 !important;
+        font-weight: 400 !important;
+    }
+    
+    .stat-separator {
+        display: none !important; /* Usamos border-right en su lugar */
+    }
+    
+    /* Tarjetas resumen */
+    .summary-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important; /* 3 columnas para carta */
+        gap: 8px !important;
+        margin: 10px 0 15px 0 !important;
+        page-break-after: avoid;
+    }
+    .summary-card {
+        padding: 10px 8px !important;
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+    }
+    .summary-value {
+        font-size: 12pt !important;
+        color: #003366 !important;
+    }
+    .summary-label {
+        font-size: 8pt !important;
+        color: #555 !important;
+    }
+    
+    /* ✅ GRÁFICOS - AJUSTADOS PARA CARTA */
+    .charts-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* 2 gráficos por fila en carta */
+        gap: 12px !important;
+        margin: 15px 0 !important;
+    }
+    
+    .chart-card {
+        padding: 12px 10px !important;
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    .chart-card h4 {
+        font-size: 9pt !important;
+        margin: 0 0 8px 0 !important;
+        text-align: center !important;
+    }
+    
+    .chart-container {
+        height: 180px !important; /* Altura reducida para carta */
+        width: 100% !important;
+    }
+    
+    /* Ajustar canvas para impresión */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Leyendas de gráficos más pequeñas */
+    .chartjs-legend {
+        font-size: 7pt !important;
+    }
+    
+    /* Evitar cortes en medio de elementos */
+    .chart-card,
+    .summary-card,
+    .stats-inline {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    /* Control de saltos de página */
+    .charts-grid {
+        page-break-before: auto;
+    }
+    
+    /* Forzar nueva página después de cada 6 gráficos si es necesario */
+    .chart-card:nth-child(6) {
+        page-break-after: auto;
+    }
+}
     </style>
 </head>
 <body class="dashboard-page">
