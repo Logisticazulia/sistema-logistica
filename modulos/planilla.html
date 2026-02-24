@@ -20,7 +20,6 @@
   margin-top: 30px;
 }
 
-/* ✅ TODOS LOS BOTONES AHORA USAN LA MISMA CLASE */
 .module-card {
   background: white;
   border-radius: 12px;
@@ -73,17 +72,33 @@
 }
 
 /* Colores específicos para cada botón */
-.module-card.consultar { border-left-color: #003366; }
-.module-card.consultar .module-icon { color: #003366; }
+.module-card.consultar { 
+  border-left-color: #003366; 
+}
+.module-card.consultar .module-icon { 
+  color: #003366; 
+}
 
-.module-card.registrar { border-left-color: #2a9d8f; }
-.module-card.registrar .module-icon { color: #2a9d8f; }
+.module-card.registrar { 
+  border-left-color: #2a9d8f; 
+}
+.module-card.registrar .module-icon { 
+  color: #2a9d8f; 
+}
 
-.module-card.modificar { border-left-color: #e9c46a; }
-.module-card.modificar .module-icon { color: #e9c46a; }
+.module-card.modificar { 
+  border-left-color: #e9c46a; 
+}
+.module-card.modificar .module-icon { 
+  color: #e9c46a; 
+}
 
-.module-card.partes { border-left-color: #e76f51; }
-.module-card.partes .module-icon { color: #e76f51; }
+.module-card.partes { 
+  border-left-color: #e76f51; 
+}
+.module-card.partes .module-icon { 
+  color: #e76f51; 
+}
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
@@ -97,6 +112,14 @@
   
   .module-arrow {
     display: none;
+  }
+  
+  .module-title {
+    font-size: 1.2rem;
+  }
+  
+  .module-icon {
+    font-size: 2rem;
   }
 }
 </style>
