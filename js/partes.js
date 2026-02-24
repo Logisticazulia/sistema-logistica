@@ -1,37 +1,80 @@
 /**
  * Módulo: Partes Generales
- * Carga datos CSV, calcula estadísticas, renderiza tabla y gráficos
+ * Carga datos CSV con rutas flexibles y manejo de errores robusto
  */
 
 let globalVehicles = [];
 let chartClaseInstance = null;
 let chartTipoInstance = null;
 
+// 🔧 Rutas posibles para el CSV (se probarán en orden)
+const CSV_PATHS = [
+    '../data/vehiculos_rows.csv',      // Desde modules/
+    'data/vehiculos_rows.csv',         // Desde root
+    './vehiculos_rows.csv',            // Misma carpeta
+    '/sistema-logistica/data/vehiculos_rows.csv' // Ruta absoluta GitHub Pages
+];
+
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        const response = await fetch('../data/vehiculos_rows.csv');
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+        const vehicles = await loadCSVWithFallback();
         
-        const csvText = await response.text();
-        globalVehicles = parseCSV(csvText);
+        if (!vehicles || vehicles.length === 0) {
+            throw new Error('No se pudieron cargar datos del CSV');
+        }
         
-        calculateStats(globalVehicles);
-        renderCharts(globalVehicles);
-        renderTable(globalVehicles);
-        setupFilters(globalVehicles);
+        globalVehicles = vehicles;
+        calculateStats(vehicles);
+        renderCharts(vehicles);
+        renderTable(vehicles);
+        setupFilters(vehicles);
         
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('partesTableBody').innerHTML = `
-            <tr><td colspan="10" style="text-align:center;padding:30px;color:#dc3545;">
-                ❌ Error cargando datos: ${error.message}
-            </td></tr>`;
+        console.error('❌ Error crítico:', error);
+        showErrorMessage(error.message);
     }
 });
 
+/**
+ * Intenta cargar el CSV probando múltiples rutas
+ */
+async function loadCSVWithFallback() {
+    let lastError = null;
+    
+    for (const path of CSV_PATHS) {
+        try {
+            console.log(`🔄 Intentando: ${path}`);
+            const response = await fetch(path);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const csvText = await response.text();
+            if (csvText.trim().length < 50) {
+                throw new Error('Archivo vacío o inválido');
+            }
+            
+            console.log(`✅ Cargado desde: ${path}`);
+            return parseCSV(csvText);
+            
+        } catch (err) {
+            lastError = err;
+            console.warn(`⚠️ Falló ${path}:`, err.message);
+            continue;
+        }
+    }
+    
+    throw new Error(`No se pudo cargar el CSV. Rutas intentadas: ${CSV_PATHS.join(', ')}`);
+}
+
+/**
+ * Parsea texto CSV a array de objetos
+ */
 function parseCSV(csvText) {
     const lines = csvText.trim().split('\n');
     if (lines.length < 2) return [];
+    
     const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
     const data = [];
     
@@ -49,15 +92,54 @@ function parseCSV(csvText) {
     return data;
 }
 
+/**
+ * Muestra mensaje de error amigable en la tabla
+ */
+function showErrorMessage(message) {
+    const tbody = document.getElementById('partesTableBody');
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" style="text-align:center;padding:30px;">
+                    <div style="color:#dc3545;margin-bottom:15px;">
+                        <strong>❌ Error cargando datos</strong>
+                    </div>
+                    <div style="color:#666;font-size:0.9rem;margin-bottom:15px;">
+                        ${message}
+                    </div>
+                    <details style="font-size:0.8rem;color:#888;">
+                        <summary>Verificar:</summary>
+                        <ul style="text-align:left;margin-top:10px;">
+                            <li>✓ El archivo <code>vehiculos_rows.csv</code> existe en <code>/data/</code></li>
+                            <li>✓ El archivo fue subido a GitHub</li>
+                            <li>✓ GitHub Pages completó el despliegue</li>
+                            <li>✓ No hay errores de mayúsculas en el nombre</li>
+                        </ul>
+                    </details>
+                    <button onclick="location.reload()" 
+                            style="margin-top:15px;padding:8px 16px;background:#003366;color:white;border:none;border-radius:4px;cursor:pointer;">
+                        🔄 Reintentar
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+    
+    // Limpiar estadísticas
+    document.querySelectorAll('.stat-value, .partes-stat-value').forEach(el => {
+        if (!el.querySelector('.loading')) el.textContent = '-';
+    });
+}
+
+/**
+ * Calcula estadísticas y actualiza el DOM
+ */
 function calculateStats(vehicles) {
-    // Totales principales
     safeUpdate('totalVehiculos', vehicles.length);
     
-    // Por tipo/clave
     const motos = vehicles.filter(v => v.tipo === 'MOTO' || v.clase === 'MOTO').length;
     safeUpdate('totalMotos', motos);
     
-    // Por estatus
     const operativos = vehicles.filter(v => v.estatus === 'OPERATIVA').length;
     const inoperativos = vehicles.filter(v => v.estatus === 'INOPERATIVA').length;
     const desincorporados = vehicles.filter(v => v.estatus === 'DESINCORPORADA').length;
@@ -89,11 +171,12 @@ function calculateStats(vehicles) {
     const d71 = vehicles.filter(v => v.ubicacion_fisica?.includes('DESTACAMENTO 71')).length;
     const brim = vehicles.filter(v => v.unidad_administrativa?.includes('BRIM')).length;
     const resg = vehicles.filter(v => v.ubicacion_fisica?.includes('RESGUARDO')).length;
+    
     safeUpdate('countCCPEM', cc);
     safeUpdate('countDest71', d71);
     safeUpdate('countBRIM', brim);
     safeUpdate('countResguardo', resg);
-    safeUpdate('countOtros', vehicles.length - (cc + d71 + brim + resg));
+    safeUpdate('countOtros', Math.max(0, vehicles.length - (cc + d71 + brim + resg)));
     
     // Novedades
     safeUpdate('countConObs', vehicles.filter(v => v.observacion?.length > 15).length);
@@ -111,6 +194,9 @@ function safeUpdate(id, val) {
     if (el) el.textContent = val;
 }
 
+/**
+ * Renderiza gráficos con Chart.js
+ */
 function renderCharts(vehicles) {
     // Datos por CLASE
     const claseCounts = {};
@@ -126,12 +212,11 @@ function renderCharts(vehicles) {
         tipoCounts[t] = (tipoCounts[t] || 0) + 1;
     });
     
-    // Configurar colores
     const colors = ['#003366', '#005b96', '#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef', '#ade8f4', '#caf0f8'];
     
     // Gráfico Clase (Doughnut)
     const ctxClase = document.getElementById('chartClase');
-    if (ctxClase) {
+    if (ctxClase && window.Chart) {
         if (chartClaseInstance) chartClaseInstance.destroy();
         chartClaseInstance = new Chart(ctxClase, {
             type: 'doughnut',
@@ -157,7 +242,7 @@ function renderCharts(vehicles) {
     
     // Gráfico Tipo (Bar)
     const ctxTipo = document.getElementById('chartTipo');
-    if (ctxTipo) {
+    if (ctxTipo && window.Chart) {
         if (chartTipoInstance) chartTipoInstance.destroy();
         chartTipoInstance = new Chart(ctxTipo, {
             type: 'bar',
@@ -183,6 +268,9 @@ function renderCharts(vehicles) {
     }
 }
 
+/**
+ * Renderiza tabla de vehículos
+ */
 function renderTable(vehicles, filtered = null) {
     const data = filtered || vehicles.slice(0, 100);
     const tbody = document.getElementById('partesTableBody');
@@ -225,6 +313,9 @@ function getStatusClass(estatus) {
     }
 }
 
+/**
+ * Configura filtros de la tabla
+ */
 function setupFilters(vehicles) {
     const fEstado = document.getElementById('filterEstado');
     const fTipo = document.getElementById('filterTipo');
