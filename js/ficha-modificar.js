@@ -1,7 +1,6 @@
 // ============================================
 // MODIFICAR FICHA TÉCNICA - LÓGICA COMPLETA
 // ============================================
-
 // Configuración de Supabase
 const supabaseClient = window.supabase.createClient(
     window.SUPABASE_URL,
@@ -36,19 +35,9 @@ const fotosModificadas = {
 let fichaSeleccionada = null;
 let isEditing = false;
 
-// ✅ CAMPOS QUE NO SE PUEDEN MODIFICAR (siempre disabled)
-const camposNoEditables = [
-    'placa', 
-    'facsimilar', 
-    'serialCarroceria', 
-    'serialMotor', 
-    'marca', 
-    'modelo',
-    'tipo',
-    'clase',
-    'estatus',
-    'color'  // ✅ AGREGADO
-];
+// ✅ TODOS LOS CAMPOS SON EDITABLES (array vacío)
+const camposNoEditables = [];
+
 // ============================================
 // FUNCIONES DE BÚSQUEDA
 // ============================================
@@ -69,10 +58,11 @@ async function buscarFicha() {
     btnSearch.disabled = true;
     
     try {
+        // ✅ BÚSQUEDA EXACTA POR 5 CAMPOS: placa, facsimil, s_carroceria, s_motor, n_identificacion
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
-            .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm}`)
+            .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm},n_identificacion.eq.${searchTerm}`)
             .limit(1);
         
         if (error) {
@@ -93,6 +83,10 @@ async function buscarFicha() {
         llenarFormulario(fichaSeleccionada);
         mostrarAlerta('✅ Ficha técnica encontrada: ' + fichaSeleccionada.marca + ' ' + fichaSeleccionada.modelo + ' - Placa: ' + fichaSeleccionada.placa, 'success');
         actualizarVistaPrevia();
+        
+        // Mostrar botones de editar/cancelar después de buscar
+        document.getElementById('btnEditar').style.display = 'inline-flex';
+        document.getElementById('btnCancelar').style.display = 'inline-flex';
         
     } catch (error) {
         console.error('❌ Error en buscarFicha:', error);
@@ -118,6 +112,7 @@ function llenarFormulario(ficha) {
         's_motor': 'serialMotor',
         'placa': 'placa',
         'facsimil': 'facsimilar',
+        'n_identificacion': 'nIdentificacion',
         'estatus_ficha': 'estatus',
         'dependencia': 'dependencia',
         'causa': 'causa',
@@ -216,7 +211,6 @@ function resetearFormulario() {
         placeholder.style.display = 'flex';
         if (btnRemove) btnRemove.style.display = 'none';
         input.value = '';
-        
         fotosData['foto' + i] = null;
         fotosUrlsExistentes['foto' + i] = null;
         fotosModificadas['foto' + i] = false;
@@ -224,7 +218,6 @@ function resetearFormulario() {
     
     actualizarVistaPrevia();
     actualizarFotosPreview();
-    toggleFormFields(false);
 }
 
 function limpiarBusqueda() {
@@ -232,30 +225,19 @@ function limpiarBusqueda() {
     document.getElementById('searchAlert').style.display = 'none';
     resetearFormulario();
     fichaSeleccionada = null;
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnCancelar').style.display = 'none';
 }
 
 // ============================================
 // FUNCIONES DE EDICIÓN
 // ============================================
-
-// ✅ TOGGLE FORM FIELDS EXCLUYE CAMPOS NO EDITABLES
+// ✅ TODOS LOS CAMPOS SON EDITABLES
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
     fields.forEach(function(field) {
-        // ✅ NUNCA HABILITAR CAMPOS DE IDENTIFICACIÓN ÚNICA
-        if (camposNoEditables.includes(field.id)) {
-            field.disabled = true;
-            // Agregar clase visual para campos bloqueados
-            const formGroup = field.closest('.form-group');
-            if (formGroup) {
-                formGroup.classList.add('locked');
-            }
-        } else if (field.id !== 'fichaId') {
+        if (field.id !== 'fichaId') {
             field.disabled = !enable;
-            const formGroup = field.closest('.form-group');
-            if (formGroup) {
-                formGroup.classList.toggle('locked', !enable);
-            }
         }
     });
     
@@ -269,13 +251,11 @@ function editarFicha() {
         mostrarAlerta('⚠️ Primero debe buscar una ficha técnica', 'error');
         return;
     }
-    
     toggleFormFields(true);
     document.getElementById('btnEditar').style.display = 'none';
     document.getElementById('btnGuardar').style.display = 'inline-flex';
-    document.getElementById('btnCancelar').disabled = false;
-    
-    mostrarAlerta('ℹ️ Editando ficha. Los campos marcados con 🔒 NO se pueden modificar.', 'info');
+    document.getElementById('btnCancelar').style.display = 'inline-flex';
+    mostrarAlerta('ℹ️ Editando ficha. TODOS los campos son modificables.', 'info');
 }
 
 function cancelarEdicion() {
@@ -285,7 +265,7 @@ function cancelarEdicion() {
     toggleFormFields(false);
     document.getElementById('btnEditar').style.display = 'inline-flex';
     document.getElementById('btnGuardar').style.display = 'none';
-    document.getElementById('btnCancelar').disabled = true;
+    document.getElementById('btnCancelar').style.display = 'inline-flex';
     mostrarAlerta('ℹ️ Edición cancelada. Los cambios no fueron guardados.', 'info');
 }
 
@@ -302,6 +282,7 @@ function actualizarVistaPrevia() {
         'color': 'previewColor',
         'placa': 'previewPlaca',
         'facsimilar': 'previewFacsimilar',
+        'nIdentificacion': 'previewNIdentificacion',
         'serialMotor': 'previewSerialMotor',
         'dependencia': 'previewDependencia',
         'estatus': 'previewEstatus',
@@ -376,7 +357,6 @@ function removeFoto(numero) {
     placeholder.style.display = 'flex';
     if (btnRemove) btnRemove.style.display = 'none';
     input.value = '';
-    
     fotosData['foto' + numero] = null;
     fotosUrlsExistentes['foto' + numero] = null;
     fotosModificadas['foto' + numero] = true;
@@ -447,7 +427,7 @@ async function guardarFicha(event) {
                 
                 const fileName = 'ficha_' + Date.now() + '_foto' + i + '_' + fichaSeleccionada.placa + '.jpg';
                 
-                const { data: uploadData, error: uploadError } = await supabaseClient
+                const {  uploadData, error: uploadError } = await supabaseClient
                     .storage
                     .from(bucketName)
                     .upload(fileName, blob, {
@@ -460,7 +440,7 @@ async function guardarFicha(event) {
                     throw uploadError;
                 }
                 
-                const { data: urlData } = supabaseClient
+                const {  urlData } = supabaseClient
                     .storage
                     .from(bucketName)
                     .getPublicUrl(fileName);
@@ -470,8 +450,19 @@ async function guardarFicha(event) {
             }
         }
         
+        // ✅ ACTUALIZAR TODOS LOS CAMPOS EDITABLES
         const fichaActualizada = {
+            marca: document.getElementById('marca').value.trim().toUpperCase(),
+            modelo: document.getElementById('modelo').value.trim().toUpperCase(),
+            tipo: document.getElementById('tipo').value.trim().toUpperCase(),
+            clase: document.getElementById('clase').value.trim().toUpperCase(),
             color: document.getElementById('color').value.trim().toUpperCase(),
+            s_carroceria: document.getElementById('serialCarroceria').value.trim(),
+            s_motor: document.getElementById('serialMotor').value.trim(),
+            placa: document.getElementById('placa').value.trim().toUpperCase(),
+            facsimil: document.getElementById('facsimilar').value.trim(),
+            n_identificacion: document.getElementById('nIdentificacion').value.trim(),
+            estatus_ficha: document.getElementById('estatus').value.trim().toUpperCase(),
             dependencia: document.getElementById('dependencia').value.trim(),
             causa: document.getElementById('causa').value.trim() || null,
             mecanica: document.getElementById('mecanica').value.trim() || null,
@@ -526,12 +517,12 @@ function limpiarTodoParaNuevaBusqueda() {
     document.getElementById('fichaForm').reset();
     document.getElementById('fichaId').value = '';
     toggleFormFields(false);
-    document.getElementById('btnEditar').style.display = 'inline-flex';
-    document.getElementById('btnGuardar').style.display = 'none';
-    document.getElementById('btnCancelar').disabled = true;
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnGuardar').style.display = 'inline-flex';
+    document.getElementById('btnCancelar').style.display = 'none';
     fichaSeleccionada = null;
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    mostrarAlerta('ℹ️ Ingrese placa, facsímil o serial para buscar una ficha', 'info');
+    mostrarAlerta('ℹ️ Ingrese placa, facsímil, serial o N° identificación para buscar una ficha', 'info');
     console.log('✅ Formulario limpiado, listo para nueva búsqueda');
 }
 
@@ -557,7 +548,6 @@ function mostrarAlerta(mensaje, tipo) {
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando modificación de fichas técnicas...');
-    
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
