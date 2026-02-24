@@ -140,6 +140,104 @@
             .chart-container { height: 200px; }
             .chart-card h4 { font-size: 0.85rem; }
         }
+        /* === HEADER CON BREADCRUMB === */
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e8eef5;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.breadcrumb-link {
+    color: #005b96;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.breadcrumb-link:hover {
+    color: #003366;
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    color: #999;
+    font-weight: 300;
+}
+
+.breadcrumb-current {
+    color: #666;
+    font-weight: 500;
+}
+
+/* === BOTÓN VOLVER === */
+.btn-volver {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+}
+
+.btn-volver:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* === SECCIÓN DE TÍTULO === */
+.module-title-section {
+    margin-bottom: 30px;
+}
+
+.module-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #003366;
+    margin: 0 0 8px 0;
+}
+
+.module-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .module-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    .breadcrumb {
+        font-size: 0.8rem;
+    }
+    .module-title {
+        font-size: 1.5rem;
+    }
+    .btn-volver {
+        width: 100%;
+        justify-content: center;
+    }
+}
     </style>
 </head>
 <body class="dashboard-page">
@@ -159,23 +257,27 @@
 
     <!-- Contenido Principal -->
     <main class="dashboard-main">
-        <header class="module-header">
-            <div class="breadcrumb">
-                <a href="../dashboard.html">🏠 Dashboard</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="transporte.html">Transporte</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="planilla.html">Planilla</a>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-current">Partes Generales</span>
-            </div>
-            <button class="btn-volver" onclick="window.location.href='planilla.html'">← Volver</button>
-        </header>
+   <!-- ================= HEADER CON BREADCRUMB ================= -->
+<header class="module-header">
+    <div class="breadcrumb">
+        <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="planilla.html" class="breadcrumb-link">Planilla</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">Partes Generales</span>
+    </div>
+    <button class="btn-volver" onclick="window.location.href='planilla.html'">
+        ← Volver a Planilla
+    </button>
+</header>
 
-        <section class="module-title-section">
-            <h1 class="module-title">📊 Partes Generales</h1>
-            <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
-        </section>
+<!-- ================= TÍTULO DEL MÓDULO ================= -->
+<section class="module-title-section">
+    <h1 class="module-title">📊 Partes Generales</h1>
+    <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
+</section>
 
         <!-- ESTADÍSTICAS PRINCIPALES -->
         <section class="stats-inline">
