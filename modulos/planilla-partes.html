@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Partes Generales - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Partes Generales | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* Estadísticas en línea con barras */
+.stats-inline {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 30px;
+padding: 25px 40px;
+background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+border-radius: 12px;
+margin: 30px 0 40px 0;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
+flex-wrap: wrap;
+}
+.stat-item {
+text-align: center;
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+.stat-value {
+font-size: 2.5rem;
+font-weight: 700;
+color: white;
+line-height: 1;
+}
+.stat-label {
+font-size: 0.9rem;
+color: rgba(255, 255, 255, 0.9);
+font-weight: 400;
+}
+.stat-separator {
+color: rgba(255, 255, 255, 0.4);
+font-size: 1.5rem;
+font-weight: 300;
+}
+/* Tarjetas de partes */
+.partes-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 25px;
+margin-top: 30px;
+}
+.partes-card {
+background: white;
+border-radius: 12px;
+padding: 25px;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
+border: 2px solid #e8eef5;
+transition: all 0.3s ease;
+}
+.partes-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 12px 30px rgba(0, 51, 102, 0.15);
+border-color: #005b96;
+}
+.partes-card-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+padding-bottom: 15px;
+border-bottom: 2px solid #e8eef5;
+}
+.partes-card-title {
+font-size: 1.1rem;
+font-weight: 700;
+color: #003366;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.partes-card-icon {
+font-size: 1.8rem;
+}
+.partes-card-body {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+.partes-stat-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 10px 0;
+border-bottom: 1px solid #f0f0f0;
+}
+.partes-stat-row:last-child {
+border-bottom: none;
+}
+.partes-stat-label {
+color: #666;
+font-size: 0.9rem;
+}
+.partes-stat-value {
+font-weight: 700;
+color: #003366;
+font-size: 1.1rem;
+}
+/* Badges de estado */
+.status-badge {
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 0.8rem;
+font-weight: 600;
+display: inline-block;
+}
+.status-operativa {
+background: #d4edda;
+color: #155724;
+}
+.status-inoperativa {
+background: #f8d7da;
+color: #721c24;
+}
+.status-reparacion {
+background: #fff3cd;
+color: #856404;
+}
+.status-taller {
+background: #e2e3e5;
+color: #383d41;
+}
+/* Tabla de partes */
+.partes-table-container {
+background: white;
+border-radius: 12px;
+padding: 25px;
+box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
+margin-top: 30px;
+overflow-x: auto;
+}
+.partes-table {
+width: 100%;
+border-collapse: collapse;
+}
+.partes-table th {
+background: #003366;
+color: white;
+padding: 15px 12px;
+text-align: left;
+font-weight: 600;
+font-size: 0.9rem;
+}
+.partes-table td {
+padding: 12px;
+border-bottom: 1px solid #e8eef5;
+font-size: 0.9rem;
+color: #333;
+}
+.partes-table tr:hover {
+background: #f8f9fa;
+}
+/* Filtros */
+.partes-filters {
+display: flex;
+gap: 15px;
+flex-wrap: wrap;
+margin-bottom: 25px;
+}
+.filter-group {
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+.filter-label {
+font-size: 0.85rem;
+font-weight: 600;
+color: #003366;
+}
+.filter-select {
+padding: 10px 15px;
+border: 2px solid #e8eef5;
+border-radius: 8px;
+font-size: 0.9rem;
+min-width: 200px;
+transition: all 0.3s;
+}
+.filter-select:focus {
+outline: none;
+border-color: #005b96;
+}
+/* Botón Volver */
+.btn-volver {
+background: #6c757d;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 0.85rem;
+font-weight: 500;
+display: flex;
+align-items: center;
+gap: 5px;
+transition: all 0.3s;
+}
+.btn-volver:hover {
+background: #5a6268;
+transform: translateY(-2px);
+}
+/* Loader */
+.loading {
+font-size: 1.5rem;
+animation: pulse 1s infinite;
+}
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.5; }
+}
+/* Responsive */
+@media (max-width: 768px) {
+.stats-inline {
+flex-direction: column;
+gap: 15px;
+padding: 20px;
+}
+.stat-separator {
+display: none;
+}
+.stat-item {
+width: 100%;
+flex-direction: row;
+justify-content: space-between;
+padding: 10px 0;
+border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.partes-filters {
+flex-direction: column;
+}
+.filter-select {
+min-width: 100%;
+}
+}
+</style>
+</head>
+<body class="dashboard-page">
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema de Logística</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">usuario@institucion.com</span>
+<button class="btn-logout" id="logoutBtn">
+<span class="logout-icon">🚪</span>
+<span class="logout-text">Cerrar Sesión</span>
+</button>
+</div>
+</div>
+</nav>
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+<!-- Header con Navegación de Migas -->
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<a href="planilla.html" class="breadcrumb-link">Planilla</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Partes Generales</span>
+</div>
+<button class="btn-volver" onclick="window.location.href='planilla.html'">
+← Volver a Planilla
+</button>
+</header>
+
+<!-- Título del Módulo -->
+<section class="module-title-section">
+<h1 class="module-title">📄 Partes Generales</h1>
+<p class="module-subtitle">Reportes de incidencias, novedades y estado del parque automotor</p>
+</section>
+
+<!-- ✅ ESTADÍSTICAS PRINCIPALES -->
+<section class="stats-inline">
+<div class="stat-item">
+<span class="stat-value" id="totalVehiculos"><span class="loading">⏳</span></span>
+<span class="stat-label">Total Vehículos</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="vehiculosOperativos"><span class="loading">⏳</span></span>
+<span class="stat-label">Operativos</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="vehiculosInoperativos"><span class="loading">⏳</span></span>
+<span class="stat-label">Inoperativos</span>
+</div>
+<span class="stat-separator">|</span>
+<div class="stat-item">
+<span class="stat-value" id="vehiculosReparacion"><span class="loading">⏳</span></span>
+<span class="stat-label">En Reparación</span>
+</div>
+</section>
+
+<!-- ✅ TARJETAS DE ESTADÍSTICAS DETALLADAS -->
+<section class="partes-grid">
+<!-- Tarjeta 1: Estado del Parque -->
+<div class="partes-card">
+<div class="partes-card-header">
+<h3 class="partes-card-title">
+<span class="partes-card-icon">📊</span>
+Estado del Parque
+</h3>
+</div>
+<div class="partes-card-body">
+<div class="partes-stat-row">
+<span class="partes-stat-label">Operativos</span>
+<span class="partes-stat-value status-badge status-operativa" id="countOperativa">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Inoperativos</span>
+<span class="partes-stat-value status-badge status-inoperativa" id="countInoperativa">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">En Reparación</span>
+<span class="partes-stat-value status-badge status-reparacion" id="countReparacion">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">En Taller</span>
+<span class="partes-stat-value status-badge status-taller" id="countTaller">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Desincorporados</span>
+<span class="partes-stat-value" id="countDesincorporada">-</span>
+</div>
+</div>
+</div>
+
+<!-- Tarjeta 2: Tipos de Vehículos -->
+<div class="partes-card">
+<div class="partes-card-header">
+<h3 class="partes-card-title">
+<span class="partes-card-icon">🚗</span>
+Por Tipo de Vehículo
+</h3>
+</div>
+<div class="partes-card-body">
+<div class="partes-stat-row">
+<span class="partes-stat-label">Motos</span>
+<span class="partes-stat-value" id="countMoto">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Camionetas</span>
+<span class="partes-stat-value" id="countCamioneta">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Automóviles</span>
+<span class="partes-stat-value" id="countAutomovil">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Camiones</span>
+<span class="partes-stat-value" id="countCamion">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Autobuses</span>
+<span class="partes-stat-value" id="countAutobus">-</span>
+</div>
+</div>
+</div>
+
+<!-- Tarjeta 3: Ubicaciones Principales -->
+<div class="partes-card">
+<div class="partes-card-header">
+<h3 class="partes-card-title">
+<span class="partes-card-icon">📍</span>
+Ubicaciones
+</h3>
+</div>
+<div class="partes-card-body">
+<div class="partes-stat-row">
+<span class="partes-stat-label">CCPEM</span>
+<span class="partes-stat-value" id="countCCPEM">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Destacamento 71</span>
+<span class="partes-stat-value" id="countDest71">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">BRIM</span>
+<span class="partes-stat-value" id="countBRIM">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Resguardo Galpón</span>
+<span class="partes-stat-value" id="countResguardo">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Otros</span>
+<span class="partes-stat-value" id="countOtros">-</span>
+</div>
+</div>
+</div>
+
+<!-- Tarjeta 4: Novedades Recientes -->
+<div class="partes-card">
+<div class="partes-card-header">
+<h3 class="partes-card-title">
+<span class="partes-card-icon">🔔</span>
+Novedades
+</h3>
+</div>
+<div class="partes-card-body">
+<div class="partes-stat-row">
+<span class="partes-stat-label">Con Observaciones</span>
+<span class="partes-stat-value" id="countConObs">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Sin Observaciones</span>
+<span class="partes-stat-value" id="countSinObs">-</span>
+</div>
+<div class="partes-stat-row">
+<span class="partes-stat-label">Última Actualización</span>
+<span class="partes-stat-value" id="lastUpdate">-</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ✅ FILTROS DE BÚSQUEDA -->
+<section class="partes-table-container">
+<div class="partes-filters">
+<div class="filter-group">
+<label class="filter-label" for="filterEstado">Estado</label>
+<select id="filterEstado" class="filter-select">
+<option value="">Todos</option>
+<option value="OPERATIVA">Operativa</option>
+<option value="INOPERATIVA">Inoperativa</option>
+<option value="REPARACION">Reparación</option>
+<option value="TALLER">Taller</option>
+<option value="DESINCORPORADA">Desincorporada</option>
+</select>
+</div>
+<div class="filter-group">
+<label class="filter-label" for="filterTipo">Tipo</label>
+<select id="filterTipo" class="filter-select">
+<option value="">Todos</option>
+<option value="MOTO">Moto</option>
+<option value="CAMIONETA">Camioneta</option>
+<option value="AUTOMOVIL">Automóvil</option>
+<option value="CAMION">Camión</option>
+<option value="AUTOBUS">Autobús</option>
+</select>
+</div>
+<div class="filter-group">
+<label class="filter-label" for="filterUbicacion">Ubicación</label>
+<select id="filterUbicacion" class="filter-select">
+<option value="">Todas</option>
+<option value="CCPEM">CCPEM</option>
+<option value="DESTACAMENTO 71">Destacamento 71</option>
+<option value="BRIGADA MOTORIZADA">BRIM</option>
+<option value="RESGUARDO">Resguardo</option>
+</select>
+</div>
+<div class="filter-group">
+<label class="filter-label" for="searchPlaca">Buscar por Placa</label>
+<input type="text" id="searchPlaca" class="filter-select" placeholder="Ej: ZU-001">
+</div>
+</div>
+
+<!-- ✅ TABLA DE PARTES -->
+<div style="overflow-x: auto;">
+<table class="partes-table" id="partesTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>Placa</th>
+<th>Marca</th>
+<th>Modelo</th>
+<th>Tipo</th>
+<th>Año</th>
+<th>Estado</th>
+<th>Ubicación</th>
+<th>Observaciones</th>
+<th>Fecha</th>
+</tr>
+</thead>
+<tbody id="partesTableBody">
+<tr>
+<td colspan="10" style="text-align: center; padding: 40px;">
+<span class="loading">⏳ Cargando datos...</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/partes.js" defer></script>
+<script>
+// Script inline para cargar datos del CSV (puedes moverlo a partes.js)
+document.addEventListener('DOMContentLoaded', async function() {
+try {
+// Cargar datos del CSV
+const response = await fetch('../data/vehiculos_rows.csv');
+const csvText = await response.text();
+const vehicles = parseCSV(csvText);
+
+// Calcular estadísticas
+calculateStats(vehicles);
+
+// Renderizar tabla
+renderTable(vehicles);
+
+// Configurar filtros
+setupFilters(vehicles);
+
+} catch (error) {
+console.error('Error cargando datos:', error);
+document.getElementById('partesTableBody').innerHTML = `
+<tr>
+<td colspan="10" style="text-align: center; padding: 40px; color: #dc3545;">
+❌ Error cargando los datos. Verifique la conexión.
+</td>
+</tr>
+`;
+}
+});
+
+// Función para parsear CSV
+function parseCSV(csvText) {
+const lines = csvText.trim().split('\n');
+const headers = lines[0].split(',');
+const data = [];
+
+for (let i = 1; i < lines.length; i++) {
+const values = lines[i].split(',');
+if (values.length >= headers.length) {
+const obj = {};
+headers.forEach((header, index) => {
+obj[header.trim()] = values[index] ? values[index].trim() : '';
+});
+data.push(obj);
+}
+}
+return data;
+}
+
+// Función para calcular estadísticas
+function calculateStats(vehicles) {
+// Totales
+document.getElementById('totalVehiculos').textContent = vehicles.length;
+
+// Por estado
+const operativos = vehicles.filter(v => v.estatus === 'OPERATIVA').length;
+const inoperativos = vehicles.filter(v => v.estatus === 'INOPERATIVA').length;
+const reparacion = vehicles.filter(v => v.situacion === 'REPARACION' || v.situacion === 'TALLER').length;
+
+document.getElementById('vehiculosOperativos').textContent = operativos;
+document.getElementById('vehiculosInoperativos').textContent = inoperativos;
+document.getElementById('vehiculosReparacion').textContent = reparacion;
+
+// Tarjeta Estado del Parque
+document.getElementById('countOperativa').textContent = operativos;
+document.getElementById('countInoperativa').textContent = inoperativos;
+document.getElementById('countReparacion').textContent = vehicles.filter(v => v.situacion === 'REPARACION').length;
+document.getElementById('countTaller').textContent = vehicles.filter(v => v.situacion === 'TALLER').length;
+document.getElementById('countDesincorporada').textContent = vehicles.filter(v => v.situacion === 'DESINCORPORADA').length;
+
+// Por tipo
+document.getElementById('countMoto').textContent = vehicles.filter(v => v.tipo === 'MOTO').length;
+document.getElementById('countCamioneta').textContent = vehicles.filter(v => v.clase === 'CAMIONETA').length;
+document.getElementById('countAutomovil').textContent = vehicles.filter(v => v.clase === 'AUTOMOVIL').length;
+document.getElementById('countCamion').textContent = vehicles.filter(v => v.clase === 'CAMION').length;
+document.getElementById('countAutobus').textContent = vehicles.filter(v => v.clase === 'AUTOBUS').length;
+
+// Por ubicación
+document.getElementById('countCCPEM').textContent = vehicles.filter(v => v.ubicacion_fisica?.includes('CCPEM')).length;
+document.getElementById('countDest71').textContent = vehicles.filter(v => v.ubicacion_fisica?.includes('DESTACAMENTO 71')).length;
+document.getElementById('countBRIM').textContent = vehicles.filter(v => v.unidad_administrativa?.includes('BRIM')).length;
+document.getElementById('countResguardo').textContent = vehicles.filter(v => v.ubicacion_fisica?.includes('RESGUARDO')).length;
+document.getElementById('countOtros').textContent = vehicles.length - (
+parseInt(document.getElementById('countCCPEM').textContent) +
+parseInt(document.getElementById('countDest71').textContent) +
+parseInt(document.getElementById('countBRIM').textContent) +
+parseInt(document.getElementById('countResguardo').textContent)
+);
+
+// Novedades
+document.getElementById('countConObs').textContent = vehicles.filter(v => v.observacion && v.observacion.length > 10).length;
+document.getElementById('countSinObs').textContent = vehicles.filter(v => !v.observacion || v.observacion.length <= 10).length;
+
+// Última actualización
+const lastDate = vehicles[vehicles.length - 1]?.created_at;
+if (lastDate) {
+const date = new Date(lastDate);
+document.getElementById('lastUpdate').textContent = date.toLocaleDateString('es-VE');
+}
+}
+
+// Función para renderizar tabla
+function renderTable(vehicles, filteredVehicles = null) {
+const data = filteredVehicles || vehicles.slice(0, 50); // Mostrar primeros 50
+const tbody = document.getElementById('partesTableBody');
+tbody.innerHTML = '';
+
+data.forEach(vehicle => {
+const row = document.createElement('tr');
+const statusClass = getStatusClass(vehicle.estatus);
+
+row.innerHTML = `
+<td>${vehicle.id || '-'}</td>
+<td>${vehicle.placa || '-'}</td>
+<td>${vehicle.marca || '-'}</td>
+<td>${vehicle.modelo || '-'}</td>
+<td>${vehicle.tipo || vehicle.clase || '-'}</td>
+<td>${vehicle.ano || '-'}</td>
+<td><span class="status-badge ${statusClass}">${vehicle.estatus || '-'}</span></td>
+<td>${vehicle.ubicacion_fisica || '-'}</td>
+<td>${vehicle.observacion ? vehicle.observacion.substring(0, 50) + '...' : '-'}</td>
+<td>${vehicle.created_at ? new Date(vehicle.created_at).toLocaleDateString('es-VE') : '-'}</td>
+`;
+tbody.appendChild(row);
+});
+}
+
+// Función para obtener clase de estado
+function getStatusClass(estatus) {
+switch(estatus) {
+case 'OPERATIVA': return 'status-operativa';
+case 'INOPERATIVA': return 'status-inoperativa';
+default: return 'status-reparacion';
+}
+}
+
+// Función para configurar filtros
+function setupFilters(vehicles) {
+const filterEstado = document.getElementById('filterEstado');
+const filterTipo = document.getElementById('filterTipo');
+const filterUbicacion = document.getElementById('filterUbicacion');
+const searchPlaca = document.getElementById('searchPlaca');
+
+function applyFilters() {
+const estado = filterEstado.value;
+const tipo = filterTipo.value;
+const ubicacion = filterUbicacion.value;
+const placa = searchPlaca.value.toUpperCase();
+
+const filtered = vehicles.filter(v => {
+const matchEstado = !estado || v.estatus === estado;
+const matchTipo = !tipo || (v.tipo === tipo || v.clase === tipo);
+const matchUbicacion = !ubicacion || (v.ubicacion_fisica && v.ubicacion_fisica.includes(ubicacion));
+const matchPlaca = !placa || (v.placa && v.placa.toUpperCase().includes(placa));
+
+return matchEstado && matchTipo && matchUbicacion && matchPlaca;
+});
+
+renderTable(vehicles, filtered);
+}
+
+filterEstado.addEventListener('change', applyFilters);
+filterTipo.addEventListener('change', applyFilters);
+filterUbicacion.addEventListener('change', applyFilters);
+searchPlaca.addEventListener('input', applyFilters);
+}
+</script>
+</body>
+</html>
