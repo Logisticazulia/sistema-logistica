@@ -344,7 +344,7 @@ function llenarFormulario(vehiculo) {
         'color': 'color',
         's_carroceria': 'serialCarroceria',
         's_motor': 'serialMotor',
-        'placa': 'placa',
+        'placa': 'placa','tipo',
         'facsimil': 'facsimil',
         'unidad_administrativa': 'dependencia',
         'observacion': 'observaciones'
