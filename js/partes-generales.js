@@ -7,21 +7,21 @@
 let chartEstatus, chartTipos, chartUnidades, chartAnos;
 
 // ================= CLIENTE SUPABASE =================
-// ✅ USAR LA VARIABLE GLOBAL DE config.js (supabaseClient)
-const db = window.supabaseClient || window.supabase;
+// ✅ USAR window.supabaseClient (creado en config.js)
+const db = window.supabaseClient;
 
 // ================= ELEMENTOS DEL DOM =================
 const userEmail = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// ================= VERIFICAR SESIÓN =================
+// ================= VERIFICAR SESIÓN (OPCIONAL) =================
 async function verificarSesion() {
   try {
     // ✅ Verificar si el cliente está disponible
     if (!db) {
-      console.warn('⚠️ Cliente Supabase no disponible');
+      console.warn('⚠️ Cliente Supabase no disponible, continuando sin autenticación');
       if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-      return true; // Continuar sin autenticación
+      return true; // Continuar sin sesión
     }
     
     const { data: { session }, error } = await db.auth.getSession();
@@ -29,7 +29,7 @@ async function verificarSesion() {
     if (error) {
       console.warn('⚠️ Error en sesión:', error.message);
       if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-      return true;
+      return true; // Continuar sin sesión
     }
     
     if (session && session.user && session.user.email) {
@@ -42,7 +42,7 @@ async function verificarSesion() {
   } catch (err) {
     console.warn('⚠️ Error verificando sesión:', err.message);
     if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-    return true; // Continuar sin autenticación
+    return true; // ✅ NO REDIRIGIR, continuar sin sesión
   }
 }
 
@@ -67,7 +67,7 @@ async function cargarDatos() {
     // ✅ Verificar si el cliente está disponible
     if (!db) {
       console.error('❌ Cliente Supabase no disponible');
-      alert('Error: No se pudo conectar a la base de datos');
+      alert('Error: No se pudo conectar a la base de datos. Verifica config.js');
       return;
     }
     
@@ -513,11 +513,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Inicializando Partes Generales...');
   
   // ✅ Verificar que el cliente Supabase esté disponible
-  if (!window.supabaseClient && !window.supabase) {
+  if (!window.supabaseClient) {
     console.error('❌ Cliente Supabase no inicializado. Verifica config.js');
   }
   
-  // Verificar sesión
+  // Verificar sesión (sin redirección)
   await verificarSesion();
   
   // Establecer fecha del reporte
