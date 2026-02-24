@@ -11,178 +11,93 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
- -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1" defer></script>
     <style>
-        /* Estadísticas en línea con barras */
+        /* Estadísticas en línea */
         .stats-inline {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 25px;
-            padding: 20px 30px;
+            gap: 20px;
+            padding: 15px 25px;
             background: linear-gradient(135deg, #003366 0%, #005b96 100%);
             border-radius: 12px;
-            margin: 25px 0 35px 0;
+            margin: 20px 0 30px 0;
             box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
             flex-wrap: wrap;
         }
         .stat-item {
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 100px;
+            min-width: 90px;
         }
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: white;
             line-height: 1;
         }
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.9);
-            font-weight: 400;
         }
         .stat-separator {
             color: rgba(255, 255, 255, 0.4);
-            font-size: 1.3rem;
-            font-weight: 300;
+            font-size: 1.2rem;
         }
-        /* Grid de tarjetas */
-        .partes-grid {
+        /* Grid de tarjetas resumen */
+        .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
-        .partes-card {
+        .summary-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-            border: 2px solid #e8eef5;
-            transition: all 0.3s ease;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 51, 102, 0.08);
+            border-left: 4px solid #005b96;
         }
-        .partes-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 51, 102, 0.12);
-            border-color: #005b96;
-        }
-        .partes-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #e8eef5;
-        }
-        .partes-card-title {
-            font-size: 1rem;
+        .summary-card.motos { border-left-color: #2a9d8f; }
+        .summary-card.desinc { border-left-color: #e76f51; }
+        .summary-card.ubic { border-left-color: #e9c46a; }
+        .summary-value {
+            font-size: 1.5rem;
             font-weight: 700;
             color: #003366;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
-        .partes-card-icon { font-size: 1.5rem; }
-        .partes-card-body { display: flex; flex-direction: column; gap: 10px; }
-        .partes-stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+        .summary-label {
+            font-size: 0.8rem;
+            color: #666;
         }
-        .partes-stat-row:last-child { border-bottom: none; }
-        .partes-stat-label { color: #666; font-size: 0.85rem; }
-        .partes-stat-value { font-weight: 700; color: #003366; font-size: 1rem; }
-        /* Badges de estado */
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .status-operativa { background: #d4edda; color: #155724; }
-        .status-inoperativa { background: #f8d7da; color: #721c24; }
-        .status-reparacion { background: #fff3cd; color: #856404; }
-        .status-taller { background: #e2e3e5; color: #383d41; }
-        .status-desincorporada { background: #6c757d; color: white; }
-        /* Gráficos */
+        /* Grid de gráficos */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
         .chart-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
             border: 2px solid #e8eef5;
+        }
+        .chart-card h4 {
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: #003366;
+            font-weight: 600;
+            text-align: center;
         }
         .chart-container {
             position: relative;
-            height: 280px;
+            height: 260px;
             width: 100%;
         }
-        /* Tabla */
-        .partes-table-container {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-            margin-top: 25px;
-            overflow-x: auto;
-        }
-        .partes-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-        .partes-table th {
-            background: #003366;
-            color: white;
-            padding: 12px 10px;
-            text-align: left;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .partes-table td {
-            padding: 10px;
-            border-bottom: 1px solid #e8eef5;
-            color: #333;
-        }
-        .partes-table tr:hover { background: #f8f9fa; }
-        /* Filtros */
-        .partes-filters {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .filter-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #003366;
-        }
-        .filter-select {
-            padding: 8px 12px;
-            border: 2px solid #e8eef5;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            min-width: 150px;
-        }
-        .filter-select:focus { outline: none; border-color: #005b96; }
         /* Botón Volver */
         .btn-volver {
             background: #6c757d;
@@ -192,30 +107,27 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.8rem;
-            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 5px;
         }
         .btn-volver:hover { background: #5a6268; }
         /* Loader */
-        .loading { font-size: 1.3rem; animation: pulse 1s infinite; }
+        .loading { font-size: 1.2rem; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         /* Responsive */
         @media (max-width: 768px) {
-            .stats-inline { flex-direction: column; gap: 12px; padding: 15px 20px; }
+            .stats-inline { flex-direction: column; gap: 10px; padding: 12px 15px; }
             .stat-separator { display: none; }
-            .stat-item { width: 100%; flex-direction: row; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-            .partes-filters { flex-direction: column; }
-            .filter-select { min-width: 100%; }
+            .stat-item { width: 100%; display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
             .charts-grid { grid-template-columns: 1fr; }
-            .chart-container { height: 250px; }
+            .chart-container { height: 240px; }
         }
     </style>
 </head>
 <body class="dashboard-page">
     <!-- Navegación -->
-    <nav class="navbar" role="navigation">
+    <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
                 <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
@@ -223,23 +135,20 @@
             </div>
             <div class="nav-user">
                 <span class="user-email" id="userEmail">usuario@institucion.com</span>
-                <button class="btn-logout" id="logoutBtn">
-                    <span class="logout-icon">🚪</span>
-                    <span class="logout-text">Cerrar Sesión</span>
-                </button>
+                <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
             </div>
         </div>
     </nav>
 
     <!-- Contenido Principal -->
-    <main class="dashboard-main" role="main">
+    <main class="dashboard-main">
         <header class="module-header">
             <div class="breadcrumb">
-                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+                <a href="../dashboard.html">🏠 Dashboard</a>
                 <span class="breadcrumb-separator">/</span>
-                <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+                <a href="transporte.html">Transporte</a>
                 <span class="breadcrumb-separator">/</span>
-                <a href="planilla.html" class="breadcrumb-link">Planilla</a>
+                <a href="planilla.html">Planilla</a>
                 <span class="breadcrumb-separator">/</span>
                 <span class="breadcrumb-current">Partes Generales</span>
             </div>
@@ -247,175 +156,99 @@
         </header>
 
         <section class="module-title-section">
-            <h1 class="module-title">📄 Partes Generales</h1>
-            <p class="module-subtitle">Reportes de incidencias, novedades y estado del parque automotor</p>
+            <h1 class="module-title">📊 Partes Generales</h1>
+            <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
         </section>
 
-        <!-- ✅ ESTADÍSTICAS PRINCIPALES (6 indicadores) -->
+        <!-- ✅ ESTADÍSTICAS PRINCIPALES -->
         <section class="stats-inline">
-            <div class="stat-item">
-                <span class="stat-value" id="totalVehiculos">⏳</span>
-                <span class="stat-label">Total Vehículos</span>
-            </div>
+            <div class="stat-item"><span class="stat-value" id="totalVehiculos">⏳</span><span class="stat-label">Total</span></div>
             <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="totalMotos">⏳</span>
-                <span class="stat-label">Motos</span>
-            </div>
+            <div class="stat-item"><span class="stat-value" id="totalMotos">⏳</span><span class="stat-label">Motos</span></div>
             <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="vehiculosOperativos">⏳</span>
-                <span class="stat-label">Operativos</span>
-            </div>
+            <div class="stat-item"><span class="stat-value" id="operativos">⏳</span><span class="stat-label">Operativos</span></div>
             <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="vehiculosInoperativos">⏳</span>
-                <span class="stat-label">Inoperativos</span>
-            </div>
+            <div class="stat-item"><span class="stat-value" id="inoperativos">⏳</span><span class="stat-label">Inoperativos</span></div>
             <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="vehiculosDesincorporados">⏳</span>
-                <span class="stat-label">Desincorporados</span>
+            <div class="stat-item"><span class="stat-value" id="desincorporados">⏳</span><span class="stat-label">Desincorporados</span></div>
+        </section>
+
+        <!-- ✅ TARJETAS RESUMEN -->
+        <section class="summary-grid">
+            <div class="summary-card motos">
+                <div class="summary-value" id="countMoto">-</div>
+                <div class="summary-label">🏍️ Motos</div>
             </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="vehiculosReparacion">⏳</span>
-                <span class="stat-label">En Reparación</span>
+            <div class="summary-card">
+                <div class="summary-value" id="countCamioneta">-</div>
+                <div class="summary-label">🚙 Camionetas</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="countAutomovil">-</div>
+                <div class="summary-label">🚗 Automóviles</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="countCamion">-</div>
+                <div class="summary-label">🚚 Camiones</div>
+            </div>
+            <div class="summary-card ubic">
+                <div class="summary-value" id="countCCPEM">-</div>
+                <div class="summary-label">📍 CCPEM</div>
+            </div>
+            <div class="summary-card desinc">
+                <div class="summary-value" id="countDesincorporada">-</div>
+                <div class="summary-label">⚠️ Desincorporados</div>
             </div>
         </section>
 
-        <!-- ✅ TARJETAS DE ESTADÍSTICAS -->
-        <section class="partes-grid">
-            <!-- Estado del Parque -->
-            <div class="partes-card">
-                <div class="partes-card-header">
-                    <h3 class="partes-card-title"><span class="partes-card-icon">📊</span> Estado del Parque</h3>
-                </div>
-                <div class="partes-card-body">
-                    <div class="partes-stat-row"><span class="partes-stat-label">Operativos</span><span class="partes-stat-value status-badge status-operativa" id="countOperativa">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Inoperativos</span><span class="partes-stat-value status-badge status-inoperativa" id="countInoperativa">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">En Reparación</span><span class="partes-stat-value status-badge status-reparacion" id="countReparacion">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">En Taller</span><span class="partes-stat-value status-badge status-taller" id="countTaller">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Desincorporados</span><span class="partes-stat-value status-badge status-desincorporada" id="countDesincorporada">-</span></div>
-                </div>
-            </div>
-
-            <!-- Por Tipo de Vehículo -->
-            <div class="partes-card">
-                <div class="partes-card-header">
-                    <h3 class="partes-card-title"><span class="partes-card-icon">🚗</span> Por Tipo</h3>
-                </div>
-                <div class="partes-card-body">
-                    <div class="partes-stat-row"><span class="partes-stat-label">Motos</span><span class="partes-stat-value" id="countMoto">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Camionetas</span><span class="partes-stat-value" id="countCamioneta">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Automóviles</span><span class="partes-stat-value" id="countAutomovil">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Camiones</span><span class="partes-stat-value" id="countCamion">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Autobuses</span><span class="partes-stat-value" id="countAutobus">-</span></div>
-                </div>
-            </div>
-
-            <!-- Ubicaciones Principales -->
-            <div class="partes-card">
-                <div class="partes-card-header">
-                    <h3 class="partes-card-title"><span class="partes-card-icon">📍</span> Ubicaciones</h3>
-                </div>
-                <div class="partes-card-body">
-                    <div class="partes-stat-row"><span class="partes-stat-label">CCPEM</span><span class="partes-stat-value" id="countCCPEM">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Destacamento 71</span><span class="partes-stat-value" id="countDest71">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">BRIM</span><span class="partes-stat-value" id="countBRIM">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Resguardo</span><span class="partes-stat-value" id="countResguardo">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Otros</span><span class="partes-stat-value" id="countOtros">-</span></div>
-                </div>
-            </div>
-
-            <!-- Novedades -->
-            <div class="partes-card">
-                <div class="partes-card-header">
-                    <h3 class="partes-card-title"><span class="partes-card-icon">🔔</span> Novedades</h3>
-                </div>
-                <div class="partes-card-body">
-                    <div class="partes-stat-row"><span class="partes-stat-label">Con Observaciones</span><span class="partes-stat-value" id="countConObs">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Sin Observaciones</span><span class="partes-stat-value" id="countSinObs">-</span></div>
-                    <div class="partes-stat-row"><span class="partes-stat-label">Última Actualización</span><span class="partes-stat-value" id="lastUpdate">-</span></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ✅ GRÁFICOS -->
+        <!-- ✅ GRÁFICOS PRINCIPALES -->
         <section class="charts-grid">
+            <!-- 1. Estado del Vehículo -->
             <div class="chart-card">
-                <div class="partes-card-header">
-                    <h3 class="partes-card-title">📊 Distribución por Clase</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartClase"></canvas>
-                </div>
+                <h4>📊 Estado del Parque</h4>
+                <div class="chart-container"><canvas id="chartEstatus"></canvas></div>
             </div>
+            
+            <!-- 2. Situación Operativa -->
             <div class="chart-card">
-                <div class="partes-card-header">
-                    <h3 class="partes-card-title">📊 Distribución por Tipo</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartTipo"></canvas>
-                </div>
+                <h4>🔧 Situación Actual</h4>
+                <div class="chart-container"><canvas id="chartSituacion"></canvas></div>
             </div>
-        </section>
-
-        <!-- ✅ FILTROS Y TABLA -->
-        <section class="partes-table-container">
-            <div class="partes-filters">
-                <div class="filter-group">
-                    <label class="filter-label" for="filterEstado">Estado</label>
-                    <select id="filterEstado" class="filter-select">
-                        <option value="">Todos</option>
-                        <option value="OPERATIVA">Operativa</option>
-                        <option value="INOPERATIVA">Inoperativa</option>
-                        <option value="REPARACION">Reparación</option>
-                        <option value="TALLER">Taller</option>
-                        <option value="DESINCORPORADA">Desincorporada</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label" for="filterTipo">Tipo</label>
-                    <select id="filterTipo" class="filter-select">
-                        <option value="">Todos</option>
-                        <option value="MOTO">Moto</option>
-                        <option value="CAMIONETA">Camioneta</option>
-                        <option value="AUTOMOVIL">Automóvil</option>
-                        <option value="CAMION">Camión</option>
-                        <option value="AUTOBUS">Autobús</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label" for="filterClase">Clase</label>
-                    <select id="filterClase" class="filter-select">
-                        <option value="">Todas</option>
-                        <option value="MOTO">Moto</option>
-                        <option value="CAMIONETA">Camioneta</option>
-                        <option value="AUTOMOVIL">Automóvil</option>
-                        <option value="CAMION">Camión</option>
-                        <option value="AUTOBUS">Autobús</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label" for="searchPlaca">Buscar Placa</label>
-                    <input type="text" id="searchPlaca" class="filter-select" placeholder="Ej: ZU-001">
-                </div>
+            
+            <!-- 3. Por Clase -->
+            <div class="chart-card">
+                <h4>🚗 Distribución por Clase</h4>
+                <div class="chart-container"><canvas id="chartClase"></canvas></div>
             </div>
-
-            <div style="overflow-x: auto;">
-                <table class="partes-table" id="partesTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th><th>Placa</th><th>Marca</th><th>Modelo</th>
-                            <th>Tipo</th><th>Clase</th><th>Año</th><th>Estado</th>
-                            <th>Ubicación</th><th>Observaciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="partesTableBody">
-                        <tr><td colspan="10" style="text-align:center;padding:30px;"><span class="loading">⏳ Cargando...</span></td></tr>
-                    </tbody>
-                </table>
+            
+            <!-- 4. Por Tipo -->
+            <div class="chart-card">
+                <h4>🏁 Distribución por Tipo</h4>
+                <div class="chart-container"><canvas id="chartTipo"></canvas></div>
+            </div>
+            
+            <!-- 5. Marcas Principales -->
+            <div class="chart-card">
+                <h4>🏷️ Marcas Más Comunes</h4>
+                <div class="chart-container"><canvas id="chartMarcas"></canvas></div>
+            </div>
+            
+            <!-- 6. Ubicación Física -->
+            <div class="chart-card">
+                <h4>📍 Ubicación Física</h4>
+                <div class="chart-container"><canvas id="chartUbicacion"></canvas></div>
+            </div>
+            
+            <!-- 7. Vehículos por Año -->
+            <div class="chart-card">
+                <h4>📅 Vehículos por Año</h4>
+                <div class="chart-container"><canvas id="chartAno"></canvas></div>
+            </div>
+            
+            <!-- 8. Unidad Administrativa -->
+            <div class="chart-card">
+                <h4>🏢 Por Unidad Administrativa</h4>
+                <div class="chart-container"><canvas id="chartUnidad"></canvas></div>
             </div>
         </section>
     </main>
