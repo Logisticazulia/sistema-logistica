@@ -3,13 +3,6 @@
  * MÓDULO: Partes Generales (Solo Gráficos)
  * FUENTE: Supabase - Tabla: vehiculos
  * ========================================
- * Funcionalidades:
- * - Carga de datos desde Supabase
- * - Mostrar email de usuario autenticado
- * - Cerrar sesión
- * - 8 gráficos con Chart.js (3 por fila)
- * - Estadísticas principales
- * - Diseño responsive
  */
 
 // ========================================
@@ -58,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // 6️⃣ Calcular y mostrar estadísticas
         calculateStats(data);
 
-        // 7️⃣ Renderizar todos los gráficos
+        // 7️⃣ Renderizar TODOS los gráficos (9 en total)
         renderAllCharts(data);
 
     } catch (error) {
@@ -73,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 /**
  * Muestra el email del usuario autenticado en el navbar
- * @param {Object} supabaseClient - Cliente de Supabase
  */
 async function mostrarUsuarioAutenticado(supabaseClient) {
     try {
@@ -87,14 +79,13 @@ async function mostrarUsuarioAutenticado(supabaseClient) {
         const userEmail = document.getElementById('userEmail');
         
         if (session?.user?.email) {
-            // Mostrar email truncado si es muy largo + tooltip con completo
             const email = session.user.email;
             const nombreMostrar = email.length > 25 
                 ? email.split('@')[0].substring(0, 22) + '...' 
                 : email;
             
             userEmail.textContent = nombreMostrar;
-            userEmail.title = email; // Tooltip con email completo
+            userEmail.title = email;
             userEmail.style.cursor = 'help';
             console.log('✅ Usuario autenticado:', email);
         } else {
@@ -109,7 +100,6 @@ async function mostrarUsuarioAutenticado(supabaseClient) {
 
 /**
  * Configura el evento de cerrar sesión
- * @param {Object} supabaseClient - Cliente de Supabase
  */
 function configurarCerrarSesion(supabaseClient) {
     const logoutBtn = document.getElementById('logoutBtn');
@@ -129,18 +119,14 @@ function configurarCerrarSesion(supabaseClient) {
             
             if (error) throw error;
             
-            // Limpiar datos locales
             localStorage.clear();
             sessionStorage.clear();
             
             console.log('✅ Sesión cerrada');
-            
-            // 🔁 Redirigir al login (ajusta la ruta según tu estructura)
             window.location.href = '../index.html';
             
         } catch (error) {
             console.error('❌ Error cerrando sesión:', error);
-            // Forzar redirección incluso con error
             window.location.href = '../index.html';
         }
     });
@@ -150,22 +136,15 @@ function configurarCerrarSesion(supabaseClient) {
 // FUNCIONES DE ESTADÍSTICAS
 // ========================================
 
-/**
- * Calcula y actualiza todas las estadísticas en el DOM
- * @param {Array} vehicles - Array de vehículos desde Supabase
- */
 function calculateStats(vehicles) {
-    // === Estadísticas Principales (Barra superior) ===
     safeUpdate('totalVehiculos', vehicles.length);
     
-    // Contar motos (por campo 'tipo' o 'clase')
     const motos = vehicles.filter(v => 
         (v.tipo && v.tipo.toUpperCase() === 'MOTO') || 
         (v.clase && v.clase.toUpperCase() === 'MOTO')
     ).length;
     safeUpdate('totalMotos', motos);
     
-    // Por estatus
     const operativos = vehicles.filter(v => v.estatus === 'OPERATIVA').length;
     const inoperativos = vehicles.filter(v => v.estatus === 'INOPERATIVA').length;
     const desincorporados = vehicles.filter(v => v.estatus === 'DESINCORPORADA').length;
@@ -173,66 +152,53 @@ function calculateStats(vehicles) {
     safeUpdate('operativos', operativos);
     safeUpdate('inoperativos', inoperativos);
     safeUpdate('desincorporados', desincorporados);
-
-    // === Tarjetas Resumen ===
-    // Por clase/tipo
+    
     safeUpdate('countMoto', vehicles.filter(v => 
         (v.tipo || v.clase)?.toUpperCase() === 'MOTO'
     ).length);
     safeUpdate('countCamioneta', vehicles.filter(v => v.clase === 'CAMIONETA').length);
     safeUpdate('countAutomovil', vehicles.filter(v => v.clase === 'AUTOMOVIL').length);
     safeUpdate('countCamion', vehicles.filter(v => v.clase === 'CAMION').length);
-    
-    // Por ubicación (CCPEM)
     safeUpdate('countCCPEM', vehicles.filter(v => 
         v.ubicacion_fisica?.toUpperCase().includes('CCPEM')
     ).length);
-    
-    // Desincorporados
     safeUpdate('countDesincorporada', desincorporados);
 }
 
-/**
- * Actualiza el texto de un elemento del DOM de forma segura
- * @param {string} id - ID del elemento
- * @param {string|number} value - Valor a mostrar
- */
 function safeUpdate(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
 }
 
 // ========================================
-// FUNCIONES DE GRÁFICOS
+// FUNCIONES DE GRÁFICOS (9 EN TOTAL)
 // ========================================
 
 /**
- * Renderiza todos los gráficos
- * @param {Array} vehicles - Array de vehículos
+ * Renderiza TODOS los gráficos incluyendo Color
  */
 function renderAllCharts(vehicles) {
-    renderChartEstatus(vehicles);      // 1. Estado del Parque
-    renderChartSituacion(vehicles);    // 2. Situación Actual
-    renderChartClase(vehicles);        // 3. Por Clase
-    renderChartTipo(vehicles);         // 4. Por Tipo
-    renderChartMarcas(vehicles);       // 5. Marcas Top 10
-    renderChartUbicacion(vehicles);    // 6. Ubicación Física
-    renderChartAno(vehicles);          // 7. Por Año
-    renderChartUnidad(vehicles);       // 8. Unidad Administrativa
+    renderChartEstatus(vehicles);
+    renderChartSituacion(vehicles);
+    renderChartClase(vehicles);
+    renderChartTipo(vehicles);
+    renderChartMarcas(vehicles);
+    renderChartUbicacion(vehicles);
+    renderChartAno(vehicles);
+    renderChartUnidad(vehicles);
+    renderChartColor(vehicles); // ✅ 9no gráfico - POR COLOR
 }
 
 /**
  * Función genérica para crear gráficos Chart.js
- * @param {string} canvasId - ID del elemento canvas
- * @param {string} type - Tipo de gráfico ('bar', 'pie', 'doughnut', 'line')
- * @param {Object} dataConfig - Configuración de datos
- * @param {Object} optionsConfig - Configuración de opciones
  */
 function createChart(canvasId, type, dataConfig, optionsConfig) {
     const canvas = document.getElementById(canvasId);
-    if (!canvas || !window.Chart) return;
+    if (!canvas || !window.Chart) {
+        console.warn(`⚠️ Canvas ${canvasId} no encontrado o Chart.js no cargado`);
+        return;
+    }
     
-    // Destruir instancia previa si existe
     if (charts[canvasId]) {
         charts[canvasId].destroy();
     }
@@ -298,7 +264,6 @@ function renderChartSituacion(vehicles) {
         counts[key] = (counts[key] || 0) + 1;
     });
     
-    // Ordenar por cantidad descendente y tomar top 8
     const sorted = Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 8);
@@ -508,7 +473,6 @@ function renderChartAno(vehicles) {
         counts[ano] = (counts[ano] || 0) + 1;
     });
     
-    // Ordenar: años numéricos primero, luego texto
     const sorted = Object.entries(counts).sort((a, b) => {
         const na = parseInt(a[0]), nb = parseInt(b[0]);
         if (!isNaN(na) && !isNaN(nb)) return na - nb;
@@ -563,7 +527,6 @@ function renderChartUnidad(vehicles) {
     vehicles.forEach(v => {
         let key = (v.unidad_administrativa || 'SIN_UNIDAD').trim();
         
-        // Agrupar nombres similares para mejor visualización
         const keyUpper = key.toUpperCase();
         if (keyUpper.includes('BRIGADA MOTORIZADA')) key = 'BRIM';
         else if (keyUpper.includes('ESTACION PARROQUIAL')) key = 'Est. Parroquial';
@@ -617,14 +580,149 @@ function renderChartUnidad(vehicles) {
     });
 }
 
+// 🎨 9. Color de Vehículos - Pie (TOP 8 + Otros)
+function renderChartColor(vehicles) {
+    console.log('🎨 Renderizando gráfico de Color...');
+    
+    const counts = {};
+    vehicles.forEach(v => {
+        let color = (v.color || '').toUpperCase().trim();
+        
+        // Si está vacío o es inválido, usar "SIN_DATO"
+        if (!color || color === 'SIN_COLOR' || color === 'N/A' || color.length < 2) {
+            color = 'SIN_DATO';
+        }
+        
+        // Agrupar colores similares
+        if (color.includes('NEGRO')) color = 'NEGRO';
+        else if (color.includes('BLANCO')) color = 'BLANCO';
+        else if (color.includes('GRIS') || color.includes('SILVER') || color.includes('PLATA')) color = 'GRIS';
+        else if (color.includes('ROJO') || color.includes('BURDEOS') || color.includes('VINOTINTO')) color = 'ROJO';
+        else if (color.includes('AZUL') || color.includes('CELESTE')) color = 'AZUL';
+        else if (color.includes('VERDE')) color = 'VERDE';
+        else if (color.includes('AMARILLO') || color.includes('DORADO')) color = 'AMARILLO';
+        else if (color.includes('NARANJA')) color = 'NARANJA';
+        else if (color.includes('BEIGE') || color.includes('CREMA')) color = 'BEIGE';
+        
+        counts[color] = (counts[color] || 0) + 1;
+    });
+    
+    console.log('📊 Datos de color:', counts);
+    
+    // Ordenar y tomar top 7 + "Otros"
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const topColors = sorted.slice(0, 7);
+    const others = sorted.slice(7);
+    
+    const labels = topColors.map(([k]) => k);
+    const dataValues = topColors.map(([,v]) => v);
+    
+    if (others.length > 0) {
+        labels.push('Otros');
+        dataValues.push(others.reduce((sum, [,v]) => sum + v, 0));
+    }
+    
+    // Verificar canvas
+    const canvas = document.getElementById('chartColor');
+    if (!canvas) {
+        console.error('❌ Canvas chartColor no encontrado en el HTML');
+        return;
+    }
+    
+    if (labels.length === 0 || dataValues.every(v => v === 0)) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px Roboto';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sin datos de color disponibles', canvas.width/2, canvas.height/2);
+        console.warn('⚠️ No hay datos de color para mostrar');
+        return;
+    }
+    
+    // Paleta de colores realista
+    const colorMap = {
+        'NEGRO': '#1a1a1a',
+        'BLANCO': '#f8f9fa',
+        'GRIS': '#6c757d',
+        'ROJO': '#dc3545',
+        'AZUL': '#0d6efd',
+        'VERDE': '#198754',
+        'AMARILLO': '#ffc107',
+        'NARANJA': '#fd7e14',
+        'BEIGE': '#d4b896',
+        'SIN_DATO': '#adb5bd',
+        'Otros': '#6c757d'
+    };
+    
+    const backgroundColors = labels.map(label => colorMap[label] || '#6c757d');
+    
+    // Destruir instancia previa
+    if (charts.chartColor) {
+        charts.chartColor.destroy();
+    }
+    
+    // Crear gráfico
+    charts.chartColor = new Chart(canvas, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: backgroundColors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        font: { size: 8 },
+                        padding: 8,
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const pct = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+                                    return {
+                                        text: `${label}: ${value} (${pct}%)`,
+                                        fillStyle: backgroundColors[i],
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    } 
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    console.log('✅ Gráfico de Color renderizado exitosamente');
+}
+
 // ========================================
 // FUNCIONES DE UTILIDAD
 // ========================================
 
-/**
- * Muestra mensaje de error amigable en la interfaz
- * @param {string} message - Mensaje de error
- */
 function showErrorMessage(message) {
     const main = document.querySelector('.dashboard-main');
     if (!main) return;
@@ -644,18 +742,17 @@ function showErrorMessage(message) {
                     <li>✓ Conexión a internet activa</li>
                     <li>✓ Credenciales de Supabase válidas en config.js</li>
                     <li>✓ Tabla "vehiculos" existe en Supabase</li>
-                    <li>✓ Políticas RLS permiten lectura pública</li>
+                    <li>✓ Políticas RLS permiten lectura</li>
                     <li>✓ El usuario tiene permisos para leer la tabla</li>
                 </ul>
             </details>
             <button onclick="location.reload()" 
-                    style="padding:10px 24px;background:#003366;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;font-weight:500;display:inline-flex;align-items:center;gap:8px;transition:background 0.3s;">
+                    style="padding:10px 24px;background:#003366;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;font-weight:500;display:inline-flex;align-items:center;gap:8px;">
                 <span>🔄</span> Reintentar
             </button>
         </div>
     `;
     
-    // Limpiar estadísticas para evitar mostrar datos incorrectos
     document.querySelectorAll('.stat-value, .summary-value, .partes-stat-value').forEach(el => {
         if (!el.querySelector('.loading')) el.textContent = '-';
     });
@@ -665,13 +762,8 @@ function showErrorMessage(message) {
 // FUNCIÓN DE RECARGA MANUAL (DEBUG)
 // ========================================
 
-/**
- * Función global para recargar datos manualmente (útil para debugging)
- * Uso: window.refreshPartesData() desde la consola del navegador
- */
 window.refreshPartesData = async function() {
     console.log('🔄 Recargando datos desde Supabase...');
-    
     try {
         const supabaseClient = window.supabase.createClient(
             window.SUPABASE_URL,
@@ -699,27 +791,7 @@ window.refreshPartesData = async function() {
 };
 
 // ========================================
-// EVENTOS ADICIONALES
-// ========================================
-
-// Cerrar modal de ficha al presionar ESC (si existe en otras páginas)
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        // Aquí podrías cerrar modales si los hubiera
-        // Ejemplo: cerrarFicha();
-    }
-});
-
-// Prevenir comportamiento por defecto en botones de tipo submit dentro del módulo
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        if (!form.dataset.allowSubmit) {
-            e.preventDefault();
-        }
-    });
-});
-
-// ========================================
 // FIN DEL MÓDULO
 // ========================================
 console.log('✅ Módulo Partes Generales cargado correctamente');
+console.log('📊 9 gráficos disponibles:', Object.keys(charts).length);
