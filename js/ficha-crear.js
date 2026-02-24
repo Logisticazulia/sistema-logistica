@@ -340,7 +340,6 @@ function llenarFormulario(vehiculo) {
     var mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
-        'tipo': 'tipo',
         'clase': 'clase',
         'color': 'color',
         's_carroceria': 'serialCarroceria',
@@ -351,24 +350,36 @@ function llenarFormulario(vehiculo) {
         'observacion': 'observaciones'
     };
     
+    // ✅ CAMPOS NORMALES (input, textarea)
     Object.keys(mapeoCampos).forEach(function(dbField) {
         var formField = mapeoCampos[dbField];
         var element = document.getElementById(formField);
-        
         if (element && vehiculo[dbField]) {
-            if (element.tagName === 'SELECT') {
-                var matchingOption = Array.from(element.options).find(function(opt) {
-                    return opt.value.toUpperCase() === vehiculo[dbField].toUpperCase();
-                });
-                if (matchingOption) {
-                    element.value = matchingOption.value;
-                }
-            } else {
-                element.value = vehiculo[dbField];
-            }
+            element.value = vehiculo[dbField];
         }
     });
     
+    // ✅ CAMPO TIPO (SELECT) - CORREGIDO
+    var tipoInput = document.getElementById('tipo');
+    if (tipoInput && vehiculo.tipo) {
+        var valorTipo = vehiculo.tipo.toUpperCase().trim();
+        var matchingOption = Array.from(tipoInput.options).find(function(opt) {
+            return opt.value.toUpperCase() === valorTipo;
+        });
+        if (matchingOption) {
+            tipoInput.value = matchingOption.value;
+        } else {
+            // Si no coincide exactamente, intentar coincidencia parcial
+            var partialMatch = Array.from(tipoInput.options).find(function(opt) {
+                return valorTipo.includes(opt.value) || opt.value.includes(valorTipo);
+            });
+            if (partialMatch) {
+                tipoInput.value = partialMatch.value;
+            }
+        }
+    }
+    
+    // ✅ CAMPO ESTATUS (SELECT)
     var estatusInput = document.getElementById('estatus');
     if (estatusInput) {
         var valorEstatus = vehiculo.estatus || vehiculo.situacion || '';
@@ -377,11 +388,9 @@ function llenarFormulario(vehiculo) {
                 .replace('OPERATIVA', 'OPERATIVO')
                 .replace('INOPERATIVA', 'INOPERATIVO')
                 .replace('DESINCORPORADA', 'DESINCORPORADO');
-            
             var matchingOption = Array.from(estatusInput.options).find(function(opt) {
                 return opt.value.toUpperCase() === valorNormalizado;
             });
-            
             if (matchingOption) {
                 estatusInput.value = matchingOption.value;
             } else {
