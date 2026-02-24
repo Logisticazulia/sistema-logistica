@@ -45,7 +45,7 @@
             color: rgba(255, 255, 255, 0.4);
             font-size: 1.2rem;
         }
-        /* Grid de tarjetas resumen */
+        
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -72,7 +72,8 @@
             font-size: 0.8rem;
             color: #666;
         }
-        /* ✅ GRID DE GRÁFICOS - 3 POR FILA */
+        
+        /* Grid de gráficos - 3 por fila */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -104,7 +105,36 @@
             height: 240px;
             width: 100%;
         }
-        /* Botón Volver */
+        
+        /* ✅ BOTÓN DE IMPRIMIR */
+        .print-section {
+            display: flex;
+            justify-content: flex-end;
+            margin: 15px 0 25px 0;
+            gap: 10px;
+        }
+        .btn-print {
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-print:hover {
+            background: #005b96;
+            transform: translateY(-2px);
+        }
+        .btn-print:active {
+            transform: translateY(0);
+        }
+        
         .btn-volver {
             background: #6c757d;
             color: white;
@@ -117,127 +147,137 @@
             align-items: center;
             gap: 5px;
         }
-        .btn-volver:hover { background: #5a6268; }
-        /* Loader */
-        .loading { font-size: 1.2rem; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .btn-volver:hover {
+            background: #5a6268;
+        }
         
-        /* ✅ RESPONSIVE - Ajuste para tablets y móviles */
+        .loading {
+            font-size: 1.2rem;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* === RESPONSIVE === */
         @media (max-width: 1024px) {
             .charts-grid {
-                grid-template-columns: repeat(2, 1fr); /* 2 por fila en tablets */
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         @media (max-width: 768px) {
-            .stats-inline { flex-direction: column; gap: 10px; padding: 12px 15px; }
+            .stats-inline {
+                flex-direction: column;
+                gap: 10px;
+                padding: 12px 15px;
+            }
             .stat-separator { display: none; }
-            .stat-item { width: 100%; display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
-            .charts-grid { grid-template-columns: 1fr; /* 1 por fila en móviles */ }
-            .chart-container { height: 220px; }
-            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-item {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.2);
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-container {
+                height: 220px;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .print-section {
+                flex-direction: column;
+            }
+            .btn-print {
+                width: 100%;
+                justify-content: center;
+            }
         }
-        @media (max-width: 480px) {
-            .chart-container { height: 200px; }
-            .chart-card h4 { font-size: 0.85rem; }
+        
+        /* === ESTILOS DE IMPRESIÓN === */
+        @media print {
+            /* Ocultar elementos no necesarios */
+            .navbar,
+            .btn-volver,
+            .btn-print,
+            .btn-logout,
+            .breadcrumb,
+            .module-subtitle {
+                display: none !important;
+            }
+            
+            /* Ajustar contenedor principal */
+            .dashboard-main {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Mostrar título en impresión */
+            .module-title-section {
+                margin-bottom: 20px !important;
+                page-break-after: avoid;
+            }
+            .module-title {
+                font-size: 1.5rem !important;
+                color: #003366 !important;
+                margin-bottom: 5px !important;
+            }
+            
+            /* Ajustar estadísticas */
+            .stats-inline {
+                background: #f8f9fa !important;
+                box-shadow: none !important;
+                margin: 10px 0 !important;
+                padding: 15px !important;
+                page-break-after: avoid;
+            }
+            .stat-value {
+                color: #003366 !important;
+                font-size: 1.5rem !important;
+            }
+            .stat-label {
+                color: #666 !important;
+            }
+            .stat-separator {
+                color: #ccc !important;
+            }
+            
+            /* Ajustar gráficos para impresión */
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px !important;
+                margin-top: 15px !important;
+            }
+            .chart-card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .chart-card h4 {
+                font-size: 0.9rem !important;
+                margin-bottom: 8px !important;
+            }
+            .chart-container {
+                height: 200px !important;
+            }
+            
+            /* Forzar colores de fondo en impresión */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            /* Configurar márgenes de página */
+            @page {
+                margin: 1.5cm;
+                size: A4 landscape;
+            }
         }
-        /* === HEADER CON BREADCRUMB === */
-.module-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e8eef5;
-}
-
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    flex-wrap: wrap;
-}
-
-.breadcrumb-link {
-    color: #005b96;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-.breadcrumb-link:hover {
-    color: #003366;
-    text-decoration: underline;
-}
-
-.breadcrumb-separator {
-    color: #999;
-    font-weight: 300;
-}
-
-.breadcrumb-current {
-    color: #666;
-    font-weight: 500;
-}
-
-/* === BOTÓN VOLVER === */
-.btn-volver {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.3s;
-}
-
-.btn-volver:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
-}
-
-/* === SECCIÓN DE TÍTULO === */
-.module-title-section {
-    margin-bottom: 30px;
-}
-
-.module-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #003366;
-    margin: 0 0 8px 0;
-}
-
-.module-subtitle {
-    font-size: 1rem;
-    color: #666;
-    margin: 0;
-    font-weight: 400;
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-    .module-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-    .breadcrumb {
-        font-size: 0.8rem;
-    }
-    .module-title {
-        font-size: 1.5rem;
-    }
-    .btn-volver {
-        width: 100%;
-        justify-content: center;
-    }
-}
     </style>
 </head>
 <body class="dashboard-page">
@@ -246,63 +286,103 @@
         <div class="nav-container">
             <div class="nav-brand">
                 <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-                <span class="nav-title">Sistema de Logística</span>
+                <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
             </div>
             <div class="nav-user">
-                <span class="user-email" id="userEmail">usuario@institucion.com</span>
-                <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+                <span class="user-email" id="userEmail">Cargando...</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- Contenido Principal -->
     <main class="dashboard-main">
-   <!-- ================= HEADER CON BREADCRUMB ================= -->
-<header class="module-header">
-    <div class="breadcrumb">
-        <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-        <span class="breadcrumb-separator">/</span>
-        <a href="transporte.html" class="breadcrumb-link">Transporte</a>
-        <span class="breadcrumb-separator">/</span>
-        <a href="planilla.html" class="breadcrumb-link">Planilla</a>
-        <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-current">Partes Generales</span>
-    </div>
-    <button class="btn-volver" onclick="window.location.href='planilla.html'">
-        ← Volver a Planilla
-    </button>
-</header>
+        <header class="module-header">
+            <div class="breadcrumb">
+                <a href="../dashboard.html">🏠 Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="transporte.html">Transporte</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="planilla.html">Planilla</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Partes Generales</span>
+            </div>
+            <button class="btn-volver" onclick="window.location.href='planilla.html'">← Volver</button>
+        </header>
 
-<!-- ================= TÍTULO DEL MÓDULO ================= -->
-<section class="module-title-section">
-    <h1 class="module-title">📊 Partes Generales</h1>
-    <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
-</section>
+        <section class="module-title-section">
+            <h1 class="module-title">📊 Partes Generales</h1>
+            <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
+        </section>
 
-        <!-- ESTADÍSTICAS PRINCIPALES -->
+        <!-- ✅ ESTADÍSTICAS PRINCIPALES (6 indicadores incluyendo Total Vehículos) -->
         <section class="stats-inline">
-            <div class="stat-item"><span class="stat-value" id="totalVehiculos">⏳</span><span class="stat-label">Total</span></div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalVehiculos">⏳</span>
+                <span class="stat-label">Total Vehículos</span>
+            </div>
             <span class="stat-separator">|</span>
-            <div class="stat-item"><span class="stat-value" id="totalMotos">⏳</span><span class="stat-label">Motos</span></div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalMotos">⏳</span>
+                <span class="stat-label">Motos</span>
+            </div>
             <span class="stat-separator">|</span>
-            <div class="stat-item"><span class="stat-value" id="operativos">⏳</span><span class="stat-label">Operativos</span></div>
+            <div class="stat-item">
+                <span class="stat-value" id="operativos">⏳</span>
+                <span class="stat-label">Operativos</span>
+            </div>
             <span class="stat-separator">|</span>
-            <div class="stat-item"><span class="stat-value" id="inoperativos">⏳</span><span class="stat-label">Inoperativos</span></div>
+            <div class="stat-item">
+                <span class="stat-value" id="inoperativos">⏳</span>
+                <span class="stat-label">Inoperativos</span>
+            </div>
             <span class="stat-separator">|</span>
-            <div class="stat-item"><span class="stat-value" id="desincorporados">⏳</span><span class="stat-label">Desinc.</span></div>
+            <div class="stat-item">
+                <span class="stat-value" id="desincorporados">⏳</span>
+                <span class="stat-label">Desinc.</span>
+            </div>
         </section>
 
         <!-- TARJETAS RESUMEN -->
         <section class="summary-grid">
-            <div class="summary-card motos"><div class="summary-value" id="countMoto">-</div><div class="summary-label">🏍️ Motos</div></div>
-            <div class="summary-card"><div class="summary-value" id="countCamioneta">-</div><div class="summary-label">🚙 Camionetas</div></div>
-            <div class="summary-card"><div class="summary-value" id="countAutomovil">-</div><div class="summary-label">🚗 Automóviles</div></div>
-            <div class="summary-card"><div class="summary-value" id="countCamion">-</div><div class="summary-label">🚚 Camiones</div></div>
-            <div class="summary-card ubic"><div class="summary-value" id="countCCPEM">-</div><div class="summary-label">📍 CCPEM</div></div>
-            <div class="summary-card desinc"><div class="summary-value" id="countDesincorporada">-</div><div class="summary-label">⚠️ Desinc.</div></div>
+            <div class="summary-card motos">
+                <div class="summary-value" id="countMoto">-</div>
+                <div class="summary-label">🏍️ Motos</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="countCamioneta">-</div>
+                <div class="summary-label">🚙 Camionetas</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="countAutomovil">-</div>
+                <div class="summary-label">🚗 Automóviles</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="countCamion">-</div>
+                <div class="summary-label">🚚 Camiones</div>
+            </div>
+            <div class="summary-card ubic">
+                <div class="summary-value" id="countCCPEM">-</div>
+                <div class="summary-label">📍 CCPEM</div>
+            </div>
+            <div class="summary-card desinc">
+                <div class="summary-value" id="countDesincorporada">-</div>
+                <div class="summary-label">⚠️ Desinc.</div>
+            </div>
         </section>
 
-        <!-- ✅ GRÁFICOS - 3 POR FILA -->
+        <!-- ✅ BOTÓN DE IMPRIMIR -->
+        <section class="print-section">
+            <button class="btn-print" onclick="imprimirGraficos()">
+                🖨️ Imprimir Gráficos
+            </button>
+        </section>
+
+        <!-- GRÁFICOS - 3 POR FILA -->
         <section class="charts-grid">
             <!-- Fila 1 -->
             <div class="chart-card">
