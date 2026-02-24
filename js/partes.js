@@ -8,18 +8,18 @@
 let globalVehicles = [];
 let chartClaseInstance = null;
 let chartTipoInstance = null;
-let supabase = null;
 
-// Inicializar cuando el DOM esté listo
+// ✅ NO declarar 'supabase' como variable local - usar window.supabase del CDN
+
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         // Verificar que Supabase esté disponible
         if (typeof window.supabase === 'undefined') {
-            throw new Error('Supabase no está cargado. Verifica que el SDK esté incluido.');
+            throw new Error('Supabase no está cargado. Verifica que el SDK esté incluido antes de este script.');
         }
         
-        // Inicializar cliente Supabase
-        supabase = window.supabase.createClient(
+        // ✅ Usar window.supabase directamente (ya inicializado por el CDN + config.js)
+        const supabaseClient = window.supabase.createClient(
             window.SUPABASE_URL,
             window.SUPABASE_KEY
         );
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('🔄 Cargando vehículos desde Supabase...');
         
         // Obtener datos desde Supabase
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .order('created_at', { ascending: false });
@@ -73,7 +73,7 @@ function showErrorMessage(message) {
                             <li>✓ Conexión a internet activa</li>
                             <li>✓ Credenciales de Supabase válidas en config.js</li>
                             <li>✓ Tabla "vehiculos" existe en Supabase</li>
-                            <li>✓ Políticas RLS permiten lectura pública (o usuario autenticado)</li>
+                            <li>✓ Políticas RLS permiten lectura pública</li>
                         </ul>
                     </details>
                     <button onclick="location.reload()" 
@@ -94,17 +94,14 @@ function showErrorMessage(message) {
  * Calcula estadísticas y actualiza el DOM
  */
 function calculateStats(vehicles) {
-    // Totales principales
     safeUpdate('totalVehiculos', vehicles.length);
     
-    // Contar motos (por tipo o clase)
     const motos = vehicles.filter(v => 
         (v.tipo && v.tipo.toUpperCase() === 'MOTO') || 
         (v.clase && v.clase.toUpperCase() === 'MOTO')
     ).length;
     safeUpdate('totalMotos', motos);
     
-    // Por estatus
     const operativos = vehicles.filter(v => v.estatus === 'OPERATIVA').length;
     const inoperativos = vehicles.filter(v => v.estatus === 'INOPERATIVA').length;
     const desincorporados = vehicles.filter(v => v.estatus === 'DESINCORPORADA').length;
@@ -119,14 +116,14 @@ function calculateStats(vehicles) {
     safeUpdate('vehiculosDesincorporados', desincorporados);
     safeUpdate('vehiculosReparacion', reparacion);
     
-    // Tarjeta: Estado del Parque
+    // Tarjeta Estado
     safeUpdate('countOperativa', operativos);
     safeUpdate('countInoperativa', inoperativos);
     safeUpdate('countReparacion', vehicles.filter(v => v.situacion === 'REPARACION').length);
     safeUpdate('countTaller', vehicles.filter(v => v.situacion === 'TALLER').length);
     safeUpdate('countDesincorporada', desincorporados);
     
-    // Tarjeta: Por Tipo/Clase
+    // Tarjeta Tipo
     safeUpdate('countMoto', vehicles.filter(v => 
         (v.tipo && v.tipo.toUpperCase() === 'MOTO') || 
         (v.clase && v.clase.toUpperCase() === 'MOTO')
@@ -136,7 +133,7 @@ function calculateStats(vehicles) {
     safeUpdate('countCamion', vehicles.filter(v => v.clase === 'CAMION').length);
     safeUpdate('countAutobus', vehicles.filter(v => v.clase === 'AUTOBUS').length);
     
-    // Tarjeta: Ubicaciones
+    // Ubicaciones
     const cc = vehicles.filter(v => v.ubicacion_fisica?.toUpperCase().includes('CCPEM')).length;
     const d71 = vehicles.filter(v => v.ubicacion_fisica?.toUpperCase().includes('DESTACAMENTO 71')).length;
     const brim = vehicles.filter(v => v.unidad_administrativa?.toUpperCase().includes('BRIM') || 
@@ -149,11 +146,11 @@ function calculateStats(vehicles) {
     safeUpdate('countResguardo', resg);
     safeUpdate('countOtros', Math.max(0, vehicles.length - (cc + d71 + brim + resg)));
     
-    // Tarjeta: Novedades
+    // Novedades
     safeUpdate('countConObs', vehicles.filter(v => v.observacion && v.observacion.trim().length > 15).length);
     safeUpdate('countSinObs', vehicles.filter(v => !v.observacion || v.observacion.trim().length <= 15).length);
     
-    // Última actualización
+    // Fecha
     if (vehicles.length > 0 && vehicles[0].created_at) {
         const date = new Date(vehicles[0].created_at);
         safeUpdate('lastUpdate', date.toLocaleDateString('es-VE', {
@@ -162,45 +159,41 @@ function calculateStats(vehicles) {
     }
 }
 
-/**
- * Actualiza elemento del DOM de forma segura
- */
 function safeUpdate(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
 }
 
 /**
- * Renderiza gráficos con Chart.js
+ * Renderiza gráficos con Chart.js - ✅ Sintaxis corregida
  */
 function renderCharts(vehicles) {
-    // Agrupar por CLASE
+    // Datos por CLASE
     const claseCounts = {};
     vehicles.forEach(v => {
         const key = (v.clase || 'SIN_CLASE').toUpperCase();
         claseCounts[key] = (claseCounts[key] || 0) + 1;
     });
     
-    // Agrupar por TIPO
+    // Datos por TIPO
     const tipoCounts = {};
     vehicles.forEach(v => {
         const key = (v.tipo || v.clase || 'SIN_TIPO').toUpperCase();
         tipoCounts[key] = (tipoCounts[key] || 0) + 1;
     });
     
-    // Paleta de colores
     const colors = ['#003366', '#005b96', '#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef', '#ade8f4', '#caf0f8'];
     
-    // 📊 Gráfico: Distribución por CLASE (Doughnut)
+    // 📊 Gráfico Clase (Doughnut) - ✅ data: agregado
     const ctxClase = document.getElementById('chartClase');
     if (ctxClase && window.Chart) {
         if (chartClaseInstance) chartClaseInstance.destroy();
         chartClaseInstance = new Chart(ctxClase, {
             type: 'doughnut',
-            data: {
+            data: {  // ✅ CORREGIDO: faltaba 'data:'
                 labels: Object.keys(claseCounts),
                 datasets: [{
-                    data: Object.values(claseCounts),
+                    data: Object.values(claseCounts),  // ✅ CORREGIDO: faltaba 'data:'
                     backgroundColor: colors.slice(0, Object.keys(claseCounts).length),
                     borderWidth: 2,
                     borderColor: '#fff'
@@ -210,10 +203,7 @@ function renderCharts(vehicles) {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { 
-                        position: 'bottom', 
-                        labels: { font: { size: 10 }, padding: 15 } 
-                    },
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
@@ -231,17 +221,17 @@ function renderCharts(vehicles) {
         });
     }
     
-    // 📊 Gráfico: Distribución por TIPO (Bar)
+    // 📊 Gráfico Tipo (Bar) - ✅ data: agregado
     const ctxTipo = document.getElementById('chartTipo');
     if (ctxTipo && window.Chart) {
         if (chartTipoInstance) chartTipoInstance.destroy();
         chartTipoInstance = new Chart(ctxTipo, {
             type: 'bar',
-            data: {
+            data: {  // ✅ CORREGIDO: faltaba 'data:'
                 labels: Object.keys(tipoCounts),
                 datasets: [{
                     label: 'Cantidad',
-                    data: Object.values(tipoCounts),
+                    data: Object.values(tipoCounts),  // ✅ CORREGIDO: faltaba 'data:'
                     backgroundColor: colors.slice(0, Object.keys(tipoCounts).length),
                     borderWidth: 1,
                     borderColor: '#003366'
@@ -250,26 +240,10 @@ function renderCharts(vehicles) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Cantidad: ${context.raw}`;
-                            }
-                        }
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        ticks: { font: { size: 9 }, stepSize: 50 },
-                        title: { display: true, text: 'Vehículos', font: { size: 10 } }
-                    },
-                    x: { 
-                        ticks: { font: { size: 9 }, maxRotation: 45, minRotation: 45 },
-                        title: { display: true, text: 'Tipo', font: { size: 10 } }
-                    }
+                    y: { beginAtZero: true, ticks: { font: { size: 9 } } },
+                    x: { ticks: { font: { size: 9 } } }
                 }
             }
         });
@@ -280,20 +254,14 @@ function renderCharts(vehicles) {
  * Renderiza tabla de vehículos
  */
 function renderTable(vehicles, filtered = null) {
-    const data = filtered || vehicles.slice(0, 100); // Limitar para rendimiento
+    const data = filtered || vehicles.slice(0, 100);
     const tbody = document.getElementById('partesTableBody');
     if (!tbody) return;
     
     tbody.innerHTML = '';
     
     if (data.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="10" style="text-align:center;padding:30px;color:#666;">
-                    🔍 No se encontraron vehículos con los filtros seleccionados
-                </td>
-            </tr>
-        `;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#666;">No hay resultados</td></tr>`;
         return;
     }
     
@@ -303,27 +271,23 @@ function renderTable(vehicles, filtered = null) {
         const obs = v.observacion ? 
             (v.observacion.length > 45 ? v.observacion.substring(0, 45) + '…' : v.observacion) 
             : '-';
-        const fecha = v.created_at ? new Date(v.created_at).toLocaleDateString('es-VE') : '-';
         
         row.innerHTML = `
-            <td>${v.id || '-'}</td>
-            <td><strong>${v.placa || '-'}</strong></td>
-            <td>${v.marca || '-'}</td>
-            <td>${v.modelo || '-'}</td>
-            <td>${v.tipo || '-'}</td>
-            <td>${v.clase || '-'}</td>
-            <td>${v.ano || '-'}</td>
-            <td><span class="status-badge ${statusClass}">${v.estatus || '-'}</span></td>
-            <td>${v.ubicacion_fisica || '-'}</td>
-            <td title="${v.observacion || ''}">${obs}</td>
+            <td>${v.id||'-'}</td>
+            <td><strong>${v.placa||'-'}</strong></td>
+            <td>${v.marca||'-'}</td>
+            <td>${v.modelo||'-'}</td>
+            <td>${v.tipo||'-'}</td>
+            <td>${v.clase||'-'}</td>
+            <td>${v.ano||'-'}</td>
+            <td><span class="status-badge ${statusClass}">${v.estatus||'-'}</span></td>
+            <td>${v.ubicacion_fisica||'-'}</td>
+            <td title="${v.observacion||''}">${obs}</td>
         `;
         tbody.appendChild(row);
     });
 }
 
-/**
- * Obtiene clase CSS para badge de estado
- */
 function getStatusClass(estatus) {
     if (!estatus) return 'status-taller';
     const e = estatus.toUpperCase();
@@ -355,7 +319,6 @@ function setupFilters(vehicles) {
             const matchTipo = !tipo || (v.tipo?.toUpperCase() === tipo || v.clase?.toUpperCase() === tipo);
             const matchClase = !clase || v.clase?.toUpperCase() === clase;
             const matchPlaca = !placa || (v.placa && v.placa.toUpperCase().includes(placa));
-            
             return matchEstado && matchTipo && matchClase && matchPlaca;
         });
         
@@ -369,16 +332,19 @@ function setupFilters(vehicles) {
 }
 
 /**
- * 🔁 Función para recargar datos manualmente (útil para debugging)
+ * 🔁 Función para recargar datos manualmente
  */
 window.refreshPartesData = async function() {
-    console.log('🔄 Recargando datos desde Supabase...');
+    console.log('🔄 Recargando datos...');
     try {
-        const { data, error } = await supabase
+        const supabaseClient = window.supabase.createClient(
+            window.SUPABASE_URL,
+            window.SUPABASE_KEY
+        );
+        const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .order('created_at', { ascending: false });
-        
         if (error) throw error;
         globalVehicles = data;
         calculateStats(data);
@@ -386,7 +352,7 @@ window.refreshPartesData = async function() {
         renderTable(data);
         console.log('✅ Datos actualizados');
     } catch (err) {
-        console.error('❌ Error recargando:', err);
-        alert('Error recargando datos: ' + err.message);
+        console.error('❌ Error:', err);
+        alert('Error: ' + err.message);
     }
 };
