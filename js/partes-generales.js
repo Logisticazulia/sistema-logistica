@@ -14,12 +14,12 @@ const db = window.supabaseClient;
 const userEmail = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// ================= VERIFICAR SESIÓN (OPCIONAL) =================
+// ================= VERIFICAR SESIÓN =================
 async function verificarSesion() {
   try {
     // ✅ Verificar si el cliente está disponible
     if (!db) {
-      console.warn('⚠️ Cliente Supabase no disponible, continuando sin autenticación');
+      console.warn('⚠️ Cliente Supabase no disponible, cargando datos sin autenticación');
       if (userEmail) userEmail.textContent = 'usuario@institucion.com';
       return true; // Continuar sin sesión
     }
@@ -29,7 +29,7 @@ async function verificarSesion() {
     if (error) {
       console.warn('⚠️ Error en sesión:', error.message);
       if (userEmail) userEmail.textContent = 'usuario@institucion.com';
-      return true; // Continuar sin sesión
+      return true;
     }
     
     if (session && session.user && session.user.email) {
