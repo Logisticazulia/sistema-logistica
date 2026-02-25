@@ -2,15 +2,21 @@
  * ============================================
  * MODIFICAR FICHA TÉCNICA - VERSIÓN CORREGIDA
  * ============================================
- * Busca y modifica registros en la tabla: fichas_tecnicas
+ * Solo permite modificar:
+ * - Información Técnico Mecánica (Si es Inoperativo)
+ * - Fotos (4 fotos)
+ * 
+ * NO permite modificar:
+ * - Datos principales del vehículo (marca, modelo, tipo, etc.)
  */
 
 // ============================================
 // CONFIGURACIÓN Y ESTADO GLOBAL
 // ============================================
-let supabaseClient = null;
-let fichaSeleccionada = null;
-let isEditing = false;
+const supabaseClient = window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_KEY
+);
 
 // Array para almacenar las imágenes en base64 o URLs
 const fotosData = {
@@ -28,7 +34,7 @@ const fotosUrlsExistentes = {
     foto4: null
 };
 
-// Flags para saber qué fotos fueron modificadas
+// Fotos modificadas (para saber cuáles subir)
 const fotosModificadas = {
     foto1: false,
     foto2: false,
@@ -36,58 +42,80 @@ const fotosModificadas = {
     foto4: false
 };
 
+// Ficha seleccionada
+let fichaSeleccionada = null;
+let isEditing = false;
+
+// ============================================
+// CAMPOS EDITABLES VS NO EDITABLES
+// ============================================
+
+// ✅ CAMPOS QUE SÍ SE PUEDEN EDITAR (Técnico Mecánica + Fotos)
+const CAMPOS_EDITABLES = [
+    'causa',
+    'mecanica',
+    'diagnostico',
+    'ubicacion',
+    'tapiceria',
+    'cauchos',
+    'luces',
+    'observaciones',
+    'foto1',
+    'foto2',
+    'foto3',
+    'foto4'
+];
+
+// ❌ CAMPOS QUE NO SE PUEDEN EDITAR (Datos principales del vehículo)
+const CAMPOS_NO_EDITABLES = [
+    'marca',
+    'modelo',
+    'tipo',
+    'clase',
+    'serialCarroceria',
+    'serialMotor',
+    'color',
+    'placa',
+    'facsimilar',
+    'estatus',
+    'dependencia'
+];
+
 // ============================================
 // INICIALIZACIÓN
 // ============================================
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando modificación de fichas técnicas...');
     
-    try {
-        // 1. Inicializar cliente de Supabase
-        if (typeof window.supabase === 'undefined') {
-            throw new Error('Supabase no está cargado');
-        }
-        
-        supabaseClient = window.supabase.createClient(
-            window.SUPABASE_URL,
-            window.SUPABASE_KEY
-        );
-        
-        console.log('✅ Supabase inicializado');
-        
-        // 2. Cargar usuario autenticado
-        await cargarUsuario();
-        
-        // 3. Configurar vista previa
-        actualizarVistaPrevia();
-        actualizarFotosPreview();
-        
-        // 4. Event listeners para vista previa en tiempo real
-        const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
-        inputs.forEach(function(input) {
-            input.addEventListener('input', actualizarVistaPrevia);
-        });
-        
-        // 5. Configurar botones
-        configurarBotones();
-        
-        // 6. Permitir buscar con Enter
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    buscarFicha();
-                }
-            });
-        }
-        
-        console.log('✅ Modificación de fichas inicializada');
-        
-    } catch (error) {
-        console.error('❌ Error en inicialización:', error);
-        mostrarAlerta('❌ Error al inicializar: ' + error.message, 'error');
+    // Inicializar cliente de Supabase
+    if (typeof window.supabase === 'undefined') {
+        console.error('❌ Supabase no está cargado');
+        return;
     }
+    
+    // Cargar usuario autenticado
+    cargarUsuario();
+    
+    // Configurar vista previa
+    actualizarVistaPrevia();
+    actualizarFotosPreview();
+    
+    // Configurar botones
+    configurarBotones();
+    
+    // Permitir buscar con Enter
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarFicha();
+            }
+        });
+    }
+    
+    console.log('✅ Modificación de fichas inicializada');
+    console.log('ℹ️ Solo se pueden modificar: Información Técnico Mecánica y Fotos');
 });
 
 // ============================================
@@ -99,9 +127,7 @@ document.addEventListener('DOMContentLoaded', async function() {
  */
 async function cargarUsuario() {
     try {
-        if (!supabaseClient) return;
-        
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        const {  { session }, error } = await supabaseClient.auth.getSession();
         
         if (error) {
             console.error('Error obteniendo sesión:', error);
@@ -109,7 +135,7 @@ async function cargarUsuario() {
         }
         
         const userEmail = document.getElementById('userEmail');
-        if (userEmail && session?.user?.email) {
+        if (session?.user?.email) {
             // Mostrar email truncado si es muy largo
             const email = session.user.email;
             const nombreMostrar = email.length > 25 
@@ -119,8 +145,8 @@ async function cargarUsuario() {
             userEmail.textContent = nombreMostrar;
             userEmail.title = email; // Tooltip con email completo
         }
-    } catch (error) {
-        console.error('Error al cargar usuario:', error);
+    } catch (err) {
+        console.error('Error mostrando usuario:', err);
     }
 }
 
@@ -134,9 +160,7 @@ function configurarCerrarSesion() {
     logoutBtn.addEventListener('click', async function() {
         if (confirm('¿Está seguro de cerrar sesión?')) {
             try {
-                if (supabaseClient) {
-                    await supabaseClient.auth.signOut();
-                }
+                await supabaseClient.auth.signOut();
                 localStorage.clear();
                 window.location.href = '../index.html';
             } catch (error) {
@@ -148,16 +172,14 @@ function configurarCerrarSesion() {
 }
 
 // ============================================
-// FUNCIONES DE BÚSQUEDA ✅ CORREGIDO
+// FUNCIONES DE BÚSQUEDA
 // ============================================
 
 /**
  * Busca una ficha técnica en la tabla fichas_tecnicas
- * Solo busca por: placa, facsimil, s_carroceria, s_motor
  */
 async function buscarFicha() {
     const searchInput = document.getElementById('searchInput');
-    const searchAlert = document.getElementById('searchAlert');
     const btnSearch = document.getElementById('btnSearch');
     
     if (!searchInput) {
@@ -175,12 +197,10 @@ async function buscarFicha() {
     console.log('🔍 Buscando ficha técnica:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
-    // Deshabilitar botón durante búsqueda
     if (btnSearch) btnSearch.disabled = true;
     
     try {
-        // ✅ BÚSQUEDA EXACTA POR 4 CAMPOS VÁLIDOS EN fichas_tecnicas
-        // NOTA: n_identificacion NO existe en fichas_tecnicas, solo en vehiculos
+        // Búsqueda por placa, facsimilar o seriales
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
@@ -225,7 +245,6 @@ async function buscarFicha() {
         console.error('❌ Error en buscarFicha:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
     } finally {
-        // Re-habilitar botón
         if (btnSearch) btnSearch.disabled = false;
     }
 }
@@ -236,13 +255,13 @@ async function buscarFicha() {
 
 /**
  * Llena el formulario con los datos de la ficha seleccionada
- * @param {Object} ficha - Datos de la ficha desde Supabase
+ * Bloquea campos no editables y habilita solo los editables
  */
 function llenarFormulario(ficha) {
     console.log('📝 Llenando formulario con ficha:', ficha.id);
     
-    // Mapeo de campos de BD a campos del formulario
-    const mapeoCampos = {
+    // === 1. LLENAR CAMPOS NO EDITABLES (solo lectura) ===
+    const mapeoCamposNoEditables = {
         'marca': 'marca',
         'modelo': 'modelo',
         'tipo': 'tipo',
@@ -253,19 +272,10 @@ function llenarFormulario(ficha) {
         'placa': 'placa',
         'facsimil': 'facsimilar',
         'estatus_ficha': 'estatus',
-        'dependencia': 'dependencia',
-        'causa': 'causa',
-        'mecanica': 'mecanica',
-        'diagnostico': 'diagnostico',
-        'ubicacion': 'ubicacion',
-        'tapiceria': 'tapiceria',
-        'cauchos': 'cauchos',
-        'luces': 'luces',
-        'observaciones': 'observaciones'
+        'dependencia': 'dependencia'
     };
     
-    // Llenar campos normales (input, textarea)
-    Object.entries(mapeoCampos).forEach(function(pair) {
+    Object.entries(mapeoCamposNoEditables).forEach(function(pair) {
         const dbField = pair[0];
         const formField = pair[1];
         const element = document.getElementById(formField);
@@ -278,7 +288,6 @@ function llenarFormulario(ficha) {
                 
                 for (let i = 0; i < element.options.length; i++) {
                     const optValue = element.options[i].value.toUpperCase().trim();
-                    // Comparación flexible (con/sin espacios)
                     if (optValue === dbValue || optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '')) {
                         element.value = element.options[i].value;
                         found = true;
@@ -286,40 +295,74 @@ function llenarFormulario(ficha) {
                     }
                 }
                 
-                // Si no encontró, agregar la opción dinámicamente
+                // Si no encuentra, agregar la opción dinámicamente
                 if (!found) {
                     const newOption = document.createElement('option');
-                    newOption.value = ficha[dbField];
-                    newOption.textContent = ficha[dbField];
+                    newOption.value = dbValue;
+                    newOption.textContent = dbValue;
                     newOption.selected = true;
                     element.appendChild(newOption);
-                    console.log('⚠️ Opción agregada dinámicamente:', formField, '=', ficha[dbField]);
                 }
             } else {
-                // Para inputs y textareas
                 element.value = ficha[dbField];
+            }
+            
+            // 🔒 BLOQUEAR CAMPO (siempre disabled)
+            element.disabled = true;
+            element.style.backgroundColor = '#f3f4f6';
+            element.style.cursor = 'not-allowed';
+            
+            // Agregar clase locked al form-group
+            const formGroup = element.closest('.form-group');
+            if (formGroup) {
+                formGroup.classList.add('locked');
             }
         }
     });
     
-    // Establecer ID de la ficha (campo oculto)
+    // === 2. LLENAR CAMPOS EDITABLES (Técnico Mecánica) ===
+    const mapeoCamposEditables = {
+        'causa': 'causa',
+        'mecanica': 'mecanica',
+        'diagnostico': 'diagnostico',
+        'ubicacion': 'ubicacion',
+        'tapiceria': 'tapiceria',
+        'cauchos': 'cauchos',
+        'luces': 'luces',
+        'observaciones': 'observaciones'
+    };
+    
+    Object.entries(mapeoCamposEditables).forEach(function(pair) {
+        const dbField = pair[0];
+        const formField = pair[1];
+        const element = document.getElementById(formField);
+        
+        if (element && ficha[dbField] !== null && ficha[dbField] !== undefined) {
+            element.value = ficha[dbField];
+            // Estos campos se habilitan/deshabilitan según modo edición
+            element.disabled = true; // Inicialmente disabled hasta que se active edición
+        }
+    });
+    
+    // === 3. ESTABLECER ID DE LA FICHA ===
     const fichaIdInput = document.getElementById('fichaId');
     if (fichaIdInput && ficha.id) {
         fichaIdInput.value = ficha.id;
     }
     
-    // Cargar fotos existentes
+    // === 4. CARGAR FOTOS EXISTENTES ===
     cargarFotosExistentes(ficha);
     
-    // Actualizar vista previa
+    // === 5. ACTUALIZAR VISTA PREVIA ===
     actualizarVistaPrevia();
     
     console.log('✅ Formulario llenado correctamente');
+    console.log('🔒 Campos principales bloqueados (solo lectura)');
+    console.log('✏️ Solo se pueden editar: Información Técnico Mecánica y Fotos');
 }
 
 /**
  * Carga las URLs de fotos existentes desde la ficha
- * @param {Object} ficha - Datos de la ficha
  */
 function cargarFotosExistentes(ficha) {
     for (let i = 1; i <= 4; i++) {
@@ -327,6 +370,7 @@ function cargarFotosExistentes(ficha) {
         const container = document.getElementById('previewFoto' + i + 'Container');
         const placeholder = container ? container.querySelector('.placeholder') : null;
         const btnRemove = container ? container.parentElement.querySelector('.btn-remove') : null;
+        const input = document.getElementById('foto' + i);
         
         const fotoUrlField = 'foto' + i + '_url';
         
@@ -342,6 +386,7 @@ function cargarFotosExistentes(ficha) {
             }
             if (placeholder) placeholder.style.display = 'none';
             if (btnRemove) btnRemove.style.display = 'flex';
+            if (input) input.disabled = true; // Deshabilitado hasta modo edición
         } else {
             // No hay foto
             fotosUrlsExistentes['foto' + i] = null;
@@ -354,6 +399,7 @@ function cargarFotosExistentes(ficha) {
             }
             if (placeholder) placeholder.style.display = 'flex';
             if (btnRemove) btnRemove.style.display = 'none';
+            if (input) input.disabled = true; // Deshabilitado hasta modo edición
         }
     }
     
@@ -364,6 +410,7 @@ function cargarFotosExistentes(ficha) {
  * Resetea el formulario a su estado inicial
  */
 function resetearFormulario() {
+    // Resetear todos los campos del formulario
     const form = document.getElementById('fichaForm');
     if (form) form.reset();
     
@@ -385,7 +432,10 @@ function resetearFormulario() {
         }
         if (placeholder) placeholder.style.display = 'flex';
         if (btnRemove) btnRemove.style.display = 'none';
-        if (input) input.value = '';
+        if (input) {
+            input.value = '';
+            input.disabled = true;
+        }
         
         fotosData['foto' + i] = null;
         fotosUrlsExistentes['foto' + i] = null;
@@ -425,6 +475,7 @@ function limpiarBusqueda() {
 
 /**
  * Activa el modo de edición del formulario
+ * Solo habilita campos de Información Técnico Mecánica y fotos
  */
 function editarFicha() {
     if (!fichaSeleccionada) {
@@ -432,10 +483,38 @@ function editarFicha() {
         return;
     }
     
-    // Habilitar todos los campos del formulario
-    toggleFormFields(true);
+    console.log('✏️ Activando modo edición...');
     
-    // Cambiar visibilidad de botones
+    // === 1. MANTENER BLOQUEADOS LOS CAMPOS PRINCIPALES ===
+    CAMPOS_NO_EDITABLES.forEach(function(campo) {
+        const element = document.getElementById(campo);
+        if (element) {
+            element.disabled = true;
+            element.style.backgroundColor = '#f3f4f6';
+            element.style.cursor = 'not-allowed';
+        }
+    });
+    
+    // === 2. HABILITAR SOLO CAMPOS EDITABLES (Técnico Mecánica) ===
+    CAMPOS_EDITABLES.forEach(function(campo) {
+        const element = document.getElementById(campo);
+        if (element && elemento.tagName !== 'INPUT' || elemento.type !== 'file') {
+            element.disabled = false;
+            element.style.backgroundColor = 'white';
+            element.style.cursor = 'auto';
+        }
+    });
+    
+    // === 3. HABILITAR INPUTS DE FOTOS ===
+    for (let i = 1; i <= 4; i++) {
+        const input = document.getElementById('foto' + i);
+        if (input) {
+            input.disabled = false;
+            input.style.cursor = 'pointer';
+        }
+    }
+    
+    // === 4. CAMBIAR VISIBILIDAD DE BOTONES ===
     const btnEditar = document.getElementById('btnEditar');
     const btnGuardar = document.getElementById('btnGuardar');
     const btnCancelar = document.getElementById('btnCancelar');
@@ -446,7 +525,7 @@ function editarFicha() {
     
     isEditing = true;
     
-    mostrarAlerta('ℹ️ Editando ficha. Modifique los campos y haga clic en "Guardar Cambios".', 'info');
+    mostrarAlerta('ℹ️ Editando ficha. Solo puede modificar: Información Técnico Mecánica y Fotos.', 'info');
 }
 
 /**
@@ -458,8 +537,24 @@ function cancelarEdicion() {
         llenarFormulario(fichaSeleccionada);
     }
     
-    // Deshabilitar campos
-    toggleFormFields(false);
+    // Deshabilitar campos editables
+    CAMPOS_EDITABLES.forEach(function(campo) {
+        const element = document.getElementById(campo);
+        if (element && element.tagName !== 'INPUT' || element.type !== 'file') {
+            element.disabled = true;
+            element.style.backgroundColor = '#f3f4f6';
+            element.style.cursor = 'not-allowed';
+        }
+    });
+    
+    // Deshabilitar inputs de fotos
+    for (let i = 1; i <= 4; i++) {
+        const input = document.getElementById('foto' + i);
+        if (input) {
+            input.disabled = true;
+            input.style.cursor = 'not-allowed';
+        }
+    }
     
     // Cambiar visibilidad de botones
     const btnEditar = document.getElementById('btnEditar');
@@ -473,27 +568,6 @@ function cancelarEdicion() {
     isEditing = false;
     
     mostrarAlerta('ℹ️ Edición cancelada. Los cambios no fueron guardados.', 'info');
-}
-
-/**
- * Habilita o deshabilita los campos del formulario
- * @param {boolean} enable - true para habilitar, false para deshabilitar
- */
-function toggleFormFields(enable) {
-    const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
-    
-    fields.forEach(function(field) {
-        // No deshabilitar el campo oculto de ID
-        if (field.id !== 'fichaId') {
-            field.disabled = !enable;
-        }
-    });
-    
-    // Actualizar clase del formulario para estilos CSS
-    const form = document.getElementById('fichaForm');
-    if (form) {
-        form.classList.toggle('form-disabled', !enable);
-    }
 }
 
 // ============================================
@@ -533,8 +607,6 @@ function actualizarVistaPrevia() {
         
         if (element && preview) {
             preview.textContent = element.value || 'N/A';
-            
-            // Formato especial para observaciones
             if (formField === 'observaciones') {
                 preview.style.whiteSpace = 'pre-wrap';
             }
@@ -544,8 +616,6 @@ function actualizarVistaPrevia() {
 
 /**
  * Maneja la previsualización de imágenes al seleccionar archivos
- * @param {HTMLInputElement} input - Input file
- * @param {string} previewId - ID del elemento img para preview
  */
 function previewImage(input, previewId) {
     if (!input.files || !input.files[0]) return;
@@ -596,7 +666,6 @@ function previewImage(input, previewId) {
 
 /**
  * Elimina una foto del preview
- * @param {number} numero - Número de la foto (1-4)
  */
 function removeFoto(numero) {
     const img = document.getElementById('previewFoto' + numero);
@@ -631,13 +700,13 @@ function actualizarFotosPreview() {
         const box = document.getElementById('previewBox' + i);
         const span = box ? box.querySelector('span') : null;
         
-        if (fotosData['foto' + i] && img && box && span) {
+        if (fotosData['foto' + i]) {
             img.src = fotosData['foto' + i];
             img.style.display = 'block';
-            span.style.display = 'none';
-        } else if (span) {
+            if (span) span.style.display = 'none';
+        } else {
             if (img) img.style.display = 'none';
-            span.style.display = 'block';
+            if (span) span.style.display = 'block';
         }
     }
 }
@@ -648,41 +717,16 @@ function actualizarFotosPreview() {
 
 /**
  * Guarda los cambios de la ficha en Supabase
- * @param {Event} event - Evento del formulario
+ * SOLO guarda campos editables (Técnico Mecánica + Fotos)
  */
 async function guardarFicha(event) {
     if (event) event.preventDefault();
     
     if (!fichaSeleccionada) {
-        mostrarAlerta('⚠️ No hay ficha seleccionada para guardar', 'error');
+        mostrarAlerta('⚠️ No hay ficha seleccionada', 'error');
         return;
     }
     
-    // Validar formulario
-    const form = document.getElementById('fichaForm');
-    if (form && !form.checkValidity()) {
-        form.reportValidity();
-        mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
-        return;
-    }
-    
-    // Validar campos obligatorios
-    const camposObligatorios = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
-    const camposFaltantes = [];
-    
-    camposObligatorios.forEach(function(campo) {
-        const input = document.getElementById(campo);
-        if (input && !input.value.trim()) {
-            camposFaltantes.push(campo);
-        }
-    });
-    
-    if (camposFaltantes.length > 0) {
-        mostrarAlerta('⚠️ Campos obligatorios faltantes: ' + camposFaltantes.join(', '), 'error');
-        return;
-    }
-    
-    // Deshabilitar botón durante guardado
     const btnGuardar = document.getElementById('btnGuardar');
     if (btnGuardar) {
         btnGuardar.disabled = true;
@@ -692,22 +736,9 @@ async function guardarFicha(event) {
     try {
         console.log('💾 Guardando ficha ID:', fichaSeleccionada.id);
         
-        // Preparar datos actualizados
+        // === PREPARAR DATOS ACTUALIZADOS (SOLO CAMPOS EDITABLES) ===
         const fichaActualizada = {
-            // Campos de texto
-            marca: (document.getElementById('marca')?.value || '').trim().toUpperCase(),
-            modelo: (document.getElementById('modelo')?.value || '').trim().toUpperCase(),
-            tipo: (document.getElementById('tipo')?.value || '').trim().toUpperCase(),
-            clase: (document.getElementById('clase')?.value || '').trim().toUpperCase(),
-            color: (document.getElementById('color')?.value || '').trim().toUpperCase(),
-            s_carroceria: (document.getElementById('serialCarroceria')?.value || '').trim(),
-            s_motor: (document.getElementById('serialMotor')?.value || '').trim(),
-            placa: (document.getElementById('placa')?.value || '').trim().toUpperCase(),
-            facsimil: (document.getElementById('facsimilar')?.value || '').trim(),
-            estatus_ficha: (document.getElementById('estatus')?.value || '').trim().toUpperCase(),
-            dependencia: (document.getElementById('dependencia')?.value || '').trim(),
-            
-            // Campos técnicos (opcionales)
+            // Información Técnico Mecánica
             causa: (document.getElementById('causa')?.value || '').trim() || null,
             mecanica: (document.getElementById('mecanica')?.value || '').trim() || null,
             diagnostico: (document.getElementById('diagnostico')?.value || '').trim() || null,
@@ -717,7 +748,7 @@ async function guardarFicha(event) {
             luces: (document.getElementById('luces')?.value || '').trim() || null,
             observaciones: (document.getElementById('observaciones')?.value || '').trim() || null,
             
-            // Fotos (se mantienen las existentes a menos que se modifiquen)
+            // URLs de fotos (se mantienen las existentes a menos que se modifiquen)
             foto1_url: fotosUrlsExistentes.foto1,
             foto2_url: fotosUrlsExistentes.foto2,
             foto3_url: fotosUrlsExistentes.foto3,
@@ -727,7 +758,7 @@ async function guardarFicha(event) {
             updated_at: new Date().toISOString()
         };
         
-        // Subir fotos modificadas a Supabase Storage
+        // === SUBIR FOTOS MODIFICADAS A SUPABASE STORAGE ===
         const bucketName = 'fichas-tecnicas';
         
         for (let i = 1; i <= 4; i++) {
@@ -753,7 +784,7 @@ async function guardarFicha(event) {
                     (fichaSeleccionada.placa || fichaSeleccionada.id) + '.jpg';
                 
                 // Subir a Supabase Storage
-                const { data: uploadData, error: uploadError } = await supabaseClient
+                const {  uploadData, error: uploadError } = await supabaseClient
                     .storage
                     .from(bucketName)
                     .upload(fileName, blob, {
@@ -767,7 +798,7 @@ async function guardarFicha(event) {
                 }
                 
                 // Obtener URL pública
-                const { data: urlData } = supabaseClient
+                const {  urlData } = supabaseClient
                     .storage
                     .from(bucketName)
                     .getPublicUrl(fileName);
@@ -777,7 +808,7 @@ async function guardarFicha(event) {
             }
         }
         
-        // Actualizar registro en Supabase
+        // === ACTUALIZAR REGISTRO EN SUPABASE ===
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .update(fichaActualizada)
@@ -786,7 +817,8 @@ async function guardarFicha(event) {
         
         if (error) {
             console.error('❌ Error al actualizar:', error);
-            throw error;
+            mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+            return;
         }
         
         console.log('✅ Ficha actualizada:', data);
@@ -799,22 +831,12 @@ async function guardarFicha(event) {
         
         // Volver al modo lectura después de guardar
         setTimeout(function() {
-            toggleFormFields(false);
-            
-            const btnEditar = document.getElementById('btnEditar');
-            const btnGuardar = document.getElementById('btnGuardar');
-            const btnCancelar = document.getElementById('btnCancelar');
-            
-            if (btnEditar) btnEditar.style.display = 'inline-flex';
-            if (btnGuardar) btnGuardar.style.display = 'none';
-            if (btnCancelar) btnCancelar.style.display = 'inline-flex';
-            
-            isEditing = false;
+            cancelarEdicion();
         }, 2000);
         
     } catch (error) {
         console.error('❌ Error en guardarFicha:', error);
-        mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+        mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
     } finally {
         // Restaurar botón
         if (btnGuardar) {
@@ -830,8 +852,6 @@ async function guardarFicha(event) {
 
 /**
  * Muestra una alerta temporal en la interfaz
- * @param {string} mensaje - Texto de la alerta
- * @param {string} tipo - Tipo de alerta: 'success', 'error', 'info'
  */
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
@@ -892,3 +912,5 @@ function configurarBotones() {
 // FIN DEL MÓDULO
 // ============================================
 console.log('✅ Módulo ficha-modificar.js cargado correctamente');
+console.log('🔒 Campos principales BLOQUEADOS (solo lectura)');
+console.log('✏️ Campos editables: Información Técnico Mecánica + Fotos');
