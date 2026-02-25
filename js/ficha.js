@@ -10,10 +10,7 @@
 // ========================================
 // CONFIGURACIÓN
 // ========================================
-const supabaseClient = window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_KEY
-);
+let supabaseClient = null;
 
 // ========================================
 // INICIALIZACIÓN
@@ -21,10 +18,22 @@ const supabaseClient = window.supabase.createClient(
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando módulo Ficha Técnica...');
     
-    // Cargar usuario autenticado
+    // 1. Verificar que Supabase esté disponible
+    if (typeof window.supabase === 'undefined') {
+        console.error('❌ Supabase no está cargado');
+        return;
+    }
+    
+    // 2. Crear cliente de Supabase
+    supabaseClient = window.supabase.createClient(
+        window.SUPABASE_URL,
+        window.SUPABASE_KEY
+    );
+    
+    // 3. Cargar usuario autenticado
     cargarUsuario();
     
-    // Configurar botón de logout
+    // 4. Configurar botón de logout
     configurarLogout();
     
     console.log('✅ Módulo Ficha Técnica inicializado');
@@ -41,7 +50,10 @@ async function cargarUsuario() {
     try {
         console.log('🔄 Cargando usuario autenticado...');
         
-        const {  { session }, error } = await supabaseClient.auth.getSession();
+        // ✅ SINTAXIS CORREGIDA - Sin espacios en la destructuración
+        const sessionData = await supabaseClient.auth.getSession();
+        const session = sessionData.data ? sessionData.data.session : null;
+        const error = sessionData.error;
         
         if (error) {
             console.error('❌ Error obteniendo sesión:', error);
@@ -67,9 +79,6 @@ async function cargarUsuario() {
             userEmail.textContent = 'Invitado';
             userEmail.title = 'No hay sesión activa';
             console.log('⚠️ No hay sesión activa');
-            
-            // Opcional: Redirigir al login si no hay sesión
-            // window.location.href = '../index.html';
         }
     } catch (err) {
         console.error('❌ Error en cargarUsuario:', err);
@@ -97,7 +106,8 @@ function configurarLogout() {
         try {
             console.log('🔄 Cerrando sesión...');
             
-            const { error } = await supabaseClient.auth.signOut();
+            const logoutData = await supabaseClient.auth.signOut();
+            const error = logoutData.error;
             
             if (error) {
                 console.error('❌ Error al cerrar sesión:', error);
