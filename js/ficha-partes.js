@@ -144,7 +144,6 @@ function calculateStats(fichas) {
     safeUpdate('fichasDesincorporadas', desincorporadas);
 
     // === Tarjetas Resumen ===
-    // Por tipo
     safeUpdate('countMoto', fichas.filter(f => 
         f.tipo && f.tipo.toUpperCase() === 'MOTO'
     ).length);
@@ -158,9 +157,8 @@ function calculateStats(fichas) {
         f.tipo && f.tipo.toUpperCase() === 'CAMION'
     ).length);
 
-    // Con/Sin fotos
     const conFotos = fichas.filter(f => 
-        (f.foto1_url || f.foto2_url || f.foto3_url || f.foto4_url)
+        f.foto1_url || f.foto2_url || f.foto3_url || f.foto4_url
     ).length;
     safeUpdate('countConFotos', conFotos);
     safeUpdate('countSinFotos', fichas.length - conFotos);
@@ -378,7 +376,6 @@ function renderChartDependencia(fichas) {
         let key = (f.dependencia || 'SIN_DEPENDENCIA').trim();
         const keyUpper = key.toUpperCase();
         
-        // Agrupar nombres similares
         if (keyUpper.includes('BRIGADA MOTORIZADA')) key = 'BRIM';
         else if (keyUpper.includes('ESTACION PARROQUIAL')) key = 'Est. Parroquial';
         else if (keyUpper.includes('ESTACION MUNICIPAL')) key = 'Est. Municipal';
@@ -439,7 +436,6 @@ function renderChartColor(fichas) {
             color = 'SIN_DATO';
         }
         
-        // Agrupar colores similares
         if (color.includes('NEGRO')) color = 'NEGRO';
         else if (color.includes('BLANCO')) color = 'BLANCO';
         else if (color.includes('GRIS') || color.includes('SILVER') || color.includes('PLATA')) color = 'GRIS';
@@ -502,4 +498,256 @@ function renderChartColor(fichas) {
                 callbacks: {
                     label: function(context) {
                         const label = context.label || '';
-                        const value = context.raw
+                        const value = context.raw || 0;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                        return `${label}: ${value} (${pct}%)`;
+                    }
+                }
+            }
+        }
+    });
+}
+
+// 📅 7. Fichas por Mes - Line
+function renderChartMes(fichas) {
+    const counts = {};
+    fichas.forEach(f => {
+        const fecha = f.fecha_creacion || f.created_at;
+        if (fecha) {
+            const date = new Date(fecha);
+            const mes = date.toLocaleString('es-ES', { month: 'short', year: '2-digit' });
+            counts[mes] = (counts[mes] || 0) + 1;
+        }
+    });
+    
+    const sorted = Object.entries(counts).sort((a, b) => {
+        const dateA = new Date('01 ' + a[0]);
+        const dateB = new Date('01 ' + b[0]);
+        return dateA - dateB;
+    });
+    
+    createChart('chartMes', 'line', {
+        labels: sorted.map(([k]) => k),
+        datasets: [{
+            label: 'Fichas',
+            data: sorted.map(([,v]) => v),
+            borderColor: '#005b96',
+            backgroundColor: 'rgba(0, 91, 150, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#005b96',
+            pointBorderWidth: 2
+        }]
+    }, {
+        plugins: { 
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `Fichas: ${ctx.raw}`
+                }
+            }
+        },
+        scales: {
+            y: { 
+                beginAtZero: true, 
+                ticks: { font: { size: 9 } },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            x: { 
+                ticks: { font: { size: 9 } },
+                grid: { display: false }
+            }
+        }
+    });
+}
+
+// 📸 8. Con/Sin Fotos - Doughnut
+function renderChartFotos(fichas) {
+    const conFotos = fichas.filter(f => 
+        f.foto1_url || f.foto2_url || f.foto3_url || f.foto4_url
+    ).length;
+    const sinFotos = fichas.length - conFotos;
+    
+    createChart('chartFotos', 'doughnut', {
+        labels: ['Con Fotos', 'Sin Fotos'],
+        datasets: [{
+            data: [conFotos, sinFotos],
+            backgroundColor: ['#2a9d8f', '#e76f51'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    }, {
+        plugins: {
+            legend: { 
+                position: 'bottom', 
+                labels: { font: { size: 9 }, padding: 12 } 
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                        return `${label}: ${value} (${pct}%)`;
+                    }
+                }
+            }
+        },
+        cutout: '65%'
+    });
+}
+
+// 📋 9. Estado Mecánico - Bar Horizontal
+function renderChartMecanico(fichas) {
+    const counts = {
+        'Con Causa': 0,
+        'Sin Causa': 0
+    };
+    
+    fichas.forEach(f => {
+        if (f.causa && f.causa.trim().length > 5) {
+            counts['Con Causa']++;
+        } else {
+            counts['Sin Causa']++;
+        }
+    });
+    
+    createChart('chartMecanico', 'bar', {
+        labels: Object.keys(counts),
+        datasets: [{
+            label: 'Fichas',
+            data: Object.values(counts),
+            backgroundColor: ['#2a9d8f', '#e9c46a'],
+            borderRadius: 4,
+            borderSkipped: false
+        }]
+    }, {
+        indexAxis: 'y',
+        plugins: { 
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `Fichas: ${ctx.raw}`
+                }
+            }
+        },
+        scales: {
+            x: { 
+                beginAtZero: true, 
+                ticks: { font: { size: 9 } },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            y: { 
+                ticks: { font: { size: 9 } },
+                grid: { display: false }
+            }
+        }
+    });
+}
+
+// ========================================
+// FUNCIONES DE UTILIDAD
+// ========================================
+
+function showErrorMessage(message) {
+    const main = document.querySelector('.dashboard-main');
+    if (!main) return;
+    
+    main.innerHTML = `
+        <div style="text-align:center;padding:40px;max-width:600px;margin:0 auto;">
+            <div style="font-size:3rem;margin-bottom:10px;">⚠️</div>
+            <div style="color:#dc3545;font-size:1.2rem;font-weight:600;margin-bottom:15px;">
+                Error cargando datos
+            </div>
+            <div style="color:#666;margin-bottom:20px;font-size:0.95rem;">
+                ${message}
+            </div>
+            <details style="text-align:left;font-size:0.85rem;color:#888;margin-bottom:20px;">
+                <summary style="cursor:pointer;font-weight:500;">Verificar:</summary>
+                <ul style="margin-top:10px;padding-left:20px;">
+                    <li>✓ Conexión a internet activa</li>
+                    <li>✓ Credenciales de Supabase válidas en config.js</li>
+                    <li>✓ Tabla "fichas_tecnicas" existe en Supabase</li>
+                    <li>✓ Políticas RLS permiten lectura</li>
+                    <li>✓ El usuario tiene permisos para leer la tabla</li>
+                </ul>
+            </details>
+            <button onclick="location.reload()"
+                    style="padding:10px 24px;background:#003366;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;font-weight:500;display:inline-flex;align-items:center;gap:8px;">
+                <span>🔄</span> Reintentar
+            </button>
+        </div>
+    `;
+    
+    document.querySelectorAll('.stat-value, .summary-value').forEach(el => {
+        if (!el.querySelector('.loading')) el.textContent = '-';
+    });
+}
+
+// ========================================
+// FUNCIÓN DE IMPRESIÓN
+// ========================================
+
+function imprimirGraficos() {
+    console.log('🖨️ Iniciando impresión...');
+    
+    if (window.Chart) {
+        Object.values(charts).forEach(chart => {
+            if (chart && chart.resize) {
+                chart.resize();
+            }
+        });
+    }
+    
+    setTimeout(() => {
+        window.print();
+        
+        setTimeout(() => {
+            if (window.Chart) {
+                Object.values(charts).forEach(chart => {
+                    if (chart && chart.resize) {
+                        chart.resize();
+                    }
+                });
+            }
+        }, 1000);
+    }, 500);
+}
+
+// ========================================
+// FUNCIÓN DE RECARGA MANUAL (DEBUG)
+// ========================================
+
+window.refreshFichasData = async function() {
+    console.log('🔄 Recargando datos desde Supabase...');
+    try {
+        const { data, error } = await supabaseClient
+            .from('fichas_tecnicas')
+            .select('*')
+            .order('fecha_creacion', { ascending: false });
+        
+        if (error) throw error;
+        
+        globalFichas = data;
+        calculateStats(data);
+        renderAllCharts(data);
+        
+        console.log(`✅ Datos actualizados: ${data.length} fichas`);
+        alert(`✅ Datos actualizados: ${data.length} fichas`);
+        
+    } catch (err) {
+        console.error('❌ Error recargando:', err);
+        alert('❌ Error recargando datos:\n' + err.message);
+    }
+};
+
+// ========================================
+// FIN DEL MÓDULO
+// ========================================
+console.log('✅ Módulo ficha-partes.js cargado correctamente');
+console.log('📊 9 gráficos disponibles:', Object.keys(charts).length);
