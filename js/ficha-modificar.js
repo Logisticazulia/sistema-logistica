@@ -5,9 +5,6 @@
  * Solo permite modificar:
  * - Información Técnico Mecánica
  * - Fotos (4 fotos)
- * 
- * NO permite modificar:
- * - Datos del vehículo (marca, modelo, tipo, etc.)
  */
 
 // ============================================
@@ -47,140 +44,32 @@ let fichaSeleccionada = null;
 let isEditing = false;
 
 // ============================================
-// CAMPOS EDITABLES VS NO EDITABLES
-// ============================================
-
-// ✅ CAMPOS QUE SÍ SE PUEDEN EDITAR
-const CAMPOS_EDITABLES = [
-    'causa',
-    'mecanica',
-    'diagnostico',
-    'ubicacion',
-    'tapiceria',
-    'cauchos',
-    'luces',
-    'observaciones',
-    'foto1',
-    'foto2',
-    'foto3',
-    'foto4'
-];
-
-// ❌ CAMPOS QUE NO SE PUEDEN EDITAR (Datos del vehículo)
-const CAMPOS_NO_EDITABLES = [
-    'marca',
-    'modelo',
-    'tipo',
-    'clase',
-    'serialCarroceria',
-    'serialMotor',
-    'color',
-    'placa',
-    'facsimilar',
-    'estatus',
-    'dependencia'
-];
-
-// ============================================
 // INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando modificación de fichas técnicas...');
     
-    // Cargar usuario autenticado
-    cargarUsuario();
-    
-    // Configurar vista previa
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
+    // Event listeners para vista previa
+    const inputs = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
+    inputs.forEach(function(input) {
+        input.addEventListener('input', actualizarVistaPrevia);
+    });
+    
     // Configurar botones
     configurarBotones();
-    
-    // Permitir buscar con Enter
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                buscarFicha();
-            }
-        });
-    }
     
     console.log('✅ Modificación de fichas inicializada');
 });
 
 // ============================================
-// FUNCIONES DE AUTENTICACIÓN
+// FUNCIONES DE BÚSQUEDA
 // ============================================
-
-/**
- * Carga y muestra el email del usuario autenticado
- */
-async function cargarUsuario() {
-    try {
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
-        
-        if (error) {
-            console.error('Error obteniendo sesión:', error);
-            return;
-        }
-        
-        const userEmail = document.getElementById('userEmail');
-        if (session?.user?.email) {
-            const email = session.user.email;
-            const nombreMostrar = email.length > 25 
-                ? email.split('@')[0].substring(0, 22) + '...' 
-                : email;
-            
-            userEmail.textContent = nombreMostrar;
-            userEmail.title = email;
-        }
-    } catch (err) {
-        console.error('Error mostrando usuario:', err);
-    }
-}
-
-/**
- * Configura el cierre de sesión
- */
-function configurarCerrarSesion() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (!logoutBtn) return;
-    
-    logoutBtn.addEventListener('click', async function() {
-        if (confirm('¿Está seguro de cerrar sesión?')) {
-            try {
-                await supabaseClient.auth.signOut();
-                localStorage.clear();
-                window.location.href = '../index.html';
-            } catch (error) {
-                console.error('Error al cerrar sesión:', error);
-                window.location.href = '../index.html';
-            }
-        }
-    });
-}
-
-// ============================================
-// FUNCIONES DE BÚSQUEDA ✅ CORREGIDO
-// ============================================
-
-/**
- * Busca una ficha técnica en la tabla fichas_tecnicas
- * SOLO busca en fichas_tecnicas (NO en vehiculos)
- */
 async function buscarFicha() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
-    const btnSearch = document.getElementById('btnSearch');
-    
-    if (!searchInput) {
-        console.error('❌ Campo de búsqueda no encontrado');
-        return;
-    }
-    
     const searchTerm = searchInput.value.trim().toUpperCase();
     
     if (!searchTerm) {
@@ -191,10 +80,10 @@ async function buscarFicha() {
     console.log('🔍 Buscando ficha técnica:', searchTerm);
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
-    if (btnSearch) btnSearch.disabled = true;
+    const btnSearch = document.getElementById('btnSearch');
+    btnSearch.disabled = true;
     
     try {
-        // ✅ BÚSQUEDA EN TABLA fichas_tecnicas (4 campos)
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
@@ -217,45 +106,28 @@ async function buscarFicha() {
         fichaSeleccionada = data[0];
         console.log('✅ Ficha encontrada:', fichaSeleccionada);
         
-        // Llenar formulario con los datos encontrados
         llenarFormulario(fichaSeleccionada);
-        
-        // Mostrar mensaje de éxito
-        mostrarAlerta('✅ Ficha técnica encontrada: ' + 
-            (fichaSeleccionada.marca || '') + ' ' + 
-            (fichaSeleccionada.modelo || '') + 
-            ' - Placa: ' + (fichaSeleccionada.placa || 'N/A'), 'success');
-        
-        // Actualizar vista previa
+        mostrarAlerta('✅ Ficha técnica encontrada: ' + fichaSeleccionada.marca + ' ' + fichaSeleccionada.modelo + ' - Placa: ' + fichaSeleccionada.placa, 'success');
         actualizarVistaPrevia();
         
-        // Mostrar botones de editar/cancelar
-        const btnEditar = document.getElementById('btnEditar');
-        const btnCancelar = document.getElementById('btnCancelar');
-        if (btnEditar) btnEditar.style.display = 'inline-flex';
-        if (btnCancelar) btnCancelar.style.display = 'inline-flex';
+        document.getElementById('btnEditar').style.display = 'inline-flex';
+        document.getElementById('btnCancelar').style.display = 'inline-flex';
         
     } catch (error) {
         console.error('❌ Error en buscarFicha:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
     } finally {
-        if (btnSearch) btnSearch.disabled = false;
+        btnSearch.disabled = false;
     }
 }
 
 // ============================================
 // FUNCIONES DE LLENADO DE FORMULARIO
 // ============================================
-
-/**
- * Llena el formulario con los datos de la ficha seleccionada
- * Bloquea campos no editables y habilita solo los editables
- */
 function llenarFormulario(ficha) {
     console.log('📝 Llenando formulario con ficha:', ficha);
     
-    // === 1. LLENAR CAMPOS NO EDITABLES (solo lectura) ===
-    const mapeoCamposNoEditables = {
+    const mapeoCampos = {
         'marca': 'marca',
         'modelo': 'modelo',
         'tipo': 'tipo',
@@ -266,10 +138,18 @@ function llenarFormulario(ficha) {
         'placa': 'placa',
         'facsimil': 'facsimilar',
         'estatus_ficha': 'estatus',
-        'dependencia': 'dependencia'
+        'dependencia': 'dependencia',
+        'causa': 'causa',
+        'mecanica': 'mecanica',
+        'diagnostico': 'diagnostico',
+        'ubicacion': 'ubicacion',
+        'tapiceria': 'tapiceria',
+        'cauchos': 'cauchos',
+        'luces': 'luces',
+        'observaciones': 'observaciones'
     };
     
-    Object.entries(mapeoCamposNoEditables).forEach(function(pair) {
+    Object.entries(mapeoCampos).forEach(function(pair) {
         const dbField = pair[0];
         const formField = pair[1];
         const element = document.getElementById(formField);
@@ -295,127 +175,120 @@ function llenarFormulario(ficha) {
             } else {
                 element.value = ficha[dbField];
             }
-            
-            // 🔒 BLOQUEAR CAMPO (siempre disabled)
-            element.disabled = true;
-            element.style.backgroundColor = '#f3f4f6';
-            element.style.cursor = 'not-allowed';
-            
-            const formGroup = element.closest('.form-group');
-            if (formGroup) {
-                formGroup.classList.add('locked');
-            }
         }
     });
     
-    // === 2. LLENAR CAMPOS EDITABLES (Técnico Mecánica) ===
-    const mapeoCamposEditables = {
-        'causa': 'causa',
-        'mecanica': 'mecanica',
-        'diagnostico': 'diagnostico',
-        'ubicacion': 'ubicacion',
-        'tapiceria': 'tapiceria',
-        'cauchos': 'cauchos',
-        'luces': 'luces',
-        'observaciones': 'observaciones'
-    };
-    
-    Object.entries(mapeoCamposEditables).forEach(function(pair) {
-        const dbField = pair[0];
-        const formField = pair[1];
-        const element = document.getElementById(formField);
-        
-        if (element && ficha[dbField]) {
-            element.value = ficha[dbField];
-            element.disabled = true; // Inicialmente disabled hasta modo edición
-        }
-    });
-    
-    // === 3. ESTABLECER ID DE LA FICHA ===
-    const fichaIdInput = document.getElementById('fichaId');
-    if (fichaIdInput && ficha.id) {
-        fichaIdInput.value = ficha.id;
-    }
-    
-    // === 4. CARGAR FOTOS EXISTENTES ===
+    document.getElementById('fichaId').value = ficha.id;
     cargarFotosExistentes(ficha);
-    
-    // === 5. ACTUALIZAR VISTA PREVIA ===
     actualizarVistaPrevia();
     
     console.log('✅ Formulario llenado correctamente');
 }
 
-/**
- * Carga las URLs de fotos existentes desde la ficha
- */
 function cargarFotosExistentes(ficha) {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewFoto' + i);
         const container = document.getElementById('previewFoto' + i + 'Container');
-        const placeholder = container ? container.querySelector('.placeholder') : null;
-        const btnRemove = container ? container.parentElement.querySelector('.btn-remove') : null;
-        const input = document.getElementById('foto' + i);
+        const placeholder = container.querySelector('.placeholder');
+        const btnRemove = container.parentElement.querySelector('.btn-remove');
         
-        const fotoUrlField = 'foto' + i + '_url';
-        
-        if (ficha[fotoUrlField]) {
-            fotosUrlsExistentes['foto' + i] = ficha[fotoUrlField];
-            fotosData['foto' + i] = ficha[fotoUrlField];
+        if (ficha['foto' + i + '_url']) {
+            fotosUrlsExistentes['foto' + i] = ficha['foto' + i + '_url'];
+            fotosData['foto' + i] = ficha['foto' + i + '_url'];
             fotosModificadas['foto' + i] = false;
             
-            if (img) {
-                img.src = ficha[fotoUrlField];
-                img.style.display = 'block';
-            }
-            if (placeholder) placeholder.style.display = 'none';
+            img.src = ficha['foto' + i + '_url'];
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
             if (btnRemove) btnRemove.style.display = 'flex';
-            if (input) input.disabled = true;
         } else {
             fotosUrlsExistentes['foto' + i] = null;
             fotosData['foto' + i] = null;
             fotosModificadas['foto' + i] = false;
             
-            if (img) {
-                img.src = '';
-                img.style.display = 'none';
-            }
-            if (placeholder) placeholder.style.display = 'flex';
+            img.src = '';
+            img.style.display = 'none';
+            placeholder.style.display = 'flex';
             if (btnRemove) btnRemove.style.display = 'none';
-            if (input) input.disabled = true;
         }
     }
-    
     actualizarFotosPreview();
 }
 
+// ============================================
+// FUNCIONES DE LIMPIEZA ✅ CORREGIDO
+// ============================================
+
 /**
- * Resetea el formulario a su estado inicial
+ * ✅ NUEVA FUNCIÓN: Limpiar formulario después de guardar exitosamente
+ */
+function limpiarDespuesDeGuardar() {
+    console.log('🧹 Limpiando formulario después de guardar...');
+    
+    // Limpiar campo de búsqueda
+    document.getElementById('searchInput').value = '';
+    
+    // Resetear formulario
+    document.getElementById('fichaForm').reset();
+    document.getElementById('fichaId').value = '';
+    
+    // Limpiar fotos
+    for (let i = 1; i <= 4; i++) {
+        const img = document.getElementById('previewFoto' + i);
+        const container = document.getElementById('previewFoto' + i + 'Container');
+        const placeholder = container.querySelector('.placeholder');
+        const btnRemove = container.parentElement.querySelector('.btn-remove');
+        const input = document.getElementById('foto' + i);
+        
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        if (btnRemove) btnRemove.style.display = 'none';
+        input.value = '';
+        
+        fotosData['foto' + i] = null;
+        fotosUrlsExistentes['foto' + i] = null;
+        fotosModificadas['foto' + i] = false;
+    }
+    
+    // Resetear estado
+    fichaSeleccionada = null;
+    isEditing = false;
+    
+    // Ocultar botones de edición
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnGuardar').style.display = 'none';
+    document.getElementById('btnCancelar').style.display = 'none';
+    
+    // Actualizar vista previa
+    actualizarVistaPrevia();
+    actualizarFotosPreview();
+    
+    // Scroll al inicio
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    console.log('✅ Formulario limpiado correctamente');
+}
+
+/**
+ * Resetear formulario (para botón limpiar)
  */
 function resetearFormulario() {
-    const form = document.getElementById('fichaForm');
-    if (form) form.reset();
-    
-    const fichaIdInput = document.getElementById('fichaId');
-    if (fichaIdInput) fichaIdInput.value = '';
+    document.getElementById('fichaForm').reset();
+    document.getElementById('fichaId').value = '';
     
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewFoto' + i);
         const container = document.getElementById('previewFoto' + i + 'Container');
-        const placeholder = container ? container.querySelector('.placeholder') : null;
-        const btnRemove = container ? container.parentElement.querySelector('.btn-remove') : null;
+        const placeholder = container.querySelector('.placeholder');
+        const btnRemove = container.parentElement.querySelector('.btn-remove');
         const input = document.getElementById('foto' + i);
         
-        if (img) {
-            img.src = '';
-            img.style.display = 'none';
-        }
-        if (placeholder) placeholder.style.display = 'flex';
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
         if (btnRemove) btnRemove.style.display = 'none';
-        if (input) {
-            input.value = '';
-            input.disabled = true;
-        }
+        input.value = '';
         
         fotosData['foto' + i] = null;
         fotosUrlsExistentes['foto' + i] = null;
@@ -425,36 +298,25 @@ function resetearFormulario() {
     actualizarVistaPrevia();
     actualizarFotosPreview();
     
-    const btnEditar = document.getElementById('btnEditar');
-    const btnCancelar = document.getElementById('btnCancelar');
-    if (btnEditar) btnEditar.style.display = 'none';
-    if (btnCancelar) btnCancelar.style.display = 'none';
+    fichaSeleccionada = null;
+    isEditing = false;
+    
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnCancelar').style.display = 'none';
 }
 
-/**
- * Limpia la búsqueda y el formulario
- */
 function limpiarBusqueda() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    const searchAlert = document.getElementById('searchAlert');
-    if (searchAlert) searchAlert.style.display = 'none';
-    
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchAlert').style.display = 'none';
     resetearFormulario();
     fichaSeleccionada = null;
-    
-    console.log('🧹 Búsqueda y formulario limpiados');
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnCancelar').style.display = 'none';
 }
 
 // ============================================
 // FUNCIONES DE EDICIÓN
 // ============================================
-
-/**
- * Activa el modo de edición del formulario
- * Solo habilita campos de Información Técnico Mecánica y fotos
- */
 function editarFicha() {
     if (!fichaSeleccionada) {
         mostrarAlerta('⚠️ Primero debe buscar una ficha técnica', 'error');
@@ -462,28 +324,18 @@ function editarFicha() {
     }
     
     console.log('✏️ Activando modo edición...');
+    isEditing = true;
     
-    // === 1. MANTENER BLOQUEADOS LOS CAMPOS PRINCIPALES ===
-    CAMPOS_NO_EDITABLES.forEach(function(campo) {
-        const element = document.getElementById(campo);
-        if (element) {
-            element.disabled = true;
-            element.style.backgroundColor = '#f3f4f6';
-            element.style.cursor = 'not-allowed';
+    const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
+    fields.forEach(function(field) {
+        if (field.id !== 'fichaId') {
+            field.disabled = false;
+            field.style.backgroundColor = 'white';
+            field.style.cursor = 'auto';
         }
     });
     
-    // === 2. HABILITAR SOLO CAMPOS EDITABLES ===
-    CAMPOS_EDITABLES.forEach(function(campo) {
-        const element = document.getElementById(campo);
-        if (element && (element.tagName !== 'INPUT' || element.type !== 'file')) {
-            element.disabled = false;
-            element.style.backgroundColor = 'white';
-            element.style.cursor = 'auto';
-        }
-    });
-    
-    // === 3. HABILITAR INPUTS DE FOTOS ===
+    // Habilitar inputs de fotos
     for (let i = 1; i <= 4; i++) {
         const input = document.getElementById('foto' + i);
         if (input) {
@@ -492,39 +344,30 @@ function editarFicha() {
         }
     }
     
-    // === 4. CAMBIAR VISIBILIDAD DE BOTONES ===
-    const btnEditar = document.getElementById('btnEditar');
-    const btnGuardar = document.getElementById('btnGuardar');
-    const btnCancelar = document.getElementById('btnCancelar');
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnGuardar').style.display = 'inline-flex';
+    document.getElementById('btnCancelar').style.display = 'inline-flex';
     
-    if (btnEditar) btnEditar.style.display = 'none';
-    if (btnGuardar) btnGuardar.style.display = 'inline-flex';
-    if (btnCancelar) btnCancelar.style.display = 'inline-flex';
-    
-    isEditing = true;
-    
-    mostrarAlerta('ℹ️ Editando ficha. Solo puede modificar: Información Técnico Mecánica y Fotos.', 'info');
+    mostrarAlerta('ℹ️ Editando ficha. Modifique los campos y haga clic en "Guardar Cambios".', 'info');
 }
 
 /**
- * Cancela la edición y restaura los datos originales
+ * ✅ CORREGIDO: Cancelar edición sin mensaje confuso
  */
 function cancelarEdicion() {
     if (fichaSeleccionada) {
         llenarFormulario(fichaSeleccionada);
     }
     
-    // Deshabilitar campos editables
-    CAMPOS_EDITABLES.forEach(function(campo) {
-        const element = document.getElementById(campo);
-        if (element && (element.tagName !== 'INPUT' || element.type !== 'file')) {
-            element.disabled = true;
-            element.style.backgroundColor = '#f3f4f6';
-            element.style.cursor = 'not-allowed';
+    const fields = document.querySelectorAll('#fichaForm input, #fichaForm select, #fichaForm textarea');
+    fields.forEach(function(field) {
+        if (field.id !== 'fichaId') {
+            field.disabled = true;
+            field.style.backgroundColor = '#f3f4f6';
+            field.style.cursor = 'not-allowed';
         }
     });
     
-    // Deshabilitar inputs de fotos
     for (let i = 1; i <= 4; i++) {
         const input = document.getElementById('foto' + i);
         if (input) {
@@ -533,27 +376,19 @@ function cancelarEdicion() {
         }
     }
     
-    // Cambiar visibilidad de botones
-    const btnEditar = document.getElementById('btnEditar');
-    const btnGuardar = document.getElementById('btnGuardar');
-    const btnCancelar = document.getElementById('btnCancelar');
-    
-    if (btnEditar) btnEditar.style.display = 'inline-flex';
-    if (btnGuardar) btnGuardar.style.display = 'none';
-    if (btnCancelar) btnCancelar.style.display = 'inline-flex';
+    document.getElementById('btnEditar').style.display = 'inline-flex';
+    document.getElementById('btnGuardar').style.display = 'none';
+    document.getElementById('btnCancelar').style.display = 'inline-flex';
     
     isEditing = false;
     
-    mostrarAlerta('ℹ️ Edición cancelada. Los cambios no fueron guardados.', 'info');
+    // ✅ Mensaje correcto (no dice que no se guardó)
+    mostrarAlerta('ℹ️ Edición cancelada. Se restauraron los datos originales.', 'info');
 }
 
 // ============================================
 // FUNCIONES DE VISTA PREVIA
 // ============================================
-
-/**
- * Actualiza la vista previa con los valores del formulario
- */
 function actualizarVistaPrevia() {
     const campos = {
         'marca': 'previewMarca',
@@ -591,70 +426,54 @@ function actualizarVistaPrevia() {
     });
 }
 
-/**
- * Maneja la previsualización de imágenes al seleccionar archivos
- */
 function previewImage(input, previewId) {
-    if (!input.files || !input.files[0]) return;
-    
-    const file = input.files[0];
-    
-    if (!file.type.startsWith('image/')) {
-        mostrarAlerta('⚠️ Por favor seleccione un archivo de imagen válido', 'error');
-        return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) {
-        mostrarAlerta('⚠️ La imagen no debe superar los 5MB', 'error');
-        return;
-    }
-    
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-        const img = document.getElementById(previewId);
-        const container = document.getElementById(previewId + 'Container');
-        const placeholder = container ? container.querySelector('.placeholder') : null;
-        const btnRemove = container ? container.parentElement.querySelector('.btn-remove') : null;
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
         
-        if (img) {
+        if (!file.type.startsWith('image/')) {
+            mostrarAlerta('⚠️ Por favor seleccione un archivo de imagen válido', 'error');
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            mostrarAlerta('⚠️ La imagen no debe superar los 5MB', 'error');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById(previewId);
+            const container = document.getElementById(previewId + 'Container');
+            const placeholder = container.querySelector('.placeholder');
+            const btnRemove = container.parentElement.querySelector('.btn-remove');
+            
             img.src = e.target.result;
             img.style.display = 'block';
-        }
-        if (placeholder) placeholder.style.display = 'none';
-        if (btnRemove) btnRemove.style.display = 'flex';
-        
-        const fotoNum = previewId.replace('previewFoto', 'foto');
-        fotosData[fotoNum] = e.target.result;
-        fotosModificadas[fotoNum] = true;
-        
-        actualizarFotosPreview();
-    };
-    
-    reader.onerror = function() {
-        mostrarAlerta('❌ Error al leer la imagen', 'error');
-    };
-    
-    reader.readAsDataURL(file);
+            placeholder.style.display = 'none';
+            if (btnRemove) btnRemove.style.display = 'flex';
+            
+            const fotoNum = previewId.replace('previewFoto', 'foto');
+            fotosData[fotoNum] = e.target.result;
+            fotosModificadas[fotoNum] = true;
+            
+            actualizarFotosPreview();
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
-/**
- * Elimina una foto del preview
- */
 function removeFoto(numero) {
     const img = document.getElementById('previewFoto' + numero);
     const container = document.getElementById('previewFoto' + numero + 'Container');
-    const placeholder = container ? container.querySelector('.placeholder') : null;
-    const btnRemove = container ? container.parentElement.querySelector('.btn-remove') : null;
+    const placeholder = container.querySelector('.placeholder');
+    const btnRemove = container.parentElement.querySelector('.btn-remove');
     const input = document.getElementById('foto' + numero);
     
-    if (img) {
-        img.src = '';
-        img.style.display = 'none';
-    }
-    if (placeholder) placeholder.style.display = 'flex';
+    img.src = '';
+    img.style.display = 'none';
+    placeholder.style.display = 'flex';
     if (btnRemove) btnRemove.style.display = 'none';
-    if (input) input.value = '';
+    input.value = '';
     
     fotosData['foto' + numero] = null;
     fotosUrlsExistentes['foto' + numero] = null;
@@ -663,22 +482,19 @@ function removeFoto(numero) {
     actualizarFotosPreview();
 }
 
-/**
- * Actualiza las fotos en la vista previa de la ficha impresa
- */
 function actualizarFotosPreview() {
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('previewImg' + i);
         const box = document.getElementById('previewBox' + i);
-        const span = box ? box.querySelector('span') : null;
+        const span = box.querySelector('span');
         
         if (fotosData['foto' + i]) {
             img.src = fotosData['foto' + i];
             img.style.display = 'block';
-            if (span) span.style.display = 'none';
+            span.style.display = 'none';
         } else {
-            if (img) img.style.display = 'none';
-            if (span) span.style.display = 'block';
+            img.style.display = 'none';
+            span.style.display = 'block';
         }
     }
 }
@@ -686,70 +502,49 @@ function actualizarFotosPreview() {
 // ============================================
 // FUNCIONES DE GUARDADO ✅ CORREGIDO
 // ============================================
-
-/**
- * Guarda los cambios de la ficha en Supabase
- * SOLO guarda campos editables (Técnico Mecánica + Fotos)
- */
 async function guardarFicha(event) {
-    if (event) event.preventDefault();
+    event.preventDefault();
     
     if (!fichaSeleccionada) {
         mostrarAlerta('⚠️ No hay ficha seleccionada', 'error');
         return;
     }
     
-    const btnGuardar = document.getElementById('btnGuardar');
-    if (btnGuardar) {
-        btnGuardar.disabled = true;
-        btnGuardar.innerHTML = '<span>⏳</span><span>Guardando...</span>';
+    const form = document.getElementById('fichaForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
+        return;
     }
     
+    const btnGuardar = document.getElementById('btnGuardar');
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = '<span>⏳</span><span>Guardando...</span>';
+    
     try {
-        console.log('💾 Guardando ficha ID:', fichaSeleccionada.id);
-        
-        // === PREPARAR DATOS ACTUALIZADOS (SOLO CAMPOS EDITABLES) ===
-        const fichaActualizada = {
-            // Información Técnico Mecánica
-            causa: (document.getElementById('causa')?.value || '').trim() || null,
-            mecanica: (document.getElementById('mecanica')?.value || '').trim() || null,
-            diagnostico: (document.getElementById('diagnostico')?.value || '').trim() || null,
-            ubicacion: (document.getElementById('ubicacion')?.value || '').trim() || null,
-            tapiceria: (document.getElementById('tapiceria')?.value || '').trim() || null,
-            cauchos: (document.getElementById('cauchos')?.value || '').trim() || null,
-            luces: (document.getElementById('luces')?.value || '').trim() || null,
-            observaciones: (document.getElementById('observaciones')?.value || '').trim() || null,
-            
-            // URLs de fotos
+        const fotoUrls = {
             foto1_url: fotosUrlsExistentes.foto1,
             foto2_url: fotosUrlsExistentes.foto2,
             foto3_url: fotosUrlsExistentes.foto3,
-            foto4_url: fotosUrlsExistentes.foto4,
-            
-            // Metadatos
-            updated_at: new Date().toISOString()
+            foto4_url: fotosUrlsExistentes.foto4
         };
         
-        // === SUBIR FOTOS MODIFICADAS A SUPABASE STORAGE ===
         const bucketName = 'fichas-tecnicas';
         
+        // Subir fotos modificadas
         for (let i = 1; i <= 4; i++) {
             if (fotosModificadas['foto' + i] && fotosData['foto' + i]) {
-                console.log('📤 Subiendo foto ' + i + '...');
-                
                 const base64Data = fotosData['foto' + i];
                 let blob;
                 
                 if (base64Data.startsWith('http')) {
-                    fichaActualizada['foto' + i + '_url'] = base64Data;
-                    continue;
-                } else {
                     const response = await fetch(base64Data);
                     blob = await response.blob();
+                } else {
+                    blob = await fetch(base64Data).then(function(r) { return r.blob(); });
                 }
                 
-                const fileName = 'ficha_' + Date.now() + '_foto' + i + '_' + 
-                    (fichaSeleccionada.placa || fichaSeleccionada.id) + '.jpg';
+                const fileName = 'ficha_' + Date.now() + '_foto' + i + '_' + fichaSeleccionada.placa + '.jpg';
                 
                 const { data: uploadData, error: uploadError } = await supabaseClient
                     .storage
@@ -760,7 +555,7 @@ async function guardarFicha(event) {
                     });
                 
                 if (uploadError) {
-                    console.error('❌ Error subiendo foto ' + i + ':', uploadError);
+                    console.error('Error subiendo foto ' + i + ':', uploadError);
                     throw uploadError;
                 }
                 
@@ -769,12 +564,30 @@ async function guardarFicha(event) {
                     .from(bucketName)
                     .getPublicUrl(fileName);
                 
-                fichaActualizada['foto' + i + '_url'] = urlData.publicUrl;
+                fotoUrls['foto' + i + '_url'] = urlData.publicUrl;
                 console.log('✅ Foto ' + i + ' subida:', urlData.publicUrl);
             }
         }
         
-        // === ACTUALIZAR REGISTRO EN SUPABASE ===
+        // Actualizar ficha
+        const fichaActualizada = {
+            causa: document.getElementById('causa').value.trim() || null,
+            mecanica: document.getElementById('mecanica').value.trim() || null,
+            diagnostico: document.getElementById('diagnostico').value.trim() || null,
+            ubicacion: document.getElementById('ubicacion').value.trim() || null,
+            tapiceria: document.getElementById('tapiceria').value.trim() || null,
+            cauchos: document.getElementById('cauchos').value.trim() || null,
+            luces: document.getElementById('luces').value.trim() || null,
+            observaciones: document.getElementById('observaciones').value.trim() || null,
+            foto1_url: fotoUrls.foto1_url,
+            foto2_url: fotoUrls.foto2_url,
+            foto3_url: fotoUrls.foto3_url,
+            foto4_url: fotoUrls.foto4_url,
+            updated_at: new Date().toISOString()
+        };
+        
+        console.log('📝 Actualizando ficha ID:', fichaSeleccionada.id);
+        
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .update(fichaActualizada)
@@ -789,32 +602,29 @@ async function guardarFicha(event) {
         
         console.log('✅ Ficha actualizada:', data);
         
+        // ✅ ACTUALIZAR FICHA SELECCIONADA CON NUEVOS DATOS
         fichaSeleccionada = Object.assign({}, fichaSeleccionada, data[0]);
         
+        // ✅ MOSTRAR MENSAJE DE ÉXITO CORRECTO
         mostrarAlerta('✅ Ficha técnica actualizada exitosamente', 'success');
         
+        // ✅ LIMPIAR FORMULARIO DESPUÉS DE GUARDAR (NO cancelarEdicion)
         setTimeout(function() {
-            cancelarEdicion();
+            limpiarDespuesDeGuardar();
         }, 2000);
         
     } catch (error) {
         console.error('❌ Error en guardarFicha:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
     } finally {
-        if (btnGuardar) {
-            btnGuardar.disabled = false;
-            btnGuardar.innerHTML = '<span>💾</span><span>Guardar Cambios</span>';
-        }
+        btnGuardar.disabled = false;
+        btnGuardar.innerHTML = '<span>💾</span><span>Guardar Cambios</span>';
     }
 }
 
 // ============================================
 // FUNCIONES DE UTILIDAD
 // ============================================
-
-/**
- * Muestra una alerta temporal en la interfaz
- */
 function mostrarAlerta(mensaje, tipo) {
     const alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
@@ -830,16 +640,14 @@ function mostrarAlerta(mensaje, tipo) {
     }, 5000);
 }
 
-/**
- * Configura los event listeners de los botones
- */
 function configurarBotones() {
-    const btnSearch = document.getElementById('btnSearch');
-    const btnLimpiar = document.getElementById('btnLimpiar');
     const btnEditar = document.getElementById('btnEditar');
     const btnGuardar = document.getElementById('btnGuardar');
     const btnCancelar = document.getElementById('btnCancelar');
+    const btnSearch = document.getElementById('btnSearch');
+    const btnLimpiar = document.getElementById('btnLimpiar');
     const logoutBtn = document.getElementById('logoutBtn');
+    const searchInput = document.getElementById('searchInput');
     
     if (btnSearch) {
         btnSearch.addEventListener('click', buscarFicha);
@@ -861,6 +669,15 @@ function configurarBotones() {
         btnCancelar.addEventListener('click', cancelarEdicion);
     }
     
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarFicha();
+            }
+        });
+    }
+    
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async function() {
             if (confirm('¿Está seguro de cerrar sesión?')) {
@@ -869,8 +686,6 @@ function configurarBotones() {
             }
         });
     }
-    
-    configurarCerrarSesion();
 }
 
 // ============================================
