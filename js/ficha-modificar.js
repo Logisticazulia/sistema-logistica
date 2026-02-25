@@ -41,6 +41,9 @@ const camposNoEditables = [];
 // ============================================
 // FUNCIONES DE BÚSQUEDA
 // ============================================
+// ============================================
+// FUNCIONES DE BÚSQUEDA ✅ CORREGIDO
+// ============================================
 async function buscarFicha() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
@@ -58,6 +61,45 @@ async function buscarFicha() {
     btnSearch.disabled = true;
     
     try {
+        // ✅ BÚSQUEDA EXACTA POR 4 CAMPOS (sin n_identificacion)
+        // Campos válidos en fichas_tecnicas: placa, facsimil, s_carroceria, s_motor
+        const { data, error } = await supabaseClient
+            .from('fichas_tecnicas')
+            .select('*')
+            .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm}`)
+            .limit(1);
+        
+        if (error) {
+            console.error('❌ Error en la búsqueda:', error);
+            mostrarAlerta('❌ Error al buscar: ' + error.message, 'error');
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            mostrarAlerta('❌ No se encontró ninguna ficha técnica con: ' + searchTerm, 'error');
+            fichaSeleccionada = null;
+            resetearFormulario();
+            return;
+        }
+        
+        fichaSeleccionada = data[0];
+        console.log('✅ Ficha encontrada:', fichaSeleccionada);
+        
+        llenarFormulario(fichaSeleccionada);
+        mostrarAlerta('✅ Ficha técnica encontrada: ' + fichaSeleccionada.marca + ' ' + fichaSeleccionada.modelo + ' - Placa: ' + fichaSeleccionada.placa, 'success');
+        actualizarVistaPrevia();
+        
+        // Mostrar botones de editar/cancelar después de buscar
+        document.getElementById('btnEditar').style.display = 'inline-flex';
+        document.getElementById('btnCancelar').style.display = 'inline-flex';
+        
+    } catch (error) {
+        console.error('❌ Error en buscarFicha:', error);
+        mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
+    } finally {
+        btnSearch.disabled = false;
+    }
+}
         // ✅ BÚSQUEDA EXACTA POR 5 CAMPOS: placa, facsimil, s_carroceria, s_motor, n_identificacion
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
