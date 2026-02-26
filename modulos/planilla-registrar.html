@@ -448,14 +448,21 @@ body {
 <h2 class="form-section-title">Estatus</h2>
 </div>
 <div class="form-fields-grid">
-<div class="form-group">
-<label>Situación <span class="required">*</span></label>
- <select id="situacion" name="situacion" class="form-select" required>
-        <option value="">Seleccione...</option>
-        <option value="REPARACION">REPARACION</option>
-        <option value="TALLER">TALLER</option>
-        <option value="DESINCORPORADA">DESINCORPORADA</option>
-    </select>
+        <div class="form-group">
+            <label>Situación <span class="required">*</span></label>
+            <select id="situacion" name="situacion" class="form-select" required>
+                <option value="">Seleccione...</option>
+                <option value="REPARACION">REPARACION</option>
+                <option value="TALLER">TALLER</option>
+                <option value="DESINCORPORADA">DESINCORPORADA</option>
+                <option value="COMODATO">COMODATO</option>
+                <option value="DENUNCIADA">DENUNCIADA</option>
+                <option value="DONACION">DONACION</option>
+                <option value="DONACION POR MOTIVO DE LA CANCELACION DE LA POLICIA MUNICIPAL DE MIRANDA">DONACION POR MOTIVO DE LA CANCELACION DE LA POLICIA MUNICIPAL DE MIRANDA</option>
+                <option value="INOPERATIVA">INOPERATIVA</option>
+                <option value="OPERATIVA">OPERATIVA</option>
+                <option value="PROCESO DE DESINCORPORACION">PROCESO DE DESINCORPORACIÓN</option>
+            </select>
 </div>
 <div class="form-group">
     <label>Estatus <span class="required">*</span></label>
@@ -463,7 +470,6 @@ body {
         <option value="">Seleccione...</option>
         <option value="OPERATIVA">OPERATIVA</option>
         <option value="INOPERATIVA">INOPERATIVA</option>
-        <option value="DESINCORPORADA">DESINCORPORADA</option>
     </select>
 </div>
 </div>
