@@ -23,7 +23,6 @@
             background: #f5f5f5;
         }
         
-        /* ✅ CONTENEDOR ANCHO COMO LAS DEMÁS PÁGINAS */
         .container {
             max-width: 1600px;
             margin: 0 auto;
@@ -77,12 +76,12 @@
             font-family: 'Roboto', sans-serif;
         }
         
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #003366;
-            box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
+        .form-group input:disabled,
+        .form-group select:disabled,
+        .form-group textarea:disabled {
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
         }
         
         /* Filas del formulario */
@@ -90,18 +89,21 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 15px;
+            margin-bottom: 15px;
         }
         
         .form-row-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
+            margin-bottom: 15px;
         }
         
         .form-row-2 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            margin-bottom: 15px;
         }
         
         /* Sección de búsqueda */
@@ -147,7 +149,7 @@
         
         .btn-search {
             padding: 12px 28px;
-            background: #2a9d8f;
+            background: #28a745;
             color: white;
             border: none;
             border-radius: 6px;
@@ -165,6 +167,43 @@
             background: #218838;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+        
+        .btn-clear {
+            padding: 12px 28px;
+            background: #ffc107;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-clear:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+        }
+        
+        .search-hint {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            margin-top: 10px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-hint span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .alert {
@@ -193,55 +232,6 @@
             border: 1px solid #bee5eb;
         }
         
-        /* Botones */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            margin-top: 20px;
-            margin-right: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: #003366;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #002244;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .btn-success {
-            background: #2a9d8f;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
         /* Vista Previa del Acta */
         .preview-section {
             background: white;
@@ -257,7 +247,6 @@
             text-align: center;
         }
         
-        /* ✅ ACTA MÁS ANCHA */
         .acta-container {
             border: 2px solid #003366;
             padding: 40px;
@@ -391,25 +380,61 @@
             margin: 5px 0;
         }
         
-        /* Botones de acción */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
+        /* Botones */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 20px;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
         }
         
-        /* Responsive */
+        .btn-primary {
+            background: #003366;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #002244;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
         @media (max-width: 1200px) {
             .form-row-4 {
                 grid-template-columns: repeat(2, 1fr);
             }
             .form-row-3 {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            .acta-container {
-                padding: 20px;
             }
         }
         
@@ -435,7 +460,6 @@
             }
         }
         
-        /* Estilos de impresión */
         @media print {
             .navbar,
             .module-header,
@@ -515,19 +539,73 @@
                             type="text" 
                             id="searchInput" 
                             class="search-input" 
-                            placeholder="Ingrese placa, facsímil o serial de carrocería..." 
+                            placeholder="Ingrese placa, facsímil, serial de carrocería, serial de motor o número de identificación..."
                             autocomplete="off"
                         >
-                        <button class="btn-search" onclick="buscarVehiculo()">
+                        <button class="btn-search" id="btnBuscar">
                             <span>🔍</span>
                             <span>Buscar</span>
                         </button>
+                        <button class="btn-clear" id="btnLimpiar">
+                            <span>🔄</span>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
+                    <div class="search-hint">
+                        <span>💡 Busque por:</span>
+                        <span>🚗 Placa</span>
+                        <span>📄 Facsímil</span>
+                        <span>🔢 Serial Carrocería</span>
+                        <span>⚙️ Serial Motor</span>
+                        <span>🆔 N° Identificación</span>
                     </div>
                 </div>
 
-                <h2>👤 Datos del Funcionario Asignado</h2>
+                <h2>📝 Datos del Vehículo</h2>
                 <form id="actaForm">
-                    <!-- FILA 1: 2 CAMPOS -->
+                    <!-- FILA 1: 4 CAMPOS -->
+                    <div class="form-row-4">
+                        <div class="form-group">
+                            <label>Marca</label>
+                            <input type="text" id="marca" name="marca" disabled placeholder="Se completará automáticamente">
+                        </div>
+                        <div class="form-group">
+                            <label>Modelo</label>
+                            <input type="text" id="modelo" name="modelo" disabled placeholder="Se completará automáticamente">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <input type="text" id="tipo" name="tipo" disabled placeholder="Se completará automáticamente">
+                        </div>
+                        <div class="form-group">
+                            <label>Clase</label>
+                            <input type="text" id="clase" name="clase" disabled placeholder="Se completará automáticamente">
+                        </div>
+                    </div>
+
+                    <!-- FILA 2: 4 CAMPOS -->
+                    <div class="form-row-4">
+                        <div class="form-group">
+                            <label>Serial Carrocería</label>
+                            <input type="text" id="serialCarroceria" name="serialCarroceria" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Serial Motor</label>
+                            <input type="text" id="serialMotor" name="serialMotor" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Placa</label>
+                            <input type="text" id="placa" name="placa" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Facsímil</label>
+                            <input type="text" id="facsimil" name="facsimil" disabled>
+                        </div>
+                    </div>
+
+                    <h2 style="margin-top: 30px;">👤 Datos del Funcionario Asignado</h2>
+                    
+                    <!-- FILA 3: 2 CAMPOS -->
                     <div class="form-row-2">
                         <div class="form-group">
                             <label>Nombre Completo del Funcionario <span class="required">*</span></label>
@@ -539,7 +617,7 @@
                         </div>
                     </div>
 
-                    <!-- FILA 2: 2 CAMPOS -->
+                    <!-- FILA 4: 2 CAMPOS -->
                     <div class="form-row-2">
                         <div class="form-group">
                             <label>Unidad de Asignación <span class="required">*</span></label>
@@ -553,15 +631,9 @@
 
                     <!-- BOTONES -->
                     <div>
-                        <button type="button" class="btn btn-secondary" onclick="window.location.href='acta.html'">
-                            ❌ Cancelar
-                        </button>
-                        <button type="button" class="btn btn-success" onclick="imprimirActa()">
-                            🖨️ Imprimir Acta
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="guardarActa()">
-                            💾 Guardar en Base de Datos
-                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnCancelar">❌ Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btnImprimir">🖨️ Imprimir Acta</button>
+                        <button type="button" class="btn btn-primary" id="btnGuardar">💾 Guardar Acta</button>
                     </div>
                 </form>
             </div>
@@ -570,7 +642,7 @@
             <div class="preview-section" id="actaPreview" style="display: none;">
                 <h2 style="color: #003366; margin-bottom: 20px;">Vista Previa del Acta</h2>
                 
-                <div class="acta-container">
+                <div class="acta-container" id="actaContent">
                     <div class="acta-header">
                         <div class="acta-logos">
                             <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
@@ -692,24 +764,14 @@
                         <p style="color: #003366; font-weight: 600; margin: 10px 0;">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
                         <p style="color: #003366; font-weight: 600; margin: 10px 0;">PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
                     </div>
-
-                    <!-- Botones de Acción -->
-                    <div class="action-buttons">
-                        <button type="button" class="btn btn-success" onclick="imprimirActa()">
-                            🖨️ Imprimir Acta
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="guardarActa()">
-                            💾 Guardar en Base de Datos
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- ================= SCRIPTS ================= -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="../js/config.js" defer></script>
-    <script src="../js/acta-crear.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/acta-crear.js"></script>
 </body>
 </html>
