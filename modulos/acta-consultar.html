@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Acta | Acta de Asignación</title>
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .search-section {
+            background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .search-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            font-size: 15px;
+            background: rgba(255,255,255,0.95);
+        }
+        .btn-search {
+            padding: 12px 28px;
+            background: #2a9d8f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .results-table th {
+            background: #003366;
+            color: white;
+        }
+        .results-table tr:hover {
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
+            </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">Cargando...</span>
+                <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <header class="module-header">
+            <div class="breadcrumb">
+                <a href="../dashboard.html">🏠 Dashboard</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="transporte.html">Transporte</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="acta.html">Acta de Asignación</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Consultar</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='acta.html'">
+                ← Volver
+            </button>
+        </header>
+
+        <section class="module-title-section">
+            <h1 class="module-title">🔍 Consultar Acta de Asignación</h1>
+            <p class="module-subtitle">Busque actas de asignación por placa, funcionario o número de acta</p>
+        </section>
+
+        <div class="search-section">
+            <h3 style="color: white; margin: 0 0 10px 0;">🔍 Búsqueda de Actas</h3>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" 
+                       placeholder="Ingrese placa, cédula del funcionario o número de acta...">
+                <button class="btn-search" onclick="buscarActa()">Buscar</button>
+            </div>
+        </div>
+
+        <div id="resultsContainer">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>N° Acta</th>
+                        <th>Placa</th>
+                        <th>Vehículo</th>
+                        <th>Funcionario</th>
+                        <th>Cédula</th>
+                        <th>Fecha Asignación</th>
+                        <th>Estatus</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #666;">
+                            Realice una búsqueda para ver los resultados
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../js/config.js" defer></script>
+    <script src="../js/acta-consultar.js" defer></script>
+</body>
+</html>
