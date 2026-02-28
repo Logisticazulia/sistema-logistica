@@ -23,22 +23,27 @@
             background: #f5f5f5;
         }
         
-        /* Contenedor principal - Diseño para escritorio */
+        /* ============================================
+           CONTENEDOR PRINCIPAL - VERTICAL
+           ============================================ */
         .container {
-            max-width: 1920px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;  /* ✅ VERTICAL: Formulario arriba, preview abajo */
             gap: 30px;
         }
         
-        /* Sección del formulario */
+        /* ============================================
+           FORMULARIO (ANCHO COMPLETO)
+           ============================================ */
         .form-section {
             background: white;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
         }
         
         .form-section h2 {
@@ -92,9 +97,10 @@
             cursor: not-allowed;
         }
         
-        .form-row-2 {
+        /* Filas del formulario */
+        .form-row-4 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -102,6 +108,13 @@
         .form-row-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -243,14 +256,14 @@
         }
         
         /* ============================================
-           VISTA PREVIA DEL DOCUMENTO - TIPO CARTA
+           VISTA PREVIA - HOJA CARTA (DEBAJO DEL FORM)
            ============================================ */
         .preview-section {
             background: white;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: auto;
+            width: 100%;
         }
         
         .preview-section h2 {
@@ -259,18 +272,19 @@
             text-align: center;
         }
         
-        /* Hoja tamaño carta */
+        /* ✅ HOJA TAMAÑO CARTA */
         .acta-document {
-            width: 21.59cm;
-            min-height: 27.94cm;
-            padding: 2.5cm 2cm;
+            width: 21.59cm;  /* ✅ Ancho carta */
+            min-height: 27.94cm;  /* ✅ Alto carta */
+            padding: 2cm;
             background: white;
             margin: 0 auto;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            font-family: Arial, sans-serif;
-            font-size: 12pt;
+            font-family: Arial, sans-serif;  /* ✅ Arial */
+            font-size: 12pt;  /* ✅ 12 puntos */
             line-height: 1.5;
-            color: #000;
+            color: #000;  /* ✅ Todo en negro */
+            text-align: justify;  /* ✅ Texto justificado */
         }
         
         /* Encabezado con logos */
@@ -278,20 +292,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 2px solid #000;
         }
         
         .acta-logo-left,
         .acta-logo-right {
-            width: 120px;
+            width: 100px;
             height: 80px;
             object-fit: contain;
         }
         
         .acta-logo-placeholder {
-            width: 120px;
+            width: 100px;
             height: 80px;
             background: #f0f0f0;
             border: 2px dashed #ccc;
@@ -310,34 +324,36 @@
         }
         
         .acta-title h1 {
-            font-size: 14pt;
+            font-size: 11pt;
             font-weight: bold;
             margin-bottom: 5px;
             color: #000;
+            line-height: 1.3;
         }
         
         .acta-title h2 {
-            font-size: 12pt;
+            font-size: 11pt;
             font-weight: bold;
-            margin-bottom: 3px;
+            margin: 3px 0;
             color: #000;
         }
         
         .acta-title h3 {
-            font-size: 12pt;
+            font-size: 11pt;
             font-weight: bold;
+            margin-top: 5px;
             color: #000;
         }
         
         /* Contenido del acta */
         .acta-body {
-            text-align: justify;
-            color: #000;
+            text-align: justify;  /* ✅ Justificado */
+            color: #000;  /* ✅ Negro */
         }
         
         .acta-body p {
             margin-bottom: 15px;
-            text-align: justify;
+            text-align: justify;  /* ✅ Justificado */
         }
         
         /* Tabla de datos del vehículo */
@@ -420,7 +436,6 @@
             .container {
                 display: block;
                 padding: 0;
-                max-width: none;
             }
             
             .preview-section {
@@ -432,6 +447,7 @@
                 box-shadow: none;
                 margin: 0;
                 padding: 2cm;
+                width: 100%;
             }
             
             @page {
@@ -441,8 +457,36 @@
         }
         
         @media (max-width: 1200px) {
-            .container {
+            .form-row-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-row-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .acta-document {
+                width: 100%;
+                padding: 1.5cm;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row-4,
+            .form-row-3,
+            .form-row-2 {
                 grid-template-columns: 1fr;
+            }
+            .acta-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            .search-input {
+                min-width: 100%;
+            }
+            .acta-document {
+                padding: 1cm;
             }
         }
     </style>
@@ -484,7 +528,9 @@
         </section>
 
         <div class="container">
-            <!-- Formulario -->
+            <!-- ============================================
+                 FORMULARIO (ARRIBA)
+                 ============================================ -->
             <div class="form-section">
                 <!-- BÚSQUEDA DE VEHÍCULO -->
                 <div class="search-section">
@@ -575,13 +621,16 @@
                 </form>
             </div>
 
-            <!-- Vista Previa del Documento -->
+            <!-- ============================================
+                 VISTA PREVIA (DEBAJO DEL FORMULARIO)
+                 ============================================ -->
             <div class="preview-section">
                 <h2 style="color: #003366; margin-bottom: 20px;">📄 Vista Previa del Acta</h2>
                 
                 <div class="acta-document" id="actaPreview">
                     <!-- Encabezado con logos -->
                     <div class="acta-header">
+                        <!-- ✅ LOGO IZQUIERDO -->
                         <div class="acta-logo-left">
                             <img src="../img/logo_izquierdo.png" alt="Logo Institucional" class="acta-logo-left" 
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -590,12 +639,14 @@
                             </div>
                         </div>
                         
+                        <!-- Título central -->
                         <div class="acta-title">
                             <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
                             <h2>Cuerpo de Policía Nacional Bolivariana</h2>
                             <h3>REDIP: OCCIDENTAL - CCPE ZULIA</h3>
                         </div>
                         
+                        <!-- ✅ LOGO DERECHO -->
                         <div class="acta-logo-right">
                             <img src="../img/logo_derecho.png" alt="Logo CPNB" class="acta-logo-right" 
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -607,7 +658,7 @@
 
                     <!-- Título del documento -->
                     <div style="text-align: center; margin-bottom: 25px;">
-                        <h2 style="font-size: 14pt; font-weight: bold; color: #000; margin-bottom: 10px;">
+                        <h2 style="font-size: 12pt; font-weight: bold; color: #000; margin-bottom: 10px;">
                             ACTA DE ASIGNACIÓN DE UNIDAD VEHICULAR
                         </h2>
                     </div>
@@ -658,12 +709,12 @@
                             de la ley de Bienes Públicos:
                         </p>
 
-                        <p style="background: #f9f9f9; padding: 15px; border-left: 4px solid #000; font-style: italic;">
+                        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #000; font-style: italic; margin: 15px 0;">
                             "El órgano o ente que tenga la propiedad, custodia, protección, adscripción o asignación 
                             de un bien público, nombrara un encargado o encargada, quien tendrá la responsabilidad de 
                             mantener y administrar el mismo, respondiendo patrimonialmente por cualquier daño, pérdida 
                             o deterioro sufrido por el bien custodiado, en cuanto le sea imputable."
-                        </p>
+                        </div>
 
                         <p>
                             El vehículo descrito, deberá mantenerse sin alteraciones en sus características originales 
