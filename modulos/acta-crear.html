@@ -24,12 +24,12 @@
         }
         
         /* ============================================
-           CONTENEDOR PRINCIPAL - ESCRITORIO ANCHO
+           CONTENEDOR PRINCIPAL - MÁS ANCHO (ESCRITORIO)
            ============================================ */
         .container {
-            max-width: 1920px;  /* ✅ MÁS ANCHO PARA ESCRITORIO */
+            max-width: 95%;  /* ✅ USA 95% DEL ANCHO DE PANTALLA */
             margin: 0 auto;
-            padding: 30px;
+            padding: 30px 40px;  /* ✅ MÁS ESPACIO LATERAL */
             display: flex;
             flex-direction: column;
             gap: 40px;
@@ -40,7 +40,7 @@
            ============================================ */
         .form-section {
             background: white;
-            padding: 40px;
+            padding: 40px 50px;  /* ✅ MÁS ESPACIO INTERNO */
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100%;
@@ -74,11 +74,6 @@
             font-size: 14px;
         }
         
-        .form-group label .required {
-            color: #dc2626;
-            margin-left: 3px;
-        }
-        
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -99,33 +94,27 @@
             box-shadow: 0 0 0 3px rgba(0,51,102,0.1);
         }
         
-        .form-group input:disabled,
-        .form-group select:disabled,
-        .form-group textarea:disabled {
-            background: #f3f4f6;
-            color: #6b7280;
-            cursor: not-allowed;
-        }
-        
-        /* Filas del formulario - MÁS ANCHAS */
+        /* ============================================
+           FILAS DEL FORMULARIO - MÁS ANCHAS
+           ============================================ */
         .form-row-4 {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);  /* ✅ 4 COLUMNAS */
+            gap: 25px;  /* ✅ MÁS ESPACIO ENTRE CAMPOS */
             margin-bottom: 20px;
         }
         
         .form-row-3 {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);  /* ✅ 3 COLUMNAS */
+            gap: 25px;
             margin-bottom: 20px;
         }
         
         .form-row-2 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);  /* ✅ 2 COLUMNAS */
+            gap: 25px;
             margin-bottom: 20px;
         }
         
@@ -134,9 +123,9 @@
            ============================================ */
         .search-section {
             background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            padding: 30px;
+            padding: 35px 40px;  /* ✅ MÁS GRANDE */
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             box-shadow: 0 4px 20px rgba(0,51,102,0.3);
         }
         
@@ -213,47 +202,12 @@
             box-shadow: 0 4px 12px rgba(255,193,7,0.3);
         }
         
-        .search-hint {
-            color: rgba(255,255,255,0.9);
-            font-size: 14px;
-            margin-top: 15px;
-            display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-            font-weight: 500;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
-        }
-        
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 2px solid #bee5eb;
-        }
-        
         /* ============================================
-           VISTA PREVIA - HOJA CARTA (DEBAJO DEL FORM)
+           VISTA PREVIA - HOJA CARTA (CENTRADA)
            ============================================ */
         .preview-section {
             background: white;
-            padding: 40px;
+            padding: 40px 50px;  /* ✅ MÁS ESPACIO */
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100%;
@@ -266,19 +220,19 @@
             font-size: 1.5rem;
         }
         
-        /* ✅ HOJA TAMAÑO CARTA */
+        /* ✅ HOJA TAMAÑO CARTA - CENTRADA EN EL CONTENEDOR ANCHO */
         .acta-document {
-            width: 21.59cm;  /* ✅ Ancho carta */
-            min-height: 27.94cm;  /* ✅ Alto carta */
+            width: 21.59cm;  /* ✅ Ancho carta estándar */
+            min-height: 27.94cm;  /* ✅ Alto carta estándar */
             padding: 2.5cm 2cm;
             background: white;
-            margin: 0 auto;
+            margin: 0 auto;  /* ✅ CENTRADA */
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            font-family: Arial, sans-serif;  /* ✅ Arial */
-            font-size: 12pt;  /* ✅ 12 puntos */
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
             line-height: 1.6;
-            color: #000;  /* ✅ Todo en negro */
-            text-align: justify;  /* ✅ Justificado */
+            color: #000;
+            text-align: justify;
         }
         
         /* Encabezado con logos */
@@ -468,6 +422,54 @@
         }
         
         /* ============================================
+           RESPONSIVE - TABLET Y MÓVIL
+           ============================================ */
+        @media (max-width: 1400px) {
+            .container {
+                max-width: 98%;
+                padding: 25px 30px;
+            }
+            
+            .form-section {
+                padding: 35px 40px;
+            }
+            
+            .form-row-4 {
+                grid-template-columns: repeat(2, 1fr);  /* 2 columnas en pantallas medianas */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 15px 20px;
+            }
+            
+            .form-section {
+                padding: 25px 30px;
+            }
+            
+            .form-row-4,
+            .form-row-3,
+            .form-row-2 {
+                grid-template-columns: 1fr;  /* 1 columna en móvil */
+            }
+            
+            .acta-document {
+                width: 100%;
+                padding: 1.5cm;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+        }
+        
+        /* ============================================
            ESTILOS DE IMPRESIÓN
            ============================================ */
         @media print {
@@ -483,6 +485,7 @@
             .container {
                 display: block;
                 padding: 0;
+                max-width: none;
             }
             
             .preview-section {
@@ -502,41 +505,11 @@
                 margin: 1.5cm;
             }
         }
-        
-        @media (max-width: 1400px) {
-            .form-row-4 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .form-row-4,
-            .form-row-3,
-            .form-row-2 {
-                grid-template-columns: 1fr;
-            }
-            
-            .acta-document {
-                padding: 1.5cm;
-            }
-            
-            .search-container {
-                flex-direction: column;
-            }
-            
-            .search-input {
-                min-width: 100%;
-            }
-        }
     </style>
 </head>
 <body class="dashboard-page">
-    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
-    <nav class="navbar" role="navigation">
+    <!-- Navegación -->
+    <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
                 <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
@@ -545,44 +518,35 @@
             </div>
             <div class="nav-user">
                 <span class="user-email" id="userEmail">Cargando...</span>
-                <button class="btn-logout" id="logoutBtn">
-                    <span class="logout-icon">🚪</span>
-                    <span class="logout-text">Cerrar Sesión</span>
-                </button>
+                <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
             </div>
         </div>
     </nav>
 
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
-    <main class="dashboard-main" role="main">
-        <!-- Header con Navegación de Migas -->
+    <!-- Contenido Principal -->
+    <main class="dashboard-main">
         <header class="module-header">
             <div class="breadcrumb">
-                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+                <a href="../dashboard.html">🏠 Dashboard</a>
                 <span class="breadcrumb-separator">/</span>
-                <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+                <a href="transporte.html">Transporte</a>
                 <span class="breadcrumb-separator">/</span>
-                <a href="acta.html" class="breadcrumb-link">Acta de Asignación</a>
+                <a href="acta.html">Acta de Asignación</a>
                 <span class="breadcrumb-separator">/</span>
                 <span class="breadcrumb-current">Crear Acta</span>
             </div>
-            <button class="btn btn-secondary btn-sm" onclick="window.location.href='acta.html'">
-                ← Volver a Acta
-            </button>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='acta.html'">← Volver</button>
         </header>
 
-        <!-- Título del Módulo -->
         <section class="module-title-section">
             <h1 class="module-title">📝 Crear Acta de Asignación de Vehículo</h1>
             <p class="module-subtitle">Busque el vehículo y complete los datos del funcionario asignado</p>
         </section>
 
         <div class="container">
-            <!-- ============================================
-                 FORMULARIO (ARRIBA)
-                 ============================================ -->
+            <!-- Formulario -->
             <div class="form-section">
-                <!-- SECCIÓN DE BÚSQUEDA -->
+                <!-- BÚSQUEDA DE VEHÍCULO -->
                 <div class="search-section">
                     <h3>🔍 Buscar Vehículo en Base de Datos</h3>
                     <div id="searchAlert" class="alert"></div>
@@ -602,13 +566,6 @@
                             <span>🔄</span>
                             <span>Limpiar</span>
                         </button>
-                    </div>
-                    <div class="search-hint">
-                        <span>💡 Busque por:</span>
-                        <span>🚗 Placa</span>
-                        <span>📄 Facsímil</span>
-                        <span>🔢 Serial Carrocería</span>
-                        <span>⚙️ Serial Motor</span>
                     </div>
                 </div>
 
@@ -678,9 +635,7 @@
                 </form>
             </div>
 
-            <!-- ============================================
-                 VISTA PREVIA (DEBAJO DEL FORMULARIO)
-                 ============================================ -->
+            <!-- Vista Previa (DEBAJO DEL FORMULARIO) -->
             <div class="preview-section" id="previewSection" style="display: none;">
                 <h2 style="color: #003366; margin-bottom: 30px;">📄 Vista Previa del Acta</h2>
                 
@@ -841,7 +796,7 @@
         </div>
     </main>
 
-    <!-- ================= SCRIPTS ================= -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
     <script src="../js/acta-crear.js"></script>
