@@ -12,15 +12,263 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        /* Estilos específicos para el acta */
-        .acta-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f5f5;
+        }
+        
+        /* ✅ CONTENEDOR ANCHO COMO LAS DEMÁS PÁGINAS */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* Formulario */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+        
+        .form-section h2 {
+            color: #003366;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #003366;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-group label .required {
+            color: #dc2626;
+            margin-left: 3px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #003366;
+            box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
+        }
+        
+        /* Filas del formulario */
+        .form-row-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        /* Sección de búsqueda */
+        .search-section {
+            background: linear-gradient(135deg, #003366 0%, #004080 100%);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,51,102,0.2);
+        }
+        
+        .search-section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            font-size: 15px;
+            background: rgba(255,255,255,0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+        }
+        
+        .btn-search {
+            padding: 12px 28px;
+            background: #2a9d8f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-search:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Botones */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 20px;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #003366;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #002244;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background: #2a9d8f;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Vista Previa del Acta */
+        .preview-section {
             background: white;
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
         }
+        
+        .preview-section h2 {
+            color: #003366;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* ✅ ACTA MÁS ANCHA */
+        .acta-container {
+            border: 2px solid #003366;
+            padding: 40px;
+            background: white;
+            width: 100%;
+            max-width: 100%;
+            text-align: justify;
+            line-height: 1.6;
+            font-size: 12px;
+        }
+        
         .acta-header {
             display: flex;
             justify-content: space-between;
@@ -29,80 +277,107 @@
             padding-bottom: 20px;
             border-bottom: 2px solid #003366;
         }
+        
         .acta-logos {
             display: flex;
             gap: 20px;
             align-items: center;
         }
+        
         .acta-logos img {
             height: 60px;
             width: auto;
         }
+        
         .acta-title {
             text-align: center;
             flex: 1;
         }
+        
         .acta-title h1 {
-            font-size: 18px;
+            font-size: 14px;
             color: #003366;
             margin: 5px 0;
+            line-height: 1.4;
             font-weight: 700;
         }
+        
         .acta-title h2 {
             font-size: 16px;
             color: #003366;
             margin: 5px 0;
-            font-weight: 600;
+            font-weight: 700;
         }
+        
+        .acta-title h3 {
+            font-size: 14px;
+            color: #003366;
+            margin-top: 10px;
+            font-weight: 700;
+        }
+        
         .acta-body {
             font-size: 12px;
-            line-height: 1.6;
+            line-height: 1.8;
             color: #333;
             text-align: justify;
         }
+        
+        .acta-body p {
+            margin: 15px 0;
+        }
+        
         .acta-table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
             border: 2px solid #003366;
         }
+        
         .acta-table th {
-            background: #003366;
+            background: #4a7c9b;
             color: white;
             padding: 10px;
+            text-align: left;
             font-size: 11px;
+            border: 2px solid #003366;
             font-weight: 700;
-            border: 1px solid #003366;
         }
+        
         .acta-table td {
             padding: 10px;
-            border: 1px solid #003366;
+            border: 2px solid #003366;
             font-size: 11px;
         }
+        
         .acta-section {
             margin: 20px 0;
             padding: 15px;
             background: #f8f9fa;
             border-left: 4px solid #003366;
         }
+        
         .acta-signatures {
             display: flex;
             justify-content: space-between;
             margin-top: 50px;
             gap: 50px;
         }
+        
         .signature-box {
             flex: 1;
             text-align: center;
             border-top: 2px solid #003366;
             padding-top: 15px;
         }
+        
         .signature-box p {
             font-size: 11px;
             font-weight: 600;
             margin: 5px 0;
             color: #003366;
         }
+        
         .acta-footer {
             margin-top: 40px;
             text-align: center;
@@ -111,256 +386,328 @@
             padding-top: 20px;
             border-top: 1px solid #ddd;
         }
-        .btn-imprimir {
-            background: #003366;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+        
+        .acta-footer p {
+            margin: 5px 0;
+        }
+        
+        /* Botones de acción */
+        .action-buttons {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
-        .btn-imprimir:hover {
-            background: #002244;
-        }
-        @media print {
-            .navbar, .module-header, .btn, .search-section, .form-section {
-                display: none !important;
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .form-row-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-row-3 {
+                grid-template-columns: repeat(2, 1fr);
             }
             .acta-container {
-                box-shadow: none;
                 padding: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row-4,
+            .form-row-3,
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+            .acta-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .acta-signatures {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            .search-input {
+                min-width: 100%;
+            }
+        }
+        
+        /* Estilos de impresión */
+        @media print {
+            .navbar,
+            .module-header,
+            .btn,
+            .search-section,
+            .form-section {
+                display: none !important;
+            }
+            .container {
+                display: block;
+                padding: 0;
+            }
+            .preview-section {
+                box-shadow: none;
+                padding: 0;
+            }
+            .acta-container {
+                border: 2px solid #003366;
+                width: 100%;
+                padding: 30px;
             }
         }
     </style>
 </head>
 <body class="dashboard-page">
-    <!-- Navegación -->
-    <nav class="navbar">
+    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
+    <nav class="navbar" role="navigation">
         <div class="nav-container">
             <div class="nav-brand">
                 <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-                <img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
+                <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
                 <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
             </div>
             <div class="nav-user">
-                <span class="user-email" id="userEmail">Cargando...</span>
-                <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+                <span class="user-email" id="userEmail">usuario@institucion.com</span>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Cerrar Sesión</span>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Contenido Principal -->
-    <main class="dashboard-main">
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="dashboard-main" role="main">
+        <!-- Header con Navegación de Migas -->
         <header class="module-header">
             <div class="breadcrumb">
-                <a href="../dashboard.html">🏠 Dashboard</a>
+                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
                 <span class="breadcrumb-separator">/</span>
-                <a href="transporte.html">Transporte</a>
+                <a href="transporte.html" class="breadcrumb-link">Transporte</a>
                 <span class="breadcrumb-separator">/</span>
-                <a href="acta.html">Acta de Asignación</a>
+                <a href="acta.html" class="breadcrumb-link">Acta de Asignación</a>
                 <span class="breadcrumb-separator">/</span>
                 <span class="breadcrumb-current">Crear Acta</span>
             </div>
-            <button class="btn btn-secondary btn-sm" onclick="window.location.href='acta.html'">← Volver</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='acta.html'">
+                ← Volver a Acta
+            </button>
         </header>
 
+        <!-- Título del Módulo -->
         <section class="module-title-section">
             <h1 class="module-title">📝 Crear Acta de Asignación de Vehículo</h1>
             <p class="module-subtitle">Busque el vehículo y complete los datos del funcionario asignado</p>
         </section>
 
-        <div class="acta-container">
-            <!-- Sección de Búsqueda de Vehículo -->
-            <div class="search-section" style="background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 8px; margin-bottom: 30px;">
-                <h3 style="color: white; margin-bottom: 15px;">🔍 Buscar Vehículo en Base de Datos</h3>
-                <div id="searchAlert" class="alert"></div>
-                <div class="search-container" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <input type="text" id="searchInput" class="search-input" 
-                           placeholder="Ingrese placa, facsímil o serial de carrocería..." 
-                           style="flex: 1; min-width: 250px; padding: 12px 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 15px; background: rgba(255,255,255,0.95);">
-                    <button class="btn-search" onclick="buscarVehiculo()" 
-                            style="padding: 12px 28px; background: #2a9d8f; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <span>🔍</span><span>Buscar</span>
-                    </button>
+        <div class="container">
+            <!-- Formulario -->
+            <div class="form-section">
+                <!-- SECCIÓN DE BÚSQUEDA -->
+                <div class="search-section">
+                    <h3>🔍 Buscar Vehículo en Base de Datos</h3>
+                    <div id="searchAlert" class="alert"></div>
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="search-input" 
+                            placeholder="Ingrese placa, facsímil o serial de carrocería..." 
+                            autocomplete="off"
+                        >
+                        <button class="btn-search" onclick="buscarVehiculo()">
+                            <span>🔍</span>
+                            <span>Buscar</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Formulario de Datos del Funcionario -->
-            <div class="form-section" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
-                <h2 style="color: #003366; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #003366;">👤 Datos del Funcionario Asignado</h2>
+                <h2>👤 Datos del Funcionario Asignado</h2>
                 <form id="actaForm">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <!-- FILA 1: 2 CAMPOS -->
+                    <div class="form-row-2">
                         <div class="form-group">
-                            <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #333; font-size: 14px;">Nombre Completo del Funcionario <span style="color: #dc2626;">*</span></label>
-                            <input type="text" id="funcionarioNombre" name="funcionarioNombre" required 
-                                   placeholder="Ej: PRIMER COMISARIO (CPNB) ALBERTO PARRA" 
-                                   style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <label>Nombre Completo del Funcionario <span class="required">*</span></label>
+                            <input type="text" id="funcionarioNombre" name="funcionarioNombre" required placeholder="Ej: PRIMER COMISARIO (CPNB) ALBERTO PARRA">
                         </div>
                         <div class="form-group">
-                            <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #333; font-size: 14px;">Cédula de Identidad <span style="color: #dc2626;">*</span></label>
-                            <input type="text" id="funcionarioCedula" name="funcionarioCedula" required 
-                                   placeholder="Ej: V-13.550.532" 
-                                   style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <label>Cédula de Identidad <span class="required">*</span></label>
+                            <input type="text" id="funcionarioCedula" name="funcionarioCedula" required placeholder="Ej: V-13.550.532">
+                        </div>
+                    </div>
+
+                    <!-- FILA 2: 2 CAMPOS -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Unidad de Asignación <span class="required">*</span></label>
+                            <input type="text" id="unidadAsignacion" name="unidadAsignacion" required placeholder="Ej: Oficina de Gestión Humana de la Redip Occidental">
                         </div>
                         <div class="form-group">
-                            <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #333; font-size: 14px;">Unidad de Asignación <span style="color: #dc2626;">*</span></label>
-                            <input type="text" id="unidadAsignacion" name="unidadAsignacion" required 
-                                   placeholder="Ej: Oficina de Gestión Humana de la Redip Occidental" 
-                                   style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <label>Cargo del Funcionario</label>
+                            <input type="text" id="funcionarioCargo" name="funcionarioCargo" placeholder="Ej: Director de la Redip Occidental">
                         </div>
-                        <div class="form-group">
-                            <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #333; font-size: 14px;">Cargo del Funcionario</label>
-                            <input type="text" id="funcionarioCargo" name="funcionarioCargo" 
-                                   placeholder="Ej: Director de la Redip Occidental" 
-                                   style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                        </div>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='acta.html'">
+                            ❌ Cancelar
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="imprimirActa()">
+                            🖨️ Imprimir Acta
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="guardarActa()">
+                            💾 Guardar en Base de Datos
+                        </button>
                     </div>
                 </form>
             </div>
 
             <!-- Vista Previa del Acta -->
-            <div id="actaPreview" style="display: none;">
-                <div class="acta-header">
-                    <div class="acta-logos">
-                        <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
-                        <img src="../img/logo_derecho.png" alt="Logo CPNB" onerror="this.style.display='none'">
+            <div class="preview-section" id="actaPreview" style="display: none;">
+                <h2 style="color: #003366; margin-bottom: 20px;">Vista Previa del Acta</h2>
+                
+                <div class="acta-container">
+                    <div class="acta-header">
+                        <div class="acta-logos">
+                            <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
+                            <img src="../img/logo_derecho.png" alt="Logo CPNB" onerror="this.style.display='none'">
+                        </div>
+                        <div class="acta-title">
+                            <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
+                            <h2>REDIP: OCCIDENTAL</h2>
+                            <h3>CCPE ZULIA</h3>
+                            <h3 style="margin-top: 15px;">Acta de Asignación de Unidad Vehicular</h3>
+                        </div>
                     </div>
-                    <div class="acta-title">
-                        <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
-                        <h2>Cuerpo de Policía Nacional Bolivariana<br>Dirección Nacional</h2>
-                        <h3 style="font-size: 14px; color: #003366; margin-top: 10px;">Acta de Asignación de Unidad Vehicular</h3>
-                    </div>
-                </div>
 
-                <div class="acta-body">
-                    <p style="margin-bottom: 20px;">
-                        Quien suscribe, <strong id="previewDirector">COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO</strong>, Director de la Redip Occidental y Coordinador del Centro Coordinación Policial Estadal Zulia, según resolución OGH-0262 de Fecha 05 de Septiembre del 2022, mediante la presente, dejo constancia de la entrega formal, en calidad de asignación para asuntos del servicio de la siguiente unidad del CCPE Estadal Zulia:
-                    </p>
-
-                    <!-- Tabla de Datos del Vehículo -->
-                    <table class="acta-table">
-                        <thead>
-                            <tr>
-                                <th>Marca-Modelo</th>
-                                <th>Serial Carrocería</th>
-                                <th>Serial Motor</th>
-                                <th>Placa</th>
-                                <th>Facsímil</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="previewMarcaModelo">-</td>
-                                <td id="previewSerialCarroceria">-</td>
-                                <td id="previewSerialMotor">-</td>
-                                <td id="previewPlaca">N/P</td>
-                                <td id="previewFacsimil">N/P</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="acta-section">
+                    <div class="acta-body">
                         <p>
-                            Esta unidad es asignada a la <strong id="previewUnidadAsignacion">-</strong>, en la figura jurídica del ciudadano <strong id="previewFuncionarioNombre">-</strong>, Cédula de Identidad número <strong id="previewFuncionarioCedula">-</strong>, esta unidad es asignada para uso netamente del servicio y labores de patrullaje en el referido Estado. Obedeciendo al Reimpulso de la gran misión cuadrante de Paz.
+                            Quien suscribe, <strong id="previewDirector">COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO</strong>, Director de la Redip Occidental y Coordinador del Centro Coordinación Policial Estadal Zulia, según resolución OGH-0262 de Fecha 05 de Septiembre del 2022, mediante la presente, dejo constancia de la entrega formal, en calidad de asignación para asuntos del servicio de la siguiente unidad del CCPE Estadal Zulia:
+                        </p>
+
+                        <!-- Tabla de Datos del Vehículo -->
+                        <table class="acta-table">
+                            <thead>
+                                <tr>
+                                    <th>Marca-Modelo</th>
+                                    <th>Serial Carrocería</th>
+                                    <th>Serial Motor</th>
+                                    <th>Placa</th>
+                                    <th>Facsímil</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="previewMarcaModelo">-</td>
+                                    <td id="previewSerialCarroceria">-</td>
+                                    <td id="previewSerialMotor">-</td>
+                                    <td id="previewPlaca">N/P</td>
+                                    <td id="previewFacsimil">N/P</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="acta-section">
+                            <p>
+                                Esta unidad es asignada a la <strong id="previewUnidadAsignacion">-</strong>, en la figura jurídica del ciudadano <strong id="previewFuncionarioNombre">-</strong>, Cédula de Identidad número <strong id="previewFuncionarioCedula">-</strong>, esta unidad es asignada para uso netamente del servicio y labores de patrullaje en el referido Estado. Obedeciendo al Reimpulso de la gran misión cuadrante de Paz.
+                            </p>
+                        </div>
+
+                        <p>
+                            En atención que la unidad descrita es un bien público, no podrá ser cedido temporal o definitivamente a terceras personas y en concordancia a lo dispuesto en el artículo 45 de la ley de Bienes Públicos:
+                        </p>
+
+                        <div class="acta-section" style="background: #fff3cd; border-left-color: #ffc107;">
+                            <p style="font-style: italic; margin: 10px 0;">
+                                "El órgano o ente que tenga la propiedad, custodia, protección, adscripción o asignación de un bien público, nombrara un encargado o encargada, quien tendrá la responsabilidad de mantener y administrar el mismo, respondiendo patrimonialmente por cualquier daño, pérdida o deterioro sufrido por el bien custodiado, en cuanto le sea imputable."
+                            </p>
+                        </div>
+
+                        <p>
+                            El vehículo descrito, deberá mantenerse sin alteraciones en sus características originales y cualquier daño visible u oculto, modificación, alteración, deterioro, colisión o extravío, será responsabilidad única del funcionario antes identificado; quien se compromete a cuidar, mantener, resguardar y custodiar, el bien del Estado asignado y que al momento de detectar cualquier falla, anomalía, desperfecto o irregularidad del mismo, deberá reportarla inmediatamente a las siguientes autoridades: Jefe de los servicios, Jefe del área de gestión administrativa y Jefe de del parque automotor del Centro de Coordinación Policial Zulia, a los fines de corregirlas y subsanarlas en su totalidad para evitar un daño mayor.
+                        </p>
+
+                        <p>
+                            La conducta contraria a lo antes señalado, será tomada como perjuicio material y daño patrimonial causado intencionalmente o por negligencia manifiesta al instituto y en consecuencia al Estado Venezolano; y se procederá de acuerdo a lo establecido en el artículo 92 de la Ley de Bienes Público:
+                        </p>
+
+                        <div class="acta-section" style="background: #fff3cd; border-left-color: #ffc107;">
+                            <p style="font-style: italic; margin: 10px 0;">
+                                "Los funcionarios o funcionarias públicos responderán penal, civil, administrativa y disciplinariamente por los delitos, faltas, hechos ilícitos e irregularidades administrativas cometidas en el ejercicio de su funciones con ocasión a la adquisición, uso, administración, mantenimiento, registro, supervisión y disposición de los Bienes Públicos. Esta responsabilidad no excluirá la que pudiere corresponderles por efecto de otras leyes o de su condición de ciudadanos o ciudadanas."
+                            </p>
+                        </div>
+
+                        <p>
+                            Pudiendo ser sancionado con la destitución del Funcionario, de conformidad con lo establecido en el artículo 97 numeral, 10 del Estatuto de la Función Policial: "Son causales de aplicación de la medida de destitución las siguientes:
+                        </p>
+
+                        <ol style="margin: 15px 0; padding-left: 25px;">
+                            <li style="margin: 8px 0;">Comisión intencional o por imprudencia, negligencia o impericias graves, de un hecho delictivo que afecte la prestación del servicio policial o la credibilidad y respetabilidad de la función policial.</li>
+                            <li style="margin: 8px 0;">Cualquier otra falta prevista en la Ley del Estatuto de la Función Pública.</li>
+                        </ol>
+
+                        <p>
+                            Como causal de destitución:
+                        </p>
+
+                        <div class="acta-section" style="background: #f8d7da; border-left-color: #dc3545;">
+                            <p style="font-weight: 600; margin: 10px 0;">
+                                8.- Perjuicio material severo causado intencionalmente o por negligencia manifiesta al patrimonio de la República.
+                            </p>
+                        </div>
+
+                        <p>
+                            Es obligación expresa del funcionario (a) conductor (a) de la unidad motorizada, realizar y registrar la inspección diaria de la unidad, que será supervisada y certificada por el Coordinador de este Centro de Coordinación policial. La negativa u omisión a realizar la inspección diaria señalada, se tendrá como indicador de manipulación irresponsable del vehículo asignado, incurriendo en desobediencia a instrucciones de servicio, conducta sancionada con la destitución de cargo, de conformidad con el artículo 97 numeral 3 del Estatuto de la Función Policial.
+                        </p>
+
+                        <p>
+                            3.- Conductas de desobediencia, insubordinación, obstaculización, sabotaje, daño material o indisposición frente a instrucciones de servicio o normas y pautas de conducta para el ejercicio de la Función Policial.
+                        </p>
+
+                        <p style="font-weight: 600;">
+                            Se levanta la presente Acta de Entrega obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">28</strong> del mes de <strong id="previewMes">Noviembre</strong> del año <strong id="previewAnio">2025</strong>.
                         </p>
                     </div>
 
-                    <p style="margin: 20px 0;">
-                        En atención que la unidad descrita es un bien público, no podrá ser cedido temporal o definitivamente a terceras personas y en concordancia a lo dispuesto en el artículo 45 de la ley de Bienes Públicos:
-                    </p>
-
-                    <div class="acta-section" style="background: #fff3cd; border-left-color: #ffc107;">
-                        <p style="font-style: italic; margin: 10px 0;">
-                            "El órgano o ente que tenga la propiedad, custodia, protección, adscripción o asignación de un bien público, nombrara un encargado o encargada, quien tendrá la responsabilidad de mantener y administrar el mismo, respondiendo patrimonialmente por cualquier daño, pérdida o deterioro sufrido por el bien custodiado, en cuanto le sea imputable."
-                        </p>
+                    <!-- Firmas -->
+                    <div class="acta-signatures">
+                        <div class="signature-box">
+                            <p>Funcionario Responsable quien recibe las unidades:</p>
+                            <p id="previewFirmaFuncionario" style="margin-top: 40px;">PRIMER COMISARIO (CPNB) ALBERTO PARRA<br>Cédula de Identidad numero V-13.550.532</p>
+                            <p>Jefe de la Oficina de Gestión Humana de la Redip Occidental</p>
+                        </div>
+                        <div class="signature-box">
+                            <p>COMISARIO MAYOR (CPNB) DR GUILLERMO PARRA PULIDO</p>
+                            <p style="margin-top: 40px;">Director de la Redip Occidental y Coordinador del CCPE-Zulia</p>
+                        </div>
                     </div>
 
-                    <p style="margin: 20px 0;">
-                        El vehículo descrito, deberá mantenerse sin alteraciones en sus características originales y cualquier daño visible u oculto, modificación, alteración, deterioro, colisión o extravío, será responsabilidad única del funcionario antes identificado; quien se compromete a cuidar, mantener, resguardar y custodiar, el bien del Estado asignado y que al momento de detectar cualquier falla, anomalía, desperfecto o irregularidad del mismo, deberá reportarla inmediatamente a las siguientes autoridades: Jefe de los servicios, Jefe del área de gestión administrativa y Jefe de del parque automotor del Centro de Coordinación Policial Zulia, a los fines de corregirlas y subsanarlas en su totalidad para evitar un daño mayor.
-                    </p>
-
-                    <p style="margin: 20px 0;">
-                        La conducta contraria a lo antes señalado, será tomada como perjuicio material y daño patrimonial causado intencionalmente o por negligencia manifiesta al instituto y en consecuencia al Estado Venezolano; y se procederá de acuerdo a lo establecido en el artículo 92 de la Ley de Bienes Público:
-                    </p>
-
-                    <div class="acta-section" style="background: #fff3cd; border-left-color: #ffc107;">
-                        <p style="font-style: italic; margin: 10px 0;">
-                            "Los funcionarios o funcionarias públicos responderán penal, civil, administrativa y disciplinariamente por los delitos, faltas, hechos ilícitos e irregularidades administrativas cometidas en el ejercicio de su funciones con ocasión a la adquisición, uso, administración, mantenimiento, registro, supervisión y disposición de los Bienes Públicos. Esta responsabilidad no excluirá la que pudiere corresponderles por efecto de otras leyes o de su condición de ciudadanos o ciudadanas."
-                        </p>
+                    <!-- Footer -->
+                    <div class="acta-footer">
+                        <p style="color: #dc2626; font-weight: 600; margin: 10px 0;">¡Chávez Vive!... La Patria Sigue...</p>
+                        <p style="color: #003366; font-weight: 600; margin: 10px 0;">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
+                        <p style="color: #003366; font-weight: 600; margin: 10px 0;">PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
                     </div>
 
-                    <p style="margin: 20px 0;">
-                        Pudiendo ser sancionado con la destitución del Funcionario, de conformidad con lo establecido en el artículo 97 numeral, 10 del Estatuto de la Función Policial: "Son causales de aplicación de la medida de destitución las siguientes:
-                    </p>
-
-                    <ol style="margin: 15px 0; padding-left: 25px;">
-                        <li style="margin: 8px 0;">Comisión intencional o por imprudencia, negligencia o impericias graves, de un hecho delictivo que afecte la prestación del servicio policial o la credibilidad y respetabilidad de la función policial.</li>
-                        <li style="margin: 8px 0;">Cualquier otra falta prevista en la Ley del Estatuto de la Función Pública.</li>
-                    </ol>
-
-                    <p style="margin: 20px 0;">
-                        Como causal de destitución:
-                    </p>
-
-                    <div class="acta-section" style="background: #f8d7da; border-left-color: #dc3545;">
-                        <p style="font-weight: 600; margin: 10px 0;">
-                            8.- Perjuicio material severo causado intencionalmente o por negligencia manifiesta al patrimonio de la República.
-                        </p>
+                    <!-- Botones de Acción -->
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-success" onclick="imprimirActa()">
+                            🖨️ Imprimir Acta
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="guardarActa()">
+                            💾 Guardar en Base de Datos
+                        </button>
                     </div>
-
-                    <p style="margin: 20px 0;">
-                        Es obligación expresa del funcionario (a) conductor (a) de la unidad motorizada, realizar y registrar la inspección diaria de la unidad, que será supervisada y certificada por el Coordinador de este Centro de Coordinación policial. La negativa u omisión a realizar la inspección diaria señalada, se tendrá como indicador de manipulación irresponsable del vehículo asignado, incurriendo en desobediencia a instrucciones de servicio, conducta sancionada con la destitución de cargo, de conformidad con el artículo 97 numeral 3 del Estatuto de la Función Policial.
-                    </p>
-
-                    <p style="margin: 20px 0;">
-                        3.- Conductas de desobediencia, insubordinación, obstaculización, sabotaje, daño material o indisposición frente a instrucciones de servicio o normas y pautas de conducta para el ejercicio de la Función Policial.
-                    </p>
-
-                    <p style="margin: 20px 0; font-weight: 600;">
-                        Se levanta la presente Acta de Entrega obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">28</strong> del mes de <strong id="previewMes">Noviembre</strong> del año <strong id="previewAnio">2025</strong>.
-                    </p>
-                </div>
-
-                <!-- Firmas -->
-                <div class="acta-signatures">
-                    <div class="signature-box">
-                        <p>Funcionario Responsable quien recibe las unidades:</p>
-                        <p id="previewFirmaFuncionario" style="margin-top: 40px;">PRIMER COMISARIO (CPNB) ALBERTO PARRA<br>Cédula de Identidad numero V-13.550.532</p>
-                        <p>Jefe de la Oficina de Gestión Humana de la Redip Occidental</p>
-                    </div>
-                    <div class="signature-box">
-                        <p>COMISARIO MAYOR (CPNB) DR GUILLERMO PARRA PULIDO</p>
-                        <p style="margin-top: 40px;">Director de la Redip Occidental y Coordinador del CCPE-Zulia</p>
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="acta-footer">
-                    <p style="color: #dc2626; font-weight: 600; margin: 10px 0;">¡Chávez Vive!... La Patria Sigue...</p>
-                    <p style="color: #003366; font-weight: 600; margin: 10px 0;">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
-                    <p style="color: #003366; font-weight: 600; margin: 10px 0;">PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
-                </div>
-
-                <!-- Botones de Acción -->
-                <div style="display: flex; gap: 15px; margin-top: 30px; justify-content: center;">
-                    <button class="btn-imprimir" onclick="imprimirActa()">
-                        🖨️ Imprimir Acta
-                    </button>
-                    <button class="btn-imprimir" onclick="guardarActa()" style="background: #2a9d8f;">
-                        💾 Guardar en Base de Datos
-                    </button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Scripts -->
+    <!-- ================= SCRIPTS ================= -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/config.js" defer></script>
     <script src="../js/acta-crear.js" defer></script>
