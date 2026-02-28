@@ -23,11 +23,11 @@
             background: #f5f5f5;
         }
         
-        /* ✅ CONTENEDOR PRINCIPAL - ANCHO COMPLETO COMO ficha-consultar.html */
+        /* ✅ CONTENEDOR PRINCIPAL - MISMO ANCHO QUE ficha-crear.html */
         .container {
-            max-width: 1600px;
+            max-width: 1600px;  /* ✅ IGUAL QUE ficha-crear.html */
             margin: 0 auto;
-            padding: 30px 40px;
+            padding: 30px 40px;  /* ✅ MÁS ESPACIO LATERAL */
             display: flex;
             flex-direction: column;
             gap: 30px;
@@ -36,7 +36,7 @@
         /* Formulario */
         .form-section {
             background: white;
-            padding: 40px 50px;
+            padding: 40px 50px;  /* ✅ MÁS ESPACIO INTERNO */
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             width: 100%;
@@ -116,10 +116,10 @@
             margin-bottom: 20px;
         }
         
-        /* ✅ SECCIÓN DE BÚSQUEDA - ANCHO COMPLETO COMO ficha-consultar.html */
+        /* ✅ SECCIÓN DE BÚSQUEDA - ANCHO COMPLETO */
         .search-section {
             background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            padding: 35px 40px;
+            padding: 35px 40px;  /* ✅ MÁS GRANDE */
             border-radius: 8px;
             margin-bottom: 35px;
             box-shadow: 0 4px 20px rgba(0,51,102,0.3);
@@ -135,7 +135,6 @@
             gap: 10px;
         }
         
-        /* ✅ CONTENEDOR DE BÚSQUEDA - LARGO COMPLETO */
         .search-container {
             display: flex;
             gap: 15px;
@@ -143,7 +142,6 @@
             width: 100%;
         }
         
-        /* ✅ INPUT DE BÚSQUEDA - OCUPA TODO EL ESPACIO DISPONIBLE */
         .search-input {
             flex: 1;
             min-width: 300px;
@@ -161,11 +159,6 @@
             box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
         }
         
-        .search-input::placeholder {
-            color: #666;
-        }
-        
-        /* Botones de búsqueda */
         .btn-search {
             padding: 14px 32px;
             background: #28a745;
@@ -179,7 +172,6 @@
             align-items: center;
             gap: 10px;
             transition: all 0.3s;
-            white-space: nowrap;
         }
         
         .btn-search:hover {
@@ -201,7 +193,6 @@
             align-items: center;
             gap: 10px;
             transition: all 0.3s;
-            white-space: nowrap;
         }
         
         .btn-clear:hover {
@@ -210,7 +201,6 @@
             box-shadow: 0 4px 12px rgba(255,193,7,0.3);
         }
         
-        /* Pistas de búsqueda */
         .search-hint {
             color: rgba(255,255,255,0.9);
             font-size: 13px;
@@ -218,12 +208,6 @@
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
-        }
-        
-        .search-hint span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
         
         .alert {
