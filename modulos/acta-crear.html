@@ -23,11 +23,11 @@
             background: #f5f5f5;
         }
         
-        /* ✅ CONTENEDOR PRINCIPAL - MISMO ANCHO QUE ficha-crear.html */
+        /* ✅ CONTENEDOR PRINCIPAL - ANCHO COMPLETO COMO ficha-consultar.html */
         .container {
-            max-width: 1600px;  /* ✅ IGUAL QUE ficha-crear.html */
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 30px 40px;  /* ✅ MÁS ESPACIO LATERAL */
+            padding: 30px 40px;
             display: flex;
             flex-direction: column;
             gap: 30px;
@@ -36,7 +36,7 @@
         /* Formulario */
         .form-section {
             background: white;
-            padding: 40px 50px;  /* ✅ MÁS ESPACIO INTERNO */
+            padding: 40px 50px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             width: 100%;
@@ -47,15 +47,6 @@
             margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 3px solid #003366;
-            font-size: 1.5rem;
-        }
-        
-        .form-section h3 {
-            color: #003366;
-            margin: 30px 0 20px 0;
-            font-size: 1.2rem;
-            padding-left: 15px;
-            border-left: 4px solid #003366;
         }
         
         .form-group {
@@ -103,35 +94,36 @@
             cursor: not-allowed;
         }
         
-        /* ✅ FILAS DEL FORMULARIO - 4 COLUMNAS COMO ficha-crear.html */
+        /* Filas del formulario */
         .form-row-4 {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);  /* ✅ 4 COLUMNAS */
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 20px;
         }
         
         .form-row-3 {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);  /* ✅ 3 COLUMNAS */
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 20px;
         }
         
         .form-row-2 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);  /* ✅ 2 COLUMNAS */
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 20px;
         }
         
-        /* Sección de búsqueda */
+        /* ✅ SECCIÓN DE BÚSQUEDA - ANCHO COMPLETO COMO ficha-consultar.html */
         .search-section {
             background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            padding: 35px 40px;  /* ✅ MÁS GRANDE */
+            padding: 35px 40px;
             border-radius: 8px;
             margin-bottom: 35px;
             box-shadow: 0 4px 20px rgba(0,51,102,0.3);
+            width: 100%;
         }
         
         .search-section h3 {
@@ -143,12 +135,15 @@
             gap: 10px;
         }
         
+        /* ✅ CONTENEDOR DE BÚSQUEDA - LARGO COMPLETO */
         .search-container {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            width: 100%;
         }
         
+        /* ✅ INPUT DE BÚSQUEDA - OCUPA TODO EL ESPACIO DISPONIBLE */
         .search-input {
             flex: 1;
             min-width: 300px;
@@ -157,6 +152,7 @@
             border-radius: 8px;
             font-size: 16px;
             background: rgba(255,255,255,0.95);
+            transition: all 0.3s;
         }
         
         .search-input:focus {
@@ -165,6 +161,11 @@
             box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
         }
         
+        .search-input::placeholder {
+            color: #666;
+        }
+        
+        /* Botones de búsqueda */
         .btn-search {
             padding: 14px 32px;
             background: #28a745;
@@ -178,6 +179,7 @@
             align-items: center;
             gap: 10px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .btn-search:hover {
@@ -199,6 +201,7 @@
             align-items: center;
             gap: 10px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .btn-clear:hover {
@@ -207,13 +210,20 @@
             box-shadow: 0 4px 12px rgba(255,193,7,0.3);
         }
         
+        /* Pistas de búsqueda */
         .search-hint {
             color: rgba(255,255,255,0.9);
-            font-size: 14px;
+            font-size: 13px;
             margin-top: 15px;
             display: flex;
-            gap: 25px;
+            gap: 20px;
             flex-wrap: wrap;
+        }
+        
+        .search-hint span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .alert {
@@ -249,13 +259,13 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             width: 100%;
+            text-align: center;
         }
         
         .preview-section h2 {
             color: #003366;
             margin-bottom: 30px;
             text-align: center;
-            font-size: 1.5rem;
         }
         
         .acta-document {
@@ -548,7 +558,7 @@
         <div class="container">
             <!-- Formulario -->
             <div class="form-section">
-                <!-- BÚSQUEDA DE VEHÍCULO -->
+                <!-- ✅ BÚSQUEDA DE VEHÍCULO - ANCHO COMPLETO -->
                 <div class="search-section">
                     <h3>🔍 Buscar Vehículo en Base de Datos</h3>
                     <div id="searchAlert" class="alert"></div>
