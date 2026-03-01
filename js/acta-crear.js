@@ -5,8 +5,10 @@
 
 // ============================================
 // ✅ VARIABLES GLOBALES
-// ============================================ */
+// ============================================
 let supabaseClient = null;
+let vehiculoActual = null; // Vehículo encontrado en la búsqueda
+let listaVehiculos = [];   // Array para almacenar múltiples vehículos
 
 // ============================================
 // ✅ INICIALIZAR SUPABASE Y CARGAR USUARIO
@@ -34,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Permitir búsqueda con Enter
     agregarListenerEnter();
+    
+    // Permitir Enter para agregar vehículo
+    agregarListenerEnterAgregar();
 });
 
 // ============================================
@@ -90,70 +95,26 @@ function cargarUsuario() {
 }
 
 // ============================================
-// ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
-// ============================================
-function actualizarActa() {
-    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
-    const funcionarioCedula = document.getElementById('funcionarioCedula').value;
-    const unidadAsignacion = document.getElementById('unidadAsignacion').value;
-    const funcionarioCargo = document.getElementById('funcionarioCargo').value;
-    
-    // Actualizar nombre y cédula en el cuerpo del acta
-    if (funcionarioNombre) {
-        document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
-    } else {
-        document.getElementById('previewFuncionarioNombre').textContent = '---';
-    }
-    
-    if (funcionarioCedula) {
-        document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
-    } else {
-        document.getElementById('previewFuncionarioCedula').textContent = '---';
-    }
-    
-    // ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
-    if (funcionarioNombre && funcionarioCedula) {
-        document.getElementById('previewFirmaFuncionario').innerHTML = 
-            `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula}`;
-    } else if (funcionarioNombre) {
-        document.getElementById('previewFirmaFuncionario').innerHTML = 
-            `${funcionarioNombre}, Cédula de Identidad numero V-00.000.000`;
-    } else {
-        // Valor por defecto si no hay datos
-        document.getElementById('previewFirmaFuncionario').textContent = '---';
-    }
-    
-    // ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
-    if (unidadAsignacion) {
-        document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
-        document.getElementById('previewCargoFuncionario').textContent = `Jefe de ${unidadAsignacion}`;
-    } else {
-        document.getElementById('previewUnidadAsignacion').textContent = '---';
-        document.getElementById('previewCargoFuncionario').textContent = '---';
-    }
-    
-    // Actualizar cargo del funcionario si existe
-    if (funcionarioCargo) {
-        document.getElementById('previewCargoFuncionario').textContent = funcionarioCargo;
-    }
-}
-
-// ============================================
 // ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
 // ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput').value.trim();
     const searchAlert = document.getElementById('searchAlert');
+    const btnAgregar = document.getElementById('btnAgregarVehiculo');
     
     // Validar que haya un término de búsqueda
     if (!searchInput) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
+        vehiculoActual = null;
+        btnAgregar.disabled = true;
         return;
     }
     
     // Verificar que supabaseClient esté inicializado
     if (!supabaseClient) {
         mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
+        vehiculoActual = null;
+        btnAgregar.disabled = true;
         return;
     }
     
@@ -217,50 +178,213 @@ async function buscarVehiculo() {
         
         if (!data) {
             mostrarAlerta('❌ Vehículo no encontrado en la base de datos', 'error');
-            limpiarDatosVehiculo();
+            vehiculoActual = null;
+            btnAgregar.disabled = true;
             return;
         }
         
-        // Llenar los campos del acta con los datos del vehículo
-        llenarDatosVehiculo(data);
-        mostrarAlerta('✅ Vehículo encontrado. Los datos han sido cargados en el acta.', 'success');
+        // Guardar vehículo encontrado en variable temporal
+        vehiculoActual = {
+            id: data.id,
+            marca: data.marca || 'N/P',
+            modelo: data.modelo || '',
+            serial_carroceria: data.s_carroceria || 'N/P',
+            serial_motor: data.s_motor || 'N/P',
+            placa: data.placa || 'N/P',
+            facsimil: data.facsimil || 'N/P'
+        };
+        
+        // Mostrar vista previa del vehículo encontrado
+        mostrarVistaPreviaVehiculo(vehiculoActual);
+        
+        // Habilitar botón para agregar
+        btnAgregar.disabled = false;
+        
+        mostrarAlerta('✅ Vehículo encontrado. Puede agregarlo a la lista.', 'success');
         
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
         mostrarAlerta('❌ Error de conexión. Intente nuevamente.', 'error');
+        vehiculoActual = null;
+        btnAgregar.disabled = true;
     }
 }
 
 // ============================================
-// ✅ LLENAR DATOS DEL VEHÍCULO EN EL ACTA
+// ✅ MOSTRAR VISTA PREVIA DEL VEHÍCULO
 // ============================================
-function llenarDatosVehiculo(vehiculo) {
-    // Mapear los campos de la tabla vehiculos a la vista previa del acta
+function mostrarVistaPreviaVehiculo(vehiculo) {
     document.getElementById('previewMarcaModelo').textContent = 
-        `${vehiculo.marca || 'N/P'} ${vehiculo.modelo || ''}`.trim() || 'N/P';
-    
-    document.getElementById('previewSerialCarroceria').textContent = 
-        vehiculo.s_carroceria || 'N/P';
-    
-    document.getElementById('previewSerialMotor').textContent = 
-        vehiculo.s_motor || 'N/P';
-    
-    document.getElementById('previewPlaca').textContent = 
-        vehiculo.placa || 'N/P';
-    
-    document.getElementById('previewFacsimil').textContent = 
-        vehiculo.facsimil || 'N/P';
+        `${vehiculo.marca} ${vehiculo.modelo}`.trim();
+    document.getElementById('previewSerialCarroceria').textContent = vehiculo.serial_carroceria;
+    document.getElementById('previewSerialMotor').textContent = vehiculo.serial_motor;
+    document.getElementById('previewPlaca').textContent = vehiculo.placa;
+    document.getElementById('previewFacsimil').textContent = vehiculo.facsimil;
 }
 
 // ============================================
-// ✅ LIMPIAR DATOS DEL VEHÍCULO
+// ✅ AGREGAR VEHÍCULO A LA LISTA
 // ============================================
-function limpiarDatosVehiculo() {
-    document.getElementById('previewMarcaModelo').textContent = '---';
-    document.getElementById('previewSerialCarroceria').textContent = '---';
-    document.getElementById('previewSerialMotor').textContent = '---';
-    document.getElementById('previewPlaca').textContent = '---';
-    document.getElementById('previewFacsimil').textContent = '---';
+function agregarVehiculoALista() {
+    if (!vehiculoActual) {
+        mostrarAlerta('⚠️ Primero debe buscar un vehículo', 'error');
+        return;
+    }
+    
+    // Verificar si el vehículo ya está en la lista (por placa o serial)
+    const yaExiste = listaVehiculos.some(v => 
+        v.placa === vehiculoActual.placa || 
+        v.serial_carroceria === vehiculoActual.serial_carroceria
+    );
+    
+    if (yaExiste) {
+        mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta', 'error');
+        return;
+    }
+    
+    // Agregar vehículo a la lista
+    listaVehiculos.push(vehiculoActual);
+    
+    // Actualizar la tabla de vehículos
+    renderizarListaVehiculos();
+    
+    // Actualizar el acta
+    renderizarVehiculosEnActa();
+    
+    // Limpiar búsqueda
+    document.getElementById('searchInput').value = '';
+    vehiculoActual = null;
+    document.getElementById('btnAgregarVehiculo').disabled = true;
+    
+    mostrarAlerta(`✅ Vehículo agregado. Total: ${listaVehiculos.length} vehículo(s)`, 'success');
+}
+
+// ============================================
+// ✅ RENDERIZAR LISTA DE VEHÍCULOS
+// ============================================
+function renderizarListaVehiculos() {
+    const tbody = document.getElementById('vehiclesListBody');
+    const section = document.getElementById('vehiclesListSection');
+    const count = document.getElementById('vehiclesCount');
+    
+    if (listaVehiculos.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    count.textContent = listaVehiculos.length;
+    
+    tbody.innerHTML = listaVehiculos.map((vehiculo, index) => `
+        <tr>
+            <td>${vehiculo.marca} ${vehiculo.modelo}</td>
+            <td>${vehiculo.serial_carroceria}</td>
+            <td>${vehiculo.serial_motor}</td>
+            <td>${vehiculo.placa}</td>
+            <td>${vehiculo.facsimil}</td>
+            <td>
+                <button class="btn-delete" onclick="eliminarVehiculo(${index})">
+                    🗑️ Eliminar
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ============================================
+// ✅ ELIMINAR VEHÍCULO DE LA LISTA
+// ============================================
+function eliminarVehiculo(index) {
+    if (index >= 0 && index < listaVehiculos.length) {
+        listaVehiculos.splice(index, 1);
+        renderizarListaVehiculos();
+        renderizarVehiculosEnActa();
+        
+        if (listaVehiculos.length === 0) {
+            mostrarAlerta('🗑️ Vehículo eliminado. La lista está vacía.', 'info');
+        } else {
+            mostrarAlerta(`🗑️ Vehículo eliminado. Total: ${listaVehiculos.length} vehículo(s)`, 'success');
+        }
+    }
+}
+
+// ============================================
+// ✅ RENDERIZAR VEHÍCULOS EN EL ACTA
+// ============================================
+function renderizarVehiculosEnActa() {
+    const tbody = document.getElementById('actaVehiclesBody');
+    
+    if (listaVehiculos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td>---</td>
+                <td>---</td>
+                <td>---</td>
+                <td>---</td>
+                <td>---</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = listaVehiculos.map(vehiculo => `
+        <tr>
+            <td>${vehiculo.marca} ${vehiculo.modelo}</td>
+            <td>${vehiculo.serial_carroceria}</td>
+            <td>${vehiculo.serial_motor}</td>
+            <td>${vehiculo.placa}</td>
+            <td>${vehiculo.facsimil}</td>
+        </tr>
+    `).join('');
+}
+
+// ============================================
+// ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
+// ============================================
+function actualizarActa() {
+    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
+    const funcionarioCedula = document.getElementById('funcionarioCedula').value;
+    const unidadAsignacion = document.getElementById('unidadAsignacion').value;
+    const funcionarioCargo = document.getElementById('funcionarioCargo').value;
+    
+    // Actualizar nombre y cédula en el cuerpo del acta
+    if (funcionarioNombre) {
+        document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
+    } else {
+        document.getElementById('previewFuncionarioNombre').textContent = '---';
+    }
+    
+    if (funcionarioCedula) {
+        document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
+    } else {
+        document.getElementById('previewFuncionarioCedula').textContent = '---';
+    }
+    
+    // ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
+    if (funcionarioNombre && funcionarioCedula) {
+        document.getElementById('previewFirmaFuncionario').innerHTML = 
+            `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula}`;
+    } else if (funcionarioNombre) {
+        document.getElementById('previewFirmaFuncionario').innerHTML = 
+            `${funcionarioNombre}, Cédula de Identidad numero V-00.000.000`;
+    } else {
+        // Valor por defecto si no hay datos
+        document.getElementById('previewFirmaFuncionario').textContent = '---';
+    }
+    
+    // ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
+    if (unidadAsignacion) {
+        document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
+        document.getElementById('previewCargoFuncionario').textContent = `Jefe de ${unidadAsignacion}`;
+    } else {
+        document.getElementById('previewUnidadAsignacion').textContent = '---';
+        document.getElementById('previewCargoFuncionario').textContent = '---';
+    }
+    
+    // Actualizar cargo del funcionario si existe
+    if (funcionarioCargo) {
+        document.getElementById('previewCargoFuncionario').textContent = funcionarioCargo;
+    }
 }
 
 // ============================================
@@ -282,10 +406,9 @@ function mostrarAlerta(mensaje, tipo) {
 // ✅ IMPRIMIR ACTA
 // ============================================
 function imprimirActa() {
-    // Validar que haya datos del vehículo
-    const marcaModelo = document.getElementById('previewMarcaModelo').textContent;
-    if (marcaModelo === '---' || marcaModelo === 'N/P') {
-        mostrarAlerta('⚠️ Primero debe buscar y cargar los datos del vehículo', 'error');
+    // Validar que haya vehículos en la lista
+    if (listaVehiculos.length === 0) {
+        mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
         return;
     }
     
@@ -314,10 +437,9 @@ async function guardarActa() {
         return;
     }
     
-    // Validar que haya datos del vehículo
-    const marcaModelo = document.getElementById('previewMarcaModelo').textContent;
-    if (marcaModelo === '---' || marcaModelo === 'N/P') {
-        mostrarAlerta('⚠️ Primero debe buscar y cargar los datos del vehículo', 'error');
+    // Validar que haya vehículos en la lista
+    if (listaVehiculos.length === 0) {
+        mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
         return;
     }
     
@@ -339,13 +461,7 @@ async function guardarActa() {
             cargo: document.getElementById('funcionarioCargo').value,
             unidad: unidadAsignacion
         },
-        vehiculo: {
-            marcaModelo: document.getElementById('previewMarcaModelo').textContent,
-            serialCarroceria: document.getElementById('previewSerialCarroceria').textContent,
-            serialMotor: document.getElementById('previewSerialMotor').textContent,
-            placa: document.getElementById('previewPlaca').textContent,
-            facsimil: document.getElementById('previewFacsimil').textContent
-        },
+        vehiculos: listaVehiculos, // Array con todos los vehículos
         fecha: {
             dia: document.getElementById('previewDia').textContent,
             mes: document.getElementById('previewMes').textContent,
@@ -366,7 +482,9 @@ async function guardarActa() {
         mostrarAlerta('✅ Acta guardada exitosamente en la base de datos', 'success');
         
         // Opcional: Limpiar formulario después de guardar
-        // limpiarFormulario();
+        setTimeout(() => {
+            limpiarFormulario();
+        }, 2000);
         
     } catch (error) {
         console.error('Error al guardar acta:', error);
@@ -440,6 +558,21 @@ function agregarListenerEnter() {
 }
 
 // ============================================
+// ✅ PERMITIR AGREGAR CON ENTER
+// ============================================
+function agregarListenerEnterAgregar() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && vehiculoActual) {
+                e.preventDefault();
+                agregarVehiculoALista();
+            }
+        });
+    }
+}
+
+// ============================================
 // ✅ LIMPIAR FORMULARIO COMPLETO
 // ============================================
 function limpiarFormulario() {
@@ -450,8 +583,16 @@ function limpiarFormulario() {
     document.getElementById('unidadAsignacion').value = '';
     document.getElementById('funcionarioCargo').value = '';
     
-    // Limpiar datos del vehículo en el acta
-    limpiarDatosVehiculo();
+    // Limpiar lista de vehículos
+    listaVehiculos = [];
+    vehiculoActual = null;
+    
+    // Limpiar vista previa
+    renderizarListaVehiculos();
+    renderizarVehiculosEnActa();
+    
+    // Deshabilitar botón de agregar
+    document.getElementById('btnAgregarVehiculo').disabled = true;
     
     // Restablecer valores por defecto en el acta
     document.getElementById('previewFuncionarioNombre').textContent = '---';
@@ -473,8 +614,8 @@ window.buscarVehiculo = buscarVehiculo;
 window.imprimirActa = imprimirActa;
 window.guardarActa = guardarActa;
 window.actualizarActa = actualizarActa;
-window.llenarDatosVehiculo = llenarDatosVehiculo;
-window.limpiarDatosVehiculo = limpiarDatosVehiculo;
+window.agregarVehiculoALista = agregarVehiculoALista;
+window.eliminarVehiculo = eliminarVehiculo;
+window.limpiarFormulario = limpiarFormulario;
 window.mostrarAlerta = mostrarAlerta;
 window.cargarUsuario = cargarUsuario;
-window.limpiarFormulario = limpiarFormulario;
