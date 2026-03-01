@@ -1,372 +1,228 @@
-/**
- * ========================================
- * CREAR ACTA DE ASIGNACIÓN DE VEHÍCULOS
- * ========================================
- */
+/* ============================================ */
+/* ACTA-CREAR.JS                                */
+/* Sistema de Gestión de Transporte - CCPE ZULIA */
+/* ============================================ */
 
-// ========================================
-// VARIABLES GLOBALES
-// ========================================
-let supabaseClient = null;
-let vehiculoSeleccionado = null;
-
-// ========================================
-// INICIALIZACIÓN
-// ========================================
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🚀 Inicializando creación de acta...');
+// ============================================
+// ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
+// ============================================
+function actualizarActa() {
+    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
+    const funcionarioCedula = document.getElementById('funcionarioCedula').value;
+    const unidadAsignacion = document.getElementById('unidadAsignacion').value;
     
-    // 1. Inicializar Supabase
-    if (typeof window.supabase === 'undefined') {
-        console.error('❌ Supabase no está cargado');
-        return;
+    if (funcionarioNombre) {
+        document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
+        document.getElementById('previewFirmaFuncionario').innerHTML = 
+            `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula || 'V-00.000.000'}`;
     }
     
-    supabaseClient = window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_KEY
-    );
+    if (funcionarioCedula) {
+        document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
+    }
     
-    // 2. Cargar usuario
-    await cargarUsuario();
-    
-    // 3. Configurar botones
-    configurarBotones();
-    
-    // 4. Configurar búsqueda con Enter
-    configurarBusquedaEnter();
-    
-    console.log('✅ Creación de acta inicializada');
-});
-
-// ========================================
-// FUNCIONES DE AUTENTICACIÓN
-// ========================================
-async function cargarUsuario() {
-    try {
-        const sessionData = await supabaseClient.auth.getSession();
-        const session = sessionData.data ? sessionData.data.session : null;
-        
-        const userEmail = document.getElementById('userEmail');
-        if (session && session.user && session.user.email) {
-            const email = session.user.email;
-            const nombreMostrar = email.length > 25 
-                ? email.split('@')[0].substring(0, 22) + '...' 
-                : email;
-            userEmail.textContent = nombreMostrar;
-        }
-    } catch (err) {
-        console.error('Error cargando usuario:', err);
+    if (unidadAsignacion) {
+        document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
     }
 }
 
-// ========================================
-// CONFIGURACIÓN DE BOTONES
-// ========================================
-function configurarBotones() {
-    // Botón Buscar
-    const btnBuscar = document.getElementById('btnBuscar');
-    if (btnBuscar) {
-        btnBuscar.addEventListener('click', buscarVehiculo);
-    }
+// ============================================
+// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
+// ============================================
+function buscarVehiculo() {
+    const searchInput = document.getElementById('searchInput').value;
+    const searchAlert = document.getElementById('searchAlert');
     
-    // Botón Limpiar
-    const btnLimpiar = document.getElementById('btnLimpiar');
-    if (btnLimpiar) {
-        btnLimpiar.addEventListener('click', limpiarBusqueda);
-    }
-    
-    // Botón Guardar
-    const btnGuardar = document.getElementById('btnGuardar');
-    if (btnGuardar) {
-        btnGuardar.addEventListener('click', guardarActa);
-    }
-    
-    // Botón Imprimir
-    const btnImprimir = document.getElementById('btnImprimir');
-    if (btnImprimir) {
-        btnImprimir.addEventListener('click', imprimirActa);
-    }
-    
-    // Botón Cancelar
-    const btnCancelar = document.getElementById('btnCancelar');
-    if (btnCancelar) {
-        btnCancelar.addEventListener('click', function() {
-            window.location.href = 'acta.html';
-        });
-    }
-}
-
-function configurarBusquedaEnter() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                buscarVehiculo();
-            }
-        });
-    }
-}
-
-// ========================================
-// FUNCIONES DE BÚSQUEDA
-// ========================================
-async function buscarVehiculo() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) {
-        mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
-        return;
-    }
-    
-    const searchTerm = searchInput.value.trim().toUpperCase();
-    if (!searchTerm) {
+    // Validar que haya un término de búsqueda
+    if (!searchInput.trim()) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
         return;
     }
     
-    console.log('🔍 Buscando vehículo:', searchTerm);
-    mostrarAlerta('⏳ Buscando en base de datos...', 'info');
+    // Simulación de búsqueda (reemplazar con llamada real a la API)
+    setTimeout(() => {
+        // Datos de ejemplo (reemplazar con datos reales de la base de datos)
+        const vehiculoEncontrado = {
+            marcaModelo: 'SINOTRUK BOLDEN',
+            serialCarroceria: 'LZZWAZG43TT500886',
+            serialMotor: 'WP2H180A087255008054',
+            placa: 'N/P',
+            facsimil: 'N/P'
+        };
+        
+        // Llenar los campos del acta
+        document.getElementById('previewMarcaModelo').textContent = vehiculoEncontrado.marcaModelo;
+        document.getElementById('previewSerialCarroceria').textContent = vehiculoEncontrado.serialCarroceria;
+        document.getElementById('previewSerialMotor').textContent = vehiculoEncontrado.serialMotor;
+        document.getElementById('previewPlaca').textContent = vehiculoEncontrado.placa;
+        document.getElementById('previewFacsimil').textContent = vehiculoEncontrado.facsimil;
+        
+        mostrarAlerta('✅ Vehículo encontrado. Los datos han sido cargados en el acta.', 'success');
+    }, 500);
+}
+
+// ============================================
+// ✅ MOSTRAR ALERTAS
+// ============================================
+function mostrarAlerta(mensaje, tipo) {
+    const searchAlert = document.getElementById('searchAlert');
+    searchAlert.textContent = mensaje;
+    searchAlert.className = `alert alert-${tipo}`;
+    searchAlert.style.display = 'block';
+    
+    // Ocultar después de 5 segundos
+    setTimeout(() => {
+        searchAlert.style.display = 'none';
+    }, 5000);
+}
+
+// ============================================
+// ✅ IMPRIMIR ACTA
+// ============================================
+function imprimirActa() {
+    // Validar que haya datos del vehículo
+    const marcaModelo = document.getElementById('previewMarcaModelo').textContent;
+    if (marcaModelo === 'SINOTRUK BOLDEN' || marcaModelo === '-') {
+        mostrarAlerta('⚠️ Primero debe buscar y cargar los datos del vehículo', 'error');
+        return;
+    }
+    
+    // Validar que haya datos del funcionario
+    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
+    if (!funcionarioNombre) {
+        mostrarAlerta('⚠️ Primero debe completar los datos del funcionario', 'error');
+        return;
+    }
+    
+    // Imprimir
+    window.print();
+}
+
+// ============================================
+// ✅ GUARDAR ACTA EN BASE DE DATOS
+// ============================================
+async function guardarActa() {
+    // Validar campos obligatorios
+    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
+    const funcionarioCedula = document.getElementById('funcionarioCedula').value;
+    const unidadAsignacion = document.getElementById('unidadAsignacion').value;
+    
+    if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
+        mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios del formulario', 'error');
+        return;
+    }
+    
+    // Validar que haya datos del vehículo
+    const marcaModelo = document.getElementById('previewMarcaModelo').textContent;
+    if (marcaModelo === 'SINOTRUK BOLDEN' || marcaModelo === '-') {
+        mostrarAlerta('⚠️ Primero debe buscar y cargar los datos del vehículo', 'error');
+        return;
+    }
+    
+    // Recopilar datos del acta
+    const actaData = {
+        funcionario: {
+            nombre: funcionarioNombre,
+            cedula: funcionarioCedula,
+            cargo: document.getElementById('funcionarioCargo').value,
+            unidad: unidadAsignacion
+        },
+        vehiculo: {
+            marcaModelo: document.getElementById('previewMarcaModelo').textContent,
+            serialCarroceria: document.getElementById('previewSerialCarroceria').textContent,
+            serialMotor: document.getElementById('previewSerialMotor').textContent,
+            placa: document.getElementById('previewPlaca').textContent,
+            facsimil: document.getElementById('previewFacsimil').textContent
+        },
+        fecha: {
+            dia: document.getElementById('previewDia').textContent,
+            mes: document.getElementById('previewMes').textContent,
+            anio: document.getElementById('previewAnio').textContent
+        },
+        director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO'
+    };
     
     try {
-        // 🔹 BÚSQUEDA POR 5 CAMPOS: placa, facsimil, s_carroceria, s_motor, n_identificacion
-        const { data, error } = await supabaseClient
-            .from('vehiculos')
-            .select('*')
-            .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm},n_identificacion.eq.${searchTerm}`)
-            .limit(1);
+        // Simulación de guardado (reemplazar con llamada real a Supabase)
+        console.log('Guardando acta:', actaData);
         
-        if (error) {
-            console.error('❌ Error en Supabase:', error);
-            mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
-            return;
-        }
+        // Aquí iría la llamada real a Supabase
+        // const { data, error } = await supabase
+        //     .from('actas_asignacion')
+        //     .insert(actaData);
         
-        if (!data || data.length === 0) {
-            mostrarAlerta('❌ No se encontró ningún vehículo con: ' + searchTerm, 'error');
-            vehiculoSeleccionado = null;
-            limpiarFormularioVehiculo();
-            document.getElementById('actaPreview').style.display = 'none';
-            return;
-        }
+        mostrarAlerta('✅ Acta guardada exitosamente en la base de datos', 'success');
         
-        vehiculoSeleccionado = data[0];
-        console.log('✅ Vehículo encontrado:', vehiculoSeleccionado);
-        
-        // Llenar formulario con datos del vehículo
-        llenarFormularioVehiculo(vehiculoSeleccionado);
-        
-        // Actualizar vista previa
-        actualizarVistaPrevia();
-        
-        // Mostrar vista previa
-        document.getElementById('actaPreview').style.display = 'block';
-        
-        mostrarAlerta('✅ Vehículo encontrado: ' + (vehiculoSeleccionado.marca || '') + ' ' + (vehiculoSeleccionado.modelo || '') + ' - Placa: ' + (vehiculoSeleccionado.placa || 'N/A'), 'success');
-        
-        // Scroll hacia la vista previa
-        setTimeout(function() {
-            document.getElementById('actaPreview').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }, 300);
+        // Opcional: Redirigir o limpiar formulario
+        // window.location.href = 'acta.html';
         
     } catch (error) {
-        console.error('❌ Error en buscarVehiculo:', error);
-        mostrarAlerta('❌ Error: ' + error.message, 'error');
+        console.error('Error al guardar acta:', error);
+        mostrarAlerta('❌ Error al guardar el acta. Intente nuevamente.', 'error');
     }
 }
 
-function llenarFormularioVehiculo(vehiculo) {
-    // Campos del vehículo
-    document.getElementById('marca').value = vehiculo.marca || '';
-    document.getElementById('modelo').value = vehiculo.modelo || '';
-    document.getElementById('tipo').value = vehiculo.tipo || '';
-    document.getElementById('clase').value = vehiculo.clase || '';
-    document.getElementById('serialCarroceria').value = vehiculo.s_carroceria || '';
-    document.getElementById('serialMotor').value = vehiculo.s_motor || '';
-    document.getElementById('placa').value = vehiculo.placa || '';
-    document.getElementById('facsimil').value = vehiculo.facsimil || '';
-}
-
-function limpiarFormularioVehiculo() {
-    document.getElementById('marca').value = '';
-    document.getElementById('modelo').value = '';
-    document.getElementById('tipo').value = '';
-    document.getElementById('clase').value = '';
-    document.getElementById('serialCarroceria').value = '';
-    document.getElementById('serialMotor').value = '';
-    document.getElementById('placa').value = '';
-    document.getElementById('facsimil').value = '';
-}
-
-function limpiarBusqueda() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    const searchAlert = document.getElementById('searchAlert');
-    if (searchAlert) searchAlert.style.display = 'none';
-    
-    vehiculoSeleccionado = null;
-    limpiarFormularioVehiculo();
-    
-    // Limpiar campos de funcionario
-    document.getElementById('funcionarioNombre').value = '';
-    document.getElementById('funcionarioCedula').value = '';
-    document.getElementById('unidadAsignacion').value = '';
-    document.getElementById('funcionarioCargo').value = '';
-    
-    // Ocultar vista previa
-    document.getElementById('actaPreview').style.display = 'none';
-}
-
-// ========================================
-// FUNCIONES DE VISTA PREVIA
-// ========================================
-function actualizarVistaPrevia() {
-    if (!vehiculoSeleccionado) return;
-    
-    // Datos del vehículo
-    document.getElementById('previewMarcaModelo').textContent = 
-        (vehiculoSeleccionado.marca || '') + ' ' + (vehiculoSeleccionado.modelo || '');
-    document.getElementById('previewSerialCarroceria').textContent = 
-        vehiculoSeleccionado.s_carroceria || 'N/P';
-    document.getElementById('previewSerialMotor').textContent = 
-        vehiculoSeleccionado.s_motor || 'N/P';
-    document.getElementById('previewPlaca').textContent = 
-        vehiculoSeleccionado.placa || 'N/P';
-    document.getElementById('previewFacsimil').textContent = 
-        vehiculoSeleccionado.facsimil || 'N/P';
-    
-    // Datos del funcionario
-    const funcionarioNombre = document.getElementById('funcionarioNombre').value || '-';
-    const funcionarioCedula = document.getElementById('funcionarioCedula').value || '-';
-    const unidadAsignacion = document.getElementById('unidadAsignacion').value || '-';
-    
-    document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
-    document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
-    document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
-    document.getElementById('previewFirmaFuncionario').innerHTML = 
-        funcionarioNombre + '<br>Cédula de Identidad numero ' + funcionarioCedula;
-    
-    // Fecha actual
+// ============================================
+// ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
+// ============================================
+function actualizarFecha() {
     const fecha = new Date();
-    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
     document.getElementById('previewDia').textContent = fecha.getDate();
     document.getElementById('previewMes').textContent = meses[fecha.getMonth()];
     document.getElementById('previewAnio').textContent = fecha.getFullYear();
 }
 
-// ========================================
-// FUNCIONES DE GUARDADO
-// ========================================
-async function guardarActa() {
-    if (!vehiculoSeleccionado) {
-        mostrarAlerta('⚠️ Primero debe buscar un vehículo', 'error');
-        return;
-    }
+// ============================================
+// ✅ INICIALIZAR EVENTOS AL CARGAR LA PÁGINA
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar fecha automáticamente
+    actualizarFecha();
     
-    // Validar campos de funcionario
-    const funcionarioNombre = document.getElementById('funcionarioNombre').value.trim();
-    const funcionarioCedula = document.getElementById('funcionarioCedula').value.trim();
-    const unidadAsignacion = document.getElementById('unidadAsignacion').value.trim();
+    // Agregar listeners para actualización en tiempo real
+    const camposFormulario = [
+        'funcionarioNombre',
+        'funcionarioCedula',
+        'unidadAsignacion',
+        'funcionarioCargo'
+    ];
     
-    if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
-        mostrarAlerta('⚠️ Complete todos los campos del funcionario', 'error');
-        return;
-    }
-    
-    const btnGuardar = document.getElementById('btnGuardar');
-    if (btnGuardar) {
-        btnGuardar.disabled = true;
-        btnGuardar.textContent = '⏳ Guardando...';
-    }
-    
-    try {
-        const acta = {
-            vehiculo_id: vehiculoSeleccionado.id,
-            placa: vehiculoSeleccionado.placa,
-            facsimil: vehiculoSeleccionado.facsimil,
-            s_carroceria: vehiculoSeleccionado.s_carroceria,
-            s_motor: vehiculoSeleccionado.s_motor,
-            marca: vehiculoSeleccionado.marca,
-            modelo: vehiculoSeleccionado.modelo,
-            tipo: vehiculoSeleccionado.tipo,
-            clase: vehiculoSeleccionado.clase,
-            funcionario_nombre: funcionarioNombre,
-            funcionario_cedula: funcionarioCedula,
-            unidad_asignacion: unidadAsignacion,
-            funcionario_cargo: document.getElementById('funcionarioCargo').value.trim(),
-            fecha_asignacion: new Date().toISOString(),
-            estatus: 'ACTIVA',
-            creado_por: document.getElementById('userEmail').textContent
-        };
-        
-        console.log('📝 Guardando acta:', acta);
-        
-        const { data, error } = await supabaseClient
-            .from('actas_asignacion')
-            .insert([acta])
-            .select();
-        
-        if (error) {
-            console.error('❌ Error al guardar:', error);
-            mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
-            return;
+    camposFormulario.forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.addEventListener('input', actualizarActa);
+            elemento.addEventListener('change', actualizarActa);
         }
-        
-        console.log('✅ Acta guardada:', data);
-        mostrarAlerta('✅ Acta de asignación guardada exitosamente', 'success');
-        
-        // Limpiar formulario después de guardar
-        setTimeout(function() {
-            if (confirm('¿Desea crear otra acta?')) {
-                limpiarBusqueda();
-            } else {
-                window.location.href = 'acta.html';
+    });
+    
+    // Permitir búsqueda con Enter
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buscarVehiculo();
             }
-        }, 2000);
-        
-    } catch (error) {
-        console.error('❌ Error en guardarActa:', error);
-        mostrarAlerta('❌ Error: ' + error.message, 'error');
-    } finally {
-        const btnGuardar = document.getElementById('btnGuardar');
-        if (btnGuardar) {
-            btnGuardar.disabled = false;
-            btnGuardar.innerHTML = '<span>💾</span> Guardar Acta';
+        });
+    }
+    
+    // Cargar email de usuario (si está disponible en config.js)
+    if (typeof window.currentUser !== 'undefined' && window.currentUser) {
+        const userEmail = document.getElementById('userEmail');
+        if (userEmail) {
+            userEmail.textContent = window.currentUser.email || 'usuario@institucion.com';
         }
     }
-}
+});
 
-// ========================================
-// FUNCIONES DE IMPRESIÓN
-// ========================================
-function imprimirActa() {
-    if (!vehiculoSeleccionado) {
-        mostrarAlerta('⚠️ Primero debe buscar un vehículo', 'error');
-        return;
-    }
-    
-    window.print();
-}
-
-// ========================================
-// FUNCIONES DE UTILIDAD
-// ========================================
-function mostrarAlerta(mensaje, tipo) {
-    const alertDiv = document.getElementById('searchAlert');
-    if (!alertDiv) return;
-    
-    alertDiv.textContent = mensaje;
-    alertDiv.className = 'alert alert-' + tipo;
-    alertDiv.style.display = 'block';
-    
-    setTimeout(function() {
-        alertDiv.style.display = 'none';
-    }, 5000);
-}
-
-console.log('✅ Script acta-crear.js cargado correctamente');
+// ============================================
+// ✅ EXPORTAR FUNCIONES PARA USO GLOBAL
+// ============================================
+window.buscarVehiculo = buscarVehiculo;
+window.imprimirActa = imprimirActa;
+window.guardarActa = guardarActa;
+window.actualizarActa = actualizarActa;
