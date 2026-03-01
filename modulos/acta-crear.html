@@ -87,18 +87,6 @@ body {
 }
 
 /* Filas del formulario */
-.form-row-4 {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-}
-
-.form-row-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
 .form-row-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -244,15 +232,16 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Vista Previa del Acta */
+/* ============================================ */
+/* ✅ VISTA PREVIA - HOJA TIPO CARTA             */
+/* ============================================ */
 .preview-section {
-    background: white;
-    padding: 40px;
+    background: #e9ecef;
+    padding: 40px 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    max-width: 1200px;
-    margin: 0 auto;
     width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .preview-section h2 {
@@ -261,35 +250,37 @@ body {
     text-align: center;
 }
 
-/* Contenedor del Acta */
+/* Hoja carta: 21.59cm x 27.94cm */
 .acta-container {
-    border: 2px solid #003366;
-    padding: 40px;
+    width: 21.59cm;
+    min-height: 27.94cm;
     background: white;
-    width: 100%;
-    max-width: 100%;
+    padding: 2.5cm;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 1px solid #ddd;
     text-align: justify;
-    line-height: 1.8;
-    font-size: 12px;
+    line-height: 1.6;
+    font-size: 11px;
+    margin: 0 auto;
 }
 
 .acta-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
     border-bottom: 2px solid #003366;
 }
 
 .acta-logos {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     align-items: center;
 }
 
 .acta-logos img {
-    height: 60px;
+    height: 50px;
     width: auto;
 }
 
@@ -299,64 +290,64 @@ body {
 }
 
 .acta-title h1 {
-    font-size: 14px;
+    font-size: 13px;
     color: #003366;
-    margin: 5px 0;
-    line-height: 1.4;
+    margin: 3px 0;
+    line-height: 1.3;
     font-weight: 700;
 }
 
 .acta-title h2 {
-    font-size: 16px;
+    font-size: 14px;
     color: #003366;
-    margin: 5px 0;
+    margin: 3px 0;
     font-weight: 700;
 }
 
 .acta-title h3 {
-    font-size: 14px;
+    font-size: 12px;
     color: #003366;
-    margin-top: 10px;
+    margin-top: 8px;
     font-weight: 700;
 }
 
 .acta-body {
-    font-size: 12px;
-    line-height: 1.8;
+    font-size: 11px;
+    line-height: 1.7;
     color: #333;
     text-align: justify;
 }
 
 .acta-body p {
-    margin: 15px 0;
+    margin: 12px 0;
 }
 
 .acta-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 15px 0;
     border: 2px solid #003366;
 }
 
 .acta-table th {
     background: #4a7c9b;
     color: white;
-    padding: 10px;
+    padding: 8px;
     text-align: left;
-    font-size: 11px;
+    font-size: 10px;
     border: 1px solid #003366;
     font-weight: 700;
 }
 
 .acta-table td {
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #003366;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .acta-section {
-    margin: 20px 0;
-    padding: 15px;
+    margin: 15px 0;
+    padding: 12px;
     background: #f8f9fa;
     border-left: 4px solid #003366;
 }
@@ -364,35 +355,35 @@ body {
 .acta-signatures {
     display: flex;
     justify-content: space-between;
-    margin-top: 50px;
-    gap: 50px;
+    margin-top: 40px;
+    gap: 40px;
 }
 
 .signature-box {
     flex: 1;
     text-align: center;
     border-top: 2px solid #003366;
-    padding-top: 15px;
+    padding-top: 12px;
 }
 
 .signature-box p {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    margin: 5px 0;
+    margin: 4px 0;
     color: #003366;
 }
 
 .acta-footer {
-    margin-top: 40px;
+    margin-top: 30px;
     text-align: center;
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
-    padding-top: 20px;
+    padding-top: 15px;
     border-top: 1px solid #ddd;
 }
 
 .acta-footer p {
-    margin: 5px 0;
+    margin: 4px 0;
 }
 
 /* Botones de acción */
@@ -405,41 +396,27 @@ body {
     flex-wrap: wrap;
 }
 
-.btn-imprimir {
-    background: #003366;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.btn-imprimir:hover {
-    background: #002244;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
 /* Responsive */
 @media (max-width: 1200px) {
-    .form-row-4 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .form-row-3 {
-        grid-template-columns: repeat(2, 1fr);
+    .form-row-2 {
+        grid-template-columns: 1fr;
     }
     .acta-container {
-        padding: 20px;
+        width: 100%;
+        padding: 1.5cm;
     }
 }
 
 @media (max-width: 768px) {
-    .form-row-4,
-    .form-row-3,
-    .form-row-2 {
-        grid-template-columns: 1fr;
+    .search-container {
+        flex-direction: column;
+    }
+    .search-input {
+        min-width: 100%;
+    }
+    .acta-container {
+        width: 100%;
+        padding: 1cm;
     }
     .acta-header {
         flex-direction: column;
@@ -449,12 +426,6 @@ body {
         flex-direction: column;
         gap: 30px;
     }
-    .search-container {
-        flex-direction: column;
-    }
-    .search-input {
-        min-width: 100%;
-    }
 }
 
 /* Estilos de impresión */
@@ -463,26 +434,33 @@ body {
     .module-header,
     .btn,
     .search-section,
-    .form-section {
+    .form-section,
+    .preview-section h2 {
         display: none !important;
+    }
+    body {
+        background: white;
     }
     .container {
         display: block;
         padding: 0;
     }
     .preview-section {
-        box-shadow: none;
+        background: white;
         padding: 0;
+        box-shadow: none;
     }
     .acta-container {
-        border: 2px solid #003366;
         width: 100%;
-        padding: 30px;
+        box-shadow: none;
+        border: none;
+        padding: 2cm;
     }
 }
 </style>
 </head>
 <body class="dashboard-page">
+
 <!-- Navegación -->
 <nav class="navbar" role="navigation">
     <div class="nav-container">
@@ -587,9 +565,8 @@ body {
             </form>
         </div>
 
-        <!-- Vista Previa del Acta -->
-        <div id="actaPreview" class="preview-section" style="display: none;">
-            <h2 style="color: #003366; margin-bottom: 20px;">Vista Previa del Acta</h2>
+        <!-- ✅ VISTA PREVIA DEL ACTA - HOJA CARTA (DEBAJO DEL FORMULARIO) -->
+        <div class="preview-section">
             <div class="acta-container">
                 <div class="acta-header">
                     <div class="acta-logos">
@@ -600,7 +577,7 @@ body {
                         <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
                         <h2>REDIP: OCCIDENTAL</h2>
                         <h3>CCPE ZULIA</h3>
-                        <h3 style="margin-top: 15px;">Acta de Asignación de Unidad Vehicular</h3>
+                        <h3 style="margin-top: 10px;">Acta de Asignación de Unidad Vehicular</h3>
                     </div>
                 </div>
 
@@ -707,16 +684,6 @@ body {
                     <p style="color: #dc2626; font-weight: 600; margin: 10px 0;">¡Chávez Vive!... La Patria Sigue...</p>
                     <p style="color: #003366; font-weight: 600; margin: 10px 0;">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
                     <p style="color: #003366; font-weight: 600; margin: 10px 0;">PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
-                </div>
-
-                <!-- Botones de Acción -->
-                <div class="action-buttons">
-                    <button type="button" class="btn btn-success" onclick="imprimirActa()">
-                        🖨️ Imprimir Acta
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="guardarActa()">
-                        💾 Guardar en Base de Datos
-                    </button>
                 </div>
             </div>
         </div>
