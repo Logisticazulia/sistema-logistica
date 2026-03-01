@@ -25,7 +25,7 @@ body {
 }
 
 /* ============================================ */
-/* ✅ CONTENEDOR PRINCIPAL - MÁS ANCHO          */
+/* CONTENEDOR PRINCIPAL                         */
 /* ============================================ */
 .container {
     max-width: 2200px;
@@ -121,6 +121,7 @@ body {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .search-input {
@@ -159,6 +160,44 @@ body {
 .btn-search:hover {
     background: #218838;
     transform: translateY(-2px);
+}
+
+/* ============================================ */
+/* ✅ AYUDA DE BÚSQUEDA - NUEVO                 */
+/* ============================================ */
+.search-help {
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 15px 20px;
+    margin-top: 15px;
+}
+
+.search-help-title {
+    color: #fff;
+    font-size: 11pt;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-help-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.search-help-item {
+    color: rgba(255,255,255,0.9);
+    font-size: 10pt;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.search-help-item span {
+    font-size: 12pt;
 }
 
 /* ============================================ */
@@ -230,7 +269,7 @@ body {
 }
 
 /* ============================================ */
-/* ✅ VISTA PREVIA - ESTIRADA A LOS LADOS       */
+/* VISTA PREVIA - ESTIRADA A LOS LADOS          */
 /* ============================================ */
 .preview-section {
     background: #e9ecef;
@@ -248,7 +287,7 @@ body {
     font-size: 16pt;
 }
 
-/* ✅ ACTA - MÁS ANCHA, OCUPA MÁS ESPACIO */
+/* ACTA - MÁS ANCHA */
 .acta-container {
     width: 95%;
     max-width: 2000px;
@@ -351,7 +390,7 @@ body {
     font-size: 11pt;
 }
 
-/* SECCIONES DESTACADAS - MÁS ANCHAS */
+/* SECCIONES DESTACADAS */
 .acta-section {
     margin: 12px 0;
     padding: 12px 15px;
@@ -420,7 +459,7 @@ body {
 }
 
 /* ============================================ */
-/* RESPONSIVE - PANTALLAS GRANDES               */
+/* RESPONSIVE                                   */
 /* ============================================ */
 @media (min-width: 1600px) {
     .acta-container {
@@ -458,6 +497,10 @@ body {
     }
     .search-input {
         min-width: 100%;
+    }
+    .search-help-items {
+        flex-direction: column;
+        gap: 10px;
     }
     .acta-container {
         width: 100%;
@@ -573,6 +616,36 @@ body {
                         <span>Buscar</span>
                     </button>
                 </div>
+                
+                <!-- ✅ AYUDA DE BÚSQUEDA - NUEVO -->
+                <div class="search-help">
+                    <div class="search-help-title">
+                        <span>💡</span>
+                        <span>Busque por:</span>
+                    </div>
+                    <div class="search-help-items">
+                        <div class="search-help-item">
+                            <span>🚗</span>
+                            <span>Placa</span>
+                        </div>
+                        <div class="search-help-item">
+                            <span>📄</span>
+                            <span>Facsímil</span>
+                        </div>
+                        <div class="search-help-item">
+                            <span>🔢</span>
+                            <span>Serial Carrocería</span>
+                        </div>
+                        <div class="search-help-item">
+                            <span>⚙️</span>
+                            <span>Serial Motor</span>
+                        </div>
+                        <div class="search-help-item">
+                            <span>🏷️</span>
+                            <span>Marca/Modelo</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Datos del Funcionario -->
@@ -619,7 +692,7 @@ body {
             </form>
         </div>
 
-        <!-- ✅ VISTA PREVIA - ESTIRADA A LOS LADOS -->
+        <!-- VISTA PREVIA - ESTIRADA A LOS LADOS -->
         <div class="preview-section">
             <div class="acta-container">
                 <!-- Encabezado -->
