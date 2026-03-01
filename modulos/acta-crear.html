@@ -413,7 +413,7 @@ body {
 }
 
 /* ============================================ */
-/* FIRMAS                                       */
+/* ✅ FIRMAS - FUNCIONARIO A LA IZQUIERDA       */
 /* ============================================ */
 .acta-signatures {
     margin-top: 40px;
@@ -428,10 +428,14 @@ body {
     max-width: 600px;
 }
 
+/* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA COMPLETA */
 .signature-box.funcionario {
-    text-align: left;
+    text-align: left !important;
+    margin-left: 0 !important;
+    max-width: 100% !important;
 }
 
+/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
 .signature-box.director {
     text-align: center;
 }
@@ -803,7 +807,7 @@ body {
 
                     <!-- Firmas -->
                     <div class="acta-signatures">
-                        <!-- 1. Funcionario Responsable - IZQUIERDA -->
+                        <!-- 1. Funcionario Responsable - IZQUIERDA COMPLETA -->
                         <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
@@ -852,9 +856,6 @@ body {
 // Función para actualizar la fecha automáticamente
 function actualizarFechaActa() {
     const fecha = new Date();
-    
-    // Días de la semana (no se usa pero disponible)
-    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     
     // Meses en español
     const meses = [
