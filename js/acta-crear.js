@@ -5,7 +5,7 @@
 
 // ============================================
 // ✅ VARIABLES GLOBALES
-// ============================================
+// ============================================ */
 let supabaseClient = null;
 
 // ============================================
@@ -53,11 +53,9 @@ function cargarUsuario() {
     if (usuarioGuardado) {
         try {
             const usuario = JSON.parse(usuarioGuardado);
-            if (usuario.email || usuario.correo) {
-                userEmailElement.textContent = usuario.email || usuario.correo;
-                console.log('✅ Usuario cargado desde sessionStorage:', usuario.email || usuario.correo);
-                return;
-            }
+            userEmailElement.textContent = usuario.email || usuario.correo || 'usuario@institucion.com';
+            console.log('✅ Usuario cargado desde sessionStorage:', usuario.email || usuario.correo);
+            return;
         } catch (error) {
             console.error('Error al parsear usuario de sessionStorage:', error);
         }
@@ -81,7 +79,7 @@ function cargarUsuario() {
                 console.log('⚠️ No hay sesión activa, mostrando email genérico');
             }
         }).catch(error => {
-            console.error('Error al obtener sesión de Supabase:', error);
+            console.error('Error al obtener sesión:', error);
             userEmailElement.textContent = 'usuario@institucion.com';
         });
     } else {
@@ -104,13 +102,13 @@ function actualizarActa() {
     if (funcionarioNombre) {
         document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
     } else {
-        document.getElementById('previewFuncionarioNombre').textContent = 'NOMBRE DEL FUNCIONARIO';
+        document.getElementById('previewFuncionarioNombre').textContent = '---';
     }
     
     if (funcionarioCedula) {
         document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
     } else {
-        document.getElementById('previewFuncionarioCedula').textContent = 'CEDULA DEL FUNCIONARIO';
+        document.getElementById('previewFuncionarioCedula').textContent = '---';
     }
     
     // ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
@@ -122,8 +120,7 @@ function actualizarActa() {
             `${funcionarioNombre}, Cédula de Identidad numero V-00.000.000`;
     } else {
         // Valor por defecto si no hay datos
-        document.getElementById('previewFirmaFuncionario').innerHTML = 
-            'NOMBRE DEL FUNCIONARIO, Cédula de Identidad numero V-XXXXX';
+        document.getElementById('previewFirmaFuncionario').textContent = '---';
     }
     
     // ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
@@ -131,8 +128,8 @@ function actualizarActa() {
         document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
         document.getElementById('previewCargoFuncionario').textContent = `Jefe de ${unidadAsignacion}`;
     } else {
-        document.getElementById('previewUnidadAsignacion').textContent = 'SERVICIO';
-        document.getElementById('previewCargoFuncionario').textContent = 'CARGO';
+        document.getElementById('previewUnidadAsignacion').textContent = '---';
+        document.getElementById('previewCargoFuncionario').textContent = '---';
     }
     
     // Actualizar cargo del funcionario si existe
@@ -162,7 +159,6 @@ async function buscarVehiculo() {
     
     try {
         let data = null;
-        let error = null;
         
         // BÚSQUEDA EXACTA por placa (primero)
         const { data: dataPlaca, error: errorPlaca } = await supabaseClient
@@ -204,15 +200,15 @@ async function buscarVehiculo() {
                     if (dataMotor && !errorMotor) {
                         data = dataMotor;
                     } else {
-                        // BÚSQUEDA EXACTA por número de identificación
-                        const { data: dataIdentificacion, error: errorIdentificacion } = await supabaseClient
+                        // BÚSQUEDA PARCIAL por marca/modelo
+                        const { data: dataMarca, error: errorMarca } = await supabaseClient
                             .from('vehiculos')
                             .select('*')
-                            .eq('n_identificacion', searchInput.toUpperCase())
+                            .ilike('marca', `%${searchInput}%`)
                             .single();
                         
-                        if (dataIdentificacion && !errorIdentificacion) {
-                            data = dataIdentificacion;
+                        if (dataMarca && !errorMarca) {
+                            data = dataMarca;
                         }
                     }
                 }
@@ -260,39 +256,11 @@ function llenarDatosVehiculo(vehiculo) {
 // ✅ LIMPIAR DATOS DEL VEHÍCULO
 // ============================================
 function limpiarDatosVehiculo() {
-    document.getElementById('previewMarcaModelo').textContent = '-';
-    document.getElementById('previewSerialCarroceria').textContent = '-';
-    document.getElementById('previewSerialMotor').textContent = '-';
-    document.getElementById('previewPlaca').textContent = 'N/P';
-    document.getElementById('previewFacsimil').textContent = 'N/P';
-}
-
-// ============================================
-// ✅ LIMPIAR FORMULARIO COMPLETO
-// ============================================
-function limpiarFormulario() {
-    // Limpiar campos del formulario
-    document.getElementById('searchInput').value = '';
-    document.getElementById('funcionarioNombre').value = '';
-    document.getElementById('funcionarioCedula').value = '';
-    document.getElementById('unidadAsignacion').value = '';
-    document.getElementById('funcionarioCargo').value = '';
-    
-    // Limpiar datos del vehículo en el acta
-    limpiarDatosVehiculo();
-    
-    // Restablecer valores por defecto en el acta
-    document.getElementById('previewFuncionarioNombre').textContent = 'PRIMER COMISARIO (CPNB) ALBERTO PARRA';
-    document.getElementById('previewFuncionarioCedula').textContent = 'V-13.550.532';
-    document.getElementById('previewFirmaFuncionario').innerHTML = 
-        'PRIMER COMISARIO (CPNB) ALBERTO PARRA, Cédula de Identidad numero V-13.550.532';
-    document.getElementById('previewUnidadAsignacion').textContent = 'Oficina de Gestión Humana de la Redip Occidental';
-    document.getElementById('previewCargoFuncionario').textContent = 'Jefe de la Oficina de Gestión Humana de la Redip Occidental';
-    
-    // Actualizar fecha
-    actualizarFechaActa();
-    
-    console.log('✅ Formulario limpiado correctamente');
+    document.getElementById('previewMarcaModelo').textContent = '---';
+    document.getElementById('previewSerialCarroceria').textContent = '---';
+    document.getElementById('previewSerialMotor').textContent = '---';
+    document.getElementById('previewPlaca').textContent = '---';
+    document.getElementById('previewFacsimil').textContent = '---';
 }
 
 // ============================================
@@ -316,7 +284,7 @@ function mostrarAlerta(mensaje, tipo) {
 function imprimirActa() {
     // Validar que haya datos del vehículo
     const marcaModelo = document.getElementById('previewMarcaModelo').textContent;
-    if (marcaModelo === '-' || marcaModelo === 'N/P') {
+    if (marcaModelo === '---' || marcaModelo === 'N/P') {
         mostrarAlerta('⚠️ Primero debe buscar y cargar los datos del vehículo', 'error');
         return;
     }
@@ -348,7 +316,7 @@ async function guardarActa() {
     
     // Validar que haya datos del vehículo
     const marcaModelo = document.getElementById('previewMarcaModelo').textContent;
-    if (marcaModelo === '-' || marcaModelo === 'N/P') {
+    if (marcaModelo === '---' || marcaModelo === 'N/P') {
         mostrarAlerta('⚠️ Primero debe buscar y cargar los datos del vehículo', 'error');
         return;
     }
@@ -397,10 +365,8 @@ async function guardarActa() {
         
         mostrarAlerta('✅ Acta guardada exitosamente en la base de datos', 'success');
         
-        // ✅ LIMPIAR TODO EL FORMULARIO DESPUÉS DE GUARDAR
-        setTimeout(() => {
-            limpiarFormulario();
-        }, 1500);
+        // Opcional: Limpiar formulario después de guardar
+        // limpiarFormulario();
         
     } catch (error) {
         console.error('Error al guardar acta:', error);
@@ -474,6 +440,33 @@ function agregarListenerEnter() {
 }
 
 // ============================================
+// ✅ LIMPIAR FORMULARIO COMPLETO
+// ============================================
+function limpiarFormulario() {
+    // Limpiar campos del formulario
+    document.getElementById('searchInput').value = '';
+    document.getElementById('funcionarioNombre').value = '';
+    document.getElementById('funcionarioCedula').value = '';
+    document.getElementById('unidadAsignacion').value = '';
+    document.getElementById('funcionarioCargo').value = '';
+    
+    // Limpiar datos del vehículo en el acta
+    limpiarDatosVehiculo();
+    
+    // Restablecer valores por defecto en el acta
+    document.getElementById('previewFuncionarioNombre').textContent = '---';
+    document.getElementById('previewFuncionarioCedula').textContent = '---';
+    document.getElementById('previewFirmaFuncionario').textContent = '---';
+    document.getElementById('previewUnidadAsignacion').textContent = '---';
+    document.getElementById('previewCargoFuncionario').textContent = '---';
+    
+    // Actualizar fecha
+    actualizarFechaActa();
+    
+    console.log('✅ Formulario limpiado correctamente');
+}
+
+// ============================================
 // ✅ EXPORTAR FUNCIONES PARA USO GLOBAL
 // ============================================
 window.buscarVehiculo = buscarVehiculo;
@@ -482,6 +475,6 @@ window.guardarActa = guardarActa;
 window.actualizarActa = actualizarActa;
 window.llenarDatosVehiculo = llenarDatosVehiculo;
 window.limpiarDatosVehiculo = limpiarDatosVehiculo;
-window.limpiarFormulario = limpiarFormulario;
 window.mostrarAlerta = mostrarAlerta;
 window.cargarUsuario = cargarUsuario;
+window.limpiarFormulario = limpiarFormulario;
