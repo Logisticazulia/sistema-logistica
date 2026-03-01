@@ -4,14 +4,20 @@
 /* ============================================ */
 
 // ============================================
-// ✅ INICIALIZAR SUPABASE (USA CONFIG.JS)
+// ✅ VARIABLES GLOBALES
 // ============================================
-let supabase;
+let supabaseClient = null;
 
+// ============================================
+// ✅ INICIALIZAR SUPABASE
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Esperar a que config.js cargue las credenciales
-    if (window.SUPABASE_URL && window.SUPABASE_KEY) {
-        supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+    // Verificar que las credenciales estén cargadas
+    if (window.SUPABASE_URL && window.SUPABASE_KEY && window.supabase) {
+        supabaseClient = window.supabase.createClient(
+            window.SUPABASE_URL, 
+            window.SUPABASE_KEY
+        );
         console.log('✅ Supabase inicializado correctamente');
     } else {
         console.error('❌ Error: Credenciales de Supabase no encontradas. Verifica config.js');
@@ -94,8 +100,14 @@ async function buscarVehiculo() {
     }
     
     try {
+        // Verificar que supabaseClient esté inicializado
+        if (!supabaseClient) {
+            mostrarAlerta('❌ Error de conexión. Recarga la página.', 'error');
+            return;
+        }
+        
         // Búsqueda exacta por placa (primero)
-        let { data, error } = await supabase
+        let { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .eq('placa', searchInput.toUpperCase())
@@ -103,7 +115,7 @@ async function buscarVehiculo() {
         
         // Si no encuentra por placa, intentar por facsimil
         if (!data || error) {
-            const { data: data2, error: error2 } = await supabase
+            const { data: data2, error: error2 } = await supabaseClient
                 .from('vehiculos')
                 .select('*')
                 .eq('facsimil', searchInput.toUpperCase())
@@ -113,7 +125,7 @@ async function buscarVehiculo() {
                 data = data2;
             } else {
                 // Intentar por serial de carrocería
-                const { data: data3, error: error3 } = await supabase
+                const { data: data3, error: error3 } = await supabaseClient
                     .from('vehiculos')
                     .select('*')
                     .eq('s_carroceria', searchInput.toUpperCase())
@@ -123,7 +135,7 @@ async function buscarVehiculo() {
                     data = data3;
                 } else {
                     // Intentar por serial de motor
-                    const { data: data4, error: error4 } = await supabase
+                    const { data: data4, error: error4 } = await supabaseClient
                         .from('vehiculos')
                         .select('*')
                         .eq('s_motor', searchInput.toUpperCase())
@@ -133,7 +145,7 @@ async function buscarVehiculo() {
                         data = data4;
                     } else {
                         // Intentar por marca/modelo
-                        const { data: data5, error: error5 } = await supabase
+                        const { data: data5, error: error5 } = await supabaseClient
                             .from('vehiculos')
                             .select('*')
                             .ilike('marca', `%${searchInput}%`)
@@ -277,8 +289,14 @@ async function guardarActa() {
     };
     
     try {
+        // Verificar que supabaseClient esté inicializado
+        if (!supabaseClient) {
+            mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
+            return;
+        }
+        
         // Guardar en Supabase - Tabla: actas_asignacion
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('actas_asignacion')
             .insert(actaData);
         
