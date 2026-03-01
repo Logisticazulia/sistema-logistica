@@ -104,13 +104,13 @@ function actualizarActa() {
     if (funcionarioNombre) {
         document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
     } else {
-        document.getElementById('previewFuncionarioNombre').textContent = 'PRIMER COMISARIO (CPNB) ALBERTO PARRA';
+        document.getElementById('previewFuncionarioNombre').textContent = 'NOMBRE DEL FUNCIONARIO';
     }
     
     if (funcionarioCedula) {
         document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
     } else {
-        document.getElementById('previewFuncionarioCedula').textContent = 'V-13.550.532';
+        document.getElementById('previewFuncionarioCedula').textContent = 'CEDULA DEL FUNCIONARIO';
     }
     
     // ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
@@ -123,7 +123,7 @@ function actualizarActa() {
     } else {
         // Valor por defecto si no hay datos
         document.getElementById('previewFirmaFuncionario').innerHTML = 
-            'PRIMER COMISARIO (CPNB) ALBERTO PARRA, Cédula de Identidad numero V-13.550.532';
+            'NOMBRE DEL FUNCIONARIO, Cédula de Identidad numero V-XXXXX';
     }
     
     // ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
@@ -131,8 +131,8 @@ function actualizarActa() {
         document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
         document.getElementById('previewCargoFuncionario').textContent = `Jefe de ${unidadAsignacion}`;
     } else {
-        document.getElementById('previewUnidadAsignacion').textContent = 'Oficina de Gestión Humana de la Redip Occidental';
-        document.getElementById('previewCargoFuncionario').textContent = 'Jefe de la Oficina de Gestión Humana de la Redip Occidental';
+        document.getElementById('previewUnidadAsignacion').textContent = 'SERVICIO';
+        document.getElementById('previewCargoFuncionario').textContent = 'CARGO';
     }
     
     // Actualizar cargo del funcionario si existe
