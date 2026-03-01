@@ -290,6 +290,7 @@ body {
     font-size: 12pt;
     line-height: 1.5;
     color: #000;
+    position: relative;
 }
 
 .acta-header {
@@ -356,6 +357,7 @@ body {
 
 .acta-body p {
     margin: 10px 0;
+    text-align: justify;
 }
 
 .acta-body strong {
@@ -477,7 +479,22 @@ body {
 .acta-footer p {
     margin: 8px 0;
     font-weight: 700;
-    color: #dc2626; /* ✅ ROJO */
+    color: #dc2626;
+}
+
+/* ============================================ */
+/* ✅ IMAGEN DE FONDO INFERIOR                  */
+/* ============================================ */
+.acta-fondo {
+    width: 100%;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.acta-fondo img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* ============================================ */
@@ -811,6 +828,13 @@ body {
                         <p>¡Chávez Vive!... La Patria Sigue...</p>
                         <p>¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
                         <p>PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- ✅ IMAGEN DE FONDO INFERIOR                  -->
+                    <!-- ============================================ -->
+                    <div class="acta-fondo">
+                        <img src="../img/fondo.png" alt="Fondo Decorativo" onerror="this.style.display='none'">
                     </div>
                 </div>
             </div>
