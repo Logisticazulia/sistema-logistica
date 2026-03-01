@@ -431,7 +431,7 @@ body {
     text-align: left;
 }
 
-/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
+/* ✅ FIRMA DEL DIRECTOR - CENTRADA Y ABAJO */
 .signature-box.director {
     text-align: center;
 }
@@ -482,7 +482,7 @@ body {
 }
 
 /* ============================================ */
-/* BOTONES DE ACCIÓN                            */
+/* BOTONES DE ACCIÓN - SOLO EN FORMULARIO      */
 /* ============================================ */
 .action-buttons {
     display: flex;
@@ -668,7 +668,7 @@ body {
                     </div>
                 </div>
 
-                <!-- Botones -->
+                <!-- Botones - SOLO EN FORMULARIO -->
                 <div class="action-buttons">
                     <button type="button" class="btn btn-secondary" onclick="window.location.href='acta.html'">
                         ❌ Cancelar
@@ -798,10 +798,12 @@ body {
                             <p class="firma-line" id="previewFirmaFuncionario">
                                 <!-- Los datos se llenan dinámicamente desde el formulario -->
                             </p>
-                            <p class="cargo" id="previewCargoFuncionario">Jefe de la Oficina de Gestión Humana de la Redip Occidental</p>
+                            <p class="cargo" id="previewCargoFuncionario">
+                                <!-- La unidad de asignación se muestra aquí -->
+                            </p>
                         </div>
 
-                        <!-- Director - CENTRADO -->
+                        <!-- Director - CENTRADO Y ABAJO -->
                         <div class="signature-box director">
                             <p class="firma-line">
                                 COMISARIO MAYOR (CPNB) DR GUILLERMO PARRA PULIDO
@@ -816,16 +818,10 @@ body {
                         <p class="frase-2">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
                         <p class="frase-3">PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
                     </div>
-                </div>
 
-                <!-- Botones de Acción -->
-                <div class="action-buttons">
-                    <button type="button" class="btn btn-success" onclick="imprimirActa()">
-                        🖨️ Imprimir Acta
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="guardarActa()">
-                        💾 Guardar en Base de Datos
-                    </button>
+                    <!-- ============================================ -->
+                    <!-- ✅ BOTONES ELIMINADOS DE LA VISTA PREVIA    -->
+                    <!-- ============================================ -->
                 </div>
             </div>
         </div>
