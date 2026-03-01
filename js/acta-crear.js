@@ -98,10 +98,56 @@ function cargarUsuario() {
 // ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
 // ============================================
 async function buscarVehiculo() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    const searchAlert = document.getElementById('searchAlert');
-    const btnAgregar = document.getElementById('btnAgregarVehiculo');
+  const termino = document.getElementById('searchInput').value.trim();
+  const alertBox = document.getElementById('searchAlert');
+  
+  if (!termino) {
+    mostrarAlerta('⚠️ Ingresa un término de búsqueda', 'alert-info', alertBox);
+    return;
+  }
+
+  try {
+    // Intenta buscar por placa primero
+    let { data, error } = await supabase
+      .from('vehiculos')
+      .select('*')
+      .eq('placa', termino)
+      .limit(1);
+
+    // Si no encuentra, intenta con facsímil
+    if (!data || data.length === 0) {
+      ({ data, error } = await supabase
+        .from('vehiculos')
+        .select('*')
+        .eq('facsimil', termino)
+        .limit(1));
+    }
     
+    // Si aún no encuentra, intenta con serial de carrocería
+    if (!data || data.length === 0) {
+      ({ data, error } = await supabase
+        .from('vehiculos')
+        .select('*')
+        .eq('s_carroceria', termino)
+        .limit(1));
+    }
+
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      mostrarAlerta('✅ Vehículo encontrado', 'alert-success', alertBox);
+      mostrarVistaPreviaVehiculo(data[0]);
+      // Guarda el vehículo encontrado para usarlo al guardar el acta
+      window.vehiculoSeleccionado = data[0];
+    } else {
+      mostrarAlerta('❌ Vehículo no encontrado', 'alert-error', alertBox);
+    }
+    
+  } catch (err) {
+    console.error('Error en búsqueda:', err);
+    mostrarAlerta(`❌ Error: ${err.message}`, 'alert-error', alertBox);
+  }
+}
     // Validar que haya un término de búsqueda
     if (!searchInput) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
@@ -214,14 +260,32 @@ async function buscarVehiculo() {
 // ✅ MOSTRAR VISTA PREVIA DEL VEHÍCULO
 // ============================================
 function mostrarVistaPreviaVehiculo(vehiculo) {
-    document.getElementById('previewMarcaModelo').textContent = 
-        `${vehiculo.marca} ${vehiculo.modelo}`.trim();
-    document.getElementById('previewSerialCarroceria').textContent = vehiculo.serial_carroceria;
-    document.getElementById('previewSerialMotor').textContent = vehiculo.serial_motor;
-    document.getElementById('previewPlaca').textContent = vehiculo.placa;
-    document.getElementById('previewFacsimil').textContent = vehiculo.facsimil;
+  // ✅ Verifica que el elemento existe antes de asignar
+  const elMarca = document.getElementById('previewMarcaModelo');
+  if (elMarca) {
+    elMarca.textContent = `${vehiculo.marca} ${vehiculo.modelo}`.trim();
+  }
+  
+  const elCarroceria = document.getElementById('previewSerialCarroceria');
+  if (elCarroceria) {
+    elCarroceria.textContent = vehiculo.s_carroceria || 'N/P';
+  }
+  
+  const elMotor = document.getElementById('previewSerialMotor');
+  if (elMotor) {
+    elMotor.textContent = vehiculo.s_motor || 'N/P';
+  }
+  
+  const elPlaca = document.getElementById('previewPlaca');
+  if (elPlaca) {
+    elPlaca.textContent = vehiculo.placa || 'N/P';
+  }
+  
+  const elFacsimil = document.getElementById('previewFacsimil');
+  if (elFacsimil) {
+    elFacsimil.textContent = vehiculo.facsimil || 'N/P';
+  }
 }
-
 // ============================================
 // ✅ AGREGAR VEHÍCULO A LA LISTA
 // ============================================
@@ -473,9 +537,11 @@ async function guardarActa() {
     
     try {
         // Guardar en Supabase - Tabla: actas_asignacion
-        const { data, error } = await supabaseClient
-            .from('actas_asignacion')
-            .insert(actaData);
+       const { data, error } = await supabase
+  .from('vehiculos')
+  .select('*')  // ← Sin espacio
+  .eq('placa', terminoBusqueda)
+  .limit(1);  // ← Importante: limita a 1 resultado
         
         if (error) throw error;
         
