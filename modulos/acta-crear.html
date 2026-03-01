@@ -428,14 +428,10 @@ body {
     max-width: 600px;
 }
 
-/* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA COMPLETA */
 .signature-box.funcionario {
     text-align: left;
-    margin-left: 0;
-    max-width: 100%;
 }
 
-/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
 .signature-box.director {
     text-align: center;
 }
@@ -802,12 +798,12 @@ body {
                     </p>
 
                     <p>
-                        Se levanta la presente <strong>Acta de Entrega</strong> obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">28</strong> del mes de <strong id="previewMes">Noviembre</strong> del año <strong id="previewAnio">2025</strong>.
+                        Se levanta la presente <strong>Acta de Entrega</strong> obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">1</strong> del mes de <strong id="previewMes">Enero</strong> del año <strong id="previewAnio">2026</strong>.
                     </p>
 
                     <!-- Firmas -->
                     <div class="acta-signatures">
-                        <!-- 1. Funcionario Responsable - IZQUIERDA COMPLETA -->
+                        <!-- 1. Funcionario Responsable - IZQUIERDA -->
                         <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
@@ -848,5 +844,49 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
 <script src="../js/acta-crear.js" defer></script>
+
+<!-- ============================================ -->
+<!-- ✅ SCRIPT PARA FECHA AUTOMÁTICA              -->
+<!-- ============================================ -->
+<script>
+// Función para actualizar la fecha automáticamente
+function actualizarFechaActa() {
+    const fecha = new Date();
+    
+    // Días de la semana (no se usa pero disponible)
+    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    
+    // Meses en español
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
+    // Obtener el día del mes (1-31)
+    const dia = fecha.getDate();
+    
+    // Obtener el mes (0-11, por eso se usa como índice del array)
+    const mes = meses[fecha.getMonth()];
+    
+    // Obtener el año completo (ej: 2026)
+    const anio = fecha.getFullYear();
+    
+    // Actualizar los elementos del acta
+    const previewDia = document.getElementById('previewDia');
+    const previewMes = document.getElementById('previewMes');
+    const previewAnio = document.getElementById('previewAnio');
+    
+    if (previewDia) previewDia.textContent = dia;
+    if (previewMes) previewMes.textContent = mes;
+    if (previewAnio) previewAnio.textContent = anio;
+}
+
+// Ejecutar cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar fecha automáticamente al cargar la página
+    actualizarFechaActa();
+});
+</script>
+
 </body>
 </html>
