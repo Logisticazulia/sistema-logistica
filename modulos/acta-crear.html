@@ -23,10 +23,11 @@
             background: #f5f5f5;
         }
         
+        /* ✅ CONTENEDOR PRINCIPAL - IDÉNTICO A ficha-crear.html */
         .container {
-            max-width: 1600px;
+            max-width: 1600px;  /* ✅ MISMO ANCHO QUE ficha-crear.html */
             margin: 0 auto;
-            padding: 20px;
+            padding: 20px;  /* ✅ MISMO PADDING */
             display: flex;
             flex-direction: column;
             gap: 30px;
@@ -35,7 +36,7 @@
         /* Formulario */
         .form-section {
             background: white;
-            padding: 30px;
+            padding: 30px;  /* ✅ MISMO PADDING */
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             width: 100%;
@@ -84,6 +85,7 @@
             box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
         }
         
+        /* Campos bloqueados */
         .form-group input:disabled,
         .form-group select:disabled,
         .form-group textarea:disabled {
@@ -95,13 +97,6 @@
         .form-group.locked label::after {
             content: ' 🔒';
             font-size: 0.8em;
-        }
-        
-        /* Input file personalizado */
-        .form-group input[type="file"] {
-            padding: 10px;
-            background: #f8f9fa;
-            cursor: pointer;
         }
         
         /* Filas del formulario */
@@ -330,7 +325,8 @@
             border-bottom: 2px solid #003366;
         }
         
-        .acta-logo {
+        .acta-logo-left,
+        .acta-logo-right {
             width: 230px;
             height: auto;
         }
@@ -361,11 +357,6 @@
             color: #003366;
             margin-top: 5px;
             font-weight: 700;
-        }
-        
-        .acta-logo-right {
-            width: 180px;
-            height: auto;
         }
         
         .acta-body {
@@ -404,16 +395,6 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             vertical-align: top;
-        }
-        
-        .acta-table .label {
-            font-weight: 700;
-            background: #f0f0f0;
-            width: 18%;
-        }
-        
-        .acta-table .value {
-            width: 32%;
         }
         
         .acta-signatures {
@@ -576,7 +557,7 @@
                     </div>
                 </div>
 
-                <h2>📋 Datos del Vehículo</h2>
+                <h2>📋 Datos del Funcionario Asignado</h2>
                 <form id="actaForm">
                     <!-- Campos ocultos del vehículo -->
                     <input type="hidden" id="vehiculoId" name="vehiculoId">
@@ -587,93 +568,44 @@
                     <input type="hidden" id="vehiculoSerialMotor" name="vehiculoSerialMotor">
                     <input type="hidden" id="vehiculoFacsimil" name="vehiculoFacsimil">
 
-                    <!-- FILA 1: 4 CAMPOS (SOLO LECTURA) -->
-                    <div class="form-row-4">
-                        <div class="form-group">
-                            <label>Marca</label>
-                            <input type="text" id="marca" name="marca" disabled placeholder="Se completará automáticamente">
-                        </div>
-                        <div class="form-group">
-                            <label>Modelo</label>
-                            <input type="text" id="modelo" name="modelo" disabled placeholder="Se completará automáticamente">
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo</label>
-                            <input type="text" id="tipo" name="tipo" disabled placeholder="Se completará automáticamente">
-                        </div>
-                        <div class="form-group">
-                            <label>Clase</label>
-                            <input type="text" id="clase" name="clase" disabled placeholder="Se completará automáticamente">
-                        </div>
-                    </div>
-
-                    <!-- FILA 2: 3 CAMPOS (SOLO LECTURA) -->
-                    <div class="form-row-3">
-                        <div class="form-group">
-                            <label>Serial Carrocería</label>
-                            <input type="text" id="serialCarroceria" name="serialCarroceria" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Serial Motor</label>
-                            <input type="text" id="serialMotor" name="serialMotor" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Color</label>
-                            <input type="text" id="color" name="color" disabled>
-                        </div>
-                    </div>
-
-                    <!-- FILA 3: 3 CAMPOS (SOLO LECTURA) -->
-                    <div class="form-row-3">
-                        <div class="form-group">
-                            <label>Placa</label>
-                            <input type="text" id="placa" name="placa" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Facsímil</label>
-                            <input type="text" id="facsimil" name="facsimil" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Estatus</label>
-                            <input type="text" id="estatus" name="estatus" disabled>
-                        </div>
-                    </div>
-
-                    <h2 style="margin-top: 30px;">👤 Datos del Funcionario Asignado</h2>
-                    
-                    <!-- FILA 4: 2 CAMPOS (EDITABLES) -->
+                    <!-- FILA 1: 2 CAMPOS -->
                     <div class="form-row-2">
                         <div class="form-group">
                             <label>Nombre Completo del Funcionario <span class="required">*</span></label>
                             <input type="text" id="funcionarioNombre" name="funcionarioNombre" required 
-                                   placeholder="Ej: PRIMER COMISARIO (CPNB) ALBERTO PARRA">
+                                   placeholder="Ej: PRIMER COMISARIO (CPNB) ALBERTO PARRA"
+                                   oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label>Cédula de Identidad <span class="required">*</span></label>
                             <input type="text" id="funcionarioCedula" name="funcionarioCedula" required 
-                                   placeholder="Ej: V-13.550.532">
+                                   placeholder="Ej: V-13.550.532"
+                                   oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
-                    <!-- FILA 5: 2 CAMPOS (EDITABLES) -->
+                    <!-- FILA 2: 2 CAMPOS -->
                     <div class="form-row-2">
                         <div class="form-group">
                             <label>Unidad de Asignación <span class="required">*</span></label>
                             <input type="text" id="unidadAsignacion" name="unidadAsignacion" required 
-                                   placeholder="Ej: Oficina de Gestión Humana de la Redip Occidental">
+                                   placeholder="Ej: Oficina de Gestión Humana de la Redip Occidental"
+                                   oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label>Cargo del Funcionario</label>
                             <input type="text" id="funcionarioCargo" name="funcionarioCargo" 
-                                   placeholder="Ej: Director de la Redip Occidental">
+                                   placeholder="Ej: Director de la Redip Occidental"
+                                   oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
-                    <!-- FILA 6: 2 CAMPOS (EDITABLES) -->
+                    <!-- FILA 3: 2 CAMPOS -->
                     <div class="form-row-2">
                         <div class="form-group">
                             <label>Fecha de Asignación</label>
-                            <input type="date" id="fechaAsignacion" name="fechaAsignacion">
+                            <input type="date" id="fechaAsignacion" name="fechaAsignacion" 
+                                   oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label>Número de Acta</label>
@@ -690,27 +622,42 @@
                 </form>
             </div>
 
-            <!-- Vista Previa -->
+            <!-- Vista Previa (DEBAJO DEL FORMULARIO) -->
             <div class="preview-section" id="previewSection" style="display: none;">
                 <h2 style="color: #003366; margin-bottom: 20px;">📄 Vista Previa del Acta</h2>
                 
                 <div class="acta-document" id="actaPreview">
+                    <!-- Encabezado con logos -->
                     <div class="acta-header">
-                        <img src="../img/logo_izquierdo.png" alt="Logo Institucional" class="acta-logo" onerror="this.style.display='none'">
+                        <div class="acta-logo-left">
+                            <img src="../img/logo_izquierdo.png" alt="Logo Institucional" class="acta-logo-left" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="acta-logo-placeholder" style="display: none;">
+                                Logo<br>Institucional
+                            </div>
+                        </div>
+                        
                         <div class="acta-title">
                             <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
                             <h2>Cuerpo de Policía Nacional Bolivariana</h2>
                             <h3>REDIP: OCCIDENTAL - CCPE ZULIA</h3>
                         </div>
-                        <img src="../img/logo_derecho.png" alt="Logo Secundario" class="acta-logo-right" onerror="this.style.display='none'">
+                        
+                        <div class="acta-logo-right">
+                            <img src="../img/logo_derecho.png" alt="Logo CPNB" class="acta-logo-right" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="acta-logo-placeholder" style="display: none;">
+                                Logo<br>CPNB
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Título del documento -->
                     <div style="text-align: center; margin-bottom: 25px;">
                         <h2 style="font-size: 14pt; font-weight: bold; color: #000; margin-bottom: 15px;">
                             ACTA DE ASIGNACIÓN DE UNIDAD VEHICULAR
                         </h2>
                     </div>
 
+                    <!-- Cuerpo del acta -->
                     <div class="acta-body">
                         <p>
                             Quien suscribe, <strong>COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO</strong>, 
@@ -720,14 +667,15 @@
                             del CCPE Estadal Zulia:
                         </p>
 
+                        <!-- Tabla de datos del vehículo -->
                         <table class="acta-table">
                             <thead>
                                 <tr>
-                                    <th>Marca-Modelo</th>
-                                    <th>Serial Carrocería</th>
-                                    <th>Serial Motor</th>
-                                    <th>Placa</th>
-                                    <th>Facsímil</th>
+                                    <th style="width: 20%;">Marca-Modelo</th>
+                                    <th style="width: 25%;">Serial Carrocería</th>
+                                    <th style="width: 20%;">Serial Motor</th>
+                                    <th style="width: 15%;">Placa</th>
+                                    <th style="width: 20%;">Facsímil</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -782,6 +730,7 @@
                         </p>
                     </div>
 
+                    <!-- Firmas -->
                     <div class="acta-signatures">
                         <div class="signature-box">
                             <div class="signature-line">
@@ -805,6 +754,7 @@
                         </div>
                     </div>
 
+                    <!-- Footer -->
                     <div class="acta-footer">
                         <p style="color: #000;">¡Chávez Vive!... La Patria Sigue...</p>
                         <p style="color: #000;">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
@@ -812,6 +762,7 @@
                     </div>
                 </div>
 
+                <!-- Botones de impresión -->
                 <div style="text-align: center; margin-top: 30px;">
                     <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir Acta</button>
                 </div>
@@ -819,7 +770,7 @@
         </div>
     </main>
 
-    <!-- ================= SCRIPTS ================= -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
     <script src="../js/acta-crear.js"></script>
