@@ -9,7 +9,7 @@
 let supabaseClient = null;
 
 // ============================================
-// ✅ INICIALIZAR SUPABASE
+// ✅ INICIALIZAR SUPABASE Y CARGAR USUARIO
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar que las credenciales estén cargadas
@@ -23,7 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('❌ Error: Credenciales de Supabase no encontradas. Verifica config.js');
     }
     
-    // Inicializar fecha automática
+    // Cargar usuario
+    cargarUsuario();
+    
+    // Actualizar fecha automática
     actualizarFechaActa();
     
     // Agregar listeners para actualización en tiempo real
@@ -31,10 +34,62 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Permitir búsqueda con Enter
     agregarListenerEnter();
-    
-    // Cargar email de usuario
-    cargarEmailUsuario();
 });
+
+// ============================================
+// ✅ CARGAR DATOS DEL USUARIO
+// ============================================
+function cargarUsuario() {
+    const userEmailElement = document.getElementById('userEmail');
+    
+    if (!userEmailElement) {
+        console.error('❌ Elemento userEmail no encontrado');
+        return;
+    }
+    
+    // Intentar obtener usuario de sessionStorage
+    const usuarioGuardado = sessionStorage.getItem('usuario');
+    
+    if (usuarioGuardado) {
+        try {
+            const usuario = JSON.parse(usuarioGuardado);
+            if (usuario.email || usuario.correo) {
+                userEmailElement.textContent = usuario.email || usuario.correo;
+                console.log('✅ Usuario cargado desde sessionStorage:', usuario.email || usuario.correo);
+                return;
+            }
+        } catch (error) {
+            console.error('Error al parsear usuario de sessionStorage:', error);
+        }
+    }
+    
+    // Si no hay usuario en sessionStorage, intentar obtener de Supabase auth
+    if (supabaseClient) {
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session && session.user) {
+                userEmailElement.textContent = session.user.email || 'usuario@institucion.com';
+                console.log('✅ Usuario cargado desde Supabase auth:', session.user.email);
+                
+                // Guardar en sessionStorage para futuras cargas
+                sessionStorage.setItem('usuario', JSON.stringify({
+                    email: session.user.email,
+                    id: session.user.id
+                }));
+            } else {
+                // Usuario no autenticado, mostrar email genérico
+                userEmailElement.textContent = 'usuario@institucion.com';
+                console.log('⚠️ No hay sesión activa, mostrando email genérico');
+            }
+        }).catch(error => {
+            console.error('Error al obtener sesión de Supabase:', error);
+            userEmailElement.textContent = 'usuario@institucion.com';
+        });
+    } else {
+        // Supabase no disponible, mostrar email genérico
+        userEmailElement.textContent = 'usuario@institucion.com';
+        console.log('⚠️ Supabase no disponible, mostrando email genérico');
+    }
+}
 
 // ============================================
 // ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
@@ -99,60 +154,65 @@ async function buscarVehiculo() {
         return;
     }
     
+    // Verificar que supabaseClient esté inicializado
+    if (!supabaseClient) {
+        mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
+        return;
+    }
+    
     try {
-        // Verificar que supabaseClient esté inicializado
-        if (!supabaseClient) {
-            mostrarAlerta('❌ Error de conexión. Recarga la página.', 'error');
-            return;
-        }
+        let data = null;
+        let error = null;
         
-        // Búsqueda exacta por placa (primero)
-        let { data, error } = await supabaseClient
+        // BÚSQUEDA EXACTA por placa (primero)
+        const { data: dataPlaca, error: errorPlaca } = await supabaseClient
             .from('vehiculos')
             .select('*')
             .eq('placa', searchInput.toUpperCase())
             .single();
         
-        // Si no encuentra por placa, intentar por facsimil
-        if (!data || error) {
-            const { data: data2, error: error2 } = await supabaseClient
+        if (dataPlaca && !errorPlaca) {
+            data = dataPlaca;
+        } else {
+            // BÚSQUEDA EXACTA por facsimil
+            const { data: dataFacsimil, error: errorFacsimil } = await supabaseClient
                 .from('vehiculos')
                 .select('*')
                 .eq('facsimil', searchInput.toUpperCase())
                 .single();
             
-            if (data2 && !error2) {
-                data = data2;
+            if (dataFacsimil && !errorFacsimil) {
+                data = dataFacsimil;
             } else {
-                // Intentar por serial de carrocería
-                const { data: data3, error: error3 } = await supabaseClient
+                // BÚSQUEDA EXACTA por serial de carrocería
+                const { data: dataCarroceria, error: errorCarroceria } = await supabaseClient
                     .from('vehiculos')
                     .select('*')
                     .eq('s_carroceria', searchInput.toUpperCase())
                     .single();
                 
-                if (data3 && !error3) {
-                    data = data3;
+                if (dataCarroceria && !errorCarroceria) {
+                    data = dataCarroceria;
                 } else {
-                    // Intentar por serial de motor
-                    const { data: data4, error: error4 } = await supabaseClient
+                    // BÚSQUEDA EXACTA por serial de motor
+                    const { data: dataMotor, error: errorMotor } = await supabaseClient
                         .from('vehiculos')
                         .select('*')
                         .eq('s_motor', searchInput.toUpperCase())
                         .single();
                     
-                    if (data4 && !error4) {
-                        data = data4;
+                    if (dataMotor && !errorMotor) {
+                        data = dataMotor;
                     } else {
-                        // Intentar por marca/modelo
-                        const { data: data5, error: error5 } = await supabaseClient
+                        // BÚSQUEDA EXACTA por número de identificación
+                        const { data: dataIdentificacion, error: errorIdentificacion } = await supabaseClient
                             .from('vehiculos')
                             .select('*')
-                            .ilike('marca', `%${searchInput}%`)
+                            .eq('n_identificacion', searchInput.toUpperCase())
                             .single();
                         
-                        if (data5 && !error5) {
-                            data = data5;
+                        if (dataIdentificacion && !errorIdentificacion) {
+                            data = dataIdentificacion;
                         }
                     }
                 }
@@ -205,6 +265,34 @@ function limpiarDatosVehiculo() {
     document.getElementById('previewSerialMotor').textContent = '-';
     document.getElementById('previewPlaca').textContent = 'N/P';
     document.getElementById('previewFacsimil').textContent = 'N/P';
+}
+
+// ============================================
+// ✅ LIMPIAR FORMULARIO COMPLETO
+// ============================================
+function limpiarFormulario() {
+    // Limpiar campos del formulario
+    document.getElementById('searchInput').value = '';
+    document.getElementById('funcionarioNombre').value = '';
+    document.getElementById('funcionarioCedula').value = '';
+    document.getElementById('unidadAsignacion').value = '';
+    document.getElementById('funcionarioCargo').value = '';
+    
+    // Limpiar datos del vehículo en el acta
+    limpiarDatosVehiculo();
+    
+    // Restablecer valores por defecto en el acta
+    document.getElementById('previewFuncionarioNombre').textContent = 'PRIMER COMISARIO (CPNB) ALBERTO PARRA';
+    document.getElementById('previewFuncionarioCedula').textContent = 'V-13.550.532';
+    document.getElementById('previewFirmaFuncionario').innerHTML = 
+        'PRIMER COMISARIO (CPNB) ALBERTO PARRA, Cédula de Identidad numero V-13.550.532';
+    document.getElementById('previewUnidadAsignacion').textContent = 'Oficina de Gestión Humana de la Redip Occidental';
+    document.getElementById('previewCargoFuncionario').textContent = 'Jefe de la Oficina de Gestión Humana de la Redip Occidental';
+    
+    // Actualizar fecha
+    actualizarFechaActa();
+    
+    console.log('✅ Formulario limpiado correctamente');
 }
 
 // ============================================
@@ -265,6 +353,16 @@ async function guardarActa() {
         return;
     }
     
+    // Verificar que supabaseClient esté inicializado
+    if (!supabaseClient) {
+        mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
+        return;
+    }
+    
+    // Obtener email del usuario
+    const userEmailElement = document.getElementById('userEmail');
+    const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
+    
     // Recopilar datos del acta
     const actaData = {
         funcionario: {
@@ -285,16 +383,11 @@ async function guardarActa() {
             mes: document.getElementById('previewMes').textContent,
             anio: document.getElementById('previewAnio').textContent
         },
-        director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO'
+        director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO',
+        created_by_email: createdByEmail
     };
     
     try {
-        // Verificar que supabaseClient esté inicializado
-        if (!supabaseClient) {
-            mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
-            return;
-        }
-        
         // Guardar en Supabase - Tabla: actas_asignacion
         const { data, error } = await supabaseClient
             .from('actas_asignacion')
@@ -304,8 +397,10 @@ async function guardarActa() {
         
         mostrarAlerta('✅ Acta guardada exitosamente en la base de datos', 'success');
         
-        // Opcional: Redirigir o limpiar formulario
-        // window.location.href = 'acta.html';
+        // ✅ LIMPIAR TODO EL FORMULARIO DESPUÉS DE GUARDAR
+        setTimeout(() => {
+            limpiarFormulario();
+        }, 1500);
         
     } catch (error) {
         console.error('Error al guardar acta:', error);
@@ -379,18 +474,6 @@ function agregarListenerEnter() {
 }
 
 // ============================================
-// ✅ CARGAR EMAIL DE USUARIO
-// ============================================
-function cargarEmailUsuario() {
-    if (typeof window.currentUser !== 'undefined' && window.currentUser) {
-        const userEmail = document.getElementById('userEmail');
-        if (userEmail) {
-            userEmail.textContent = window.currentUser.email || 'usuario@institucion.com';
-        }
-    }
-}
-
-// ============================================
 // ✅ EXPORTAR FUNCIONES PARA USO GLOBAL
 // ============================================
 window.buscarVehiculo = buscarVehiculo;
@@ -399,4 +482,6 @@ window.guardarActa = guardarActa;
 window.actualizarActa = actualizarActa;
 window.llenarDatosVehiculo = llenarDatosVehiculo;
 window.limpiarDatosVehiculo = limpiarDatosVehiculo;
+window.limpiarFormulario = limpiarFormulario;
 window.mostrarAlerta = mostrarAlerta;
+window.cargarUsuario = cargarUsuario;
