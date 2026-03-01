@@ -121,7 +121,6 @@ body {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
 }
 
 .search-input {
@@ -163,41 +162,21 @@ body {
 }
 
 /* ============================================ */
-/* ✅ AYUDA DE BÚSQUEDA - NUEVO                 */
+/* ✅ AYUDA DE BÚSQUEDA - IGUAL QUE FICHA-CONSULTA */
 /* ============================================ */
-.search-help {
-    background: rgba(255,255,255,0.1);
-    border-radius: 6px;
-    padding: 15px 20px;
-    margin-top: 15px;
-}
-
-.search-help-title {
-    color: #fff;
-    font-size: 11pt;
-    font-weight: 600;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.search-help-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.search-help-item {
+.search-hint {
     color: rgba(255,255,255,0.9);
-    font-size: 10pt;
+    font-size: 13px;
+    margin-top: 10px;
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.search-help-item span {
-    font-size: 12pt;
+.search-hint span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 /* ============================================ */
@@ -498,9 +477,9 @@ body {
     .search-input {
         min-width: 100%;
     }
-    .search-help-items {
+    .search-hint {
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
     }
     .acta-container {
         width: 100%;
@@ -617,34 +596,14 @@ body {
                     </button>
                 </div>
                 
-                <!-- ✅ AYUDA DE BÚSQUEDA - NUEVO -->
-                <div class="search-help">
-                    <div class="search-help-title">
-                        <span>💡</span>
-                        <span>Busque por:</span>
-                    </div>
-                    <div class="search-help-items">
-                        <div class="search-help-item">
-                            <span>🚗</span>
-                            <span>Placa</span>
-                        </div>
-                        <div class="search-help-item">
-                            <span>📄</span>
-                            <span>Facsímil</span>
-                        </div>
-                        <div class="search-help-item">
-                            <span>🔢</span>
-                            <span>Serial Carrocería</span>
-                        </div>
-                        <div class="search-help-item">
-                            <span>⚙️</span>
-                            <span>Serial Motor</span>
-                        </div>
-                        <div class="search-help-item">
-                            <span>🏷️</span>
-                            <span>Marca/Modelo</span>
-                        </div>
-                    </div>
+                <!-- ✅ AYUDA DE BÚSQUEDA - IGUAL QUE FICHA-CONSULTA -->
+                <div class="search-hint">
+                    <span>💡 Busque por:</span>
+                    <span>🚗 Placa</span>
+                    <span>📄 Facsímil</span>
+                    <span>🔢 Serial Carrocería</span>
+                    <span>⚙️ Serial Motor</span>
+                    <span>🏷️ Marca/Modelo</span>
                 </div>
             </div>
 
