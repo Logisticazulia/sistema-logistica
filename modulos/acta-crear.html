@@ -428,10 +428,14 @@ body {
     max-width: 600px;
 }
 
+/* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA COMPLETA */
 .signature-box.funcionario {
     text-align: left;
+    margin-left: 0;
+    max-width: 100%;
 }
 
+/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
 .signature-box.director {
     text-align: center;
 }
@@ -480,7 +484,7 @@ body {
 }
 
 /* ============================================ */
-/* ✅ MARCA DE AGUA - FONDO.PNG (SIN CAMBIOS)   */
+/* MARCA DE AGUA - FONDO.PNG                    */
 /* ============================================ */
 .acta-watermark {
     position: absolute;
@@ -803,7 +807,7 @@ body {
 
                     <!-- Firmas -->
                     <div class="acta-signatures">
-                        <!-- 1. Funcionario Responsable - IZQUIERDA -->
+                        <!-- 1. Funcionario Responsable - IZQUIERDA COMPLETA -->
                         <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
@@ -832,7 +836,7 @@ body {
                 </div>
 
                 <!-- ============================================ -->
-                <!-- ✅ MARCA DE AGUA - FONDO.PNG (SIN CAMBIOS)   -->
+                <!-- MARCA DE AGUA - FONDO.PNG                    -->
                 <!-- ============================================ -->
                 <img src="../img/fondo.png" alt="Marca de Agua" class="acta-watermark" onerror="this.style.display='none'">
             </div>
