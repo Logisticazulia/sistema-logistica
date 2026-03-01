@@ -411,14 +411,29 @@ body {
     text-align: justify;
 }
 
-/* FIRMAS */
+/* ============================================ */
+/* ✅ FIRMAS - CORREGIDAS                       */
+/* ============================================ */
 .acta-signatures {
     margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
 }
 
 .signature-box {
+    flex: 1;
     text-align: left;
-    margin-bottom: 30px;
+}
+
+/* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA */
+.signature-box.funcionario {
+    text-align: left;
+}
+
+/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
+.signature-box.director {
+    text-align: center;
 }
 
 .signature-box p {
@@ -429,10 +444,17 @@ body {
     line-height: 1.4;
 }
 
+/* ✅ LÍNEA DE FIRMA MÁS PEQUEÑA */
 .signature-box .firma-line {
     border-top: 1px solid #000;
-    margin: 40px 0 10px 0;
+    margin: 30px 0 10px 0;
     padding-top: 10px;
+    width: 80%;
+}
+
+/* ✅ LÍNEA CENTRADA PARA EL DIRECTOR */
+.signature-box.director .firma-line {
+    margin: 30px auto 10px auto;
 }
 
 .signature-box .cargo {
@@ -480,6 +502,13 @@ body {
     }
     .acta-container {
         padding: 1.5cm;
+    }
+    .acta-signatures {
+        flex-direction: column;
+        gap: 30px;
+    }
+    .signature-box.director .firma-line {
+        margin: 30px 0 10px 0;
     }
 }
 
@@ -759,17 +788,21 @@ body {
                         Se levanta la presente <strong>Acta de Entrega</strong> obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">28</strong> del mes de <strong id="previewMes">Noviembre</strong> del año <strong id="previewAnio">2025</strong>.
                     </p>
 
-                    <!-- Firmas -->
+                    <!-- ============================================ -->
+                    <!-- ✅ FIRMAS - CORREGIDAS                       -->
+                    <!-- ============================================ -->
                     <div class="acta-signatures">
-                        <div class="signature-box">
+                        <!-- Funcionario Responsable - IZQUIERDA -->
+                        <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
-                                PRIMER COMISARIO (CPNB) ALBERTO PARRA, Cédula de Identidad numero V- 13.550.532
+                                <!-- Los datos se llenan dinámicamente desde el formulario -->
                             </p>
-                            <p class="cargo">Jefe de la Oficina de Gestión Humana de la Redip Occidental</p>
+                            <p class="cargo" id="previewCargoFuncionario">Jefe de la Oficina de Gestión Humana de la Redip Occidental</p>
                         </div>
 
-                        <div class="signature-box">
+                        <!-- Director - CENTRADO -->
+                        <div class="signature-box director">
                             <p class="firma-line">
                                 COMISARIO MAYOR (CPNB) DR GUILLERMO PARRA PULIDO
                             </p>
