@@ -10,19 +10,42 @@ function actualizarActa() {
     const funcionarioNombre = document.getElementById('funcionarioNombre').value;
     const funcionarioCedula = document.getElementById('funcionarioCedula').value;
     const unidadAsignacion = document.getElementById('unidadAsignacion').value;
+    const funcionarioCargo = document.getElementById('funcionarioCargo').value;
     
+    // Actualizar nombre y cédula en el cuerpo del acta
     if (funcionarioNombre) {
         document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
-        document.getElementById('previewFirmaFuncionario').innerHTML = 
-            `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula || 'V-00.000.000'}`;
+    } else {
+        document.getElementById('previewFuncionarioNombre').textContent = 'PRIMER COMISARIO (CPNB) ALBERTO PARRA';
     }
     
     if (funcionarioCedula) {
         document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
+    } else {
+        document.getElementById('previewFuncionarioCedula').textContent = 'V-13.550.532';
     }
     
+    // ✅ ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
+    if (funcionarioNombre && funcionarioCedula) {
+        document.getElementById('previewFirmaFuncionario').innerHTML = 
+            `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula}`;
+    } else if (funcionarioNombre) {
+        document.getElementById('previewFirmaFuncionario').innerHTML = 
+            `${funcionarioNombre}, Cédula de Identidad numero V-00.000.000`;
+    } else {
+        // Valor por defecto si no hay datos
+        document.getElementById('previewFirmaFuncionario').innerHTML = 
+            'PRIMER COMISARIO (CPNB) ALBERTO PARRA, Cédula de Identidad numero V-13.550.532';
+    }
+    
+    // Actualizar unidad de asignación
     if (unidadAsignacion) {
         document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
+    }
+    
+    // Actualizar cargo del funcionario si existe
+    if (funcionarioCargo) {
+        document.getElementById('previewCargoFuncionario').textContent = funcionarioCargo;
     }
 }
 
