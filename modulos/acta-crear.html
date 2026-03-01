@@ -413,7 +413,7 @@ body {
 }
 
 /* ============================================ */
-/* ✅ FIRMAS - FUNCIONARIO A LA IZQUIERDA       */
+/* FIRMAS                                       */
 /* ============================================ */
 .acta-signatures {
     margin-top: 40px;
@@ -428,14 +428,10 @@ body {
     max-width: 600px;
 }
 
-/* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA COMPLETA */
 .signature-box.funcionario {
-    text-align: left !important;
-    margin-left: 0 !important;
-    max-width: 100% !important;
+    text-align: left;
 }
 
-/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
 .signature-box.director {
     text-align: center;
 }
@@ -741,9 +737,9 @@ body {
                         </thead>
                         <tbody>
                             <tr>
-                                <td id="previewMarcaModelo">SINOTRUK BOLDEN</td>
-                                <td id="previewSerialCarroceria">LZZWAZG43TT500886</td>
-                                <td id="previewSerialMotor">WP2H180A087255008054</td>
+                                <td id="previewMarcaModelo">-</td>
+                                <td id="previewSerialCarroceria">-</td>
+                                <td id="previewSerialMotor">-</td>
                                 <td id="previewPlaca">N/P</td>
                                 <td id="previewFacsimil">N/P</td>
                             </tr>
@@ -807,7 +803,7 @@ body {
 
                     <!-- Firmas -->
                     <div class="acta-signatures">
-                        <!-- 1. Funcionario Responsable - IZQUIERDA COMPLETA -->
+                        <!-- 1. Funcionario Responsable - IZQUIERDA -->
                         <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
@@ -848,46 +844,5 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
 <script src="../js/acta-crear.js" defer></script>
-
-<!-- ============================================ -->
-<!-- ✅ SCRIPT PARA FECHA AUTOMÁTICA              -->
-<!-- ============================================ -->
-<script>
-// Función para actualizar la fecha automáticamente
-function actualizarFechaActa() {
-    const fecha = new Date();
-    
-    // Meses en español
-    const meses = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
-    
-    // Obtener el día del mes (1-31)
-    const dia = fecha.getDate();
-    
-    // Obtener el mes (0-11, por eso se usa como índice del array)
-    const mes = meses[fecha.getMonth()];
-    
-    // Obtener el año completo (ej: 2026)
-    const anio = fecha.getFullYear();
-    
-    // Actualizar los elementos del acta
-    const previewDia = document.getElementById('previewDia');
-    const previewMes = document.getElementById('previewMes');
-    const previewAnio = document.getElementById('previewAnio');
-    
-    if (previewDia) previewDia.textContent = dia;
-    if (previewMes) previewMes.textContent = mes;
-    if (previewAnio) previewAnio.textContent = anio;
-}
-
-// Ejecutar cuando el DOM esté completamente cargado
-document.addEventListener('DOMContentLoaded', function() {
-    // Actualizar fecha automáticamente al cargar la página
-    actualizarFechaActa();
-});
-</script>
-
 </body>
 </html>
