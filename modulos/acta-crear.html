@@ -413,25 +413,33 @@ body {
 }
 
 /* ============================================ */
-/* FIRMAS                                       */
+/* ✅ FIRMAS - FUNCIONARIO IZQUIERDA COMPLETA   */
 /* ============================================ */
 .acta-signatures {
     margin-top: 40px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 30px;
+    width: 100%;
 }
 
 .signature-box {
     width: 100%;
-    max-width: 600px;
 }
 
+/* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA COMPLETA */
 .signature-box.funcionario {
-    text-align: left;
+    text-align: left !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
 }
 
+.signature-box.funcionario p {
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+
+/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
 .signature-box.director {
     text-align: center;
 }
@@ -737,9 +745,9 @@ body {
                         </thead>
                         <tbody>
                             <tr>
-                                <td id="previewMarcaModelo">-</td>
-                                <td id="previewSerialCarroceria">-</td>
-                                <td id="previewSerialMotor">-</td>
+                                <td id="previewMarcaModelo">SINOTRUK BOLDEN</td>
+                                <td id="previewSerialCarroceria">LZZWAZG43TT500886</td>
+                                <td id="previewSerialMotor">WP2H180A087255008054</td>
                                 <td id="previewPlaca">N/P</td>
                                 <td id="previewFacsimil">N/P</td>
                             </tr>
@@ -798,12 +806,14 @@ body {
                     </p>
 
                     <p>
-                        Se levanta la presente <strong>Acta de Entrega</strong> obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">1</strong> del mes de <strong id="previewMes">Enero</strong> del año <strong id="previewAnio">2026</strong>.
+                        Se levanta la presente <strong>Acta de Entrega</strong> obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">28</strong> del mes de <strong id="previewMes">Noviembre</strong> del año <strong id="previewAnio">2025</strong>.
                     </p>
 
-                    <!-- Firmas -->
+                    <!-- ============================================ -->
+                    <!-- ✅ FIRMAS - FUNCIONARIO IZQUIERDA COMPLETA   -->
+                    <!-- ============================================ -->
                     <div class="acta-signatures">
-                        <!-- 1. Funcionario Responsable - IZQUIERDA -->
+                        <!-- 1. Funcionario Responsable - IZQUIERDA COMPLETA -->
                         <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
