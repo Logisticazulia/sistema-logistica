@@ -28,7 +28,7 @@ body {
 /* CONTENEDOR PRINCIPAL                         */
 /* ============================================ */
 .container {
-    max-width: 1600px;
+    max-width: 1800px;
     margin: 0 auto;
     padding: 20px;
     display: flex;
@@ -229,15 +229,16 @@ body {
 }
 
 /* ============================================ */
-/* ✅ VISTA PREVIA - HOJA CARTA                 */
+/* ✅ VISTA PREVIA - HOJA CARTA (MÁS ANCHA)     */
 /* ============================================ */
 .preview-section {
     background: #e9ecef;
-    padding: 40px 20px;
+    padding: 40px;
     border-radius: 8px;
     width: 100%;
     display: flex;
     justify-content: center;
+    overflow-x: auto;
 }
 
 .preview-section h2 {
@@ -247,21 +248,20 @@ body {
     font-size: 16pt;
 }
 
-/* HOJA CARTA: 21.59cm × 27.94cm */
+/* HOJA CARTA: 21.59cm × 27.94cm - AHORA MÁS ANCHA EN PANTALLA */
 .acta-container {
-    width: 21.59cm;
+    width: 100%;
+    max-width: 21.59cm;
     min-height: 27.94cm;
-    max-height: 27.94cm;
     background: white;
     padding: 2cm 2.5cm;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     border: 1px solid #ddd;
     text-align: justify;
     line-height: 1.4;
     font-size: 12pt;
     font-family: Arial, sans-serif;
     margin: 0 auto;
-    overflow: hidden;
 }
 
 .acta-header {
@@ -420,14 +420,28 @@ body {
 }
 
 /* ============================================ */
-/* RESPONSIVE                                   */
+/* RESPONSIVE - MÁS ANCHO EN PANTALLAS GRANDES  */
 /* ============================================ */
+@media (min-width: 1400px) {
+    .acta-container {
+        max-width: 23cm;
+        padding: 2cm 3cm;
+    }
+}
+
+@media (min-width: 1600px) {
+    .acta-container {
+        max-width: 24cm;
+        padding: 2cm 3.5cm;
+    }
+}
+
 @media (max-width: 1200px) {
     .form-row-2 {
         grid-template-columns: 1fr;
     }
     .acta-container {
-        width: 100%;
+        max-width: 100%;
         padding: 1.5cm;
     }
 }
@@ -440,7 +454,7 @@ body {
         min-width: 100%;
     }
     .acta-container {
-        width: 100%;
+        max-width: 100%;
         padding: 1cm;
     }
     .acta-header {
@@ -479,10 +493,10 @@ body {
     }
     .acta-container {
         width: 100%;
+        max-width: 21.59cm;
         box-shadow: none;
         border: none;
         padding: 1.5cm 2cm;
-        max-height: none;
     }
 }
 </style>
@@ -597,7 +611,7 @@ body {
             </form>
         </div>
 
-        <!-- ✅ VISTA PREVIA - HOJA CARTA -->
+        <!-- ✅ VISTA PREVIA - HOJA CARTA (MÁS ANCHA) -->
         <div class="preview-section">
             <div class="acta-container">
                 <!-- Encabezado -->
