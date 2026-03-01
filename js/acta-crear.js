@@ -4,11 +4,31 @@
 /* ============================================ */
 
 // ============================================
-// ✅ CONFIGURACIÓN DE SUPABASE
+// ✅ INICIALIZAR SUPABASE (USA CONFIG.JS)
 // ============================================
-const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
-const SUPABASE_KEY = 'tu-anon-key';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar a que config.js cargue las credenciales
+    if (window.SUPABASE_URL && window.SUPABASE_KEY) {
+        supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+        console.log('✅ Supabase inicializado correctamente');
+    } else {
+        console.error('❌ Error: Credenciales de Supabase no encontradas. Verifica config.js');
+    }
+    
+    // Inicializar fecha automática
+    actualizarFechaActa();
+    
+    // Agregar listeners para actualización en tiempo real
+    agregarListenersFormulario();
+    
+    // Permitir búsqueda con Enter
+    agregarListenerEnter();
+    
+    // Cargar email de usuario
+    cargarEmailUsuario();
+});
 
 // ============================================
 // ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
@@ -74,34 +94,66 @@ async function buscarVehiculo() {
     }
     
     try {
-        // Búsqueda exacta por placa
-        const { data, error } = await supabase
+        // Búsqueda exacta por placa (primero)
+        let { data, error } = await supabase
             .from('vehiculos')
             .select('*')
             .eq('placa', searchInput.toUpperCase())
             .single();
         
-        if (error || !data) {
-            // Si no encuentra por placa, intentar por otros campos
+        // Si no encuentra por placa, intentar por facsimil
+        if (!data || error) {
             const { data: data2, error: error2 } = await supabase
                 .from('vehiculos')
                 .select('*')
-                .or(`facsimal.eq.${searchInput},serial_carroceria.eq.${searchInput},serial_motor.eq.${searchInput}`)
+                .eq('facsimil', searchInput.toUpperCase())
                 .single();
             
-            if (error2 || !data2) {
-                mostrarAlerta('❌ Vehículo no encontrado en la base de datos', 'error');
-                limpiarDatosVehiculo();
-                return;
+            if (data2 && !error2) {
+                data = data2;
+            } else {
+                // Intentar por serial de carrocería
+                const { data: data3, error: error3 } = await supabase
+                    .from('vehiculos')
+                    .select('*')
+                    .eq('s_carroceria', searchInput.toUpperCase())
+                    .single();
+                
+                if (data3 && !error3) {
+                    data = data3;
+                } else {
+                    // Intentar por serial de motor
+                    const { data: data4, error: error4 } = await supabase
+                        .from('vehiculos')
+                        .select('*')
+                        .eq('s_motor', searchInput.toUpperCase())
+                        .single();
+                    
+                    if (data4 && !error4) {
+                        data = data4;
+                    } else {
+                        // Intentar por marca/modelo
+                        const { data: data5, error: error5 } = await supabase
+                            .from('vehiculos')
+                            .select('*')
+                            .ilike('marca', `%${searchInput}%`)
+                            .single();
+                        
+                        if (data5 && !error5) {
+                            data = data5;
+                        }
+                    }
+                }
             }
-            
-            // Llenar con datos encontrados por otros campos
-            llenarDatosVehiculo(data2);
-            mostrarAlerta('✅ Vehículo encontrado. Los datos han sido cargados en el acta.', 'success');
+        }
+        
+        if (!data) {
+            mostrarAlerta('❌ Vehículo no encontrado en la base de datos', 'error');
+            limpiarDatosVehiculo();
             return;
         }
         
-        // Llenar con datos encontrados por placa
+        // Llenar los campos del acta con los datos del vehículo
         llenarDatosVehiculo(data);
         mostrarAlerta('✅ Vehículo encontrado. Los datos han sido cargados en el acta.', 'success');
         
@@ -115,12 +167,21 @@ async function buscarVehiculo() {
 // ✅ LLENAR DATOS DEL VEHÍCULO EN EL ACTA
 // ============================================
 function llenarDatosVehiculo(vehiculo) {
-    // Llenar la tabla del acta con los datos del vehículo
-    document.getElementById('previewMarcaModelo').textContent = vehiculo.marca_modelo || 'N/P';
-    document.getElementById('previewSerialCarroceria').textContent = vehiculo.serial_carroceria || 'N/P';
-    document.getElementById('previewSerialMotor').textContent = vehiculo.serial_motor || 'N/P';
-    document.getElementById('previewPlaca').textContent = vehiculo.placa || 'N/P';
-    document.getElementById('previewFacsimil').textContent = vehiculo.facsimal || 'N/P';
+    // Mapear los campos de la tabla vehiculos a la vista previa del acta
+    document.getElementById('previewMarcaModelo').textContent = 
+        `${vehiculo.marca || 'N/P'} ${vehiculo.modelo || ''}`.trim() || 'N/P';
+    
+    document.getElementById('previewSerialCarroceria').textContent = 
+        vehiculo.s_carroceria || 'N/P';
+    
+    document.getElementById('previewSerialMotor').textContent = 
+        vehiculo.s_motor || 'N/P';
+    
+    document.getElementById('previewPlaca').textContent = 
+        vehiculo.placa || 'N/P';
+    
+    document.getElementById('previewFacsimil').textContent = 
+        vehiculo.facsimil || 'N/P';
 }
 
 // ============================================
@@ -216,7 +277,7 @@ async function guardarActa() {
     };
     
     try {
-        // Guardar en Supabase
+        // Guardar en Supabase - Tabla: actas_asignacion
         const { data, error } = await supabase
             .from('actas_asignacion')
             .insert(actaData);
@@ -266,13 +327,9 @@ function actualizarFechaActa() {
 }
 
 // ============================================
-// ✅ INICIALIZAR EVENTOS AL CARGAR LA PÁGINA
+// ✅ AGREGAR LISTENERS AL FORMULARIO
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Actualizar fecha automáticamente
-    actualizarFechaActa();
-    
-    // Agregar listeners para actualización en tiempo real
+function agregarListenersFormulario() {
     const camposFormulario = [
         'funcionarioNombre',
         'funcionarioCedula',
@@ -287,8 +344,12 @@ document.addEventListener('DOMContentLoaded', function() {
             elemento.addEventListener('change', actualizarActa);
         }
     });
-    
-    // Permitir búsqueda con Enter
+}
+
+// ============================================
+// ✅ PERMITIR BÚSQUEDA CON ENTER
+// ============================================
+function agregarListenerEnter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
@@ -297,15 +358,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // Cargar email de usuario (si está disponible en config.js)
+}
+
+// ============================================
+// ✅ CARGAR EMAIL DE USUARIO
+// ============================================
+function cargarEmailUsuario() {
     if (typeof window.currentUser !== 'undefined' && window.currentUser) {
         const userEmail = document.getElementById('userEmail');
         if (userEmail) {
             userEmail.textContent = window.currentUser.email || 'usuario@institucion.com';
         }
     }
-});
+}
 
 // ============================================
 // ✅ EXPORTAR FUNCIONES PARA USO GLOBAL
@@ -316,3 +381,4 @@ window.guardarActa = guardarActa;
 window.actualizarActa = actualizarActa;
 window.llenarDatosVehiculo = llenarDatosVehiculo;
 window.limpiarDatosVehiculo = limpiarDatosVehiculo;
+window.mostrarAlerta = mostrarAlerta;
