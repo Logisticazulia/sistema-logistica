@@ -412,18 +412,19 @@ body {
 }
 
 /* ============================================ */
-/* ✅ FIRMAS - CORREGIDAS                       */
+/* ✅ FIRMAS - ORDEN CORREGIDO                  */
 /* ============================================ */
 .acta-signatures {
     margin-top: 40px;
     display: flex;
-    justify-content: space-between;
-    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
 }
 
 .signature-box {
-    flex: 1;
-    text-align: left;
+    width: 100%;
+    max-width: 600px;
 }
 
 /* ✅ FIRMA DEL FUNCIONARIO - IZQUIERDA */
@@ -431,7 +432,7 @@ body {
     text-align: left;
 }
 
-/* ✅ FIRMA DEL DIRECTOR - CENTRADA Y ABAJO */
+/* ✅ FIRMA DEL DIRECTOR - CENTRADA */
 .signature-box.director {
     text-align: center;
 }
@@ -444,7 +445,7 @@ body {
     line-height: 1.4;
 }
 
-/* ✅ LÍNEA DE FIRMA MÁS PEQUEÑA */
+/* ✅ LÍNEA DE FIRMA */
 .signature-box .firma-line {
     border-top: 1px solid #000;
     margin: 30px 0 10px 0;
@@ -462,27 +463,25 @@ body {
     font-weight: 400;
 }
 
-/* FOOTER CON FRASES */
+/* ============================================ */
+/* ✅ FOOTER - FRASES EN ROJO                   */
+/* ============================================ */
 .acta-footer {
-    margin-top: 30px;
+    margin-top: 40px;
     text-align: center;
-    font-size: 10pt;
-    padding-top: 15px;
+    font-size: 11pt;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
 }
 
 .acta-footer p {
-    margin: 5px 0;
+    margin: 8px 0;
     font-weight: 700;
-}
-
-.acta-footer .frase-1,
-.acta-footer .frase-2,
-.acta-footer .frase-3 {
-    color: #000;
+    color: #dc2626; /* ✅ ROJO */
 }
 
 /* ============================================ */
-/* BOTONES DE ACCIÓN - SOLO EN FORMULARIO      */
+/* BOTONES DE ACCIÓN                            */
 /* ============================================ */
 .action-buttons {
     display: flex;
@@ -502,13 +501,6 @@ body {
     }
     .acta-container {
         padding: 1.5cm;
-    }
-    .acta-signatures {
-        flex-direction: column;
-        gap: 30px;
-    }
-    .signature-box.director .firma-line {
-        margin: 30px 0 10px 0;
     }
 }
 
@@ -789,10 +781,10 @@ body {
                     </p>
 
                     <!-- ============================================ -->
-                    <!-- ✅ FIRMAS - CORREGIDAS                       -->
+                    <!-- ✅ FIRMAS - ORDEN CORREGIDO                  -->
                     <!-- ============================================ -->
                     <div class="acta-signatures">
-                        <!-- Funcionario Responsable - IZQUIERDA -->
+                        <!-- 1. Funcionario Responsable - IZQUIERDA -->
                         <div class="signature-box funcionario">
                             <p>Funcionario Responsable quien recibe las unidades:</p>
                             <p class="firma-line" id="previewFirmaFuncionario">
@@ -803,7 +795,7 @@ body {
                             </p>
                         </div>
 
-                        <!-- Director - CENTRADO Y ABAJO -->
+                        <!-- 2. Director - CENTRADO (DEBAJO DEL FUNCIONARIO) -->
                         <div class="signature-box director">
                             <p class="firma-line">
                                 COMISARIO MAYOR (CPNB) DR GUILLERMO PARRA PULIDO
@@ -812,16 +804,14 @@ body {
                         </div>
                     </div>
 
-                    <!-- Footer -->
+                    <!-- ============================================ -->
+                    <!-- ✅ FOOTER - FRASES EN ROJO (DEBAJO DEL DIRECTOR) -->
+                    <!-- ============================================ -->
                     <div class="acta-footer">
-                        <p class="frase-1">¡Chávez Vive!... La Patria Sigue...</p>
-                        <p class="frase-2">¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
-                        <p class="frase-3">PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
+                        <p>¡Chávez Vive!... La Patria Sigue...</p>
+                        <p>¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
+                        <p>PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
                     </div>
-
-                    <!-- ============================================ -->
-                    <!-- ✅ BOTONES ELIMINADOS DE LA VISTA PREVIA    -->
-                    <!-- ============================================ -->
                 </div>
             </div>
         </div>
