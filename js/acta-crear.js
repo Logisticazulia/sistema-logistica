@@ -38,13 +38,19 @@ function actualizarActa() {
             'PRIMER COMISARIO (CPNB) ALBERTO PARRA, Cédula de Identidad numero V-13.550.532';
     }
     
-    // Actualizar unidad de asignación
+    // ✅ ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
     if (unidadAsignacion) {
         document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
+        // ✅ La unidad también va donde dice "Jefe de..."
+        document.getElementById('previewCargoFuncionario').textContent = `Jefe de ${unidadAsignacion}`;
+    } else {
+        document.getElementById('previewUnidadAsignacion').textContent = 'Oficina de Gestión Humana de la Redip Occidental';
+        document.getElementById('previewCargoFuncionario').textContent = 'Jefe de la Oficina de Gestión Humana de la Redip Occidental';
     }
     
     // Actualizar cargo del funcionario si existe
     if (funcionarioCargo) {
+        // Si hay un cargo específico, usarlo; si no, usar la unidad
         document.getElementById('previewCargoFuncionario').textContent = funcionarioCargo;
     }
 }
