@@ -394,30 +394,49 @@ body {
 }
 
 .acta-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #003366;
+  display: flex;
+  justify-content: center;  /* ✅ Centrar todo */
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #003366;
+  position: relative;  /* ✅ Necesario para posicionar hijos absolutamente */
+  min-height: 80px;  /* ✅ Altura mínima para los logos */
 }
 
 .acta-logos {
-    display: flex;
-    gap: 15px;
-    align-items: center;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  position: absolute;  /* ✅ Fuera del flujo normal */
+  top: 50%;
+  transform: translateY(-50%);  /* ✅ Centrado vertical */
+}
+
+.acta-logos:first-child {
+  left: 0;  /* ✅ Logo izquierdo en la esquina */
+}
+
+.acta-logos:last-child {
+  right: 0;  /* ✅ Logo derecho en la esquina */
 }
 
 .acta-logos img {
-    height: 80px;
-    width: auto;
+  height: 45px;
+  width: auto;
 }
 
 .acta-title {
-    text-align: center;
-    flex: 1;
+  text-align: center;
+  flex: 1;
+  padding: 0 20px;  /* ✅ Espacio para que no se superponga con logos */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;  /* ✅ Centrado horizontal */
+  width: 100%;  /* ✅ Ocupa todo el ancho disponible */
 }
-
 .acta-title h1 {
     font-size: 11pt;
     color: #003366;
