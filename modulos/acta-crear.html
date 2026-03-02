@@ -513,51 +513,60 @@ body {
 }
 
 /* ============================================ */
-/* FIRMAS                                       */
+/* FIRMAS - AJUSTADAS                          */
 /* ============================================ */
 .acta-signatures {
-    margin-top: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
+  margin-top: 25px !important;
+  display: flex !important;
+  flex-direction: row !important;  /* ✅ Cambiar a horizontal */
+  justify-content: space-between !important;  /* ✅ Uno a cada lado */
+  align-items: flex-start !important;
+  gap: 30px !important;
+  page-break-inside: avoid !important;
+  width: 100% !important;
 }
 
 .signature-box {
-    width: 100%;
-    max-width: 600px;
+  width: 45% !important;  /* ✅ Cada uno ocupa 45% del ancho */
+  max-width: none !important;
 }
 
 .signature-box.funcionario {
-    text-align: left;
+  text-align: left !important;
+  margin-right: auto !important;  /* ✅ Empujar a la izquierda */
 }
 
 .signature-box.director {
-    text-align: center;
+  text-align: center !important;
+  margin-left: auto !important;  /* ✅ Empujar a la derecha */
 }
 
 .signature-box p {
-    font-size: 12pt;
-    font-weight: 600;
-    margin: 5px 0;
-    color: #000;
-    line-height: 1.4;
+  font-size: 10pt !important;
+  font-weight: 600 !important;
+  margin: 3px 0 !important;
+  color: #000 !important;
+  line-height: 1.3 !important;
 }
 
 .signature-box .firma-line {
-    border-top: 1px solid #000;
-    margin: 30px 0 10px 0;
-    padding-top: 10px;
-    width: 80%;
+  border-top: 1px solid #000 !important;
+  margin: 20px 0 8px 0 !important;
+  padding-top: 8px !important;
+  width: 90% !important;  /* ✅ Línea de firma más ancha */
+}
+
+.signature-box.funcionario .firma-line {
+  margin: 20px 0 8px 0 !important;  /* ✅ Sin auto para izquierda */
 }
 
 .signature-box.director .firma-line {
-    margin: 30px auto 10px auto;
+  margin: 20px auto 8px auto !important;  /* ✅ Centrado para director */
 }
 
 .signature-box .cargo {
-    font-size: 11pt;
-    font-weight: 400;
+  font-size: 9pt !important;
+  font-weight: 400 !important;
 }
 
 /* ============================================ */
