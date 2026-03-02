@@ -148,10 +148,37 @@ function actualizarActa() {
             previewCargoFuncionario.textContent = '---';
         }
     }
+    
+    // ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+    actualizarTextoSingularPlural();
 }
 
 // ============================================
-// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS (BÚSQUEDA EXACTA)
+// ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+// ============================================
+function actualizarTextoSingularPlural() {
+    const cantidadVehiculos = listaVehiculos.length;
+    
+    // Elementos de texto a actualizar
+    const textoUnidad = document.getElementById('textoUnidad');
+    const textoUso = document.getElementById('textoUso');
+    const textoUnidad2 = document.getElementById('textoUnidad2');
+    
+    if (cantidadVehiculos >= 2) {
+        // PLURAL (2 o más vehículos)
+        if (textoUnidad) textoUnidad.textContent = 'Estas unidades son asignadas';
+        if (textoUso) textoUso.textContent = 'estas unidades son asignadas';
+        if (textoUnidad2) textoUnidad2.textContent = 'las unidades descritas son';
+    } else {
+        // SINGULAR (1 vehículo o menos)
+        if (textoUnidad) textoUnidad.textContent = 'Esta unidad es asignada';
+        if (textoUso) textoUso.textContent = 'esta unidad es asignada';
+        if (textoUnidad2) textoUnidad2.textContent = 'la unidad descrita es';
+    }
+}
+
+// ============================================
+// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
 // ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
@@ -270,8 +297,7 @@ async function buscarVehiculo() {
             s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
             s_motor: vehiculoEncontrado.s_motor || 'N/P',
             placa: vehiculoEncontrado.placa || 'N/P',
-            facsimil: vehiculoEncontrado.facsimil || 'N/P',
-            n_identificacion: vehiculoEncontrado.n_identificacion || 'N/P'
+            facsimil: vehiculoEncontrado.facsimil || 'N/P'
         };
         
         // Habilitar botón para agregar
@@ -316,6 +342,9 @@ function agregarVehiculoAlActa() {
     
     // Actualizar el acta con todos los vehículos
     renderizarVehiculosEnActa();
+    
+    // ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+    actualizarTextoSingularPlural();
     
     // Limpiar búsqueda
     const searchInput = document.getElementById('searchInput');
@@ -378,6 +407,9 @@ function eliminarVehiculo(tempId) {
         renderizarListaVehiculos();
         renderizarVehiculosEnActa();
         
+        // ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+        actualizarTextoSingularPlural();
+        
         if (listaVehiculos.length === 0) {
             mostrarAlerta('🗑️ Vehículo eliminado. La lista está vacía.', 'info');
         } else {
@@ -419,37 +451,6 @@ function renderizarVehiculosEnActa() {
             <td>${vehiculo.facsimil}</td>
         </tr>
     `).join('');
-}
-
-// ============================================
-// ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
-// ============================================
-function actualizarFechaActa() {
-    const fecha = new Date();
-    
-    // Meses en español
-    const meses = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
-    
-    // Obtener el día del mes (1-31)
-    const dia = fecha.getDate();
-    
-    // Obtener el mes (0-11, por eso se usa como índice del array)
-    const mes = meses[fecha.getMonth()];
-    
-    // Obtener el año completo (ej: 2026)
-    const anio = fecha.getFullYear();
-    
-    // Actualizar los elementos del acta
-    const previewDia = document.getElementById('previewDia');
-    const previewMes = document.getElementById('previewMes');
-    const previewAnio = document.getElementById('previewAnio');
-    
-    if (previewDia) previewDia.textContent = dia;
-    if (previewMes) previewMes.textContent = mes;
-    if (previewAnio) previewAnio.textContent = anio;
 }
 
 // ============================================
@@ -510,6 +511,37 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
 }
 
 // ============================================
+// ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
+// ============================================
+function actualizarFechaActa() {
+    const fecha = new Date();
+    
+    // Meses en español
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
+    // Obtener el día del mes (1-31)
+    const dia = fecha.getDate();
+    
+    // Obtener el mes (0-11, por eso se usa como índice del array)
+    const mes = meses[fecha.getMonth()];
+    
+    // Obtener el año completo (ej: 2026)
+    const anio = fecha.getFullYear();
+    
+    // Actualizar los elementos del acta
+    const previewDia = document.getElementById('previewDia');
+    const previewMes = document.getElementById('previewMes');
+    const previewAnio = document.getElementById('previewAnio');
+    
+    if (previewDia) previewDia.textContent = dia;
+    if (previewMes) previewMes.textContent = mes;
+    if (previewAnio) previewAnio.textContent = anio;
+}
+
+// ============================================
 // ✅ IMPRIMIR ACTA
 // ============================================
 function imprimirActa() {
@@ -530,10 +562,8 @@ function imprimirActa() {
     actualizarActa();
     renderizarVehiculosEnActa();
     
-    // Pequeño delay para asegurar que el DOM se actualizó
-    setTimeout(() => {
-        window.print();
-    }, 100);
+    // Imprimir
+    window.print();
 }
 
 // ============================================
@@ -589,8 +619,7 @@ async function guardarActa() {
             anio: document.getElementById('previewAnio')?.textContent || ''
         },
         director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO',
-        created_by_email: createdByEmail,
-        created_at: new Date().toISOString()
+        created_by_email: createdByEmail
     };
     
     try {
@@ -667,4 +696,5 @@ window.cargarEmailUsuario = cargarEmailUsuario;
 window.actualizarFechaActa = actualizarFechaActa;
 window.renderizarListaVehiculos = renderizarListaVehiculos;
 window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
+window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
 window.mostrarAlerta = mostrarAlerta;
