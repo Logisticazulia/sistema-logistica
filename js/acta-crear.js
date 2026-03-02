@@ -5,14 +5,15 @@
 
 // ============================================
 // ✅ VARIABLES GLOBALES
-// ============================================ */
+// ============================================
 let supabaseClient = null;
 let vehiculoActual = null; // Vehículo encontrado en la búsqueda
 let listaVehiculos = [];   // Array para almacenar múltiples vehículos
+let vehicleCounter = 0;    // Contador único para IDs
 
 // ============================================
 // ✅ INICIALIZAR AL CARGAR LA PÁGINA
-// ============================================ */
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar que Supabase esté disponible desde config.js
     if (typeof window.supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_KEY) {
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ============================================
 // ✅ CARGAR EMAIL DEL USUARIO
-// ============================================ */
+// ============================================
 function cargarEmailUsuario() {
     const userEmailElement = document.getElementById('userEmail');
     
@@ -52,7 +53,9 @@ function cargarEmailUsuario() {
     if (usuarioGuardado) {
         try {
             const usuario = JSON.parse(usuarioGuardado);
-            userEmailElement.textContent = usuario.email || usuario.correo || 'usuario@institucion.com';
+            if (userEmailElement) {
+                userEmailElement.textContent = usuario.email || usuario.correo || 'usuario@institucion.com';
+            }
             console.log('✅ Usuario cargado desde sessionStorage:', usuario.email || usuario.correo);
             return;
         } catch (error) {
@@ -64,7 +67,9 @@ function cargarEmailUsuario() {
     if (supabaseClient) {
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
             if (session && session.user) {
-                userEmailElement.textContent = session.user.email || 'usuario@institucion.com';
+                if (userEmailElement) {
+                    userEmailElement.textContent = session.user.email || 'usuario@institucion.com';
+                }
                 console.log('✅ Usuario cargado desde Supabase auth:', session.user.email);
                 
                 // Guardar en sessionStorage para futuras cargas
@@ -74,34 +79,91 @@ function cargarEmailUsuario() {
                 }));
             } else {
                 // Usuario no autenticado, mostrar email genérico
-                userEmailElement.textContent = 'usuario@institucion.com';
+                if (userEmailElement) {
+                    userEmailElement.textContent = 'usuario@institucion.com';
+                }
                 console.log('⚠️ No hay sesión activa, mostrando email genérico');
             }
         }).catch(error => {
             console.error('Error al obtener sesión:', error);
-            userEmailElement.textContent = 'usuario@institucion.com';
+            if (userEmailElement) {
+                userEmailElement.textContent = 'usuario@institucion.com';
+            }
         });
     } else {
         // Supabase no disponible, mostrar email genérico
-        userEmailElement.textContent = 'usuario@institucion.com';
+        if (userEmailElement) {
+            userEmailElement.textContent = 'usuario@institucion.com';
+        }
         console.log('⚠️ Supabase no disponible, mostrando email genérico');
     }
 }
 
 // ============================================
+// ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
+// ============================================
+function actualizarActa() {
+    const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
+    const funcionarioCedula = document.getElementById('funcionarioCedula')?.value || '';
+    const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
+    const funcionarioCargo = document.getElementById('funcionarioCargo')?.value || '';
+    
+    // Actualizar nombre y cédula en el cuerpo del acta
+    const previewFuncionarioNombre = document.getElementById('previewFuncionarioNombre');
+    const previewFuncionarioCedula = document.getElementById('previewFuncionarioCedula');
+    const previewUnidadAsignacion = document.getElementById('previewUnidadAsignacion');
+    const previewFirmaFuncionario = document.getElementById('previewFirmaFuncionario');
+    const previewCargoFuncionario = document.getElementById('previewCargoFuncionario');
+    
+    if (previewFuncionarioNombre) {
+        previewFuncionarioNombre.textContent = funcionarioNombre || '---';
+    }
+    
+    if (previewFuncionarioCedula) {
+        previewFuncionarioCedula.textContent = funcionarioCedula || '---';
+    }
+    
+    // ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
+    if (previewFirmaFuncionario) {
+        if (funcionarioNombre && funcionarioCedula) {
+            previewFirmaFuncionario.innerHTML = `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula}`;
+        } else if (funcionarioNombre) {
+            previewFirmaFuncionario.innerHTML = `${funcionarioNombre}, Cédula de Identidad numero V-00.000.000`;
+        } else {
+            previewFirmaFuncionario.textContent = '---';
+        }
+    }
+    
+    // ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
+    if (previewUnidadAsignacion) {
+        previewUnidadAsignacion.textContent = unidadAsignacion || '---';
+    }
+    
+    if (previewCargoFuncionario) {
+        if (funcionarioCargo) {
+            previewCargoFuncionario.textContent = funcionarioCargo;
+        } else if (unidadAsignacion) {
+            previewCargoFuncionario.textContent = `Jefe de ${unidadAsignacion}`;
+        } else {
+            previewCargoFuncionario.textContent = '---';
+        }
+    }
+}
+
+// ============================================
 // ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
-// ============================================ */
+// ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
-    const terminoBusqueda = searchInput.value.trim();
+    const terminoBusqueda = searchInput?.value.trim() || '';
     
     // Validar que haya un término de búsqueda
     if (!terminoBusqueda) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error', searchAlert);
         vehiculoActual = null;
-        btnAgregar.disabled = true;
+        if (btnAgregar) btnAgregar.disabled = true;
         return;
     }
     
@@ -109,7 +171,7 @@ async function buscarVehiculo() {
     if (!supabaseClient) {
         mostrarAlerta('❌ Error de conexión con la base de datos', 'error', searchAlert);
         vehiculoActual = null;
-        btnAgregar.disabled = true;
+        if (btnAgregar) btnAgregar.disabled = true;
         return;
     }
     
@@ -174,8 +236,19 @@ async function buscarVehiculo() {
         if (!vehiculoEncontrado) {
             mostrarAlerta('❌ Vehículo no encontrado en la base de datos', 'error', searchAlert);
             vehiculoActual = null;
-            btnAgregar.disabled = true;
-            limpiarVistaPreviaVehiculo();
+            if (btnAgregar) btnAgregar.disabled = true;
+            return;
+        }
+        
+        // Verificar si el vehículo ya está en la lista
+        const yaExiste = listaVehiculos.some(v => 
+            v.placa === vehiculoEncontrado.placa || 
+            v.s_carroceria === vehiculoEncontrado.s_carroceria
+        );
+        
+        if (yaExiste) {
+            mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta', 'info', searchAlert);
+            if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
         
@@ -184,74 +257,37 @@ async function buscarVehiculo() {
             id: vehiculoEncontrado.id,
             marca: vehiculoEncontrado.marca || 'N/P',
             modelo: vehiculoEncontrado.modelo || '',
-            serial_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
-            serial_motor: vehiculoEncontrado.s_motor || 'N/P',
+            s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
+            s_motor: vehiculoEncontrado.s_motor || 'N/P',
             placa: vehiculoEncontrado.placa || 'N/P',
             facsimil: vehiculoEncontrado.facsimil || 'N/P'
         };
         
-        // Mostrar vista previa del vehículo encontrado
-        mostrarVistaPreviaVehiculo(vehiculoActual);
-        
-        // Verificar si el vehículo ya está en la lista
-        const yaExiste = listaVehiculos.some(v => 
-            v.placa === vehiculoActual.placa || 
-            v.serial_carroceria === vehiculoActual.serial_carroceria
-        );
-        
-        if (yaExiste) {
-            mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta', 'info', searchAlert);
-            btnAgregar.disabled = true;
-        } else {
-            // Habilitar botón para agregar
-            btnAgregar.disabled = false;
-            mostrarAlerta('✅ Vehículo encontrado. Puede agregarlo a la lista.', 'success', searchAlert);
-        }
+        // Habilitar botón para agregar
+        if (btnAgregar) btnAgregar.disabled = false;
+        mostrarAlerta('✅ Vehículo encontrado. Puede agregarlo a la lista.', 'success', searchAlert);
         
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
         mostrarAlerta('❌ Error de conexión. Intente nuevamente.', 'error', searchAlert);
         vehiculoActual = null;
-        btnAgregar.disabled = true;
+        if (btnAgregar) btnAgregar.disabled = true;
     }
 }
 
 // ============================================
-// ✅ MOSTRAR VISTA PREVIA DEL VEHÍCULO
-// ============================================ */
-function mostrarVistaPreviaVehiculo(vehiculo) {
-    document.getElementById('previewMarcaModelo').textContent = 
-        `${vehiculo.marca} ${vehiculo.modelo}`.trim();
-    document.getElementById('previewSerialCarroceria').textContent = vehiculo.serial_carroceria;
-    document.getElementById('previewSerialMotor').textContent = vehiculo.serial_motor;
-    document.getElementById('previewPlaca').textContent = vehiculo.placa;
-    document.getElementById('previewFacsimil').textContent = vehiculo.facsimil;
-}
-
+// ✅ AGREGAR VEHÍCULO AL ACTA
 // ============================================
-// ✅ LIMPIAR VISTA PREVIA DEL VEHÍCULO
-// ============================================ */
-function limpiarVistaPreviaVehiculo() {
-    document.getElementById('previewMarcaModelo').textContent = '---';
-    document.getElementById('previewSerialCarroceria').textContent = '---';
-    document.getElementById('previewSerialMotor').textContent = '---';
-    document.getElementById('previewPlaca').textContent = '---';
-    document.getElementById('previewFacsimil').textContent = '---';
-}
-
-// ============================================
-// ✅ AGREGAR VEHÍCULO A LA LISTA
-// ============================================ */
-function agregarVehiculoALista() {
+function agregarVehiculoAlActa() {
     if (!vehiculoActual) {
         mostrarAlerta('⚠️ Primero debe buscar un vehículo', 'error');
         return;
     }
     
-    // Verificar si el vehículo ya está en la lista (por placa o serial)
+    // Verificar si el vehículo ya está en la lista
     const yaExiste = listaVehiculos.some(v => 
         v.placa === vehiculoActual.placa || 
-        v.serial_carroceria === vehiculoActual.serial_carroceria
+        v.s_carroceria === vehiculoActual.s_carroceria
     );
     
     if (yaExiste) {
@@ -260,6 +296,8 @@ function agregarVehiculoALista() {
     }
     
     // Agregar vehículo a la lista
+    vehicleCounter++;
+    vehiculoActual.tempId = vehicleCounter;
     listaVehiculos.push(vehiculoActual);
     
     // Actualizar la tabla de vehículos
@@ -269,21 +307,28 @@ function agregarVehiculoALista() {
     renderizarVehiculosEnActa();
     
     // Limpiar búsqueda
-    document.getElementById('searchInput').value = '';
+    const searchInput = document.getElementById('searchInput');
+    const btnAgregar = document.getElementById('btnAgregarVehiculo');
+    
+    if (searchInput) searchInput.value = '';
     vehiculoActual = null;
-    document.getElementById('btnAgregarVehiculo').disabled = true;
-    limpiarVistaPreviaVehiculo();
+    if (btnAgregar) btnAgregar.disabled = true;
     
     mostrarAlerta(`✅ Vehículo agregado. Total: ${listaVehiculos.length} vehículo(s)`, 'success');
 }
 
 // ============================================
-// ✅ RENDERIZAR LISTA DE VEHÍCULOS (TABLA)
-// ============================================ */
+// ✅ RENDERIZAR LISTA DE VEHÍCULOS
+// ============================================
 function renderizarListaVehiculos() {
     const tbody = document.getElementById('vehiclesListBody');
     const section = document.getElementById('vehiclesListSection');
     const count = document.getElementById('vehiclesCount');
+    
+    if (!tbody || !section || !count) {
+        console.error('❌ Elementos de la lista de vehículos no encontrados');
+        return;
+    }
     
     if (listaVehiculos.length === 0) {
         section.style.display = 'none';
@@ -296,12 +341,12 @@ function renderizarListaVehiculos() {
     tbody.innerHTML = listaVehiculos.map((vehiculo, index) => `
         <tr>
             <td>${vehiculo.marca} ${vehiculo.modelo}</td>
-            <td>${vehiculo.serial_carroceria}</td>
-            <td>${vehiculo.serial_motor}</td>
             <td>${vehiculo.placa}</td>
+            <td>${vehiculo.s_carroceria}</td>
+            <td>${vehiculo.s_motor}</td>
             <td>${vehiculo.facsimil}</td>
             <td>
-                <button class="btn-delete" onclick="eliminarVehiculo(${index})">
+                <button class="btn-remove-vehicle" onclick="eliminarVehiculo(${vehiculo.tempId})">
                     🗑️ Eliminar
                 </button>
             </td>
@@ -311,8 +356,10 @@ function renderizarListaVehiculos() {
 
 // ============================================
 // ✅ ELIMINAR VEHÍCULO DE LA LISTA
-// ============================================ */
-function eliminarVehiculo(index) {
+// ============================================
+function eliminarVehiculo(tempId) {
+    const index = listaVehiculos.findIndex(v => v.tempId === tempId);
+    
     if (index >= 0 && index < listaVehiculos.length) {
         const vehiculoEliminado = listaVehiculos[index];
         listaVehiculos.splice(index, 1);
@@ -330,9 +377,14 @@ function eliminarVehiculo(index) {
 
 // ============================================
 // ✅ RENDERIZAR VEHÍCULOS EN EL ACTA
-// ============================================ */
+// ============================================
 function renderizarVehiculosEnActa() {
     const tbody = document.getElementById('actaVehiclesBody');
+    
+    if (!tbody) {
+        console.error('❌ Elemento actaVehiclesBody no encontrado');
+        return;
+    }
     
     if (listaVehiculos.length === 0) {
         tbody.innerHTML = `
@@ -350,8 +402,8 @@ function renderizarVehiculosEnActa() {
     tbody.innerHTML = listaVehiculos.map(vehiculo => `
         <tr>
             <td>${vehiculo.marca} ${vehiculo.modelo}</td>
-            <td>${vehiculo.serial_carroceria}</td>
-            <td>${vehiculo.serial_motor}</td>
+            <td>${vehiculo.s_carroceria}</td>
+            <td>${vehiculo.s_motor}</td>
             <td>${vehiculo.placa}</td>
             <td>${vehiculo.facsimil}</td>
         </tr>
@@ -359,57 +411,8 @@ function renderizarVehiculosEnActa() {
 }
 
 // ============================================
-// ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
-// ============================================ */
-function actualizarActa() {
-    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
-    const funcionarioCedula = document.getElementById('funcionarioCedula').value;
-    const unidadAsignacion = document.getElementById('unidadAsignacion').value;
-    const funcionarioCargo = document.getElementById('funcionarioCargo').value;
-    
-    // Actualizar nombre y cédula en el cuerpo del acta
-    if (funcionarioNombre) {
-        document.getElementById('previewFuncionarioNombre').textContent = funcionarioNombre;
-    } else {
-        document.getElementById('previewFuncionarioNombre').textContent = '---';
-    }
-    
-    if (funcionarioCedula) {
-        document.getElementById('previewFuncionarioCedula').textContent = funcionarioCedula;
-    } else {
-        document.getElementById('previewFuncionarioCedula').textContent = '---';
-    }
-    
-    // ACTUALIZAR FIRMA DEL FUNCIONARIO - DINÁMICO
-    if (funcionarioNombre && funcionarioCedula) {
-        document.getElementById('previewFirmaFuncionario').innerHTML = 
-            `${funcionarioNombre}, Cédula de Identidad numero ${funcionarioCedula}`;
-    } else if (funcionarioNombre) {
-        document.getElementById('previewFirmaFuncionario').innerHTML = 
-            `${funcionarioNombre}, Cédula de Identidad numero V-00.000.000`;
-    } else {
-        // Valor por defecto si no hay datos
-        document.getElementById('previewFirmaFuncionario').textContent = '---';
-    }
-    
-    // ACTUALIZAR UNIDAD DE ASIGNACIÓN EN EL CARGO
-    if (unidadAsignacion) {
-        document.getElementById('previewUnidadAsignacion').textContent = unidadAsignacion;
-        document.getElementById('previewCargoFuncionario').textContent = `Jefe de ${unidadAsignacion}`;
-    } else {
-        document.getElementById('previewUnidadAsignacion').textContent = '---';
-        document.getElementById('previewCargoFuncionario').textContent = '---';
-    }
-    
-    // Actualizar cargo del funcionario si existe
-    if (funcionarioCargo) {
-        document.getElementById('previewCargoFuncionario').textContent = funcionarioCargo;
-    }
-}
-
-// ============================================
 // ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
-// ============================================ */
+// ============================================
 function actualizarFechaActa() {
     const fecha = new Date();
     
@@ -439,25 +442,8 @@ function actualizarFechaActa() {
 }
 
 // ============================================
-// ✅ MOSTRAR ALERTAS
-// ============================================ */
-function mostrarAlerta(mensaje, tipo, elemento = null) {
-    const searchAlert = elemento || document.getElementById('searchAlert');
-    if (!searchAlert) return;
-    
-    searchAlert.textContent = mensaje;
-    searchAlert.className = `alert alert-${tipo}`;
-    searchAlert.style.display = 'block';
-    
-    // Ocultar después de 5 segundos
-    setTimeout(() => {
-        searchAlert.style.display = 'none';
-    }, 5000);
-}
-
-// ============================================
 // ✅ AGREGAR LISTENERS AL FORMULARIO
-// ============================================ */
+// ============================================
 function agregarListenersFormulario() {
     const camposFormulario = [
         'funcionarioNombre',
@@ -477,12 +463,13 @@ function agregarListenersFormulario() {
 
 // ============================================
 // ✅ PERMITIR BÚSQUEDA CON ENTER
-// ============================================ */
+// ============================================
 function agregarListenerEnter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 buscarVehiculo();
             }
         });
@@ -490,8 +477,30 @@ function agregarListenerEnter() {
 }
 
 // ============================================
+// ✅ MOSTRAR ALERTAS
+// ============================================
+function mostrarAlerta(mensaje, tipo, elemento = null) {
+    const alertElement = elemento || document.getElementById('searchAlert');
+    if (!alertElement) {
+        console.error('❌ Elemento de alerta no encontrado');
+        return;
+    }
+    
+    alertElement.textContent = mensaje;
+    alertElement.className = `alert alert-${tipo}`;
+    alertElement.style.display = 'block';
+    
+    // Ocultar después de 5 segundos (excepto errores)
+    if (tipo !== 'error') {
+        setTimeout(() => {
+            alertElement.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// ============================================
 // ✅ IMPRIMIR ACTA
-// ============================================ */
+// ============================================
 function imprimirActa() {
     // Validar que haya vehículos en la lista
     if (listaVehiculos.length === 0) {
@@ -500,24 +509,30 @@ function imprimirActa() {
     }
     
     // Validar que haya datos del funcionario
-    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
+    const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
     if (!funcionarioNombre) {
         mostrarAlerta('⚠️ Primero debe completar los datos del funcionario', 'error');
         return;
     }
     
-    // Imprimir
-    window.print();
+    // Actualizar vista previa antes de imprimir
+    actualizarActa();
+    renderizarVehiculosEnActa();
+    
+    // Pequeño delay para asegurar que el DOM se actualizó
+    setTimeout(() => {
+        window.print();
+    }, 100);
 }
 
 // ============================================
 // ✅ GUARDAR ACTA EN BASE DE DATOS
-// ============================================ */
+// ============================================
 async function guardarActa() {
     // Validar campos obligatorios
-    const funcionarioNombre = document.getElementById('funcionarioNombre').value;
-    const funcionarioCedula = document.getElementById('funcionarioCedula').value;
-    const unidadAsignacion = document.getElementById('unidadAsignacion').value;
+    const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
+    const funcionarioCedula = document.getElementById('funcionarioCedula')?.value || '';
+    const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
     
     if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
         mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios del formulario', 'error');
@@ -545,17 +560,26 @@ async function guardarActa() {
         funcionario: {
             nombre: funcionarioNombre,
             cedula: funcionarioCedula,
-            cargo: document.getElementById('funcionarioCargo').value,
+            cargo: document.getElementById('funcionarioCargo')?.value || '',
             unidad: unidadAsignacion
         },
-        vehiculos: listaVehiculos, // Array con todos los vehículos
+        vehiculos: listaVehiculos.map(v => ({
+            id: v.id,
+            marca: v.marca,
+            modelo: v.modelo,
+            placa: v.placa,
+            facsimil: v.facsimil,
+            s_carroceria: v.s_carroceria,
+            s_motor: v.s_motor
+        })),
         fecha: {
-            dia: document.getElementById('previewDia').textContent,
-            mes: document.getElementById('previewMes').textContent,
-            anio: document.getElementById('previewAnio').textContent
+            dia: document.getElementById('previewDia')?.textContent || '',
+            mes: document.getElementById('previewMes')?.textContent || '',
+            anio: document.getElementById('previewAnio')?.textContent || ''
         },
         director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO',
-        created_by_email: createdByEmail
+        created_by_email: createdByEmail,
+        created_at: new Date().toISOString()
     };
     
     try {
@@ -581,43 +605,55 @@ async function guardarActa() {
 
 // ============================================
 // ✅ LIMPIAR FORMULARIO COMPLETO
-// ============================================ */
+// ============================================
 function limpiarFormulario() {
     // Limpiar campos del formulario
-    document.getElementById('searchInput').value = '';
-    document.getElementById('funcionarioNombre').value = '';
-    document.getElementById('funcionarioCedula').value = '';
-    document.getElementById('unidadAsignacion').value = '';
-    document.getElementById('funcionarioCargo').value = '';
+    const searchInput = document.getElementById('searchInput');
+    const funcionarioNombre = document.getElementById('funcionarioNombre');
+    const funcionarioCedula = document.getElementById('funcionarioCedula');
+    const unidadAsignacion = document.getElementById('unidadAsignacion');
+    const funcionarioCargo = document.getElementById('funcionarioCargo');
+    
+    if (searchInput) searchInput.value = '';
+    if (funcionarioNombre) funcionarioNombre.value = '';
+    if (funcionarioCedula) funcionarioCedula.value = '';
+    if (unidadAsignacion) unidadAsignacion.value = '';
+    if (funcionarioCargo) funcionarioCargo.value = '';
     
     // Limpiar lista de vehículos
     listaVehiculos = [];
     vehiculoActual = null;
+    vehicleCounter = 0;
     
     // Limpiar vista previa
     renderizarListaVehiculos();
     renderizarVehiculosEnActa();
-    limpiarVistaPreviaVehiculo();
-    
-    // Deshabilitar botón de agregar
-    document.getElementById('btnAgregarVehiculo').disabled = true;
-    
-    // Actualizar fecha
+    actualizarActa();
     actualizarFechaActa();
     
+    // Deshabilitar botón de agregar
+    const btnAgregar = document.getElementById('btnAgregarVehiculo');
+    if (btnAgregar) btnAgregar.disabled = true;
+    
     // Ocultar sección de vehículos
-    document.getElementById('vehiclesListSection').style.display = 'none';
+    const vehiclesListSection = document.getElementById('vehiclesListSection');
+    if (vehiclesListSection) vehiclesListSection.style.display = 'none';
     
     console.log('✅ Formulario limpiado correctamente');
 }
 
 // ============================================
 // ✅ EXPORTAR FUNCIONES PARA USO GLOBAL
-// ============================================ */
+// ============================================
 window.buscarVehiculo = buscarVehiculo;
 window.imprimirActa = imprimirActa;
 window.guardarActa = guardarActa;
 window.actualizarActa = actualizarActa;
-window.agregarVehiculoALista = agregarVehiculoALista;
+window.agregarVehiculoAlActa = agregarVehiculoAlActa;
 window.eliminarVehiculo = eliminarVehiculo;
 window.limpiarFormulario = limpiarFormulario;
+window.cargarEmailUsuario = cargarEmailUsuario;
+window.actualizarFechaActa = actualizarFechaActa;
+window.renderizarListaVehiculos = renderizarListaVehiculos;
+window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
+window.mostrarAlerta = mostrarAlerta;
