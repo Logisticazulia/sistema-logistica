@@ -515,60 +515,60 @@ body {
 /* ============================================ */
 /* FIRMAS - AJUSTADAS                          */
 /* ============================================ */
+/* ============================================ */
+/* FIRMAS - AJUSTADAS                          */
+/* ============================================ */
 .acta-signatures {
-  margin-top: 25px !important;
-  display: flex !important;
-  flex-direction: row !important;  /* ✅ Cambiar a horizontal */
-  justify-content: space-between !important;  /* ✅ Uno a cada lado */
-  align-items: flex-start !important;
-  gap: 30px !important;
-  page-break-inside: avoid !important;
-  width: 100% !important;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;  /* ✅ Apilados verticalmente */
+  align-items: stretch;    /* ✅ Ocupan todo el ancho */
+  gap: 40px;
 }
 
 .signature-box {
-  width: 45% !important;  /* ✅ Cada uno ocupa 45% del ancho */
-  max-width: none !important;
+  width: 100%;
+  max-width: none;
 }
 
 .signature-box.funcionario {
-  text-align: left !important;
-  margin-right: auto !important;  /* ✅ Empujar a la izquierda */
+  text-align: left;        /* ✅ Funcionario a la izquierda */
+  padding-right: 50%;      /* ✅ Ocupa solo mitad izquierda */
 }
 
 .signature-box.director {
-  text-align: center !important;
-  margin-left: auto !important;  /* ✅ Empujar a la derecha */
+  text-align: center;      /* ✅ Director centrado */
+  margin: 0 auto;
+  max-width: 500px;
 }
 
 .signature-box p {
-  font-size: 10pt !important;
-  font-weight: 600 !important;
-  margin: 3px 0 !important;
-  color: #000 !important;
-  line-height: 1.3 !important;
+  font-size: 12pt;
+  font-weight: 600;
+  margin: 5px 0;
+  color: #000;
+  line-height: 1.4;
 }
 
 .signature-box .firma-line {
-  border-top: 1px solid #000 !important;
-  margin: 20px 0 8px 0 !important;
-  padding-top: 8px !important;
-  width: 90% !important;  /* ✅ Línea de firma más ancha */
+  border-top: 1px solid #000;
+  margin: 30px 0 10px 0;
+  padding-top: 10px;
+  width: 80%;
 }
 
 .signature-box.funcionario .firma-line {
-  margin: 20px 0 8px 0 !important;  /* ✅ Sin auto para izquierda */
+  margin: 30px 0 10px 0;   /* ✅ Alineado a la izquierda */
 }
 
 .signature-box.director .firma-line {
-  margin: 20px auto 8px auto !important;  /* ✅ Centrado para director */
+  margin: 30px auto 10px auto;  /* ✅ Centrado */
 }
 
 .signature-box .cargo {
-  font-size: 9pt !important;
-  font-weight: 400 !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
-
 /* ============================================ */
 /* FOOTER - FRASES EN ROJO                      */
 /* ============================================ */
@@ -849,27 +849,36 @@ body {
     line-height: 1.3 !important;
   }
   
-  /* Firmas más compactas */
+/* ============================================ */
+/* ESTILOS DE IMPRESIÓN - FIRMAS               */
+/* ============================================ */
+@media print {
+  /* ... resto de estilos ... */
+  
+  /* ✅ FIRMAS - Funcionario izquierda, Director centrado abajo */
   .acta-signatures {
-    margin-top: 25px !important;
+    margin-top: 30px !important;
     display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 20px !important;
+    flex-direction: column !important;  /* ✅ Vertical */
+    align-items: stretch !important;
+    gap: 35px !important;
     page-break-inside: avoid !important;
   }
   
   .signature-box {
     width: 100% !important;
-    max-width: 550px !important;
+    max-width: none !important;
   }
   
   .signature-box.funcionario {
     text-align: left !important;
+    padding-right: 50% !important;  /* ✅ Solo mitad izquierda */
   }
   
   .signature-box.director {
     text-align: center !important;
+    margin: 0 auto !important;
+    max-width: 500px !important;
   }
   
   .signature-box p {
@@ -882,19 +891,24 @@ body {
   
   .signature-box .firma-line {
     border-top: 1px solid #000 !important;
-    margin: 20px 0 8px 0 !important;
+    margin: 25px 0 8px 0 !important;
     padding-top: 8px !important;
-    width: 80% !important;
+    width: 85% !important;
+  }
+  
+  .signature-box.funcionario .firma-line {
+    margin: 25px 0 8px 0 !important;  /* ✅ Izquierda */
   }
   
   .signature-box.director .firma-line {
-    margin: 20px auto 8px auto !important;
+    margin: 25px auto 8px auto !important;  /* ✅ Centrado */
   }
   
   .signature-box .cargo {
     font-size: 9pt !important;
     font-weight: 400 !important;
   }
+}
   
   /* Footer más compacto */
   .acta-footer {
