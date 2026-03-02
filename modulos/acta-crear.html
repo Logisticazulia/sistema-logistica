@@ -655,7 +655,7 @@ body {
 }
 
 /* ============================================ */
-/* ESTILOS DE IMPRESIÓN - CORREGIDO            */
+/* ESTILOS DE IMPRESIÓN - COMPLETO Y CORREGIDO */
 /* ============================================ */
 @media print {
   @page {
@@ -703,7 +703,7 @@ body {
     line-height: 1.3;
   }
   
-  /* ✅ ENCABEZADO - FORZAR HORIZONTAL */
+  /* ENCABEZADO - FORZAR HORIZONTAL */
   .acta-header {
     display: flex !important;
     flex-direction: row !important;
@@ -716,7 +716,7 @@ body {
     width: 100%;
   }
   
-  /* ✅ LOGOS - IZQUIERDA Y DERECHA */
+  /* LOGOS - IZQUIERDA Y DERECHA */
   .acta-logos {
     display: flex !important;
     flex-direction: row !important;
@@ -738,7 +738,7 @@ body {
     width: auto !important;
   }
   
-  /* ✅ TÍTULO - CENTRADO ENTRE LOGOS */
+  /* TÍTULO - CENTRADO ENTRE LOGOS */
   .acta-title {
     text-align: center !important;
     flex: 1 !important;
@@ -854,17 +854,11 @@ body {
     line-height: 1.3 !important;
   }
   
-/* ============================================ */
-/* ESTILOS DE IMPRESIÓN - FIRMAS               */
-/* ============================================ */
-@media print {
-  /* ... resto de estilos ... */
-  
-  /* ✅ FIRMAS - Funcionario izquierda, Director centrado abajo */
+  /* FIRMAS - Funcionario izquierda, Director centrado abajo */
   .acta-signatures {
     margin-top: 30px !important;
     display: flex !important;
-    flex-direction: column !important;  /* ✅ Vertical */
+    flex-direction: column !important;
     align-items: stretch !important;
     gap: 35px !important;
     page-break-inside: avoid !important;
@@ -877,7 +871,7 @@ body {
   
   .signature-box.funcionario {
     text-align: left !important;
-    padding-right: 50% !important;  /* ✅ Solo mitad izquierda */
+    padding-right: 50% !important;
   }
   
   .signature-box.director {
@@ -902,20 +896,19 @@ body {
   }
   
   .signature-box.funcionario .firma-line {
-    margin: 25px 0 8px 0 !important;  /* ✅ Izquierda */
+    margin: 25px 0 8px 0 !important;
   }
   
   .signature-box.director .firma-line {
-    margin: 25px auto 8px auto !important;  /* ✅ Centrado */
+    margin: 25px auto 8px auto !important;
   }
   
   .signature-box .cargo {
     font-size: 9pt !important;
     font-weight: 400 !important;
   }
-}
   
-  /* Footer más compacto */
+  /* ✅ FOOTER - CENTRADO CORRECTO */
   .acta-footer {
     margin-top: 25px !important;
     text-align: center !important;
@@ -925,6 +918,7 @@ body {
     position: relative !important;
     z-index: 1 !important;
     page-break-inside: avoid !important;
+    width: 100% !important;
   }
   
   .acta-footer p {
@@ -932,6 +926,7 @@ body {
     font-weight: 700 !important;
     color: #dc2626 !important;
     line-height: 1.2 !important;
+    text-align: center !important;
   }
   
   /* Marca de agua optimizada */
