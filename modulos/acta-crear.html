@@ -638,13 +638,6 @@ body {
         flex-direction: column;
         gap: 10px;
     }
-    .vehicles-table {
-        font-size: 12px;
-    }
-    .vehicles-table th,
-    .vehicles-table td {
-        padding: 8px 5px;
-    }
 }
 
 /* ============================================ */
@@ -792,7 +785,7 @@ body {
             </div>
 
             <!-- Formulario de Datos del Funcionario -->
-            <h2 style="margin-top: 30px;">👤 Datos del Funcionario Asignado</h2>
+            <h2>👤 Datos del Funcionario Asignado</h2>
             <form id="actaForm">
                 <div class="form-row-2">
                     <div class="form-group">
@@ -885,8 +878,9 @@ body {
                         </tbody>
                     </table>
 
+                    <!-- ✅ TEXTO DINÁMICO (singular/plural) -->
                     <p>
-                        Esta unidad es asignada a la <strong id="previewUnidadAsignacion">---</strong> en la figura jurídica del ciudadano <strong id="previewFuncionarioNombre">---</strong>, Cédula de Identidad numero <strong id="previewFuncionarioCedula">---</strong>, esta unidad es asignada para uso netamente del servicio y labores de patrullaje en el referido Estado. Obedeciendo al Reimpulso de la gran misión cuadrante de Paz. En atención que la unidad descrita es un bien público, no podrá ser cedido temporal o definitivamente a terceras personas y en concordancia a lo dispuesto en el artículo 45 de la ley de Bienes Públicos:
+                        <strong id="textoUnidad">Esta unidad es asignada</strong> a la <strong id="previewUnidadAsignacion">---</strong> en la figura jurídica del ciudadano <strong id="previewFuncionarioNombre">---</strong>, Cédula de Identidad numero <strong id="previewFuncionarioCedula">---</strong>, <strong id="textoUso">esta unidad es asignada</strong> para uso netamente del servicio y labores de patrullaje en el referido Estado. Obedeciendo al Reimpulso de la gran misión cuadrante de Paz. En atención que <strong id="textoUnidad2">la unidad descrita es</strong> un bien público, no podrá ser cedido temporal o definitivamente a terceras personas y en concordancia a lo dispuesto en el artículo 45 de la ley de Bienes Públicos:
                     </p>
 
                     <p class="acta-section citation">
