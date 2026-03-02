@@ -591,23 +591,21 @@ body {
     line-height: 1.2 !important;
     text-align: center !important;  /* ✅ Forzar centrado en cada párrafo */
   }
-}
-
-
 /* ============================================ */
-/* MARCA DE AGUA - FONDO.PNG - AJUSTADO        */
+/* MARCA DE AGUA - FONDO.PNG - CORREGIDO       */
 /* ============================================ */
 .acta-watermark {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);  /* ✅ Centrado perfecto */
-  width: 100%;                   /* ✅ Ancho completo del contenedor */
+  width: 100%;                   /* ✅ Ancho máximo del contenedor */
+  max-width: 800px;              /* ✅ Límite de ancho absoluto */
   height: auto;
-  max-height: 4000px;            /* ✅ Altura máxima reducida */
+  max-height: 100%;              /* ✅ No superar altura del contenedor */
   object-fit: contain;
-  opacity: 0.10;                 /* ✅ Un poco más transparente */
-  z-index: 0;
+  opacity: 0.08;                 /* ✅ Más sutil (antes 0.12) */
+  z-index: -1;                   /* ✅ DETRÁS del contenido */
   pointer-events: none;
   user-select: none;
 }
