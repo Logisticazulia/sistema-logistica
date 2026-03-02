@@ -641,7 +641,7 @@ body {
 }
 
 /* ============================================ */
-/* ESTILOS DE IMPRESIÓN - OPTIMIZADO           */
+/* ESTILOS DE IMPRESIÓN - CORREGIDO            */
 /* ============================================ */
 @media print {
   @page {
@@ -689,215 +689,236 @@ body {
     line-height: 1.3;
   }
   
-  /* Encabezado más compacto y centrado */
+  /* ✅ ENCABEZADO - FORZAR HORIZONTAL */
   .acta-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 2px solid #003366;
     page-break-inside: avoid;
+    width: 100%;
   }
   
+  /* ✅ LOGOS - IZQUIERDA Y DERECHA */
   .acta-logos {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    align-items: center !important;
+    flex: 0 0 auto;
+  }
+  
+  .acta-logos:first-child {
+    margin-right: 15px;
+  }
+  
+  .acta-logos:last-child {
+    margin-left: 15px;
   }
   
   .acta-logos img {
-    height: 40px;
-    width: auto;
+    height: 40px !important;
+    width: auto !important;
   }
   
-  /* Título centrado y optimizado */
+  /* ✅ TÍTULO - CENTRADO ENTRE LOGOS */
   .acta-title {
-    text-align: center;
-    flex: 1;
-    padding: 0 15px;
+    text-align: center !important;
+    flex: 1 !important;
+    padding: 0 15px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
   
   .acta-title h1 {
-    font-size: 10pt;
-    color: #003366;
-    margin: 2px 0;
-    line-height: 1.2;
-    font-weight: 700;
+    font-size: 10pt !important;
+    color: #003366 !important;
+    margin: 2px 0 !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    text-align: center !important;
   }
   
   .acta-title h2 {
-    font-size: 10pt;
-    color: #003366;
-    margin: 2px 0;
-    font-weight: 700;
+    font-size: 10pt !important;
+    color: #003366 !important;
+    margin: 2px 0 !important;
+    font-weight: 700 !important;
+    text-align: center !important;
   }
   
   .acta-title h3 {
-    font-size: 10pt;
-    color: #003366;
-    margin: 5px 0 3px 0;
-    font-weight: 700;
+    font-size: 10pt !important;
+    color: #003366 !important;
+    margin: 5px 0 3px 0 !important;
+    font-weight: 700 !important;
+    text-align: center !important;
   }
   
   .acta-title .acta-subtitle {
-    font-size: 11pt;
-    color: #000;
-    margin-top: 8px;
-    font-weight: 700;
-    text-decoration: underline;
+    font-size: 11pt !important;
+    color: #000 !important;
+    margin-top: 8px !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+    text-align: center !important;
   }
   
   /* Cuerpo del acta optimizado */
   .acta-body {
-    font-size: 11pt;
-    line-height: 1.3;
-    color: #000;
-    text-align: justify;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+    text-align: justify !important;
   }
   
   .acta-body p {
-    margin: 6px 0;
-    text-align: justify;
+    margin: 6px 0 !important;
+    text-align: justify !important;
   }
   
   .acta-body strong {
-    font-weight: 700;
+    font-weight: 700 !important;
   }
   
   /* Tabla más compacta */
   .acta-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0;
-    border: 1px solid #000;
-    page-break-inside: avoid;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 10px 0 !important;
+    border: 1px solid #000 !important;
+    page-break-inside: avoid !important;
   }
   
   .acta-table th {
-    background: #fff;
-    color: #000;
-    padding: 6px 8px;
-    text-align: center;
-    font-size: 10pt;
-    border: 1px solid #000;
-    font-weight: 700;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 6px 8px !important;
+    text-align: center !important;
+    font-size: 10pt !important;
+    border: 1px solid #000 !important;
+    font-weight: 700 !important;
   }
   
   .acta-table td {
-    padding: 6px 8px;
-    border: 1px solid #000;
-    font-size: 10pt;
-    text-align: center;
+    padding: 6px 8px !important;
+    border: 1px solid #000 !important;
+    font-size: 10pt !important;
+    text-align: center !important;
   }
   
   /* Secciones más compactas */
   .acta-section {
-    margin: 8px 0;
-    padding: 8px 10px;
-    text-align: justify;
-    font-size: 11pt;
-    line-height: 1.3;
+    margin: 8px 0 !important;
+    padding: 8px 10px !important;
+    text-align: justify !important;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
   }
   
   .acta-section.citation {
-    font-style: italic;
-    text-align: justify;
-    margin: 6px 0;
+    font-style: italic !important;
+    text-align: justify !important;
+    margin: 6px 0 !important;
   }
   
   /* Listas más compactas */
   .acta-body ol {
-    margin: 6px 0;
-    padding-left: 20px;
+    margin: 6px 0 !important;
+    padding-left: 20px !important;
   }
   
   .acta-body li {
-    margin: 3px 0;
-    text-align: justify;
-    font-size: 11pt;
-    line-height: 1.3;
+    margin: 3px 0 !important;
+    text-align: justify !important;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
   }
   
   /* Firmas más compactas */
   .acta-signatures {
-    margin-top: 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    page-break-inside: avoid;
+    margin-top: 25px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 20px !important;
+    page-break-inside: avoid !important;
   }
   
   .signature-box {
-    width: 100%;
-    max-width: 550px;
+    width: 100% !important;
+    max-width: 550px !important;
   }
   
   .signature-box.funcionario {
-    text-align: left;
+    text-align: left !important;
   }
   
   .signature-box.director {
-    text-align: center;
+    text-align: center !important;
   }
   
   .signature-box p {
-    font-size: 10pt;
-    font-weight: 600;
-    margin: 3px 0;
-    color: #000;
-    line-height: 1.3;
+    font-size: 10pt !important;
+    font-weight: 600 !important;
+    margin: 3px 0 !important;
+    color: #000 !important;
+    line-height: 1.3 !important;
   }
   
   .signature-box .firma-line {
-    border-top: 1px solid #000;
-    margin: 20px 0 8px 0;
-    padding-top: 8px;
-    width: 80%;
+    border-top: 1px solid #000 !important;
+    margin: 20px 0 8px 0 !important;
+    padding-top: 8px !important;
+    width: 80% !important;
   }
   
   .signature-box.director .firma-line {
-    margin: 20px auto 8px auto;
+    margin: 20px auto 8px auto !important;
   }
   
   .signature-box .cargo {
-    font-size: 9pt;
-    font-weight: 400;
+    font-size: 9pt !important;
+    font-weight: 400 !important;
   }
   
   /* Footer más compacto */
   .acta-footer {
-    margin-top: 25px;
-    text-align: center;
-    font-size: 9pt;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-    position: relative;
-    z-index: 1;
-    page-break-inside: avoid;
+    margin-top: 25px !important;
+    text-align: center !important;
+    font-size: 9pt !important;
+    padding-top: 15px !important;
+    border-top: 1px solid #ddd !important;
+    position: relative !important;
+    z-index: 1 !important;
+    page-break-inside: avoid !important;
   }
   
   .acta-footer p {
-    margin: 5px 0;
-    font-weight: 700;
-    color: #dc2626;
-    line-height: 1.2;
+    margin: 5px 0 !important;
+    font-weight: 700 !important;
+    color: #dc2626 !important;
+    line-height: 1.2 !important;
   }
   
   /* Marca de agua optimizada */
   .acta-watermark {
-    position: absolute;
-    bottom: 0;
-    left: -7%;
-    width: 128.5%;
-    height: auto;
-    max-height: 5500px;
-    object-fit: contain;
-    opacity: 0.12;
-    z-index: 0;
-    pointer-events: none;
-    user-select: none;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: -7% !important;
+    width: 128.5% !important;
+    height: auto !important;
+    max-height: 5500px !important;
+    object-fit: contain !important;
+    opacity: 0.12 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    user-select: none !important;
   }
   
   /* Control de saltos de página */
@@ -909,11 +930,11 @@ body {
   }
   
   .acta-table {
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
   }
   
   .acta-signatures {
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
   }
 }
 </style>
