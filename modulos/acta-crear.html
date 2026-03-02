@@ -597,18 +597,17 @@ body {
 .acta-watermark {
   position: absolute;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-45%);  /* ✅ Centrado perfecto */
-  width: 129%;                   /* ✅ Ancho completo del contenedor */
+  left: 50%;                    /* ✅ Centrado horizontal */
+  transform: translateX(-50%);  /* ✅ Ajuste fino de centro */
+  width: 80%;                   /* ✅ 80% del ancho (antes 128.5%) */
   height: auto;
-  max-height: 4000px;            /* ✅ Altura máxima reducida */
+  max-height: 3000px;           /* ✅ Altura máxima reducida */
   object-fit: contain;
-  opacity: 0.10;                 /* ✅ Un poco más transparente */
+  opacity: 0.08;                /* ✅ Más sutil (antes 0.12) */
   z-index: 0;
   pointer-events: none;
   user-select: none;
-}
-/* ============================================ */
+}=========================================== */
 /* BOTONES DE ACCIÓN                            */
 /* ============================================ */
 .action-buttons {
