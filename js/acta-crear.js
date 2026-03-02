@@ -5,7 +5,7 @@
 
 // ============================================
 // ✅ VARIABLES GLOBALES
-// ============================================
+// ============================================ */
 let supabaseClient = null;
 let vehiculoActual = null; // Vehículo encontrado en la búsqueda
 let listaVehiculos = [];   // Array para almacenar múltiples vehículos
@@ -159,7 +159,6 @@ function actualizarActa() {
 function actualizarTextoSingularPlural() {
     const cantidadVehiculos = listaVehiculos.length;
     
-    // Elementos de texto a actualizar
     const textoUnidad = document.getElementById('textoUnidad');
     const textoUso = document.getElementById('textoUso');
     const textoUnidad2 = document.getElementById('textoUnidad2');
@@ -343,7 +342,7 @@ function agregarVehiculoAlActa() {
     // Actualizar el acta con todos los vehículos
     renderizarVehiculosEnActa();
     
-    // ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+    // ✅ Actualizar texto singular/plural
     actualizarTextoSingularPlural();
     
     // Limpiar búsqueda
@@ -407,7 +406,7 @@ function eliminarVehiculo(tempId) {
         renderizarListaVehiculos();
         renderizarVehiculosEnActa();
         
-        // ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+        // ✅ Actualizar texto singular/plural
         actualizarTextoSingularPlural();
         
         if (listaVehiculos.length === 0) {
@@ -451,6 +450,37 @@ function renderizarVehiculosEnActa() {
             <td>${vehiculo.facsimil}</td>
         </tr>
     `).join('');
+}
+
+// ============================================
+// ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
+// ============================================
+function actualizarFechaActa() {
+    const fecha = new Date();
+    
+    // Meses en español
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
+    // Obtener el día del mes (1-31)
+    const dia = fecha.getDate();
+    
+    // Obtener el mes (0-11, por eso se usa como índice del array)
+    const mes = meses[fecha.getMonth()];
+    
+    // Obtener el año completo (ej: 2026)
+    const anio = fecha.getFullYear();
+    
+    // Actualizar los elementos del acta
+    const previewDia = document.getElementById('previewDia');
+    const previewMes = document.getElementById('previewMes');
+    const previewAnio = document.getElementById('previewAnio');
+    
+    if (previewDia) previewDia.textContent = dia;
+    if (previewMes) previewMes.textContent = mes;
+    if (previewAnio) previewAnio.textContent = anio;
 }
 
 // ============================================
@@ -508,37 +538,6 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
             alertElement.style.display = 'none';
         }, 5000);
     }
-}
-
-// ============================================
-// ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
-// ============================================
-function actualizarFechaActa() {
-    const fecha = new Date();
-    
-    // Meses en español
-    const meses = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
-    
-    // Obtener el día del mes (1-31)
-    const dia = fecha.getDate();
-    
-    // Obtener el mes (0-11, por eso se usa como índice del array)
-    const mes = meses[fecha.getMonth()];
-    
-    // Obtener el año completo (ej: 2026)
-    const anio = fecha.getFullYear();
-    
-    // Actualizar los elementos del acta
-    const previewDia = document.getElementById('previewDia');
-    const previewMes = document.getElementById('previewMes');
-    const previewAnio = document.getElementById('previewAnio');
-    
-    if (previewDia) previewDia.textContent = dia;
-    if (previewMes) previewMes.textContent = mes;
-    if (previewAnio) previewAnio.textContent = anio;
 }
 
 // ============================================
@@ -692,9 +691,9 @@ window.actualizarActa = actualizarActa;
 window.agregarVehiculoAlActa = agregarVehiculoAlActa;
 window.eliminarVehiculo = eliminarVehiculo;
 window.limpiarFormulario = limpiarFormulario;
-window.cargarEmailUsuario = cargarEmailUsuario;
-window.actualizarFechaActa = actualizarFechaActa;
 window.renderizarListaVehiculos = renderizarListaVehiculos;
 window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
 window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
+window.cargarEmailUsuario = cargarEmailUsuario;
+window.actualizarFechaActa = actualizarFechaActa;
 window.mostrarAlerta = mostrarAlerta;
