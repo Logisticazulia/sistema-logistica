@@ -151,7 +151,7 @@ function actualizarActa() {
 }
 
 // ============================================
-// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
+// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS (BÚSQUEDA EXACTA)
 // ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
@@ -178,7 +178,9 @@ async function buscarVehiculo() {
     try {
         let vehiculoEncontrado = null;
         
-        // BÚSQUEDA EXACTA por placa (primero)
+        // ============================================
+        // ✅ BÚSQUEDA EXACTA POR PLACA
+        // ============================================
         const { data: dataPlaca, error: errorPlaca } = await supabaseClient
             .from('vehiculos')
             .select('*')
@@ -188,7 +190,9 @@ async function buscarVehiculo() {
         if (dataPlaca && dataPlaca.length > 0 && !errorPlaca) {
             vehiculoEncontrado = dataPlaca[0];
         } else {
-            // BÚSQUEDA EXACTA por facsimil
+            // ============================================
+            // ✅ BÚSQUEDA EXACTA POR FACSÍMIL
+            // ============================================
             const { data: dataFacsimil, error: errorFacsimil } = await supabaseClient
                 .from('vehiculos')
                 .select('*')
@@ -198,7 +202,9 @@ async function buscarVehiculo() {
             if (dataFacsimil && dataFacsimil.length > 0 && !errorFacsimil) {
                 vehiculoEncontrado = dataFacsimil[0];
             } else {
-                // BÚSQUEDA EXACTA por serial de carrocería
+                // ============================================
+                // ✅ BÚSQUEDA EXACTA POR SERIAL DE CARROCERÍA
+                // ============================================
                 const { data: dataCarroceria, error: errorCarroceria } = await supabaseClient
                     .from('vehiculos')
                     .select('*')
@@ -208,7 +214,9 @@ async function buscarVehiculo() {
                 if (dataCarroceria && dataCarroceria.length > 0 && !errorCarroceria) {
                     vehiculoEncontrado = dataCarroceria[0];
                 } else {
-                    // BÚSQUEDA EXACTA por serial de motor
+                    // ============================================
+                    // ✅ BÚSQUEDA EXACTA POR SERIAL DE MOTOR
+                    // ============================================
                     const { data: dataMotor, error: errorMotor } = await supabaseClient
                         .from('vehiculos')
                         .select('*')
@@ -218,15 +226,17 @@ async function buscarVehiculo() {
                     if (dataMotor && dataMotor.length > 0 && !errorMotor) {
                         vehiculoEncontrado = dataMotor[0];
                     } else {
-                        // BÚSQUEDA PARCIAL por marca/modelo
-                        const { data: dataMarca, error: errorMarca } = await supabaseClient
+                        // ============================================
+                        // ✅ BÚSQUEDA EXACTA POR NÚMERO DE IDENTIFICACIÓN
+                        // ============================================
+                        const { data: dataIdentificacion, error: errorIdentificacion } = await supabaseClient
                             .from('vehiculos')
                             .select('*')
-                            .ilike('marca', `%${terminoBusqueda}%`)
+                            .eq('n_identificacion', terminoBusqueda.toUpperCase())
                             .limit(1);
                         
-                        if (dataMarca && dataMarca.length > 0 && !errorMarca) {
-                            vehiculoEncontrado = dataMarca[0];
+                        if (dataIdentificacion && dataIdentificacion.length > 0 && !errorIdentificacion) {
+                            vehiculoEncontrado = dataIdentificacion[0];
                         }
                     }
                 }
@@ -260,7 +270,8 @@ async function buscarVehiculo() {
             s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
             s_motor: vehiculoEncontrado.s_motor || 'N/P',
             placa: vehiculoEncontrado.placa || 'N/P',
-            facsimil: vehiculoEncontrado.facsimil || 'N/P'
+            facsimil: vehiculoEncontrado.facsimil || 'N/P',
+            n_identificacion: vehiculoEncontrado.n_identificacion || 'N/P'
         };
         
         // Habilitar botón para agregar
