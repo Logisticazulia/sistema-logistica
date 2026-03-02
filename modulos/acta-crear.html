@@ -164,106 +164,6 @@ body {
 }
 
 /* ============================================ */
-/* ✅ BOTONES PARA AGREGAR VEHÍCULOS            */
-/* ============================================ */
-.btn-add-vehicle {
-    padding: 10px 20px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 15px;
-    transition: all 0.3s ease;
-}
-
-.btn-add-vehicle:hover {
-    background: #218838;
-    transform: translateY(-2px);
-}
-
-.btn-add-vehicle:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ============================================ */
-/* ✅ TABLA DE VEHÍCULOS AGREGADOS              */
-/* ============================================ */
-.vehicles-list-section {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-    border: 1px solid #ddd;
-}
-
-.vehicles-list-section h3 {
-    color: #003366;
-    margin-bottom: 15px;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.vehicles-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.vehicles-table th {
-    background: #003366;
-    color: white;
-    padding: 10px 8px;
-    text-align: left;
-    font-weight: 600;
-    border: 1px solid #002244;
-}
-
-.vehicles-table td {
-    padding: 10px 8px;
-    border: 1px solid #ddd;
-    background: white;
-}
-
-.vehicles-table tr:nth-child(even) td {
-    background: #f8f9fa;
-}
-
-.vehicles-table .btn-delete {
-    padding: 6px 12px;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.vehicles-table .btn-delete:hover {
-    background: #c82333;
-    transform: translateY(-1px);
-}
-
-.vehicles-count {
-    background: #003366;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* ============================================ */
 /* AYUDA DE BÚSQUEDA                            */
 /* ============================================ */
 .search-hint {
@@ -463,7 +363,7 @@ body {
     font-weight: 700;
 }
 
-/* TABLA DE VEHÍCULO EN EL ACTA */
+/* TABLA DE VEHÍCULO */
 .acta-table {
     width: 100%;
     border-collapse: collapse;
@@ -618,13 +518,6 @@ body {
     .acta-container {
         padding: 1.5cm;
     }
-    .vehicles-table {
-        font-size: 12px;
-    }
-    .vehicles-table th,
-    .vehicles-table td {
-        padding: 8px 5px;
-    }
 }
 
 @media (max-width: 768px) {
@@ -645,10 +538,6 @@ body {
         flex-direction: column;
         gap: 10px;
     }
-    .vehicles-table {
-        display: block;
-        overflow-x: auto;
-    }
 }
 
 /* ============================================ */
@@ -661,8 +550,7 @@ body {
     .search-section,
     .form-section,
     .preview-section h2,
-    .action-buttons,
-    .vehicles-list-section {
+    .action-buttons {
         display: none !important;
     }
     body {
@@ -730,7 +618,7 @@ body {
     <!-- Título del Módulo -->
     <section class="module-title-section">
         <h1 class="module-title">📝 Crear Acta de Asignación de Vehículo</h1>
-        <p class="module-subtitle">Busque los vehículos y complete los datos del funcionario asignado</p>
+        <p class="module-subtitle">Busque el vehículo y complete los datos del funcionario asignado</p>
     </section>
 
     <div class="container">
@@ -762,41 +650,10 @@ body {
                     <span>⚙️ Serial Motor</span>
                     <span>🏷️ Marca/Modelo</span>
                 </div>
-                
-                <!-- ✅ BOTÓN PARA AGREGAR VEHÍCULO -->
-                <button class="btn-add-vehicle" id="btnAgregarVehiculo" onclick="agregarVehiculoALista()" disabled>
-                    <span>➕</span>
-                    <span>Agregar Vehículo a la Lista</span>
-                </button>
-            </div>
-
-            <!-- ✅ LISTA DE VEHÍCULOS AGREGADOS -->
-            <div class="vehicles-list-section" id="vehiclesListSection" style="display: none;">
-                <h3>
-                    <span>🚗 Vehículos en el Acta</span>
-                    <span class="vehicles-count" id="vehiclesCount">0</span>
-                </h3>
-                <div class="table-container">
-                    <table class="vehicles-table">
-                        <thead>
-                            <tr>
-                                <th>Marca-Modelo</th>
-                                <th>Serial Carrocería</th>
-                                <th>Serial Motor</th>
-                                <th>Placa</th>
-                                <th>Facsímil</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vehiclesListBody">
-                            <!-- Los vehículos se agregan dinámicamente aquí -->
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
             <!-- Formulario de Datos del Funcionario -->
-            <h2 style="margin-top: 30px;">👤 Datos del Funcionario Asignado</h2>
+            <h2>👤 Datos del Funcionario Asignado</h2>
             <form id="actaForm">
                 <div class="form-row-2">
                     <div class="form-group">
@@ -867,7 +724,7 @@ body {
                         Quien suscribe, Ciudadano Comisario Mayor (CPNB) Dr. Guillermo Parra Pulido, Director de la Redip Occidental y Coordinador del Centro Coordinación Policial Estadal Zulia, según resolución OGH-0262 de Fecha 05 de Septiembre del 2022, mediante la presente, dejo constancia de la entrega formal, en calidad de asignación para asuntos del servicio de la siguiente unidad del CCPE Estadal Zulia:
                     </p>
 
-                    <!-- ✅ TABLA DE VEHÍCULOS DINÁMICA -->
+                    <!-- Tabla de Datos del Vehículo -->
                     <table class="acta-table">
                         <thead>
                             <tr>
@@ -878,8 +735,9 @@ body {
                                 <th>Facsímil</th>
                             </tr>
                         </thead>
-                        <tbody id="actaVehiclesBody">
+                        <tbody>
                             <tr>
+                                <!-- ✅ VALORES VACÍOS POR DEFECTO -->
                                 <td id="previewMarcaModelo">---</td>
                                 <td id="previewSerialCarroceria">---</td>
                                 <td id="previewSerialMotor">---</td>
@@ -974,7 +832,9 @@ body {
                     </div>
                 </div>
 
-                <!-- Marca de Agua -->
+                <!-- ============================================ -->
+                <!-- ✅ MARCA DE AGUA - FONDO.PNG                 -->
+                <!-- ============================================ -->
                 <img src="../img/fondo.png" alt="Marca de Agua" class="acta-watermark" onerror="this.style.display='none'">
             </div>
         </div>
