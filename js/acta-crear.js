@@ -595,51 +595,51 @@ async function guardarActa() {
     const userEmailElement = document.getElementById('userEmail');
     const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
     
-    // Recopilar datos del acta
-    const actaData = {
-        funcionario: {
-            nombre: funcionarioNombre,
-            cedula: funcionarioCedula,
-            cargo: document.getElementById('funcionarioCargo')?.value || '',
-            unidad: unidadAsignacion
-        },
-        vehiculos: listaVehiculos.map(v => ({
-            id: v.id,
-            marca: v.marca,
-            modelo: v.modelo,
-            placa: v.placa,
-            facsimil: v.facsimil,
-            s_carroceria: v.s_carroceria,
-            s_motor: v.s_motor
-        })),
-        fecha: {
-            dia: document.getElementById('previewDia')?.textContent || '',
-            mes: document.getElementById('previewMes')?.textContent || '',
-            anio: document.getElementById('previewAnio')?.textContent || ''
-        },
-        director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO',
-        created_by_email: createdByEmail
-    };
+const actaData = {
+    // Datos del funcionario (columnas separadas)
+    funcionario_nombre: funcionarioNombre,
+    funcionario_cedula: funcionarioCedula,
+    funcionario_cargo: document.getElementById('funcionarioCargo')?.value || '',
+    unidad_asignacion: unidadAsignacion,
     
-    try {
-        // Guardar en Supabase - Tabla: actas_asignacion
-        const { data, error } = await supabaseClient
-            .from('actas_asignacion')
-            .insert(actaData);
-        
-        if (error) throw error;
-        
-        mostrarAlerta('✅ Acta guardada exitosamente en la base de datos', 'success');
-        
-        // Opcional: Limpiar formulario después de guardar
-        setTimeout(() => {
-            limpiarFormulario();
-        }, 2000);
-        
-    } catch (error) {
-        console.error('Error al guardar acta:', error);
-        mostrarAlerta('❌ Error al guardar el acta. Intente nuevamente.', 'error');
-    }
+    // Vehículos como JSON string (si la columna es jsonb)
+    vehiculos: JSON.stringify(listaVehiculos.map(v => ({
+      id: v.id,
+      marca: v.marca,
+      modelo: v.modelo,
+      placa: v.placa,
+      facsimil: v.facsimil,
+      s_carroceria: v.s_carroceria,
+      s_motor: v.s_motor
+    }))),
+    
+    // Fecha separada
+    fecha_dia: document.getElementById('previewDia')?.textContent || '',
+    fecha_mes: document.getElementById('previewMes')?.textContent || '',
+    fecha_anio: document.getElementById('previewAnio')?.textContent || '',
+    
+    // Director
+    director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO',
+    
+    // Metadata
+    created_by_email: createdByEmail,
+    created_at: new Date().toISOString()
+  };
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('actas_asignacion')
+      .insert(actaData);
+    
+    if (error) throw error;
+    
+    mostrarAlerta('✅ Acta guardada exitosamente', 'success');
+    setTimeout(() => limpiarFormulario(), 2000);
+    
+  } catch (error) {
+    console.error('Error al guardar acta:', error);
+    mostrarAlerta(`❌ Error: ${error.message}`, 'error');
+  }
 }
 
 // ============================================
