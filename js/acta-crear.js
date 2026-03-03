@@ -134,7 +134,7 @@ async function buscarVehiculo() {
     
     // Validar que haya un término de búsqueda
     if (!terminoBusqueda) {
-        mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error', searchAlert);
+        mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
         return;
@@ -142,7 +142,7 @@ async function buscarVehiculo() {
     
     // Verificar que supabaseClient esté inicializado
     if (!supabaseClient) {
-        mostrarAlerta('❌ Error de conexión con la base de datos', 'error', searchAlert);
+        mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
         return;
@@ -167,7 +167,7 @@ async function buscarVehiculo() {
         }
         
         if (!vehiculoEncontrado) {
-            mostrarAlerta('❌ Vehículo no encontrado en la base de datos', 'error', searchAlert);
+            mostrarAlerta('❌ vehículo no encontrado en la base de datos', 'error', searchAlert);
             vehiculoActual = null;
             if (btnAgregar) btnAgregar.disabled = true;
             return;
@@ -181,12 +181,12 @@ async function buscarVehiculo() {
         );
         
         if (yaEnLista) {
-            mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta actual', 'info', searchAlert);
+            mostrarAlerta('⚠️ este vehículo ya está en la lista del acta actual', 'info', searchAlert);
             if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
         
-        // 🚫 VALIDACIÓN 2: Verificar si el vehículo YA ESTÁ ASIGNADO en actas_asignacion
+        // 🚫 VALIDACIÓN 2: Verificar si el vehículo YA ESTÁ REGISTRADO en actas_asignacion
         // Buscamos en el campo JSONB 'vehiculos' si existe este ID de vehículo
         const { data: actasExistentes, error: errorActas } = await supabaseClient
             .from('actas_asignacion')
@@ -196,16 +196,11 @@ async function buscarVehiculo() {
         
         if (errorActas) {
             console.error('Error al verificar asignaciones:', errorActas);
-            // Si hay error en la consulta, continuamos pero con advertencia
         }
         
+        // ✅ VALIDACIÓN CRÍTICA: Si existe en actas_asignacion, NO permitir agregar
         if (actasExistentes && actasExistentes.length > 0) {
-            const acta = actasExistentes[0];
-            mostrarAlerta(
-                `🚫 Vehículo YA ASIGNADO en Acta #${acta.id} al funcionario: ${acta.funcionario_nombre} (${new Date(acta.created_at).toLocaleDateString()})`,
-                'error',
-                searchAlert
-            );
+            mostrarAlerta('el vehiculo ya se encuentra registrado', 'error', searchAlert);
             vehiculoActual = null;
             if (btnAgregar) btnAgregar.disabled = true;
             return;
@@ -224,17 +219,13 @@ async function buscarVehiculo() {
         
         // Habilitar botón para agregar
         if (btnAgregar) btnAgregar.disabled = false;
-        mostrarAlerta('✅ Vehículo encontrado y disponible. Puede agregarlo a la lista.', 'success', searchAlert);
+        mostrarAlerta('✅ vehículo encontrado y disponible. puede agregarlo a la lista.', 'success', searchAlert);
         
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
-        mostrarAlerta('❌ Error de conexión. Intente nuevamente.', 'error', searchAlert);
+        mostrarAlerta('❌ error de conexión. intente nuevamente.', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
-
-        if (tipo === 'error' && mensaje.includes('YA ASIGNADO')) {
-    alertElement.classList.add('assigned');
-}
     }
 }
 
@@ -243,7 +234,7 @@ async function buscarVehiculo() {
 // ============================================
 function agregarVehiculoAlActa() {
     if (!vehiculoActual) {
-        mostrarAlerta('⚠️ Primero debe buscar un vehículo', 'error');
+        mostrarAlerta('⚠️ primero debe buscar un vehículo', 'error');
         return;
     }
     
@@ -253,7 +244,7 @@ function agregarVehiculoAlActa() {
     );
     
     if (yaExiste) {
-        mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta', 'error');
+        mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'error');
         return;
     }
     
@@ -271,7 +262,7 @@ function agregarVehiculoAlActa() {
     vehiculoActual = null;
     if (btnAgregar) btnAgregar.disabled = true;
     
-    mostrarAlerta(`✅ Vehículo agregado. Total: ${listaVehiculos.length} vehículo(s)`, 'success');
+    mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length} vehículo(s)`, 'success');
 }
 
 // ============================================
@@ -301,7 +292,7 @@ function renderizarListaVehiculos() {
             <td>${vehiculo.facsimil}</td>
             <td>
                 <button class="btn-remove-vehicle" onclick="eliminarVehiculo(${vehiculo.tempId})">
-                    🗑️ Eliminar
+                    🗑️ eliminar
                 </button>
             </td>
         </tr>
@@ -320,8 +311,8 @@ function eliminarVehiculo(tempId) {
         actualizarTextoSingularPlural();
         mostrarAlerta(
             listaVehiculos.length === 0 
-                ? '🗑️ Vehículo eliminado. La lista está vacía.' 
-                : `🗑️ Vehículo eliminado. Total: ${listaVehiculos.length} vehículo(s)`,
+                ? '🗑️ vehículo eliminado. la lista está vacía.' 
+                : `🗑️ vehículo eliminado. total: ${listaVehiculos.length} vehículo(s)`,
             'info'
         );
     }
@@ -392,15 +383,12 @@ function agregarListenerEnter() {
 }
 
 // ============================================
-// ✅ MOSTRAR ALERTAS
-// ============================================
-// ============================================
 // ✅ MOSTRAR ALERTAS CON SCROLL AUTOMÁTICO
 // ============================================
 function mostrarAlerta(mensaje, tipo, elemento = null) {
     const alertElement = elemento || document.getElementById('searchAlert');
     if (!alertElement) {
-        console.error('❌ Elemento de alerta no encontrado');
+        console.error('❌ elemento de alerta no encontrado');
         return;
     }
     
@@ -411,10 +399,10 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
     // 🔄 SCROLL SUAVE HACIA LA ALERTA
     setTimeout(() => {
         alertElement.scrollIntoView({ 
-            behavior: 'smooth',  // Animación suave
-            block: 'center'      // Centrar la alerta en pantalla
+            behavior: 'smooth',
+            block: 'center'
         });
-    }, 100);  // Pequeño delay para asegurar que el elemento esté visible
+    }, 100);
     
     // Ocultar después de 5 segundos (excepto errores)
     if (tipo !== 'error') {
@@ -423,16 +411,17 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
         }, 5000);
     }
 }
+
 // ============================================
 // ✅ IMPRIMIR ACTA
 // ============================================
 function imprimirActa() {
     if (listaVehiculos.length === 0) {
-        mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
+        mostrarAlerta('⚠️ primero debe agregar al menos un vehículo al acta', 'error');
         return;
     }
     if (!document.getElementById('funcionarioNombre')?.value) {
-        mostrarAlerta('⚠️ Primero debe completar los datos del funcionario', 'error');
+        mostrarAlerta('⚠️ primero debe completar los datos del funcionario', 'error');
         return;
     }
     actualizarActa();
@@ -449,15 +438,15 @@ async function guardarActa() {
     const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
     
     if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
-        mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios', 'error');
+        mostrarAlerta('⚠️ por favor complete todos los campos obligatorios', 'error');
         return;
     }
     if (listaVehiculos.length === 0) {
-        mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
+        mostrarAlerta('⚠️ primero debe agregar al menos un vehículo al acta', 'error');
         return;
     }
     if (!supabaseClient) {
-        mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
+        mostrarAlerta('❌ error de conexión con la base de datos', 'error');
         return;
     }
     
@@ -480,17 +469,17 @@ async function guardarActa() {
         created_at: new Date().toISOString()
     };
     
-    console.log('📦 Datos a enviar:', JSON.stringify(actaData, null, 2));
+    console.log('📦 datos a enviar:', JSON.stringify(actaData, null, 2));
     
     try {
         const { error } = await supabaseClient.from('actas_asignacion').insert(actaData);
         if (error) throw error;
         
-        mostrarAlerta('✅ Acta guardada exitosamente', 'success');
+        mostrarAlerta('✅ acta guardada exitosamente', 'success');
         setTimeout(limpiarFormulario, 2000);
     } catch (error) {
-        console.error('❌ Error al guardar acta:', error);
-        mostrarAlerta(`❌ Error: ${error.message}`, 'error');
+        console.error('❌ error al guardar acta:', error);
+        mostrarAlerta(`❌ error: ${error.message}`, 'error');
     }
 }
 
@@ -518,16 +507,22 @@ function limpiarFormulario() {
     const section = document.getElementById('vehiclesListSection');
     if (section) section.style.display = 'none';
     
-    console.log('✅ Formulario limpiado correctamente');
+    console.log('✅ formulario limpiado correctamente');
 }
 
 // ============================================
 // ✅ EXPORTAR FUNCIONES GLOBALES
 // ============================================
-[
-    'buscarVehiculo','imprimirActa','guardarActa','actualizarActa',
-    'agregarVehiculoAlActa','eliminarVehiculo','limpiarFormulario',
-    'renderizarListaVehiculos','renderizarVehiculosEnActa',
-    'actualizarTextoSingularPlural','cargarEmailUsuario',
-    'actualizarFechaActa','mostrarAlerta'
-].forEach(fn => window[fn] = window[fn] || eval(fn));
+window.buscarVehiculo = buscarVehiculo;
+window.imprimirActa = imprimirActa;
+window.guardarActa = guardarActa;
+window.actualizarActa = actualizarActa;
+window.agregarVehiculoAlActa = agregarVehiculoAlActa;
+window.eliminarVehiculo = eliminarVehiculo;
+window.limpiarFormulario = limpiarFormulario;
+window.renderizarListaVehiculos = renderizarListaVehiculos;
+window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
+window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
+window.cargarEmailUsuario = cargarEmailUsuario;
+window.actualizarFechaActa = actualizarFechaActa;
+window.mostrarAlerta = mostrarAlerta;
