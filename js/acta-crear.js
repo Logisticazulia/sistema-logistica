@@ -127,12 +127,16 @@ function actualizarTextoSingularPlural() {
 // ============================================
 // ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
 // ============================================
+// ============================================
+// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
+// ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     const terminoBusqueda = searchInput?.value.trim().toUpperCase() || '';
     
+    // Validar que haya un término de búsqueda
     if (!terminoBusqueda) {
         mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert);
         vehiculoActual = null;
@@ -140,6 +144,7 @@ async function buscarVehiculo() {
         return;
     }
     
+    // Verificar que supabaseClient esté inicializado
     if (!supabaseClient) {
         mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert);
         vehiculoActual = null;
@@ -161,6 +166,7 @@ async function buscarVehiculo() {
             
             if (response.data && response.data.length > 0 && !response.error) {
                 vehiculoEncontrado = response.data[0];
+                console.log('🔍 vehículo encontrado:', vehiculoEncontrado.id, vehiculoEncontrado.placa);
                 break;
             }
         }
@@ -173,24 +179,27 @@ async function buscarVehiculo() {
         }
         
         // 🚫 VALIDACIÓN 1: Verificar si ya está en la lista temporal del acta actual
-        const yaEnLista = listaVehiculos.some(v =>
-            v.placa === vehiculoEncontrado.placa ||
-            v.s_carroceria === vehiculoEncontrado.s_carroceria ||
-            v.id === vehiculoEncontrado.id
-        );
+        const yaEnListaTemporal = listaVehiculos.some(v => {
+            const match = v.id === vehiculoEncontrado.id ||
+                         v.placa?.toUpperCase() === vehiculoEncontrado.placa?.toUpperCase() ||
+                         v.s_carroceria?.toUpperCase() === vehiculoEncontrado.s_carroceria?.toUpperCase();
+            console.log('📋 comparando con lista temporal:', v.id, v.placa, '→ match:', match);
+            return match;
+        });
         
-        if (yaEnLista) {
+        if (yaEnListaTemporal) {
             mostrarAlerta('⚠️ este vehículo ya está en la lista del acta actual', 'info', searchAlert);
             if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
         
         // 🚫 VALIDACIÓN 2: Verificar si el vehículo YA ESTÁ REGISTRADO en actas_asignacion
-        // Esta es la validación CRÍTICA que necesitas
+        console.log('🔍 verificando si vehículo ya está asignado en actas_asignacion, ID:', vehiculoEncontrado.id);
+        
         const responseActas = await supabaseClient
             .from('actas_asignacion')
             .select('id, funcionario_nombre, created_at, vehiculos')
-            .limit(100);
+            .limit(500);
         
         if (responseActas.error) {
             console.error('Error al verificar asignaciones:', responseActas.error);
@@ -219,15 +228,17 @@ async function buscarVehiculo() {
                 
                 // Verificar si el vehículo está en esta acta
                 if (vehiculosData && Array.isArray(vehiculosData)) {
-                    const encontrado = vehiculosData.some(v => 
-                        v.id === vehiculoEncontrado.id ||
-                        v.placa === vehiculoEncontrado.placa ||
-                        v.s_carroceria === vehiculoEncontrado.s_carroceria
-                    );
+                    const encontrado = vehiculosData.some(v => {
+                        const match = v.id === vehiculoEncontrado.id ||
+                                     v.placa?.toUpperCase() === vehiculoEncontrado.placa?.toUpperCase() ||
+                                     v.s_carroceria?.toUpperCase() === vehiculoEncontrado.s_carroceria?.toUpperCase();
+                        return match;
+                    });
                     
                     if (encontrado) {
                         vehiculoYaAsignado = true;
                         actaExistente = acta;
+                        console.log('🚫 vehículo ya asignado en acta:', acta.id);
                         break;
                     }
                 }
@@ -236,11 +247,36 @@ async function buscarVehiculo() {
         
         // ✅ SI EL VEHÍCULO YA ESTÁ ASIGNADO, NO PERMITIR AGREGAR
         if (vehiculoYaAsignado) {
-            mostrarAlerta('el vehiculo ya se encuentra Asignado', 'error', searchAlert);
+            mostrarAlerta('el vehiculo ya se encuentra registrado', 'error', searchAlert);
             vehiculoActual = null;
             if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
+        
+        // ✅ Vehículo disponible: guardar en variable temporal
+        vehiculoActual = {
+            id: vehiculoEncontrado.id,
+            marca: vehiculoEncontrado.marca || 'N/P',
+            modelo: vehiculoEncontrado.modelo || '',
+            s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
+            s_motor: vehiculoEncontrado.s_motor || 'N/P',
+            placa: vehiculoEncontrado.placa || 'N/P',
+            facsimil: vehiculoEncontrado.facsimil || 'N/P'
+        };
+        
+        console.log('✅ vehículo disponible para agregar:', vehiculoActual.id, vehiculoActual.placa);
+        
+        // Habilitar botón para agregar
+        if (btnAgregar) btnAgregar.disabled = false;
+        mostrarAlerta('✅ vehículo encontrado y disponible. puede agregarlo a la lista.', 'success', searchAlert);
+        
+    } catch (error) {
+        console.error('Error al buscar vehículo:', error);
+        mostrarAlerta('❌ error de conexión. intente nuevamente.', 'error', searchAlert);
+        vehiculoActual = null;
+        if (btnAgregar) btnAgregar.disabled = true;
+    }
+}
         
         // ✅ Vehículo disponible: guardar en variable temporal
         vehiculoActual = {
