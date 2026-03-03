@@ -15,7 +15,6 @@ let vehicleCounter = 0;
 // ✅ INICIALIZAR AL CARGAR LA PÁGINA
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Verificar que Supabase esté disponible desde config.js
     if (typeof window.supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_KEY) {
         supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
         console.log('✅ Supabase inicializado correctamente');
@@ -34,10 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================
 function cargarEmailUsuario() {
     const userEmailElement = document.getElementById('userEmail');
-    if (!userEmailElement) {
-        console.error('❌ Elemento userEmail no encontrado');
-        return;
-    }
+    if (!userEmailElement) return;
     
     const usuarioGuardado = sessionStorage.getItem('usuario');
     if (usuarioGuardado) {
@@ -47,13 +43,13 @@ function cargarEmailUsuario() {
             console.log('✅ Usuario cargado desde sessionStorage:', usuario.email);
             return;
         } catch (error) {
-            console.error('Error al parsear usuario de sessionStorage:', error);
+            console.error('Error al parsear usuario:', error);
         }
     }
     
     if (supabaseClient) {
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
-            if (session && session.user) {
+            if (session?.user) {
                 userEmailElement.textContent = session.user.email || 'usuario@institucion.com';
                 sessionStorage.setItem('usuario', JSON.stringify({
                     email: session.user.email,
@@ -101,13 +97,7 @@ function actualizarActa() {
     }
     
     if (previewCargoFuncionario) {
-        if (funcionarioCargo) {
-            previewCargoFuncionario.textContent = funcionarioCargo;
-        } else if (unidadAsignacion) {
-            previewCargoFuncionario.textContent = `Jefe de ${unidadAsignacion}`;
-        } else {
-            previewCargoFuncionario.textContent = '---';
-        }
+        previewCargoFuncionario.textContent = funcionarioCargo || (unidadAsignacion ? `Jefe de ${unidadAsignacion}` : '---');
     }
     
     actualizarTextoSingularPlural();
@@ -140,7 +130,7 @@ async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
-    const terminoBusqueda = searchInput?.value.trim() || '';
+    const terminoBusqueda = searchInput?.value.trim().toUpperCase() || '';
     
     if (!terminoBusqueda) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error', searchAlert);
@@ -151,55 +141,23 @@ async function buscarVehiculo() {
     
     if (!supabaseClient) {
         mostrarAlerta('❌ Error de conexión con la base de datos', 'error', searchAlert);
-        vehiculoActual = null;
-        if (btnAgregar) btnAgregar.disabled = true;
         return;
     }
     
     try {
         let vehiculoEncontrado = null;
+        const camposBusqueda = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
         
-        // Búsqueda por PLACA
-        let { data: dataPlaca, error: errorPlaca } = await supabaseClient
-            .from('vehiculos')
-            .select('*')
-            .eq('placa', terminoBusqueda.toUpperCase())
-            .limit(1);
-        
-        if (dataPlaca && dataPlaca.length > 0 && !errorPlaca) {
-            vehiculoEncontrado = dataPlaca[0];
-        } else {
-            // Búsqueda por FACSÍMIL
-            let { data: dataFacsimil, error: errorFacsimil } = await supabaseClient
+        for (const campo of camposBusqueda) {
+            const { data, error } = await supabaseClient
                 .from('vehiculos')
                 .select('*')
-                .eq('facsimil', terminoBusqueda.toUpperCase())
+                .eq(campo, terminoBusqueda)
                 .limit(1);
             
-            if (dataFacsimil && dataFacsimil.length > 0 && !errorFacsimil) {
-                vehiculoEncontrado = dataFacsimil[0];
-            } else {
-                // Búsqueda por SERIAL CARROCERÍA
-                let { data: dataCarroceria, error: errorCarroceria } = await supabaseClient
-                    .from('vehiculos')
-                    .select('*')
-                    .eq('s_carroceria', terminoBusqueda.toUpperCase())
-                    .limit(1);
-                
-                if (dataCarroceria && dataCarroceria.length > 0 && !errorCarroceria) {
-                    vehiculoEncontrado = dataCarroceria[0];
-                } else {
-                    // Búsqueda por SERIAL MOTOR
-                    let { data: dataMotor, error: errorMotor } = await supabaseClient
-                        .from('vehiculos')
-                        .select('*')
-                        .eq('s_motor', terminoBusqueda.toUpperCase())
-                        .limit(1);
-                    
-                    if (dataMotor && dataMotor.length > 0 && !errorMotor) {
-                        vehiculoEncontrado = dataMotor[0];
-                    }
-                }
+            if (data?.[0] && !error) {
+                vehiculoEncontrado = data[0];
+                break;
             }
         }
         
@@ -210,7 +168,6 @@ async function buscarVehiculo() {
             return;
         }
         
-        // Verificar duplicados
         const yaExiste = listaVehiculos.some(v =>
             v.placa === vehiculoEncontrado.placa ||
             v.s_carroceria === vehiculoEncontrado.s_carroceria
@@ -264,7 +221,7 @@ function agregarVehiculoAlActa() {
     
     vehicleCounter++;
     vehiculoActual.tempId = vehicleCounter;
-    listaVehiculos.push(vehiculoActual);
+    listaVehiculos.push({ ...vehiculoActual });
     
     renderizarListaVehiculos();
     renderizarVehiculosEnActa();
@@ -287,10 +244,7 @@ function renderizarListaVehiculos() {
     const section = document.getElementById('vehiclesListSection');
     const count = document.getElementById('vehiclesCount');
     
-    if (!tbody || !section || !count) {
-        console.error('❌ Elementos de la lista de vehículos no encontrados');
-        return;
-    }
+    if (!tbody || !section || !count) return;
     
     if (listaVehiculos.length === 0) {
         section.style.display = 'none';
@@ -300,7 +254,7 @@ function renderizarListaVehiculos() {
     section.style.display = 'block';
     count.textContent = listaVehiculos.length;
     
-    tbody.innerHTML = listaVehiculos.map((vehiculo, index) => `
+    tbody.innerHTML = listaVehiculos.map(vehiculo => `
         <tr>
             <td>${vehiculo.marca} ${vehiculo.modelo}</td>
             <td>${vehiculo.placa}</td>
@@ -326,12 +280,12 @@ function eliminarVehiculo(tempId) {
         renderizarListaVehiculos();
         renderizarVehiculosEnActa();
         actualizarTextoSingularPlural();
-        
-        if (listaVehiculos.length === 0) {
-            mostrarAlerta('🗑️ Vehículo eliminado. La lista está vacía.', 'info');
-        } else {
-            mostrarAlerta(`🗑️ Vehículo eliminado. Total: ${listaVehiculos.length} vehículo(s)`, 'success');
-        }
+        mostrarAlerta(
+            listaVehiculos.length === 0 
+                ? '🗑️ Vehículo eliminado. La lista está vacía.' 
+                : `🗑️ Vehículo eliminado. Total: ${listaVehiculos.length} vehículo(s)`,
+            'info'
+        );
     }
 }
 
@@ -340,21 +294,10 @@ function eliminarVehiculo(tempId) {
 // ============================================
 function renderizarVehiculosEnActa() {
     const tbody = document.getElementById('actaVehiclesBody');
-    if (!tbody) {
-        console.error('❌ Elemento actaVehiclesBody no encontrado');
-        return;
-    }
+    if (!tbody) return;
     
     if (listaVehiculos.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td>---</td>
-                <td>---</td>
-                <td>---</td>
-                <td>---</td>
-                <td>---</td>
-            </tr>
-        `;
+        tbody.innerHTML = `<tr><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td></tr>`;
         return;
     }
     
@@ -374,36 +317,19 @@ function renderizarVehiculosEnActa() {
 // ============================================
 function actualizarFechaActa() {
     const fecha = new Date();
-    const meses = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     
-    const dia = fecha.getDate();
-    const mes = meses[fecha.getMonth()];
-    const anio = fecha.getFullYear();
-    
-    const previewDia = document.getElementById('previewDia');
-    const previewMes = document.getElementById('previewMes');
-    const previewAnio = document.getElementById('previewAnio');
-    
-    if (previewDia) previewDia.textContent = dia;
-    if (previewMes) previewMes.textContent = mes;
-    if (previewAnio) previewAnio.textContent = anio;
+    ['previewDia','previewMes','previewAnio'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = i === 0 ? fecha.getDate() : i === 1 ? meses[fecha.getMonth()] : fecha.getFullYear();
+    });
 }
 
 // ============================================
 // ✅ AGREGAR LISTENERS AL FORMULARIO
 // ============================================
 function agregarListenersFormulario() {
-    const camposFormulario = [
-        'funcionarioNombre',
-        'funcionarioCedula',
-        'unidadAsignacion',
-        'funcionarioCargo'
-    ];
-    
-    camposFormulario.forEach(id => {
+    ['funcionarioNombre','funcionarioCedula','unidadAsignacion','funcionarioCargo'].forEach(id => {
         const elemento = document.getElementById(id);
         if (elemento) {
             elemento.addEventListener('input', actualizarActa);
@@ -418,7 +344,7 @@ function agregarListenersFormulario() {
 function agregarListenerEnter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
+        searchInput.addEventListener('keypress', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 buscarVehiculo();
@@ -432,19 +358,14 @@ function agregarListenerEnter() {
 // ============================================
 function mostrarAlerta(mensaje, tipo, elemento = null) {
     const alertElement = elemento || document.getElementById('searchAlert');
-    if (!alertElement) {
-        console.error('❌ Elemento de alerta no encontrado');
-        return;
-    }
+    if (!alertElement) return;
     
     alertElement.textContent = mensaje;
     alertElement.className = `alert alert-${tipo}`;
     alertElement.style.display = 'block';
     
     if (tipo !== 'error') {
-        setTimeout(() => {
-            alertElement.style.display = 'none';
-        }, 5000);
+        setTimeout(() => { alertElement.style.display = 'none'; }, 5000);
     }
 }
 
@@ -456,13 +377,10 @@ function imprimirActa() {
         mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
         return;
     }
-    
-    const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
-    if (!funcionarioNombre) {
+    if (!document.getElementById('funcionarioNombre')?.value) {
         mostrarAlerta('⚠️ Primero debe completar los datos del funcionario', 'error');
         return;
     }
-    
     actualizarActa();
     renderizarVehiculosEnActa();
     window.print();
@@ -477,37 +395,29 @@ async function guardarActa() {
     const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
     
     if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
-        mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios del formulario', 'error');
+        mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios', 'error');
         return;
     }
-    
     if (listaVehiculos.length === 0) {
         mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
         return;
     }
-    
     if (!supabaseClient) {
         mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
         return;
     }
     
-    const userEmailElement = document.getElementById('userEmail');
-    const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
+    const createdByEmail = document.getElementById('userEmail')?.textContent || 'usuario@institucion.com';
     
     const actaData = {
         funcionario_nombre: funcionarioNombre,
         funcionario_cedula: funcionarioCedula,
         funcionario_cargo: document.getElementById('funcionarioCargo')?.value || '',
         unidad_asignacion: unidadAsignacion,
-        vehiculos: JSON.stringify(listaVehiculos.map(v => ({
-            id: v.id,
-            marca: v.marca,
-            modelo: v.modelo,
-            placa: v.placa,
-            facsimil: v.facsimil,
-            s_carroceria: v.s_carroceria,
-            s_motor: v.s_motor
-        }))),
+        vehiculos: listaVehiculos.map(v => ({
+            id: v.id, marca: v.marca, modelo: v.modelo, placa: v.placa,
+            facsimil: v.facsimil, s_carroceria: v.s_carroceria, s_motor: v.s_motor
+        })),
         fecha_dia: document.getElementById('previewDia')?.textContent || '',
         fecha_mes: document.getElementById('previewMes')?.textContent || '',
         fecha_anio: document.getElementById('previewAnio')?.textContent || '',
@@ -519,15 +429,11 @@ async function guardarActa() {
     console.log('📦 Datos a enviar:', JSON.stringify(actaData, null, 2));
     
     try {
-        const { data, error } = await supabaseClient
-            .from('actas_asignacion')
-            .insert(actaData);
-        
+        const { error } = await supabaseClient.from('actas_asignacion').insert(actaData);
         if (error) throw error;
         
         mostrarAlerta('✅ Acta guardada exitosamente', 'success');
-        setTimeout(() => limpiarFormulario(), 2000);
-        
+        setTimeout(limpiarFormulario, 2000);
     } catch (error) {
         console.error('❌ Error al guardar acta:', error);
         mostrarAlerta(`❌ Error: ${error.message}`, 'error');
@@ -538,17 +444,10 @@ async function guardarActa() {
 // ✅ LIMPIAR FORMULARIO COMPLETO
 // ============================================
 function limpiarFormulario() {
-    const searchInput = document.getElementById('searchInput');
-    const funcionarioNombre = document.getElementById('funcionarioNombre');
-    const funcionarioCedula = document.getElementById('funcionarioCedula');
-    const unidadAsignacion = document.getElementById('unidadAsignacion');
-    const funcionarioCargo = document.getElementById('funcionarioCargo');
-    
-    if (searchInput) searchInput.value = '';
-    if (funcionarioNombre) funcionarioNombre.value = '';
-    if (funcionarioCedula) funcionarioCedula.value = '';
-    if (unidadAsignacion) unidadAsignacion.value = '';
-    if (funcionarioCargo) funcionarioCargo.value = '';
+    ['searchInput','funcionarioNombre','funcionarioCedula','unidadAsignacion','funcionarioCargo'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
     
     listaVehiculos = [];
     vehiculoActual = null;
@@ -562,25 +461,19 @@ function limpiarFormulario() {
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     if (btnAgregar) btnAgregar.disabled = true;
     
-    const vehiclesListSection = document.getElementById('vehiclesListSection');
-    if (vehiclesListSection) vehiclesListSection.style.display = 'none';
+    const section = document.getElementById('vehiclesListSection');
+    if (section) section.style.display = 'none';
     
     console.log('✅ Formulario limpiado correctamente');
 }
 
 // ============================================
-// ✅ EXPORTAR FUNCIONES PARA USO GLOBAL
+// ✅ EXPORTAR FUNCIONES GLOBALES
 // ============================================
-window.buscarVehiculo = buscarVehiculo;
-window.imprimirActa = imprimirActa;
-window.guardarActa = guardarActa;
-window.actualizarActa = actualizarActa;
-window.agregarVehiculoAlActa = agregarVehiculoAlActa;
-window.eliminarVehiculo = eliminarVehiculo;
-window.limpiarFormulario = limpiarFormulario;
-window.renderizarListaVehiculos = renderizarListaVehiculos;
-window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
-window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
-window.cargarEmailUsuario = cargarEmailUsuario;
-window.actualizarFechaActa = actualizarFechaActa;
-window.mostrarAlerta = mostrarAlerta;
+[
+    'buscarVehiculo','imprimirActa','guardarActa','actualizarActa',
+    'agregarVehiculoAlActa','eliminarVehiculo','limpiarFormulario',
+    'renderizarListaVehiculos','renderizarVehiculosEnActa',
+    'actualizarTextoSingularPlural','cargarEmailUsuario',
+    'actualizarFechaActa','mostrarAlerta'
+].forEach(fn => window[fn] = window[fn] || eval(fn));
