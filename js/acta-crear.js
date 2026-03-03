@@ -236,7 +236,7 @@ async function buscarVehiculo() {
         
         // ✅ SI EL VEHÍCULO YA ESTÁ ASIGNADO, NO PERMITIR AGREGAR
         if (vehiculoYaAsignado) {
-            mostrarAlerta('el vehiculo ya se encuentra registrado', 'error', searchAlert);
+            mostrarAlerta('el vehiculo ya se encuentra Asignado', 'error', searchAlert);
             vehiculoActual = null;
             if (btnAgregar) btnAgregar.disabled = true;
             return;
