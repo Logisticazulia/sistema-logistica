@@ -569,33 +569,32 @@ function imprimirActa() {
 // ✅ GUARDAR ACTA EN BASE DE DATOS
 // ============================================
 async function guardarActa() {
-    // Validar campos obligatorios
-    const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
-    const funcionarioCedula = document.getElementById('funcionarioCedula')?.value || '';
-    const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
-    
-    if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
-        mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios del formulario', 'error');
-        return;
-    }
-    
-    // Validar que haya vehículos en la lista
-    if (listaVehiculos.length === 0) {
-        mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
-        return;
-    }
-    
-    // Verificar que supabaseClient esté inicializado
-    if (!supabaseClient) {
-        mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
-        return;
-    }
-    
-    // Obtener email del usuario
-    const userEmailElement = document.getElementById('userEmail');
-    const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
-    
-const actaData = {
+  // Validar campos obligatorios
+  const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
+  const funcionarioCedula = document.getElementById('funcionarioCedula')?.value || '';
+  const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
+
+  if (!funcionarioNombre || !funcionarioCedula || !unidadAsignacion) {
+    mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios del formulario', 'error');
+    return;
+  }
+
+  if (listaVehiculos.length === 0) {
+    mostrarAlerta('⚠️ Primero debe agregar al menos un vehículo al acta', 'error');
+    return;
+  }
+
+  if (!supabaseClient) {
+    mostrarAlerta('❌ Error de conexión con la base de datos', 'error');
+    return;
+  }
+
+  // Obtener email del usuario
+  const userEmailElement = document.getElementById('userEmail');
+  const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
+
+  // ✅ RECOPILAR DATOS EN FORMATO PLANO (no anidado)
+  const actaData = {
     // Datos del funcionario (columnas separadas)
     funcionario_nombre: funcionarioNombre,
     funcionario_cedula: funcionarioCedula,
@@ -613,7 +612,7 @@ const actaData = {
       s_motor: v.s_motor
     }))),
     
-    // Fecha separada
+    // ✅ Fecha en columnas separadas (NO objeto anidado)
     fecha_dia: document.getElementById('previewDia')?.textContent || '',
     fecha_mes: document.getElementById('previewMes')?.textContent || '',
     fecha_anio: document.getElementById('previewAnio')?.textContent || '',
@@ -626,6 +625,9 @@ const actaData = {
     created_at: new Date().toISOString()
   };
 
+  // 🔍 DEBUG: Ver qué se está enviando
+  console.log('📦 Datos a enviar:', JSON.stringify(actaData, null, 2));
+
   try {
     const { data, error } = await supabaseClient
       .from('actas_asignacion')
@@ -637,11 +639,10 @@ const actaData = {
     setTimeout(() => limpiarFormulario(), 2000);
     
   } catch (error) {
-    console.error('Error al guardar acta:', error);
+    console.error('❌ Error al guardar acta:', error);
     mostrarAlerta(`❌ Error: ${error.message}`, 'error');
   }
 }
-
 // ============================================
 // ✅ LIMPIAR FORMULARIO COMPLETO
 // ============================================
