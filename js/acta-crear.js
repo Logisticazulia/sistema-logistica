@@ -270,42 +270,66 @@ async function buscarVehiculo() {
 // ============================================
 // ✅ AGREGAR VEHÍCULO AL ACTA
 // ============================================
+// ============================================
+// ✅ AGREGAR VEHÍCULO AL ACTA (CORREGIDO)
+// ============================================
 function agregarVehiculoAlActa() {
     if (!vehiculoActual) {
         mostrarAlerta('⚠️ primero debe buscar un vehículo', 'error');
         return;
     }
     
-    const yaExiste = listaVehiculos.some(v =>
-        v.id === vehiculoActual.id ||
-        (v.placa || '').toUpperCase().trim() === (vehiculoActual.placa || '').toUpperCase().trim()
-    );
+    // 🔍 DEBUG: Verificar qué se está comparando
+    console.log('🔍 Vehículo a agregar:', vehiculoActual);
+    console.log('🔍 Lista actual:', listaVehiculos);
+    
+    // ✅ VALIDACIÓN MEJORADA - Normalizar datos antes de comparar
+    const yaExiste = listaVehiculos.some(v => {
+        const placa1 = (v.placa || '').toString().trim().toUpperCase();
+        const placa2 = (vehiculoActual.placa || '').toString().trim().toUpperCase();
+        const serial1 = (v.s_carroceria || '').toString().trim().toUpperCase();
+        const serial2 = (vehiculoActual.s_carroceria || '').toString().trim().toUpperCase();
+        const id1 = v.id;
+        const id2 = vehiculoActual.id;
+        
+        return placa1 === placa2 || serial1 === serial2 || id1 === id2;
+    });
     
     if (yaExiste) {
+        console.error('❌ Vehículo duplicado detectado:', vehiculoActual);
         mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'error');
         return;
     }
     
+    // ✅ Agregar vehículo
     vehicleCounter++;
     vehiculoActual.tempId = vehicleCounter;
     listaVehiculos.push({ ...vehiculoActual });
     
     console.log('✅ Vehículo agregado. Total:', listaVehiculos.length);
-    console.log('📋 Lista actual:', listaVehiculos.map(v => ({ id: v.id, placa: v.placa })));
     
     renderizarListaVehiculos();
     renderizarVehiculosEnActa();
     actualizarTextoSingularPlural();
     
+    // ✅ Limpiar búsqueda
     const searchInput = document.getElementById('searchInput');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
+    const searchAlert = document.getElementById('searchAlert');
+    
     if (searchInput) searchInput.value = '';
+    if (searchAlert) {
+        searchAlert.style.display = 'none';
+        searchAlert.textContent = '';
+    }
+    
+    // ✅ IMPORTANTE: Limpiar vehiculoActual DESPUÉS de agregar
     vehiculoActual = null;
+    
     if (btnAgregar) btnAgregar.disabled = true;
     
     mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length} vehículo(s)`, 'success');
 }
-
 // ============================================
 // ✅ RENDERIZAR LISTA DE VEHÍCULOS
 // ============================================
