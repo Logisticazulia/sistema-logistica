@@ -568,6 +568,9 @@ function imprimirActa() {
 // ============================================
 // ✅ GUARDAR ACTA EN BASE DE DATOS
 // ============================================
+// ============================================
+// ✅ GUARDAR ACTA EN BASE DE DATOS
+// ============================================
 async function guardarActa() {
   // Validar campos obligatorios
   const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
@@ -589,6 +592,59 @@ async function guardarActa() {
     return;
   }
 
+  // Obtener email del usuario
+  const userEmailElement = document.getElementById('userEmail');
+  const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
+
+  // ✅ Recopilar datos del acta - FORMATO PLANO (no anidado)
+  const actaData = {
+    funcionario_nombre: funcionarioNombre,
+    funcionario_cedula: funcionarioCedula,
+    funcionario_cargo: document.getElementById('funcionarioCargo')?.value || '',
+    unidad_asignacion: unidadAsignacion,
+    
+    // Vehículos como JSON string
+    vehiculos: JSON.stringify(listaVehiculos.map(v => ({
+      id: v.id,
+      marca: v.marca,
+      modelo: v.modelo,
+      placa: v.placa,
+      facsimil: v.facsimil,
+      s_carroceria: v.s_carroceria,
+      s_motor: v.s_motor
+    }))),
+    
+    // Fecha en columnas separadas
+    fecha_dia: document.getElementById('previewDia')?.textContent || '',
+    fecha_mes: document.getElementById('previewMes')?.textContent || '',
+    fecha_anio: document.getElementById('previewAnio')?.textContent || '',
+    
+    // Director
+    director: 'COMISARIO MAYOR (CPNB) Dr. GUILLERMO PARRA PULIDO',
+    
+    // Metadata
+    created_by_email: createdByEmail,
+    created_at: new Date().toISOString()
+  };
+
+  // 🔍 Debug: Ver qué se está enviando
+  console.log('📦 Datos a enviar:', JSON.stringify(actaData, null, 2));
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('actas_asignacion')
+      .insert(actaData);
+    
+    if (error) throw error;
+    
+    mostrarAlerta('✅ Acta guardada exitosamente', 'success');
+    setTimeout(() => limpiarFormulario(), 2000);
+    
+  } catch (error) {
+    console.error('❌ Error al guardar acta:', error);
+    mostrarAlerta(`❌ Error: ${error.message}`, 'error');
+  }
+}  // ← ✅ ESTA LLAVE DE CIERRE ES CRÍTICA - NO OLVIDARLA
   // Obtener email del usuario
   const userEmailElement = document.getElementById('userEmail');
   const createdByEmail = userEmailElement ? userEmailElement.textContent : 'usuario@institucion.com';
