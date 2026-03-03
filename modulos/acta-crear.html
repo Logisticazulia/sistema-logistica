@@ -773,50 +773,62 @@ body {
     width: auto !important;
   }
   
-  /* ✅ TÍTULO - CENTRADO ENTRE LOGOS */
-  .acta-title {
-    text-align: center !important;
-    flex: 1 !important;
-    padding: 0 20px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-  }
-  
-  .acta-title h1 {
-    font-size: 10pt !important;
-    color: #003366 !important;
-    margin: 2px 0 !important;
-    line-height: 1.2 !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-  }
-  
-  .acta-title h2 {
-    font-size: 10pt !important;
-    color: #003366 !important;
-    margin: 2px 0 !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-  }
-  
-  .acta-title h3 {
-    font-size: 10pt !important;
-    color: #003366 !important;
-    margin: 5px 0 3px 0 !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-  }
-  
-  .acta-title .acta-subtitle {
-    font-size: 11pt !important;
-    color: #000 !important;
-    margin-top: 8px !important;
-    font-weight: 700 !important;
-    text-decoration: underline !important;
-    text-align: center !important;
-  }
+/* ✅ TÍTULO - CENTRADO ENTRE LOGOS - CORREGIDO */
+.acta-title {
+  text-align: center !important;
+  flex: 1 !important;
+  padding: 0 15px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.acta-title h1 {
+  font-size: 10pt !important;
+  color: #000000 !important;  /* ✅ Negro puro para mejor visibilidad */
+  margin: 2px 0 !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  display: block !important;  /* ✅ Forzar visualización */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* ✅ CORREGIDO - h2 para Cuerpo de Policía */
+.acta-title h2 {
+  font-size: 10pt !important;
+  color: #000000 !important;  /* ✅ Negro puro (no azul) */
+  margin: 2px 0 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  display: block !important;  /* ✅ Forzar visualización */
+  visibility: visible !important;  /* ✅ Asegurar que sea visible */
+  opacity: 1 !important;  /* ✅ Opacidad completa */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.acta-title h3 {
+  font-size: 10pt !important;
+  color: #000000 !important;
+  margin: 5px 0 3px 0 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  display: block !important;
+}
+
+.acta-title .acta-subtitle {
+  font-size: 11pt !important;
+  color: #000 !important;
+  margin-top: 8px !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-align: center !important;
+  display: block !important;
+}
   
   /* ... resto de estilos del cuerpo, tablas, firmas, footer ... */
 }
