@@ -48,7 +48,7 @@ function cargarEmailUsuario() {
     }
     
     if (supabaseClient) {
-        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        supabaseClient.auth.getSession().then(({  { session } }) => {
             if (session?.user) {
                 userEmailElement.textContent = session.user.email || 'usuario@institucion.com';
                 sessionStorage.setItem('usuario', JSON.stringify({
@@ -188,7 +188,7 @@ async function buscarVehiculo() {
         
         // 🚫 VALIDACIÓN 2: Verificar si el vehículo YA ESTÁ REGISTRADO en actas_asignacion
         // Buscamos en el campo JSONB 'vehiculos' si existe este ID de vehículo
-        const { data: actasExistentes, error: errorActas } = await supabaseClient
+        const {  actasExistentes, error: errorActas } = await supabaseClient
             .from('actas_asignacion')
             .select('id, funcionario_nombre, created_at')
             .contains('vehiculos', [{ id: vehiculoEncontrado.id }])
