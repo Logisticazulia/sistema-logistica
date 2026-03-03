@@ -127,16 +127,12 @@ function actualizarTextoSingularPlural() {
 // ============================================
 // ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
 // ============================================
-// ============================================
-// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
-// ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     const terminoBusqueda = searchInput?.value.trim().toUpperCase() || '';
     
-    // Validar que haya un término de búsqueda
     if (!terminoBusqueda) {
         mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert);
         vehiculoActual = null;
@@ -144,7 +140,6 @@ async function buscarVehiculo() {
         return;
     }
     
-    // Verificar que supabaseClient esté inicializado
     if (!supabaseClient) {
         mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert);
         vehiculoActual = null;
@@ -156,7 +151,6 @@ async function buscarVehiculo() {
         let vehiculoEncontrado = null;
         const camposBusqueda = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
         
-        // 🔍 Buscar vehículo por los diferentes campos
         for (const campo of camposBusqueda) {
             const response = await supabaseClient
                 .from('vehiculos')
@@ -166,7 +160,6 @@ async function buscarVehiculo() {
             
             if (response.data && response.data.length > 0 && !response.error) {
                 vehiculoEncontrado = response.data[0];
-                console.log('🔍 vehículo encontrado:', vehiculoEncontrado.id, vehiculoEncontrado.placa);
                 break;
             }
         }
@@ -179,42 +172,31 @@ async function buscarVehiculo() {
         }
         
         // 🚫 VALIDACIÓN 1: Verificar si ya está en la lista temporal del acta actual
-        const yaEnListaTemporal = listaVehiculos.some(v => {
-            const match = v.id === vehiculoEncontrado.id ||
-                         v.placa?.toUpperCase() === vehiculoEncontrado.placa?.toUpperCase() ||
-                         v.s_carroceria?.toUpperCase() === vehiculoEncontrado.s_carroceria?.toUpperCase();
-            console.log('📋 comparando con lista temporal:', v.id, v.placa, '→ match:', match);
-            return match;
-        });
+        const yaEnLista = listaVehiculos.some(v =>
+            v.placa === vehiculoEncontrado.placa ||
+            v.s_carroceria === vehiculoEncontrado.s_carroceria ||
+            v.id === vehiculoEncontrado.id
+        );
         
-        if (yaEnListaTemporal) {
+        if (yaEnLista) {
             mostrarAlerta('⚠️ este vehículo ya está en la lista del acta actual', 'info', searchAlert);
             if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
         
         // 🚫 VALIDACIÓN 2: Verificar si el vehículo YA ESTÁ REGISTRADO en actas_asignacion
-        console.log('🔍 verificando si vehículo ya está asignado en actas_asignacion, ID:', vehiculoEncontrado.id);
-        
         const responseActas = await supabaseClient
             .from('actas_asignacion')
             .select('id, funcionario_nombre, created_at, vehiculos')
             .limit(500);
         
-        if (responseActas.error) {
-            console.error('Error al verificar asignaciones:', responseActas.error);
-        }
-        
-        // ✅ Buscar manualmente en los resultados si el vehículo ya está asignado
         let vehiculoYaAsignado = false;
-        let actaExistente = null;
         
         if (responseActas.data && responseActas.data.length > 0) {
             for (let i = 0; i < responseActas.data.length; i++) {
                 const acta = responseActas.data[i];
                 let vehiculosData = null;
                 
-                // Intentar parsear el campo vehiculos (puede ser JSONB o TEXT)
                 try {
                     if (typeof acta.vehiculos === 'string') {
                         vehiculosData = JSON.parse(acta.vehiculos);
@@ -222,23 +204,18 @@ async function buscarVehiculo() {
                         vehiculosData = acta.vehiculos;
                     }
                 } catch (e) {
-                    console.error('Error al parsear vehiculos:', e);
                     continue;
                 }
                 
-                // Verificar si el vehículo está en esta acta
                 if (vehiculosData && Array.isArray(vehiculosData)) {
-                    const encontrado = vehiculosData.some(v => {
-                        const match = v.id === vehiculoEncontrado.id ||
-                                     v.placa?.toUpperCase() === vehiculoEncontrado.placa?.toUpperCase() ||
-                                     v.s_carroceria?.toUpperCase() === vehiculoEncontrado.s_carroceria?.toUpperCase();
-                        return match;
-                    });
+                    const encontrado = vehiculosData.some(v => 
+                        v.id === vehiculoEncontrado.id ||
+                        v.placa === vehiculoEncontrado.placa ||
+                        v.s_carroceria === vehiculoEncontrado.s_carroceria
+                    );
                     
                     if (encontrado) {
                         vehiculoYaAsignado = true;
-                        actaExistente = acta;
-                        console.log('🚫 vehículo ya asignado en acta:', acta.id);
                         break;
                     }
                 }
@@ -253,7 +230,7 @@ async function buscarVehiculo() {
             return;
         }
         
-        // ✅ Vehículo disponible: guardar en variable temporal
+        // ✅ Vehículo disponible
         vehiculoActual = {
             id: vehiculoEncontrado.id,
             marca: vehiculoEncontrado.marca || 'N/P',
@@ -264,32 +241,6 @@ async function buscarVehiculo() {
             facsimil: vehiculoEncontrado.facsimil || 'N/P'
         };
         
-        console.log('✅ vehículo disponible para agregar:', vehiculoActual.id, vehiculoActual.placa);
-        
-        // Habilitar botón para agregar
-        if (btnAgregar) btnAgregar.disabled = false;
-        mostrarAlerta('✅ vehículo encontrado y disponible. puede agregarlo a la lista.', 'success', searchAlert);
-        
-    } catch (error) {
-        console.error('Error al buscar vehículo:', error);
-        mostrarAlerta('❌ error de conexión. intente nuevamente.', 'error', searchAlert);
-        vehiculoActual = null;
-        if (btnAgregar) btnAgregar.disabled = true;
-    }
-}
-        
-        // ✅ Vehículo disponible: guardar en variable temporal
-        vehiculoActual = {
-            id: vehiculoEncontrado.id,
-            marca: vehiculoEncontrado.marca || 'N/P',
-            modelo: vehiculoEncontrado.modelo || '',
-            s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
-            s_motor: vehiculoEncontrado.s_motor || 'N/P',
-            placa: vehiculoEncontrado.placa || 'N/P',
-            facsimil: vehiculoEncontrado.facsimil || 'N/P'
-        };
-        
-        // Habilitar botón para agregar
         if (btnAgregar) btnAgregar.disabled = false;
         mostrarAlerta('✅ vehículo encontrado y disponible. puede agregarlo a la lista.', 'success', searchAlert);
         
@@ -468,7 +419,6 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
     alertElement.className = `alert alert-${tipo}`;
     alertElement.style.display = 'block';
     
-    // 🔄 SCROLL SUAVE HACIA LA ALERTA
     setTimeout(() => {
         alertElement.scrollIntoView({ 
             behavior: 'smooth',
