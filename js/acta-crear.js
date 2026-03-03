@@ -356,19 +356,35 @@ function agregarListenerEnter() {
 // ============================================
 // ✅ MOSTRAR ALERTAS
 // ============================================
+// ============================================
+// ✅ MOSTRAR ALERTAS CON SCROLL AUTOMÁTICO
+// ============================================
 function mostrarAlerta(mensaje, tipo, elemento = null) {
     const alertElement = elemento || document.getElementById('searchAlert');
-    if (!alertElement) return;
+    if (!alertElement) {
+        console.error('❌ Elemento de alerta no encontrado');
+        return;
+    }
     
     alertElement.textContent = mensaje;
     alertElement.className = `alert alert-${tipo}`;
     alertElement.style.display = 'block';
     
+    // 🔄 SCROLL SUAVE HACIA LA ALERTA
+    setTimeout(() => {
+        alertElement.scrollIntoView({ 
+            behavior: 'smooth',  // Animación suave
+            block: 'center'      // Centrar la alerta en pantalla
+        });
+    }, 100);  // Pequeño delay para asegurar que el elemento esté visible
+    
+    // Ocultar después de 5 segundos (excepto errores)
     if (tipo !== 'error') {
-        setTimeout(() => { alertElement.style.display = 'none'; }, 5000);
+        setTimeout(() => {
+            alertElement.style.display = 'none';
+        }, 5000);
     }
 }
-
 // ============================================
 // ✅ IMPRIMIR ACTA
 // ============================================
