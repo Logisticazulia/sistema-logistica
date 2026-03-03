@@ -286,14 +286,51 @@ async function buscarVehiculo() {
 // ============================================
 // ✅ AGREGAR VEHÍCULO AL ACTA (VALIDACIÓN ESTRICTA)
 // ============================================
+// ============================================
+// ✅ AGREGAR VEHÍCULO AL ACTA (CORREGIDO - VALIDACIÓN ESTRICTA)
+// ============================================
 function agregarVehiculoAlActa() {
     if (!vehiculoActual) {
         mostrarAlerta('⚠️ primero debe buscar un vehículo', 'error');
         return;
     }
     
-    // ✅ VALIDACIÓN ESTRICTA con función auxiliar
-    const yaExiste = listaVehiculos.some(v => sonVehiculosIguales(v, vehiculoActual));
+    // 🔍 DEBUG: Verificar qué se está comparando
+    console.log('🔍 Vehículo a agregar:', vehiculoActual);
+    console.log('🔍 Lista actual:', listaVehiculos);
+    
+    // ✅ VALIDACIÓN ESTRICTA: Solo comparar si los campos tienen valores REALES
+    const yaExiste = listaVehiculos.some(v => {
+        // 🔹 Priorizar comparación por ID (único en BD)
+        if (v.id && vehiculoActual.id && v.id === vehiculoActual.id) {
+            console.log(`🔍 Duplicado por ID: ${v.id}`);
+            return true;
+        }
+        
+        // 🔹 Comparar placa SOLO si ambos tienen valores válidos (no 'N/P', no vacío)
+        const placa1 = (v.placa || '').toString().trim().toUpperCase();
+        const placa2 = (vehiculoActual.placa || '').toString().trim().toUpperCase();
+        const placaValida1 = placa1 && placa1 !== 'N/P' && placa1 !== 'N/D' && placa1.length >= 6;
+        const placaValida2 = placa2 && placa2 !== 'N/P' && placa2 !== 'N/D' && placa2.length >= 6;
+        
+        if (placaValida1 && placaValida2 && placa1 === placa2) {
+            console.log(`🔍 Duplicado por placa: ${placa1}`);
+            return true;
+        }
+        
+        // 🔹 Comparar serial de carrocería SOLO si ambos tienen valores válidos
+        const serial1 = (v.s_carroceria || '').toString().trim().toUpperCase();
+        const serial2 = (vehiculoActual.s_carroceria || '').toString().trim().toUpperCase();
+        const serialValido1 = serial1 && serial1 !== 'N/P' && serial1 !== 'N/D' && serial1.length >= 10;
+        const serialValido2 = serial2 && serial2 !== 'N/P' && serial2 !== 'N/D' && serial2.length >= 10;
+        
+        if (serialValido1 && serialValido2 && serial1 === serial2) {
+            console.log(`🔍 Duplicado por serial: ${serial1}`);
+            return true;
+        }
+        
+        return false;
+    });
     
     if (yaExiste) {
         console.warn('⚠️ Vehículo duplicado detectado:', vehiculoActual);
@@ -308,7 +345,7 @@ function agregarVehiculoAlActa() {
     
     console.log('✅ Vehículo agregado. Total:', listaVehiculos.length);
     
-    // ✅ Llamar funciones de renderizado con verificación de existencia
+    // ✅ Verificar que las funciones existen antes de llamar
     if (typeof renderizarListaVehiculos === 'function') renderizarListaVehiculos();
     if (typeof renderizarVehiculosEnActa === 'function') renderizarVehiculosEnActa();
     if (typeof actualizarTextoSingularPlural === 'function') actualizarTextoSingularPlural();
@@ -331,7 +368,6 @@ function agregarVehiculoAlActa() {
     
     mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length} vehículo(s)`, 'success');
 }
-
 // ============================================
 // ✅ RENDERIZAR LISTA DE VEHÍCULOS
 // ============================================
