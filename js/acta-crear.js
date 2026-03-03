@@ -132,6 +132,7 @@ async function buscarVehiculo() {
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     const terminoBusqueda = searchInput?.value.trim().toUpperCase() || '';
     
+    // Validar que haya un término de búsqueda
     if (!terminoBusqueda) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error', searchAlert);
         vehiculoActual = null;
@@ -139,8 +140,11 @@ async function buscarVehiculo() {
         return;
     }
     
+    // Verificar que supabaseClient esté inicializado
     if (!supabaseClient) {
         mostrarAlerta('❌ Error de conexión con la base de datos', 'error', searchAlert);
+        vehiculoActual = null;
+        if (btnAgregar) btnAgregar.disabled = true;
         return;
     }
     
@@ -148,6 +152,7 @@ async function buscarVehiculo() {
         let vehiculoEncontrado = null;
         const camposBusqueda = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
         
+        // 🔍 Buscar vehículo por los diferentes campos
         for (const campo of camposBusqueda) {
             const { data, error } = await supabaseClient
                 .from('vehiculos')
@@ -168,17 +173,45 @@ async function buscarVehiculo() {
             return;
         }
         
-        const yaExiste = listaVehiculos.some(v =>
+        // 🚫 VALIDACIÓN 1: Verificar si ya está en la lista temporal del acta actual
+        const yaEnLista = listaVehiculos.some(v =>
             v.placa === vehiculoEncontrado.placa ||
-            v.s_carroceria === vehiculoEncontrado.s_carroceria
+            v.s_carroceria === vehiculoEncontrado.s_carroceria ||
+            v.id === vehiculoEncontrado.id
         );
         
-        if (yaExiste) {
-            mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta', 'info', searchAlert);
+        if (yaEnLista) {
+            mostrarAlerta('⚠️ Este vehículo ya está en la lista del acta actual', 'info', searchAlert);
             if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
         
+        // 🚫 VALIDACIÓN 2: Verificar si el vehículo YA ESTÁ ASIGNADO en actas_asignacion
+        // Buscamos en el campo JSONB 'vehiculos' si existe este ID de vehículo
+        const { data: actasExistentes, error: errorActas } = await supabaseClient
+            .from('actas_asignacion')
+            .select('id, funcionario_nombre, created_at')
+            .contains('vehiculos', [{ id: vehiculoEncontrado.id }])
+            .limit(1);
+        
+        if (errorActas) {
+            console.error('Error al verificar asignaciones:', errorActas);
+            // Si hay error en la consulta, continuamos pero con advertencia
+        }
+        
+        if (actasExistentes && actasExistentes.length > 0) {
+            const acta = actasExistentes[0];
+            mostrarAlerta(
+                `🚫 Vehículo YA ASIGNADO en Acta #${acta.id} al funcionario: ${acta.funcionario_nombre} (${new Date(acta.created_at).toLocaleDateString()})`,
+                'error',
+                searchAlert
+            );
+            vehiculoActual = null;
+            if (btnAgregar) btnAgregar.disabled = true;
+            return;
+        }
+        
+        // ✅ Vehículo disponible: guardar en variable temporal
         vehiculoActual = {
             id: vehiculoEncontrado.id,
             marca: vehiculoEncontrado.marca || 'N/P',
@@ -189,14 +222,19 @@ async function buscarVehiculo() {
             facsimil: vehiculoEncontrado.facsimil || 'N/P'
         };
         
+        // Habilitar botón para agregar
         if (btnAgregar) btnAgregar.disabled = false;
-        mostrarAlerta('✅ Vehículo encontrado. Puede agregarlo a la lista.', 'success', searchAlert);
+        mostrarAlerta('✅ Vehículo encontrado y disponible. Puede agregarlo a la lista.', 'success', searchAlert);
         
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
         mostrarAlerta('❌ Error de conexión. Intente nuevamente.', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
+
+        if (tipo === 'error' && mensaje.includes('YA ASIGNADO')) {
+    alertElement.classList.add('assigned');
+}
     }
 }
 
