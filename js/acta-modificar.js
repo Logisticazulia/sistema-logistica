@@ -1,7 +1,7 @@
 /* ============================================ */
 /* ACTA-MODIFICAR.JS                            */
 /* Sistema de Gestión de Transporte - CCPE ZULIA */
-/* CON MODAL DE CONFIRMACIÓN ELEGANTE           */
+/* VERSIÓN COMPLETA Y CORREGIDA                 */
 /* ============================================ */
 
 // ============================================
@@ -81,6 +81,16 @@ function cargarEmailUsuario() {
 }
 
 // ============================================
+// ✅ FUNCIÓN AUXILIAR: Limpiar input de forma segura
+// ============================================
+function limpiarInput(id) {
+    const el = document.getElementById(id);
+    if (el && typeof el.value !== 'undefined') {
+        el.value = '';
+    }
+}
+
+// ============================================
 // ✅ BUSCAR ACTAS CON FILTROS Y PAGINACIÓN
 // ============================================
 async function buscarActas() {
@@ -90,6 +100,8 @@ async function buscarActas() {
     const filterFecha = document.getElementById('filterFecha')?.value || '';
     const searchActaAlert = document.getElementById('searchActaAlert');
     
+    console.log('🔍 buscarActas - Filtros:', { filterFuncionario, filterCedula, filterUnidad, filterFecha });
+    
     if (!supabaseClient) {
         mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchActaAlert);
         return;
@@ -98,7 +110,7 @@ async function buscarActas() {
     try {
         let query = supabaseClient
             .from('actas_asignacion')
-            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, vehiculos, created_at, fecha_dia, fecha_mes, fecha_anio')
+            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, vehiculos, created_at, fecha_dia, fecha_mes, fecha_anio, estado')
             .order('created_at', { ascending: false })
             .limit(1000);
         
@@ -130,34 +142,39 @@ async function buscarActas() {
 }
 
 // ============================================
-// ✅ CARGAR TODAS LAS ACTAS
+// ✅ CARGAR TODAS LAS ACTAS (CORREGIDO)
 // ============================================
 async function cargarTodasLasActas() {
     const searchActaAlert = document.getElementById('searchActaAlert');
-    mostrarAlerta('🔄 cargando todas las actas...', 'info', searchActaAlert);
+    if (searchActaAlert) mostrarAlerta('🔄 cargando todas las actas...', 'info', searchActaAlert);
     
-    document.getElementById('filterFuncionario').value = '';
-    document.getElementById('filterCedula').value = '';
-    document.getElementById('filterUnidad').value = '';
-    document.getElementById('filterFecha').value = '';
+    // ✅ Usar función auxiliar para limpiar inputs de forma segura
+    limpiarInput('filterFuncionario');
+    limpiarInput('filterCedula');
+    limpiarInput('filterUnidad');
+    limpiarInput('filterFecha');
+    
+    // ✅ Resetear paginación
+    paginaActual = 1;
+    actasFiltradas = [];
     
     await buscarActas();
 }
 
 // ============================================
-// ✅ RESETEAR FILTROS
+// ✅ RESETEAR FILTROS (CORREGIDO)
 // ============================================
 function resetearFiltros() {
-    document.getElementById('filterFuncionario').value = '';
-    document.getElementById('filterCedula').value = '';
-    document.getElementById('filterUnidad').value = '';
-    document.getElementById('filterFecha').value = '';
+    limpiarInput('filterFuncionario');
+    limpiarInput('filterCedula');
+    limpiarInput('filterUnidad');
+    limpiarInput('filterFecha');
     
     paginaActual = 1;
     actasFiltradas = [];
     
     const searchActaAlert = document.getElementById('searchActaAlert');
-    mostrarAlerta('🔄 filtros limpiados. cargando todas las actas...', 'info', searchActaAlert);
+    if (searchActaAlert) mostrarAlerta('🔄 filtros limpiados. cargando todas las actas...', 'info', searchActaAlert);
     cargarTodasLasActas();
 }
 
@@ -195,6 +212,10 @@ function renderizarTablaActas() {
             }
         } catch (e) { vehiculosCount = 0; }
         
+        const estadoBadge = acta.estado === 'reasignado' 
+            ? '<span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;">Reasignado</span>' 
+            : '<span style="background:#d4edda;color:#155724;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;">Activo</span>';
+        
         return `
             <tr>
                 <td>${fecha}</td>
@@ -202,6 +223,7 @@ function renderizarTablaActas() {
                 <td>${acta.funcionario_cedula || '---'}</td>
                 <td>${acta.unidad_asignacion || '---'}</td>
                 <td style="text-align: center;">${vehiculosCount}</td>
+                <td>${estadoBadge}</td>
                 <td>
                     <button class="btn-select-acta" onclick="seleccionarActa('${acta.id}')">📥 Cargar</button>
                 </td>
@@ -294,8 +316,8 @@ async function seleccionarActa(actaId) {
     const searchActaAlert = document.getElementById('searchActaAlert');
     const btnActualizar = document.getElementById('btnActualizarActa');
     
-    if (!actaId) { mostrarAlerta('⚠️ ID de acta no válido', 'error', searchActaAlert); return; }
-    if (!supabaseClient) { mostrarAlerta('❌ error de conexión', 'error', searchActaAlert); return; }
+    if (!actaId) { if (searchActaAlert) mostrarAlerta('⚠️ ID de acta no válido', 'error', searchActaAlert); return; }
+    if (!supabaseClient) { if (searchActaAlert) mostrarAlerta('❌ error de conexión', 'error', searchActaAlert); return; }
     
     try {
         const { data, error } = await supabaseClient.from('actas_asignacion').select('*').eq('id', actaId).single();
@@ -303,15 +325,25 @@ async function seleccionarActa(actaId) {
         
         actaActualId = String(data.id);
         
-        document.getElementById('funcionarioNombre').value = data.funcionario_nombre || '';
-        document.getElementById('funcionarioCedula').value = data.funcionario_cedula || '';
-        document.getElementById('unidadAsignacion').value = data.unidad_asignacion || '';
-        document.getElementById('funcionarioCargo').value = data.funcionario_cargo || '';
-        document.getElementById('actaId').value = data.id;
+        // ✅ Validar cada elemento antes de asignar valor
+        const elNombre = document.getElementById('funcionarioNombre');
+        const elCedula = document.getElementById('funcionarioCedula');
+        const elUnidad = document.getElementById('unidadAsignacion');
+        const elCargo = document.getElementById('funcionarioCargo');
+        const elActaId = document.getElementById('actaId');
         
-        if (data.fecha_dia) document.getElementById('previewDia').textContent = data.fecha_dia;
-        if (data.fecha_mes) document.getElementById('previewMes').textContent = data.fecha_mes;
-        if (data.fecha_anio) document.getElementById('previewAnio').textContent = data.fecha_anio;
+        if (elNombre) elNombre.value = data.funcionario_nombre || '';
+        if (elCedula) elCedula.value = data.funcionario_cedula || '';
+        if (elUnidad) elUnidad.value = data.unidad_asignacion || '';
+        if (elCargo) elCargo.value = data.funcionario_cargo || '';
+        if (elActaId) elActaId.value = data.id;
+        
+        const elDia = document.getElementById('previewDia');
+        const elMes = document.getElementById('previewMes');
+        const elAnio = document.getElementById('previewAnio');
+        if (elDia && data.fecha_dia) elDia.textContent = data.fecha_dia;
+        if (elMes && data.fecha_mes) elMes.textContent = data.fecha_mes;
+        if (elAnio && data.fecha_anio) elAnio.textContent = data.fecha_anio;
         
         let vehiculosData = null;
         try {
@@ -330,21 +362,23 @@ async function seleccionarActa(actaId) {
         if (btnActualizar) btnActualizar.disabled = false;
         
         const btnReasignar = document.getElementById('btnReasignarVehiculos');
-        if (btnReasignar && listaVehiculos.length > 0) {
+        if (btnReasignar && listaVehiculos.length > 0 && data.estado !== 'reasignado') {
             btnReasignar.disabled = false;
+        } else if (btnReasignar) {
+            btnReasignar.disabled = true;
         }
         
-        mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', searchActaAlert);
+        if (searchActaAlert) mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', searchActaAlert);
         document.querySelector('.form-section')?.scrollIntoView({ behavior: 'smooth' });
         
     } catch (error) {
         console.error('❌ Error al cargar acta:', error);
-        mostrarAlerta('❌ error al cargar la acta: ' + error.message, 'error', searchActaAlert);
+        if (searchActaAlert) mostrarAlerta('❌ error al cargar la acta: ' + error.message, 'error', searchActaAlert);
     }
 }
 
 // ============================================
-// ✅ FUNCIONES DE ACTUALIZACIÓN Y RENDERIZADO
+// ✅ ACTUALIZAR EL ACTA EN TIEMPO REAL
 // ============================================
 function actualizarActa() {
     const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
@@ -377,6 +411,9 @@ function actualizarActa() {
     actualizarTextoSingularPlural();
 }
 
+// ============================================
+// ✅ ACTUALIZAR TEXTO SINGULAR/PLURAL
+// ============================================
 function actualizarTextoSingularPlural() {
     const cantidadVehiculos = listaVehiculos.length;
     const textoUnidad = document.getElementById('textoUnidad');
@@ -394,6 +431,9 @@ function actualizarTextoSingularPlural() {
     }
 }
 
+// ============================================
+// ✅ FUNCIONES AUXILIARES DE COMPARACIÓN
+// ============================================
 function normalizarTexto(texto) { if (!texto) return ''; return texto.toString().trim().toUpperCase(); }
 
 function sonVehiculosIguales(v1, v2) {
@@ -406,14 +446,17 @@ function sonVehiculosIguales(v1, v2) {
     return false;
 }
 
+// ============================================
+// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
+// ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     const terminoBusqueda = normalizarTexto(searchInput?.value);
     
-    if (!terminoBusqueda) { mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
-    if (!supabaseClient) { mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
+    if (!terminoBusqueda) { if (searchAlert) mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
+    if (!supabaseClient) { if (searchAlert) mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
     
     try {
         let vehiculoEncontrado = null;
@@ -422,22 +465,25 @@ async function buscarVehiculo() {
             const response = await supabaseClient.from('vehiculos').select('*').eq(campo, terminoBusqueda).limit(1);
             if (response.data && response.data.length > 0 && !response.error) { vehiculoEncontrado = response.data[0]; break; }
         }
-        if (!vehiculoEncontrado) { mostrarAlerta('❌ vehículo no encontrado en la base de datos', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
+        if (!vehiculoEncontrado) { if (searchAlert) mostrarAlerta('❌ vehículo no encontrado en la base de datos', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
         
         const yaEnLista = listaVehiculos.some(v => sonVehiculosIguales(v, vehiculoEncontrado));
-        if (yaEnLista) { mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'info', searchAlert); if (btnAgregar) btnAgregar.disabled = true; return; }
+        if (yaEnLista) { if (searchAlert) mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'info', searchAlert); if (btnAgregar) btnAgregar.disabled = true; return; }
         
         vehiculoActual = { id: vehiculoEncontrado.id, marca: vehiculoEncontrado.marca || 'N/P', modelo: vehiculoEncontrado.modelo || '', s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P', s_motor: vehiculoEncontrado.s_motor || 'N/P', placa: vehiculoEncontrado.placa || 'N/P', facsimil: vehiculoEncontrado.facsimil || 'N/P' };
         if (btnAgregar) btnAgregar.disabled = false;
-        mostrarAlerta('✅ vehículo encontrado. puede agregarlo.', 'success', searchAlert);
+        if (searchAlert) mostrarAlerta('✅ vehículo encontrado. puede agregarlo.', 'success', searchAlert);
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
-        mostrarAlerta('❌ error de conexión', 'error', searchAlert);
+        if (searchAlert) mostrarAlerta('❌ error de conexión', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
     }
 }
 
+// ============================================
+// ✅ AGREGAR VEHÍCULO AL ACTA
+// ============================================
 function agregarVehiculoAlActa() {
     if (!vehiculoActual) { mostrarAlerta('⚠️ primero debe buscar un vehículo', 'error'); return; }
     const yaExiste = listaVehiculos.some(v => {
@@ -462,9 +508,8 @@ function agregarVehiculoAlActa() {
     if (typeof renderizarVehiculosEnActa === 'function') renderizarVehiculosEnActa();
     if (typeof actualizarTextoSingularPlural === 'function') actualizarTextoSingularPlural();
     
-    const searchInput = document.getElementById('searchInput');
+    limpiarInput('searchInput');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
-    if (searchInput) searchInput.value = '';
     vehiculoActual = null;
     if (btnAgregar) btnAgregar.disabled = true;
     
@@ -472,6 +517,9 @@ function agregarVehiculoAlActa() {
     mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length}`, 'success');
 }
 
+// ============================================
+// ✅ RENDERIZAR LISTA DE VEHÍCULOS
+// ============================================
 function renderizarListaVehiculos() {
     const tbody = document.getElementById('vehiclesListBody'), section = document.getElementById('vehiclesListSection'), count = document.getElementById('vehiclesCount');
     if (!tbody || !section || !count) return;
@@ -481,6 +529,9 @@ function renderizarListaVehiculos() {
     tbody.innerHTML = listaVehiculos.map(vehiculo => `<tr><td>${vehiculo.marca} ${vehiculo.modelo}</td><td>${vehiculo.placa}</td><td>${vehiculo.s_carroceria}</td><td>${vehiculo.s_motor}</td><td>${vehiculo.facsimil}</td><td><button class="btn-remove-vehicle" onclick="eliminarVehiculo(${vehiculo.tempId})">🗑️ eliminar</button></td></tr>`).join('');
 }
 
+// ============================================
+// ✅ ELIMINAR VEHÍCULO DE LA LISTA
+// ============================================
 function eliminarVehiculo(tempId) {
     const index = listaVehiculos.findIndex(v => v.tempId === tempId);
     if (index >= 0) {
@@ -493,6 +544,9 @@ function eliminarVehiculo(tempId) {
     }
 }
 
+// ============================================
+// ✅ RENDERIZAR VEHÍCULOS EN EL ACTA
+// ============================================
 function renderizarVehiculosEnActa() {
     const tbody = document.getElementById('actaVehiclesBody');
     if (!tbody) return;
@@ -500,12 +554,18 @@ function renderizarVehiculosEnActa() {
     tbody.innerHTML = listaVehiculos.map(vehiculo => `<tr><td>${vehiculo.marca} ${vehiculo.modelo}</td><td>${vehiculo.s_carroceria}</td><td>${vehiculo.s_motor}</td><td>${vehiculo.placa}</td><td>${vehiculo.facsimil}</td></tr>`).join('');
 }
 
+// ============================================
+// ✅ ACTUALIZAR FECHA AUTOMÁTICAMENTE
+// ============================================
 function actualizarFechaActa() {
     const fecha = new Date();
     const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     ['previewDia','previewMes','previewAnio'].forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = i === 0 ? fecha.getDate() : i === 1 ? meses[fecha.getMonth()] : fecha.getFullYear(); });
 }
 
+// ============================================
+// ✅ AGREGAR LISTENERS AL FORMULARIO
+// ============================================
 function agregarListenersFormulario() {
     ['funcionarioNombre','funcionarioCedula','unidadAsignacion','funcionarioCargo'].forEach(id => {
         const elemento = document.getElementById(id);
@@ -513,6 +573,9 @@ function agregarListenersFormulario() {
     });
 }
 
+// ============================================
+// ✅ PERMITIR BÚSQUEDA CON ENTER
+// ============================================
 function agregarListenerEnter() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) { searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); buscarVehiculo(); } }); }
@@ -522,6 +585,9 @@ function agregarListenerEnter() {
     });
 }
 
+// ============================================
+// ✅ MOSTRAR ALERTAS
+// ============================================
 function mostrarAlerta(mensaje, tipo, elemento = null) {
     const alertElement = elemento || document.getElementById('searchAlert');
     if (!alertElement) { console.error('❌ elemento de alerta no encontrado'); return; }
@@ -532,6 +598,9 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
     if (tipo !== 'error') { setTimeout(() => { alertElement.style.display = 'none'; }, 5000); }
 }
 
+// ============================================
+// ✅ IMPRIMIR ACTA
+// ============================================
 function imprimirActa() {
     if (listaVehiculos.length === 0) { mostrarAlerta('⚠️ primero debe agregar al menos un vehículo', 'error'); return; }
     if (!document.getElementById('funcionarioNombre')?.value) { mostrarAlerta('⚠️ complete los datos del funcionario', 'error'); return; }
@@ -547,7 +616,7 @@ function abrirModalReasignar() {
     const modal = document.getElementById('modalReasignar');
     if (modal) {
         modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Evitar scroll del fondo
+        document.body.style.overflow = 'hidden';
     }
 }
 
@@ -555,24 +624,17 @@ function cerrarModalReasignar() {
     const modal = document.getElementById('modalReasignar');
     if (modal) {
         modal.style.display = 'none';
-        document.body.style.overflow = ''; // Restaurar scroll
+        document.body.style.overflow = '';
     }
 }
 
-// Cerrar modal al hacer click fuera del contenido
 document.addEventListener('click', function(e) {
     const modal = document.getElementById('modalReasignar');
-    const modalContent = modal?.querySelector('.modal-content');
-    if (modal && e.target === modal) {
-        cerrarModalReasignar();
-    }
+    if (modal && e.target === modal) cerrarModalReasignar();
 });
 
-// Cerrar modal con tecla ESC
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        cerrarModalReasignar();
-    }
+    if (e.key === 'Escape') cerrarModalReasignar();
 });
 
 // ============================================
@@ -586,7 +648,7 @@ function reasignarVehiculos() {
     if (!actaActualId) { mostrarAlerta('⚠️ primero debe cargar una acta para reasignar', 'error'); return; }
     if (!listaVehiculos || listaVehiculos.length === 0) { mostrarAlerta('⚠️ el acta no tiene vehículos para reasignar', 'error'); return; }
     
-    // ✅ MOSTRAR MODAL ELEGANTE EN VEZ DE confirm()
+    // ✅ MOSTRAR MODAL ELEGANTE
     abrirModalReasignar();
 }
 
@@ -598,7 +660,7 @@ async function confirmarReasignacion() {
     
     try {
         // ✅ PASO 1: Obtener datos completos del acta actual
-        const { data: actaData, error: errorActa } = await supabaseClient
+        const {  actaData, error: errorActa } = await supabaseClient
             .from('actas_asignacion')
             .select('*')
             .eq('id', actaActualId)
@@ -611,7 +673,7 @@ async function confirmarReasignacion() {
         
         // ✅ PASO 2: Registrar en historial_de_actas
         const historialData = {
-            acta_id: String(actaActualId),  // ✅ Forzar conversión a string para compatibilidad
+            acta_id: String(actaActualId),
             funcionario_nombre: actaData.funcionario_nombre || '',
             funcionario_cedula: actaData.funcionario_cedula || '',
             unidad_asignacion: actaData.unidad_asignacion || '',
@@ -638,13 +700,13 @@ async function confirmarReasignacion() {
         
         console.log('✅ Registro guardado en historial_de_actas');
         
-        // ✅ PASO 3: Actualizar el acta original (marcar como reasignada)
+        // ✅ PASO 3: Actualizar el acta original
         const { error: errorUpdate } = await supabaseClient
             .from('actas_asignacion')
             .update({
                 estado: 'reasignado',
                 fecha_reasignacion: new Date().toISOString(),
-                vehiculos: []  // ✅ Limpiar vehículos para que queden disponibles
+                vehiculos: []
             })
             .eq('id', actaActualId);
         
@@ -655,7 +717,6 @@ async function confirmarReasignacion() {
         
         console.log('✅ Acta actualizada como reasignada');
         
-        // ✅ PASO 4: Limpiar formulario y recargar
         mostrarAlerta('✅ vehículos reasignados exitosamente. ahora están disponibles para nuevas actas', 'success');
         
         setTimeout(() => {
@@ -729,7 +790,7 @@ async function actualizarActaEnBD() {
 // ✅ LIMPIAR FORMULARIO
 // ============================================
 function limpiarFormulario() {
-    ['searchInput','funcionarioNombre','funcionarioCedula','unidadAsignacion','funcionarioCargo','actaId'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    ['searchInput','funcionarioNombre','funcionarioCedula','unidadAsignacion','funcionarioCargo','actaId'].forEach(id => { limpiarInput(id); });
     listaVehiculos = [];
     vehiculoActual = null;
     vehicleCounter = 0;
@@ -773,10 +834,10 @@ window.normalizarTexto = normalizarTexto;
 window.sonVehiculosIguales = sonVehiculosIguales;
 window.cambiarPagina = cambiarPagina;
 window.irAPagina = irAPagina;
-// ✅ FUNCIONES DEL MODAL DE REASIGNACIÓN
 window.reasignarVehiculos = reasignarVehiculos;
 window.confirmarReasignacion = confirmarReasignacion;
 window.abrirModalReasignar = abrirModalReasignar;
 window.cerrarModalReasignar = cerrarModalReasignar;
+window.limpiarInput = limpiarInput;
 
 console.log('✅ Funciones exportadas a window');
