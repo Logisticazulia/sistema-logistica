@@ -656,6 +656,9 @@ function reasignarVehiculos() {
 // ============================================
 // ✅ REASIGNAR VEHÍCULOS DEL ACTA (CORREGIDO)
 // ============================================
+// ============================================
+// ✅ REASIGNAR VEHÍCULOS DEL ACTA (CORREGIDO)
+// ============================================
 async function confirmarReasignacion() {
     cerrarModalReasignar();
     
@@ -668,27 +671,73 @@ async function confirmarReasignacion() {
     }
     
     try {
-        // ✅ PASO 1: Convertir ID al tipo correcto (número si la BD usa enteros)
-        const idParaBuscar = isNaN(actaActualId) ? actaActualId : Number(actaActualId);
-        console.log('🔍 ID convertido para búsqueda:', idParaBuscar, typeof idParaBuscar);
+        // ✅ PASO 1: Preparar ID para búsqueda (probar ambos formatos)
+        const idNumero = Number(actaActualId);
+        const idString = String(actaActualId);
         
-        // ✅ PASO 2: Obtener datos del acta (usando .limit(1) en vez de .single() para mejor manejo de errores)
-        const {  actasData, error: errorActa } = await supabaseClient
+        console.log('🔍 Probando ID como número:', idNumero);
+        console.log('🔍 Probando ID como string:', idString);
+        
+        // ✅ PASO 2: Obtener datos del acta (CORREGIDO: data: actasData)
+        let actasData = null;
+        let errorActa = null;
+        
+        // Primero intentar con número
+        const responseNum = await supabaseClient
             .from('actas_asignacion')
             .select('*')
-            .eq('id', idParaBuscar)
+            .eq('id', idNumero)
             .limit(1);
         
-        console.log('📊 Respuesta de Supabase:', { actasData, error: errorActa });
+        console.log('📊 Respuesta con ID numérico:', { 
+            data: responseNum.data, 
+            error: responseNum.error 
+        });
         
+        if (responseNum.error) {
+            errorActa = responseNum.error;
+        } else if (responseNum.data && responseNum.data.length > 0) {
+            actasData = responseNum.data;
+        } else {
+            // Si no encontró con número, intentar con string
+            const responseStr = await supabaseClient
+                .from('actas_asignacion')
+                .select('*')
+                .eq('id', idString)
+                .limit(1);
+            
+            console.log('📊 Respuesta con ID string:', { 
+                data: responseStr.data, 
+                error: responseStr.error 
+            });
+            
+            if (responseStr.error) {
+                errorActa = responseStr.error;
+            } else {
+                actasData = responseStr.data;
+            }
+        }
+        
+        // ✅ Validar resultados
         if (errorActa) {
             console.error('❌ Error de Supabase:', errorActa);
             throw new Error('Error de base de datos: ' + errorActa.message);
         }
         
         if (!actasData || actasData.length === 0) {
-            console.error('❌ No se encontró acta con ID:', idParaBuscar);
-            throw new Error(`No se encontró el acta #${actaActualId}. Verifica que exista en la base de datos.`);
+            console.error('❌ No se encontró acta con ID:', actaActualId);
+            
+            // 🔍 Debug: listar IDs disponibles para diagnóstico
+            const debugResponse = await supabaseClient
+                .from('actas_asignacion')
+                .select('id, funcionario_nombre')
+                .limit(5);
+            
+            if (debugResponse.data) {
+                console.log('🔍 Actas disponibles en BD:', debugResponse.data.map(a => a.id));
+            }
+            
+            throw new Error(`No se encontró el acta #${actaActualId}. Verifica que exista y que tengas permisos.`);
         }
         
         const actaData = actasData[0];
@@ -696,7 +745,7 @@ async function confirmarReasignacion() {
         
         // ✅ PASO 3: Registrar en historial_de_actas
         const historialData = {
-            acta_id: String(actaData.id),  // ✅ Guardar como string para compatibilidad
+            acta_id: String(actaData.id),
             funcionario_nombre: actaData.funcionario_nombre || '',
             funcionario_cedula: actaData.funcionario_cedula || '',
             unidad_asignacion: actaData.unidad_asignacion || '',
@@ -723,15 +772,17 @@ async function confirmarReasignacion() {
         
         console.log('✅ Registro guardado en historial_de_actas');
         
-        // ✅ PASO 4: Actualizar el acta original (marcar como reasignada)
+        // ✅ PASO 4: Actualizar el acta original (usar el ID que funcionó)
+        const idParaUpdate = actasData[0].id;
+        
         const { error: errorUpdate } = await supabaseClient
             .from('actas_asignacion')
             .update({
                 estado: 'reasignado',
                 fecha_reasignacion: new Date().toISOString(),
-                vehiculos: []  // ✅ Limpiar vehículos para que queden disponibles
+                vehiculos: []
             })
-            .eq('id', idParaBuscar);  // ✅ Usar el ID convertido
+            .eq('id', idParaUpdate);
         
         if (errorUpdate) {
             console.error('❌ Error al actualizar acta:', errorUpdate);
