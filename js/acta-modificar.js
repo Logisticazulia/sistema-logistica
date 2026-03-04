@@ -13,6 +13,7 @@ let listaVehiculos = [];
 let vehicleCounter = 0;
 let actaActualId = null;
 let actasFiltradas = [];
+let actaEncontradaId = null;
 
 // ============================================
 // ✅ VARIABLES DE PAGINACIÓN
@@ -110,7 +111,7 @@ async function buscarActas() {
     try {
         let query = supabaseClient
             .from('actas_asignacion')
-            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, vehiculos, created_at, fecha_dia, fecha_mes, fecha_anio, estado')
+            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, vehiculos, created_at, fecha_dia, fecha_mes, fecha_anio')
             .order('created_at', { ascending: false })
             .limit(1000);
         
@@ -142,19 +143,17 @@ async function buscarActas() {
 }
 
 // ============================================
-// ✅ CARGAR TODAS LAS ACTAS (CORREGIDO)
+// ✅ CARGAR TODAS LAS ACTAS
 // ============================================
 async function cargarTodasLasActas() {
     const searchActaAlert = document.getElementById('searchActaAlert');
     if (searchActaAlert) mostrarAlerta('🔄 cargando todas las actas...', 'info', searchActaAlert);
     
-    // ✅ Usar función auxiliar para limpiar inputs de forma segura
     limpiarInput('filterFuncionario');
     limpiarInput('filterCedula');
     limpiarInput('filterUnidad');
     limpiarInput('filterFecha');
     
-    // ✅ Resetear paginación
     paginaActual = 1;
     actasFiltradas = [];
     
@@ -162,7 +161,7 @@ async function cargarTodasLasActas() {
 }
 
 // ============================================
-// ✅ RESETEAR FILTROS (CORREGIDO)
+// ✅ RESETEAR FILTROS
 // ============================================
 function resetearFiltros() {
     limpiarInput('filterFuncionario');
@@ -178,9 +177,6 @@ function resetearFiltros() {
     cargarTodasLasActas();
 }
 
-// ============================================
-// ✅ RENDERIZAR TABLA DE ACTAS CON PAGINACIÓN
-// ============================================
 // ============================================
 // ✅ RENDERIZAR TABLA DE ACTAS (SIN COLUMNA ESTADO)
 // ============================================
@@ -215,7 +211,6 @@ function renderizarTablaActas() {
             }
         } catch (e) { vehiculosCount = 0; }
         
-        // ✅ Sin badge de estado - solo botón de cargar
         return `
             <tr>
                 <td>${fecha}</td>
@@ -299,6 +294,7 @@ function cambiarPagina(direccion) {
         document.getElementById('actaResultsSection')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 }
+
 function irAPagina(numeroPagina) {
     const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
     if (numeroPagina >= 1 && numeroPagina <= totalPaginas) {
@@ -314,41 +310,53 @@ function irAPagina(numeroPagina) {
 async function seleccionarActa(actaId) {
     const searchActaAlert = document.getElementById('searchActaAlert');
     const btnActualizar = document.getElementById('btnActualizarActa');
+    const btnReasignar = document.getElementById('btnReasignarVehiculos');
     
     if (!actaId) { if (searchActaAlert) mostrarAlerta('⚠️ ID de acta no válido', 'error', searchActaAlert); return; }
     if (!supabaseClient) { if (searchActaAlert) mostrarAlerta('❌ error de conexión', 'error', searchActaAlert); return; }
     
     try {
-        const { data, error } = await supabaseClient.from('actas_asignacion').select('*').eq('id', actaId).single();
-        if (error || !data) throw error;
+        const idNumero = Number(actaId);
+        const idString = String(actaId);
         
+        let actaData = null;
         
-        actaActualId = String(data.id);
-        const idParaBuscar = isNaN(actaActualId) ? actaActualId : Number(actaActualId);
+        const responseNum = await supabaseClient.from('actas_asignacion').select('*').eq('id', idNumero).limit(1);
+        if (responseNum.data && responseNum.data.length > 0) {
+            actaData = responseNum.data[0];
+        } else {
+            const responseStr = await supabaseClient.from('actas_asignacion').select('*').eq('id', idString).limit(1);
+            if (responseStr.data && responseStr.data.length > 0) {
+                actaData = responseStr.data[0];
+            }
+        }
         
-        // ✅ Validar cada elemento antes de asignar valor
+        if (!actaData) throw new Error('No se encontró el acta');
+        
+        actaActualId = String(actaData.id);
+        
         const elNombre = document.getElementById('funcionarioNombre');
         const elCedula = document.getElementById('funcionarioCedula');
         const elUnidad = document.getElementById('unidadAsignacion');
         const elCargo = document.getElementById('funcionarioCargo');
         const elActaId = document.getElementById('actaId');
         
-        if (elNombre) elNombre.value = data.funcionario_nombre || '';
-        if (elCedula) elCedula.value = data.funcionario_cedula || '';
-        if (elUnidad) elUnidad.value = data.unidad_asignacion || '';
-        if (elCargo) elCargo.value = data.funcionario_cargo || '';
-        if (elActaId) elActaId.value = data.id;
+        if (elNombre) elNombre.value = actaData.funcionario_nombre || '';
+        if (elCedula) elCedula.value = actaData.funcionario_cedula || '';
+        if (elUnidad) elUnidad.value = actaData.unidad_asignacion || '';
+        if (elCargo) elCargo.value = actaData.funcionario_cargo || '';
+        if (elActaId) elActaId.value = actaData.id;
         
         const elDia = document.getElementById('previewDia');
         const elMes = document.getElementById('previewMes');
         const elAnio = document.getElementById('previewAnio');
-        if (elDia && data.fecha_dia) elDia.textContent = data.fecha_dia;
-        if (elMes && data.fecha_mes) elMes.textContent = data.fecha_mes;
-        if (elAnio && data.fecha_anio) elAnio.textContent = data.fecha_anio;
+        if (elDia && actaData.fecha_dia) elDia.textContent = actaData.fecha_dia;
+        if (elMes && actaData.fecha_mes) elMes.textContent = actaData.fecha_mes;
+        if (elAnio && actaData.fecha_anio) elAnio.textContent = actaData.fecha_anio;
         
         let vehiculosData = null;
         try {
-            vehiculosData = typeof data.vehiculos === 'string' ? JSON.parse(data.vehiculos) : data.vehiculos;
+            vehiculosData = typeof actaData.vehiculos === 'string' ? JSON.parse(actaData.vehiculos) : actaData.vehiculos;
         } catch (e) { vehiculosData = []; }
         
         listaVehiculos = Array.isArray(vehiculosData) ? vehiculosData : [];
@@ -361,12 +369,8 @@ async function seleccionarActa(actaId) {
         actualizarTextoSingularPlural();
         
         if (btnActualizar) btnActualizar.disabled = false;
-        
-        const btnReasignar = document.getElementById('btnReasignarVehiculos');
-        if (btnReasignar && listaVehiculos.length > 0 && data.estado !== 'reasignado') {
+        if (btnReasignar && listaVehiculos.length > 0) {
             btnReasignar.disabled = false;
-        } else if (btnReasignar) {
-            btnReasignar.disabled = true;
         }
         
         if (searchActaAlert) mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', searchActaAlert);
@@ -448,35 +452,160 @@ function sonVehiculosIguales(v1, v2) {
 }
 
 // ============================================
-// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
+// ✅ MOSTRAR INFO DE ACTA ENCONTRADA
+// ============================================
+function mostrarInfoActaEncontrada(acta) {
+    const infoDiv = document.getElementById('actaEncontradaInfo');
+    const detallesP = document.getElementById('actaEncontradaDetalles');
+    
+    if (!infoDiv || !detallesP) return;
+    
+    actaEncontradaId = String(acta.id);
+    
+    const fecha = `${acta.fecha_dia || ''} ${acta.fecha_mes || ''} ${acta.fecha_anio || ''}`.trim() || 'N/A';
+    
+    detallesP.innerHTML = `
+      <strong>Acta #${acta.id}</strong><br>
+      👤 ${acta.funcionario_nombre || 'N/A'}<br>
+      🆔 ${acta.funcionario_cedula || 'N/A'}<br>
+      🏢 ${acta.unidad_asignacion || 'N/A'}<br>
+      📅 ${fecha}
+    `;
+    
+    infoDiv.style.display = 'block';
+}
+
+function irAModificarActa() {
+    if (actaEncontradaId) {
+        seleccionarActa(actaEncontradaId);
+        const infoDiv = document.getElementById('actaEncontradaInfo');
+        if (infoDiv) infoDiv.style.display = 'none';
+    }
+}
+
+// ============================================
+// ✅ BUSCAR VEHÍCULO - CON VISTA PREVIA DE ACTA EXISTENTE
 // ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
+    const infoDiv = document.getElementById('actaEncontradaInfo');
+    
     const terminoBusqueda = normalizarTexto(searchInput?.value);
     
-    if (!terminoBusqueda) { if (searchAlert) mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
-    if (!supabaseClient) { if (searchAlert) mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
+    if (!terminoBusqueda) {
+        if (searchAlert) mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert);
+        vehiculoActual = null;
+        if (btnAgregar) btnAgregar.disabled = true;
+        return;
+    }
+    
+    if (infoDiv) infoDiv.style.display = 'none';
+    
+    if (!supabaseClient) {
+        if (searchAlert) mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert);
+        vehiculoActual = null;
+        if (btnAgregar) btnAgregar.disabled = true;
+        return;
+    }
     
     try {
         let vehiculoEncontrado = null;
         const camposBusqueda = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
+        
         for (const campo of camposBusqueda) {
             const response = await supabaseClient.from('vehiculos').select('*').eq(campo, terminoBusqueda).limit(1);
-            if (response.data && response.data.length > 0 && !response.error) { vehiculoEncontrado = response.data[0]; break; }
+            if (response.data && response.data.length > 0 && !response.error) {
+                vehiculoEncontrado = response.data[0];
+                console.log(`✅ Vehículo encontrado por ${campo}:`, vehiculoEncontrado);
+                break;
+            }
         }
-        if (!vehiculoEncontrado) { if (searchAlert) mostrarAlerta('❌ vehículo no encontrado en la base de datos', 'error', searchAlert); vehiculoActual = null; if (btnAgregar) btnAgregar.disabled = true; return; }
+        
+        if (!vehiculoEncontrado) {
+            if (searchAlert) mostrarAlerta('❌ vehículo no encontrado en la base de datos', 'error', searchAlert);
+            vehiculoActual = null;
+            if (btnAgregar) btnAgregar.disabled = true;
+            return;
+        }
         
         const yaEnLista = listaVehiculos.some(v => sonVehiculosIguales(v, vehiculoEncontrado));
-        if (yaEnLista) { if (searchAlert) mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'info', searchAlert); if (btnAgregar) btnAgregar.disabled = true; return; }
+        if (yaEnLista) {
+            if (searchAlert) mostrarAlerta('⚠️ este vehículo ya está en la lista del acta actual', 'info', searchAlert);
+            if (btnAgregar) btnAgregar.disabled = true;
+            return;
+        }
         
-        vehiculoActual = { id: vehiculoEncontrado.id, marca: vehiculoEncontrado.marca || 'N/P', modelo: vehiculoEncontrado.modelo || '', s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P', s_motor: vehiculoEncontrado.s_motor || 'N/P', placa: vehiculoEncontrado.placa || 'N/P', facsimil: vehiculoEncontrado.facsimil || 'N/P' };
+        const responseActas = await supabaseClient
+            .from('actas_asignacion')
+            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, funcionario_cargo, vehiculos, fecha_dia, fecha_mes, fecha_anio, created_at')
+            .limit(200);
+        
+        let vehiculoYaAsignado = false;
+        let actaExistente = null;
+        
+        if (responseActas.data && responseActas.data.length > 0) {
+            for (const acta of responseActas.data) {
+                let vehiculosData = null;
+                try {
+                    if (typeof acta.vehiculos === 'string') {
+                        vehiculosData = JSON.parse(acta.vehiculos);
+                    } else {
+                        vehiculosData = acta.vehiculos;
+                    }
+                } catch (e) { continue; }
+                
+                if (Array.isArray(vehiculosData)) {
+                    const encontrado = vehiculosData.some(v => sonVehiculosIguales(v, vehiculoEncontrado));
+                    if (encontrado) {
+                        vehiculoYaAsignado = true;
+                        actaExistente = acta;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (vehiculoYaAsignado && actaExistente) {
+            console.log('🔍 Vehículo ya asignado en acta:', actaExistente.id);
+            
+            const mensaje = `⚠️ Este vehículo ya está asignado en el acta #${actaExistente.id}\n\n` +
+                `Funcionario: ${actaExistente.funcionario_nombre || 'N/A'}\n` +
+                `Cédula: ${actaExistente.funcionario_cedula || 'N/A'}\n` +
+                `Unidad: ${actaExistente.unidad_asignacion || 'N/A'}\n` +
+                `Fecha: ${actaExistente.fecha_dia || ''} ${actaExistente.fecha_mes || ''} ${actaExistente.fecha_anio || ''}\n\n` +
+                `¿Desea cargar esta acta para modificarla?`;
+            
+            if (confirm(mensaje)) {
+                await seleccionarActa(String(actaExistente.id));
+                if (searchAlert) mostrarAlerta(`✅ acta #${actaExistente.id} cargada. ahora puede modificarla.`, 'success', searchAlert);
+                document.querySelector('.form-section')?.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                if (searchAlert) mostrarAlerta('ℹ️ vehículo ya asignado. puede buscar otro o cargar el acta para modificar.', 'info', searchAlert);
+            }
+            
+            vehiculoActual = null;
+            if (btnAgregar) btnAgregar.disabled = true;
+            return;
+        }
+        
+        vehiculoActual = {
+            id: vehiculoEncontrado.id,
+            marca: vehiculoEncontrado.marca || 'N/P',
+            modelo: vehiculoEncontrado.modelo || '',
+            s_carroceria: vehiculoEncontrado.s_carroceria || 'N/P',
+            s_motor: vehiculoEncontrado.s_motor || 'N/P',
+            placa: vehiculoEncontrado.placa || 'N/P',
+            facsimil: vehiculoEncontrado.facsimil || 'N/P'
+        };
+        
         if (btnAgregar) btnAgregar.disabled = false;
-        if (searchAlert) mostrarAlerta('✅ vehículo encontrado. puede agregarlo.', 'success', searchAlert);
+        if (searchAlert) mostrarAlerta('✅ vehículo encontrado y disponible. puede agregarlo a la lista.', 'success', searchAlert);
+        
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
-        if (searchAlert) mostrarAlerta('❌ error de conexión', 'error', searchAlert);
+        if (searchAlert) mostrarAlerta('❌ error de conexión. intente nuevamente.', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
     }
@@ -487,6 +616,7 @@ async function buscarVehiculo() {
 // ============================================
 function agregarVehiculoAlActa() {
     if (!vehiculoActual) { mostrarAlerta('⚠️ primero debe buscar un vehículo', 'error'); return; }
+    
     const yaExiste = listaVehiculos.some(v => {
         if (v.id && vehiculoActual.id && v.id === vehiculoActual.id) return true;
         const placa1 = (v.placa || '').toString().trim().toUpperCase(), placa2 = (vehiculoActual.placa || '').toString().trim().toUpperCase();
@@ -499,6 +629,7 @@ function agregarVehiculoAlActa() {
         if (serialValido1 && serialValido2 && serial1 === serial2) return true;
         return false;
     });
+    
     if (yaExiste) { mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'error'); return; }
     
     vehicleCounter++;
@@ -514,7 +645,11 @@ function agregarVehiculoAlActa() {
     vehiculoActual = null;
     if (btnAgregar) btnAgregar.disabled = true;
     
-    if (actaActualId) { const btnActualizar = document.getElementById('btnActualizarActa'); if (btnActualizar) btnActualizar.disabled = false; }
+    if (actaActualId) {
+        const btnActualizar = document.getElementById('btnActualizarActa');
+        if (btnActualizar) btnActualizar.disabled = false;
+    }
+    
     mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length}`, 'success');
 }
 
@@ -639,20 +774,6 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================
-// ✅ REASIGNAR VEHÍCULOS DEL ACTA
-// ============================================
-function reasignarVehiculos() {
-    console.log('🔍 reasignarVehiculos - INICIANDO');
-    console.log('🔍 actaActualId:', actaActualId);
-    console.log('🔍 listaVehiculos.length:', listaVehiculos.length);
-    
-    if (!actaActualId) { mostrarAlerta('⚠️ primero debe cargar una acta para reasignar', 'error'); return; }
-    if (!listaVehiculos || listaVehiculos.length === 0) { mostrarAlerta('⚠️ el acta no tiene vehículos para reasignar', 'error'); return; }
-    
-    // ✅ MOSTRAR MODAL ELEGANTE
-    abrirModalReasignar();
-}
-// ============================================
 // ✅ REASIGNAR VEHÍCULOS - GUARDAR SIEMPRE EN HISTORIAL
 // ============================================
 async function confirmarReasignacion() {
@@ -661,35 +782,19 @@ async function confirmarReasignacion() {
     console.log('🔍 confirmarReasignacion - INICIANDO');
     console.log('🔍 actaActualId:', actaActualId);
     
-    if (!supabaseClient) { 
-        mostrarAlerta('❌ error de conexión con la base de datos', 'error'); 
-        return; 
-    }
+    if (!supabaseClient) { mostrarAlerta('❌ error de conexión con la base de datos', 'error'); return; }
     
     try {
-        // ✅ PASO 1: Preparar ID para búsqueda
         const idNumero = Number(actaActualId);
         const idString = String(actaActualId);
         
-        // ✅ PASO 2: Obtener datos del acta (probar ambos formatos de ID)
         let actasData = null;
         
-        // Intentar con número primero
-        const responseNum = await supabaseClient
-            .from('actas_asignacion')
-            .select('*')
-            .eq('id', idNumero)
-            .limit(1);
-        
+        const responseNum = await supabaseClient.from('actas_asignacion').select('*').eq('id', idNumero).limit(1);
         if (responseNum.data && responseNum.data.length > 0) {
             actasData = responseNum.data;
         } else {
-            // Si no encontró, intentar con string
-            const responseStr = await supabaseClient
-                .from('actas_asignacion')
-                .select('*')
-                .eq('id', idString)
-                .limit(1);
+            const responseStr = await supabaseClient.from('actas_asignacion').select('*').eq('id', idString).limit(1);
             actasData = responseStr.data;
         }
         
@@ -700,20 +805,19 @@ async function confirmarReasignacion() {
         const actaData = actasData[0];
         console.log('✅ Acta encontrada:', actaData.id);
         
-        // ✅ PASO 3: Registrar en historial_de_actas (SIEMPRE, sin verificar estado)
         const historialData = {
             acta_id: String(actaData.id),
             funcionario_nombre: actaData.funcionario_nombre || '',
             funcionario_cedula: actaData.funcionario_cedula || '',
             unidad_asignacion: actaData.unidad_asignacion || '',
-            vehiculos: actaData.vehiculos,  // ✅ Guardar vehículos originales
-            fecha_reasignacion: new Date().toISOString(),  // ✅ Fecha/hora actual siempre
+            vehiculos: actaData.vehiculos,
+            fecha_reasignacion: new Date().toISOString(),
             fecha_dia: actaData.fecha_dia || '',
             fecha_mes: actaData.fecha_mes || '',
             fecha_anio: actaData.fecha_anio || '',
             usuario_reasigno: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
             motivo: 'Reasignación de vehículos - Registro automático',
-            estado: 'registrado'  // ✅ Estado genérico para historial
+            estado: 'registrado'
         };
         
         console.log('📦 Guardando en historial:', {
@@ -722,9 +826,7 @@ async function confirmarReasignacion() {
             vehiculos_count: Array.isArray(historialData.vehiculos) ? historialData.vehiculos.length : 0
         });
         
-        const { error: errorHistorial } = await supabaseClient
-            .from('historial_de_actas')
-            .insert(historialData);
+        const { error: errorHistorial } = await supabaseClient.from('historial_de_actas').insert(historialData);
         
         if (errorHistorial) {
             console.error('❌ Error al guardar en historial:', errorHistorial);
@@ -733,15 +835,11 @@ async function confirmarReasignacion() {
         
         console.log('✅ Registro guardado en historial_de_actas');
         
-        // ✅ PASO 4: Actualizar el acta original (limpiar vehículos para liberarlos)
         const idParaUpdate = actaData.id;
         
         const { error: errorUpdate } = await supabaseClient
             .from('actas_asignacion')
-            .update({
-                vehiculos: []  // ✅ Limpiar vehículos para que queden disponibles
-                // ❌ NO actualizar estado - mantener acta visible en lista
-            })
+            .update({ vehiculos: [] })
             .eq('id', idParaUpdate);
         
         if (errorUpdate) {
@@ -751,18 +849,48 @@ async function confirmarReasignacion() {
         
         console.log('✅ Vehículos liberados en acta original');
         
-        // ✅ PASO 5: Mostrar éxito y recargar
         mostrarAlerta('✅ vehículos reasignados y registrados en historial. ahora disponibles para nuevas actas', 'success');
+        
+        // ✅ ELIMINAR ACTA DE LA LISTA LOCAL
+        console.log('🗑️ Eliminando acta de la lista local:', actaActualId);
+        actasFiltradas = actasFiltradas.filter(acta => String(acta.id) !== String(actaActualId));
+        
+        const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
+        if (paginaActual > totalPaginas && totalPaginas > 0) {
+            paginaActual = totalPaginas;
+        }
+        
+        renderizarTablaActas();
+        
+        if (actasFiltradas.length === 0) {
+            const section = document.getElementById('actaResultsSection');
+            if (section) section.classList.remove('active');
+        }
+        
+        console.log('✅ Acta eliminada de la lista. Total restante:', actasFiltradas.length);
         
         setTimeout(() => {
             limpiarFormulario();
-            cargarTodasLasActas();  // ✅ Recargar lista para reflejar cambios
+            if (actasFiltradas.length === 0) {
+                cargarTodasLasActas();
+            }
         }, 2000);
         
     } catch (error) {
         console.error('❌ error al reasignar vehículos:', error);
         mostrarAlerta(`❌ error: ${error.message}`, 'error');
     }
+}
+
+function reasignarVehiculos() {
+    console.log('🔍 reasignarVehiculos - INICIANDO');
+    console.log('🔍 actaActualId:', actaActualId);
+    console.log('🔍 listaVehiculos.length:', listaVehiculos.length);
+    
+    if (!actaActualId) { mostrarAlerta('⚠️ primero debe cargar una acta para reasignar', 'error'); return; }
+    if (!listaVehiculos || listaVehiculos.length === 0) { mostrarAlerta('⚠️ el acta no tiene vehículos para reasignar', 'error'); return; }
+    
+    abrirModalReasignar();
 }
 
 // ============================================
@@ -830,6 +958,7 @@ function limpiarFormulario() {
     vehiculoActual = null;
     vehicleCounter = 0;
     actaActualId = null;
+    actaEncontradaId = null;
     renderizarListaVehiculos();
     renderizarVehiculosEnActa();
     actualizarActa();
@@ -837,9 +966,11 @@ function limpiarFormulario() {
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     const btnActualizar = document.getElementById('btnActualizarActa');
     const btnReasignar = document.getElementById('btnReasignarVehiculos');
+    const infoDiv = document.getElementById('actaEncontradaInfo');
     if (btnAgregar) btnAgregar.disabled = true;
     if (btnActualizar) btnActualizar.disabled = true;
     if (btnReasignar) btnReasignar.disabled = true;
+    if (infoDiv) infoDiv.style.display = 'none';
     const section = document.getElementById('vehiclesListSection');
     if (section) section.style.display = 'none';
     console.log('✅ formulario limpiado');
@@ -874,5 +1005,7 @@ window.confirmarReasignacion = confirmarReasignacion;
 window.abrirModalReasignar = abrirModalReasignar;
 window.cerrarModalReasignar = cerrarModalReasignar;
 window.limpiarInput = limpiarInput;
+window.mostrarInfoActaEncontrada = mostrarInfoActaEncontrada;
+window.irAModificarActa = irAModificarActa;
 
 console.log('✅ Funciones exportadas a window');
