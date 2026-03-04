@@ -1,7 +1,7 @@
 /* ============================================ */
 /* ACTA-MODIFICAR.JS                            */
 /* Sistema de Gestión de Transporte - CCPE ZULIA */
-/* MISMA BÚSQUEDA EXACTA QUE acta-crear.js      */
+/* CORREGIDO: Actualización REAL en BD          */
 /* ============================================ */
 
 // ============================================
@@ -18,17 +18,24 @@ let listaActas = [];
 // ✅ INICIALIZAR AL CARGAR LA PÁGINA
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 DOMContentLoaded - Iniciando acta-modificar.js');
+    
     if (typeof window.supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_KEY) {
         supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
         console.log('✅ Supabase inicializado correctamente');
     } else {
         console.error('❌ Error: Credenciales de Supabase no encontradas. Verifica config.js');
+        console.log('SUPABASE_URL:', window.SUPABASE_URL);
+        console.log('SUPABASE_KEY:', window.SUPABASE_KEY);
     }
+    
     actualizarFechaActa();
     agregarListenersFormulario();
     agregarListenerEnter();
     cargarEmailUsuario();
     cargarListaActas();
+    
+    console.log('✅ Inicialización completada');
 });
 
 // ============================================
@@ -79,6 +86,8 @@ async function cargarListaActas() {
     const btnCargar = document.getElementById('btnCargarActa');
     const selectorAlert = document.getElementById('selectorAlert');
     
+    console.log('🔍 cargandoListaActas - supabaseClient:', supabaseClient ? 'OK' : 'NULL');
+    
     if (!supabaseClient) {
         mostrarAlerta('❌ error de conexión con la base de datos', 'error', selectorAlert);
         return;
@@ -94,6 +103,8 @@ async function cargarListaActas() {
             .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, created_at')
             .order('created_at', { ascending: false })
             .limit(100);
+        
+        console.log('📊 Respuesta de actas:', { data, error });
         
         if (error) throw error;
         
@@ -118,9 +129,9 @@ async function cargarListaActas() {
         mostrarAlerta(`✅ ${listaActas.length} acta(s) cargada(s)`, 'success', selectorAlert);
         
     } catch (error) {
-        console.error('Error al cargar actas:', error);
+        console.error('❌ Error al cargar actas:', error);
         actaSelect.innerHTML = '<option value="">-- Error al cargar --</option>';
-        mostrarAlerta('❌ error al cargar la lista de actas', 'error', selectorAlert);
+        mostrarAlerta('❌ error al cargar la lista de actas: ' + error.message, 'error', selectorAlert);
     }
 }
 
@@ -142,6 +153,10 @@ async function cargarActaSeleccionada() {
     const btnActualizar = document.getElementById('btnActualizarActa');
     
     const actaId = actaSelect?.value;
+    
+    console.log('🔍 cargarActaSeleccionada - actaId:', actaId);
+    console.log('🔍 supabaseClient:', supabaseClient ? 'OK' : 'NULL');
+    
     if (!actaId) {
         mostrarAlerta('⚠️ por favor seleccione una acta', 'error', selectorAlert);
         return;
@@ -159,10 +174,16 @@ async function cargarActaSeleccionada() {
             .eq('id', actaId)
             .single();
         
-        if (error || !data) throw error;
+        console.log('📊 Respuesta de cargar acta:', { data, error });
         
-        // ✅ Guardar ID del acta actual
+        if (error || !data) {
+            console.error('❌ Error al cargar acta:', error);
+            throw error;
+        }
+        
+        // ✅ GUARDAR ID DEL ACTA ACTUAL (CRÍTICO)
         actaActualId = data.id;
+        console.log('✅ actaActualId establecido:', actaActualId);
         
         // ✅ Cargar datos del funcionario
         document.getElementById('funcionarioNombre').value = data.funcionario_nombre || '';
@@ -192,6 +213,8 @@ async function cargarActaSeleccionada() {
         listaVehiculos = Array.isArray(vehiculosData) ? vehiculosData : [];
         vehicleCounter = listaVehiculos.length;
         
+        console.log('🚗 Vehículos cargados:', listaVehiculos.length);
+        
         // ✅ Asignar tempId a cada vehículo cargado
         listaVehiculos.forEach((v, index) => {
             if (!v.tempId) v.tempId = index + 1;
@@ -203,8 +226,11 @@ async function cargarActaSeleccionada() {
         actualizarActa();
         actualizarTextoSingularPlural();
         
-        // ✅ Habilitar botón de actualizar
-        if (btnActualizar) btnActualizar.disabled = false;
+        // ✅ HABILITAR BOTÓN DE ACTUALIZAR
+        if (btnActualizar) {
+            btnActualizar.disabled = false;
+            console.log('✅ Botón actualizar habilitado');
+        }
         
         mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', selectorAlert);
         
@@ -212,8 +238,8 @@ async function cargarActaSeleccionada() {
         document.querySelector('.form-section')?.scrollIntoView({ behavior: 'smooth' });
         
     } catch (error) {
-        console.error('Error al cargar acta:', error);
-        mostrarAlerta('❌ error al cargar la acta seleccionada', 'error', selectorAlert);
+        console.error('❌ Error al cargar acta:', error);
+        mostrarAlerta('❌ error al cargar la acta seleccionada: ' + error.message, 'error', selectorAlert);
     }
 }
 
@@ -274,7 +300,7 @@ function actualizarTextoSingularPlural() {
 }
 
 // ============================================
-// ✅ FUNCIÓN AUXILIAR: Normalizar texto (MAYÚSCULAS + SIN ESPACIOS)
+// ✅ FUNCIÓN AUXILIAR: Normalizar texto
 // ============================================
 function normalizarTexto(texto) {
     if (!texto) return '';
@@ -292,7 +318,6 @@ function sonVehiculosIguales(v1, v2) {
     const id1 = v1.id;
     const id2 = v2.id;
     
-    // ✅ Solo es duplicado si hay coincidencia EXACTA en campos no vacíos
     if (placa1 && placa2 && placa1 === placa2) return true;
     if (serial1 && serial2 && serial1 === serial2) return true;
     if (id1 && id2 && id1 === id2) return true;
@@ -301,14 +326,13 @@ function sonVehiculosIguales(v1, v2) {
 }
 
 // ============================================
-// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS (BÚSQUEDA EXACTA)
+// ✅ BUSCAR VEHÍCULO EN BASE DE DATOS
 // ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
     
-    // ✅ Normalizar término de búsqueda
     const terminoBusqueda = normalizarTexto(searchInput?.value);
     
     if (!terminoBusqueda) {
@@ -327,11 +351,8 @@ async function buscarVehiculo() {
     
     try {
         let vehiculoEncontrado = null;
-        
-        // 🔍 Campos para búsqueda EXACTA (NO predictiva)
         const camposBusqueda = ['placa', 'facsimil', 's_carroceria', 's_motor', 'n_identificacion'];
         
-        // ✅ Usar .eq() que es match EXACTO en Supabase
         for (const campo of camposBusqueda) {
             const response = await supabaseClient
                 .from('vehiculos')
@@ -341,7 +362,6 @@ async function buscarVehiculo() {
             
             if (response.data && response.data.length > 0 && !response.error) {
                 vehiculoEncontrado = response.data[0];
-                console.log(`✅ Vehículo encontrado por ${campo}:`, vehiculoEncontrado);
                 break;
             }
         }
@@ -353,16 +373,13 @@ async function buscarVehiculo() {
             return;
         }
         
-        // 🚫 VALIDACIÓN 1: Verificar duplicados en lista temporal (COMPARACIÓN EXACTA)
         const yaEnLista = listaVehiculos.some(v => sonVehiculosIguales(v, vehiculoEncontrado));
-        
         if (yaEnLista) {
-            mostrarAlerta('⚠️ este vehículo ya está en la lista del acta actual', 'info', searchAlert);
+            mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'info', searchAlert);
             if (btnAgregar) btnAgregar.disabled = true;
             return;
         }
         
-        // ✅ Vehículo disponible: guardar en variable temporal
         vehiculoActual = {
             id: vehiculoEncontrado.id,
             marca: vehiculoEncontrado.marca || 'N/P',
@@ -373,22 +390,19 @@ async function buscarVehiculo() {
             facsimil: vehiculoEncontrado.facsimil || 'N/P'
         };
         
-        console.log('✅ vehiculoActual establecido:', vehiculoActual);
-        
-        // Habilitar botón para agregar
         if (btnAgregar) btnAgregar.disabled = false;
-        mostrarAlerta('✅ vehículo encontrado y disponible. puede agregarlo a la lista.', 'success', searchAlert);
+        mostrarAlerta('✅ vehículo encontrado. puede agregarlo.', 'success', searchAlert);
         
     } catch (error) {
         console.error('Error al buscar vehículo:', error);
-        mostrarAlerta('❌ error de conexión. intente nuevamente.', 'error', searchAlert);
+        mostrarAlerta('❌ error de conexión', 'error', searchAlert);
         vehiculoActual = null;
         if (btnAgregar) btnAgregar.disabled = true;
     }
 }
 
 // ============================================
-// ✅ AGREGAR VEHÍCULO AL ACTA (VALIDACIÓN ESTRICTA)
+// ✅ AGREGAR VEHÍCULO AL ACTA
 // ============================================
 function agregarVehiculoAlActa() {
     if (!vehiculoActual) {
@@ -396,83 +410,55 @@ function agregarVehiculoAlActa() {
         return;
     }
     
-    // 🔍 DEBUG: Verificar qué se está comparando
-    console.log('🔍 Vehículo a agregar:', vehiculoActual);
-    console.log('🔍 Lista actual:', listaVehiculos);
-    
-    // ✅ VALIDACIÓN ESTRICTA: Solo comparar si los campos tienen valores REALES
     const yaExiste = listaVehiculos.some(v => {
-        // 🔹 Priorizar comparación por ID (único en BD)
-        if (v.id && vehiculoActual.id && v.id === vehiculoActual.id) {
-            console.log(`🔍 Duplicado por ID: ${v.id}`);
-            return true;
-        }
+        if (v.id && vehiculoActual.id && v.id === vehiculoActual.id) return true;
         
-        // 🔹 Comparar placa SOLO si ambos tienen valores válidos (no 'N/P', no vacío)
         const placa1 = (v.placa || '').toString().trim().toUpperCase();
         const placa2 = (vehiculoActual.placa || '').toString().trim().toUpperCase();
         const placaValida1 = placa1 && placa1 !== 'N/P' && placa1 !== 'N/D' && placa1.length >= 6;
         const placaValida2 = placa2 && placa2 !== 'N/P' && placa2 !== 'N/D' && placa2.length >= 6;
         
-        if (placaValida1 && placaValida2 && placa1 === placa2) {
-            console.log(`🔍 Duplicado por placa: ${placa1}`);
-            return true;
-        }
+        if (placaValida1 && placaValida2 && placa1 === placa2) return true;
         
-        // 🔹 Comparar serial de carrocería SOLO si ambos tienen valores válidos
         const serial1 = (v.s_carroceria || '').toString().trim().toUpperCase();
         const serial2 = (vehiculoActual.s_carroceria || '').toString().trim().toUpperCase();
         const serialValido1 = serial1 && serial1 !== 'N/P' && serial1 !== 'N/D' && serial1.length >= 10;
         const serialValido2 = serial2 && serial2 !== 'N/P' && serial2 !== 'N/D' && serial2.length >= 10;
         
-        if (serialValido1 && serialValido2 && serial1 === serial2) {
-            console.log(`🔍 Duplicado por serial: ${serial1}`);
-            return true;
-        }
+        if (serialValido1 && serialValido2 && serial1 === serial2) return true;
         
         return false;
     });
     
     if (yaExiste) {
-        console.warn('⚠️ Vehículo duplicado detectado:', vehiculoActual);
         mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'error');
         return;
     }
     
-    // ✅ Agregar vehículo
     vehicleCounter++;
     vehiculoActual.tempId = vehicleCounter;
     listaVehiculos.push({ ...vehiculoActual });
     
-    console.log('✅ Vehículo agregado. Total:', listaVehiculos.length);
-    
-    // ✅ Llamar funciones de renderizado con verificación de existencia
     if (typeof renderizarListaVehiculos === 'function') renderizarListaVehiculos();
     if (typeof renderizarVehiculosEnActa === 'function') renderizarVehiculosEnActa();
     if (typeof actualizarTextoSingularPlural === 'function') actualizarTextoSingularPlural();
     
-    // ✅ Limpiar búsqueda
     const searchInput = document.getElementById('searchInput');
     const btnAgregar = document.getElementById('btnAgregarVehiculo');
-    const searchAlert = document.getElementById('searchAlert');
-    
     if (searchInput) searchInput.value = '';
-    if (searchAlert) {
-        searchAlert.style.display = 'none';
-        searchAlert.textContent = '';
-    }
-    
-    // ✅ IMPORTANTE: Limpiar vehiculoActual DESPUÉS de agregar
     vehiculoActual = null;
-    
     if (btnAgregar) btnAgregar.disabled = true;
     
     // ✅ Habilitar botón de actualizar si hay cambios
     if (actaActualId) {
-        document.getElementById('btnActualizarActa').disabled = false;
+        const btnActualizar = document.getElementById('btnActualizarActa');
+        if (btnActualizar) {
+            btnActualizar.disabled = false;
+            console.log('✅ Botón actualizar habilitado después de agregar vehículo');
+        }
     }
     
-    mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length} vehículo(s)`, 'success');
+    mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length}`, 'success');
 }
 
 // ============================================
@@ -483,10 +469,7 @@ function renderizarListaVehiculos() {
     const section = document.getElementById('vehiclesListSection');
     const count = document.getElementById('vehiclesCount');
     
-    if (!tbody || !section || !count) {
-        console.warn('⚠️ Elementos del DOM no encontrados para renderizarListaVehiculos');
-        return;
-    }
+    if (!tbody || !section || !count) return;
     
     if (listaVehiculos.length === 0) {
         section.style.display = 'none';
@@ -517,7 +500,6 @@ function renderizarListaVehiculos() {
 // ============================================
 function eliminarVehiculo(tempId) {
     const index = listaVehiculos.findIndex(v => v.tempId === tempId);
-    
     if (index >= 0) {
         listaVehiculos.splice(index, 1);
         
@@ -525,15 +507,15 @@ function eliminarVehiculo(tempId) {
         if (typeof renderizarVehiculosEnActa === 'function') renderizarVehiculosEnActa();
         if (typeof actualizarTextoSingularPlural === 'function') actualizarTextoSingularPlural();
         
-        // ✅ Habilitar botón de actualizar si hay cambios
         if (actaActualId) {
-            document.getElementById('btnActualizarActa').disabled = false;
+            const btnActualizar = document.getElementById('btnActualizarActa');
+            if (btnActualizar) btnActualizar.disabled = false;
         }
         
         mostrarAlerta(
             listaVehiculos.length === 0
                 ? '🗑️ vehículo eliminado. la lista está vacía.'
-                : `🗑️ vehículo eliminado. total: ${listaVehiculos.length} vehículo(s)`,
+                : `🗑️ vehículo eliminado. total: ${listaVehiculos.length}`,
             'info'
         );
     }
@@ -604,7 +586,7 @@ function agregarListenerEnter() {
 }
 
 // ============================================
-// ✅ MOSTRAR ALERTAS CON SCROLL AUTOMÁTICO
+// ✅ MOSTRAR ALERTAS
 // ============================================
 function mostrarAlerta(mensaje, tipo, elemento = null) {
     const alertElement = elemento || document.getElementById('searchAlert');
@@ -618,16 +600,11 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
     alertElement.style.display = 'block';
     
     setTimeout(() => {
-        alertElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
+        alertElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
     
     if (tipo !== 'error') {
-        setTimeout(() => {
-            alertElement.style.display = 'none';
-        }, 5000);
+        setTimeout(() => { alertElement.style.display = 'none'; }, 5000);
     }
 }
 
@@ -636,12 +613,11 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
 // ============================================
 function imprimirActa() {
     if (listaVehiculos.length === 0) {
-        mostrarAlerta('⚠️ primero debe agregar al menos un vehículo al acta', 'error');
+        mostrarAlerta('⚠️ primero debe agregar al menos un vehículo', 'error');
         return;
     }
-    
     if (!document.getElementById('funcionarioNombre')?.value) {
-        mostrarAlerta('⚠️ primero debe completar los datos del funcionario', 'error');
+        mostrarAlerta('⚠️ complete los datos del funcionario', 'error');
         return;
     }
     
@@ -651,14 +627,22 @@ function imprimirActa() {
 }
 
 // ============================================
-// ✅ ACTUALIZAR ACTA EN BASE DE DATOS
+// ✅ ACTUALIZAR ACTA EN BASE DE DATOS (CORREGIDO)
 // ============================================
 async function actualizarActaEnBD() {
+    console.log('🔍 actualizarActaEnBD - INICIANDO');
+    console.log('🔍 actaActualId:', actaActualId);
+    console.log('🔍 supabaseClient:', supabaseClient ? 'OK' : 'NULL');
+    console.log('🔍 listaVehiculos.length:', listaVehiculos.length);
+    
+    // ✅ VALIDACIÓN 1: Verificar ID del acta
     if (!actaActualId) {
+        console.error('❌ actaActualId es null o undefined');
         mostrarAlerta('⚠️ primero debe cargar una acta para modificar', 'error');
         return;
     }
     
+    // ✅ VALIDACIÓN 2: Campos obligatorios
     const funcionarioNombre = document.getElementById('funcionarioNombre')?.value || '';
     const funcionarioCedula = document.getElementById('funcionarioCedula')?.value || '';
     const unidadAsignacion = document.getElementById('unidadAsignacion')?.value || '';
@@ -668,11 +652,13 @@ async function actualizarActaEnBD() {
         return;
     }
     
+    // ✅ VALIDACIÓN 3: Al menos un vehículo
     if (listaVehiculos.length === 0) {
         mostrarAlerta('⚠️ el acta debe tener al menos un vehículo', 'error');
         return;
     }
     
+    // ✅ VALIDACIÓN 4: Cliente Supabase
     if (!supabaseClient) {
         mostrarAlerta('❌ error de conexión con la base de datos', 'error');
         return;
@@ -698,26 +684,53 @@ async function actualizarActaEnBD() {
     };
     
     console.log('📦 datos a actualizar:', JSON.stringify(actaData, null, 2));
+    console.log('🔍 ID del acta a actualizar:', actaActualId);
     
     try {
-        const { error } = await supabaseClient
+        console.log('🔍 Ejecutando update en Supabase...');
+        
+        const { data, error } = await supabaseClient
             .from('actas_asignacion')
             .update(actaData)
-            .eq('id', actaActualId);
+            .eq('id', actaActualId)
+            .select();  // ✅ Agregar .select() para verificar qué se actualizó
         
-        if (error) throw error;
+        console.log('📊 Respuesta de update:', { data, error });
         
+        if (error) {
+            console.error('❌ Error de Supabase:', error);
+            throw error;
+        }
+        
+        if (!data || data.length === 0) {
+            console.error('❌ No se actualizó ninguna fila - RLS o ID incorrecto');
+            mostrarAlerta('❌ no se pudo actualizar - verifique permisos o ID del acta', 'error');
+            return;
+        }
+        
+        console.log('✅ Acta actualizada exitosamente:', data[0].id);
         mostrarAlerta('✅ acta actualizada exitosamente', 'success');
         document.getElementById('btnActualizarActa').disabled = true;
         
+        // ✅ Recargar lista de actas para mostrar cambios
+        setTimeout(() => {
+            recargarListaActas();
+        }, 1000);
+        
     } catch (error) {
         console.error('❌ error al actualizar acta:', error);
+        console.error('📋 Detalles del error:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        });
         mostrarAlerta(`❌ error: ${error.message}`, 'error');
     }
 }
 
 // ============================================
-// ✅ LIMPIAR FORMULARIO COMPLETO
+// ✅ LIMPIAR FORMULARIO
 // ============================================
 function limpiarFormulario() {
     ['searchInput','funcionarioNombre','funcionarioCedula','unidadAsignacion','funcionarioCargo','actaId'].forEach(id => {
@@ -743,11 +756,11 @@ function limpiarFormulario() {
     const section = document.getElementById('vehiclesListSection');
     if (section) section.style.display = 'none';
     
-    console.log('✅ formulario limpiado correctamente');
+    console.log('✅ formulario limpiado');
 }
 
 // ============================================
-// ✅ EXPORTAR FUNCIONES AL SCOPE GLOBAL
+// ✅ EXPORTAR FUNCIONES GLOBALES (CRÍTICO)
 // ============================================
 window.buscarVehiculo = buscarVehiculo;
 window.agregarVehiculoAlActa = agregarVehiculoAlActa;
@@ -756,7 +769,7 @@ window.renderizarListaVehiculos = renderizarListaVehiculos;
 window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
 window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
 window.imprimirActa = imprimirActa;
-window.actualizarActaEnBD = actualizarActaEnBD;
+window.actualizarActaEnBD = actualizarActaEnBD;  // ✅ ESTA ES LA QUE FALLABA
 window.limpiarFormulario = limpiarFormulario;
 window.mostrarAlerta = mostrarAlerta;
 window.actualizarActa = actualizarActa;
@@ -767,3 +780,9 @@ window.cargarActaSeleccionada = cargarActaSeleccionada;
 window.recargarListaActas = recargarListaActas;
 window.normalizarTexto = normalizarTexto;
 window.sonVehiculosIguales = sonVehiculosIguales;
+
+console.log('✅ Funciones exportadas a window:', {
+    actualizarActaEnBD: typeof window.actualizarActaEnBD,
+    cargarActaSeleccionada: typeof window.cargarActaSeleccionada,
+    buscarVehiculo: typeof window.buscarVehiculo
+});
