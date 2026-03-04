@@ -297,7 +297,12 @@ async function seleccionarActa(actaId) {
             btnActualizar.disabled = false;
             console.log('✅ Botón actualizar habilitado');
         }
-        
+        // ✅ NUEVO: Habilitar botón de reasignar
+const btnReasignar = document.getElementById('btnReasignarVehiculos');
+if (btnReasignar && listaVehiculos.length > 0) {
+    btnReasignar.disabled = false;
+    console.log('✅ Botón reasignar habilitado');
+}
         mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', searchActaAlert);
         
         // 🔍 Scroll hacia el formulario
@@ -817,7 +822,117 @@ function limpiarFormulario() {
     
     console.log('✅ formulario limpiado');
 }
-
+// ============================================
+// ✅ REASIGNAR VEHÍCULOS DEL ACTA
+// ============================================
+async function reasignarVehiculos() {
+    console.log('🔍 reasignarVehiculos - INICIANDO');
+    console.log('🔍 actaActualId:', actaActualId);
+    console.log('🔍 listaVehiculos.length:', listaVehiculos.length);
+    
+    // ✅ VALIDACIÓN 1: Verificar ID del acta
+    if (!actaActualId) {
+        mostrarAlerta('⚠️ primero debe cargar una acta para reasignar', 'error');
+        return;
+    }
+    
+    // ✅ VALIDACIÓN 2: Verificar que haya vehículos
+    if (!listaVehiculos || listaVehiculos.length === 0) {
+        mostrarAlerta('⚠️ el acta no tiene vehículos para reasignar', 'error');
+        return;
+    }
+    
+    // ✅ CONFIRMACIÓN DEL USUARIO
+    const confirmado = confirm('⚠️ ¿ESTÁ SEGURO DE REASIGNAR LAS UNIDADES DE ESTA ACTA?\n\n' +
+        'Esta acción:\n' +
+        '• Guardará un registro en el historial de actas\n' +
+        '• Liberará los vehículos para nuevas asignaciones\n' +
+        '• La fecha y hora quedarán registradas\n\n' +
+        '¿Continuar?');
+    
+    if (!confirmado) {
+        console.log('❌ Usuario canceló la reasignación');
+        return;
+    }
+    
+    if (!supabaseClient) {
+        mostrarAlerta('❌ error de conexión con la base de datos', 'error');
+        return;
+    }
+    
+    try {
+        // ✅ PASO 1: Obtener datos completos del acta actual
+        const { data: actaData, error: errorActa } = await supabaseClient
+            .from('actas_asignacion')
+            .select('*')
+            .eq('id', actaActualId)
+            .single();
+        
+        if (errorActa || !actaData) {
+            console.error('❌ Error al obtener datos del acta:', errorActa);
+            throw new Error('No se pudo obtener la información del acta');
+        }
+        
+        // ✅ PASO 2: Registrar en historial_de_actas
+        const historialData = {
+            acta_id: actaActualId,
+            funcionario_nombre: actaData.funcionario_nombre || '',
+            funcionario_cedula: actaData.funcionario_cedula || '',
+            unidad_asignacion: actaData.unidad_asignacion || '',
+            vehiculos: actaData.vehiculos,
+            fecha_reasignacion: new Date().toISOString(),
+            fecha_dia: actaData.fecha_dia || '',
+            fecha_mes: actaData.fecha_mes || '',
+            fecha_anio: actaData.fecha_anio || '',
+            usuario_reasigno: document.getElementById('userEmail')?.textContent || 'usuario@institucion.com',
+            motivo: 'Reasignación de vehículos solicitada por usuario',
+            estado: 'reasignado'
+        };
+        
+        console.log('📦 Datos para historial:', JSON.stringify(historialData, null, 2));
+        
+        const { error: errorHistorial } = await supabaseClient
+            .from('historial_de_actas')
+            .insert(historialData);
+        
+        if (errorHistorial) {
+            console.error('❌ Error al guardar en historial:', errorHistorial);
+            throw new Error('No se pudo registrar en el historial: ' + errorHistorial.message);
+        }
+        
+        console.log('✅ Registro guardado en historial_de_actas');
+        
+        // ✅ PASO 3: Actualizar el acta original (marcar como reasignada)
+        const { error: errorUpdate } = await supabaseClient
+            .from('actas_asignacion')
+            .update({
+                estado: 'reasignado',
+                fecha_reasignacion: new Date().toISOString(),
+                vehiculos: []  // ✅ Limpiar vehículos para que queden disponibles
+            })
+            .eq('id', actaActualId);
+        
+        if (errorUpdate) {
+            console.error('❌ Error al actualizar acta:', errorUpdate);
+            throw new Error('No se pudo actualizar el acta: ' + errorUpdate.message);
+        }
+        
+        console.log('✅ Acta actualizada como reasignada');
+        
+        // ✅ PASO 4: Limpiar formulario y recargar
+        mostrarAlerta('✅ vehículos reasignados exitosamente. ahora están disponibles para nuevas actas', 'success');
+        
+        // Limpiar formulario después de 2 segundos
+        setTimeout(() => {
+            limpiarFormulario();
+            cargarTodasLasActas();  // Recargar lista de actas
+        }, 2000);
+        
+    } catch (error) {
+        console.error('❌ error al reasignar vehículos:', error);
+        mostrarAlerta(`❌ error: ${error.message}`, 'error');
+    }
+}
 // ============================================
 // ✅ EXPORTAR FUNCIONES GLOBALES
 // ============================================
@@ -840,5 +955,6 @@ window.cargarTodasLasActas = cargarTodasLasActas;
 window.resetearFiltros = resetearFiltros;
 window.normalizarTexto = normalizarTexto;
 window.sonVehiculosIguales = sonVehiculosIguales;
+window.reasignarVehiculos = reasignarVehiculos;
 
 console.log('✅ Funciones exportadas a window');
