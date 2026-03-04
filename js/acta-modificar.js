@@ -323,7 +323,9 @@ async function seleccionarActa(actaId) {
         const { data, error } = await supabaseClient.from('actas_asignacion').select('*').eq('id', actaId).single();
         if (error || !data) throw error;
         
+        
         actaActualId = String(data.id);
+        const idParaBuscar = isNaN(actaActualId) ? actaActualId : Number(actaActualId);
         
         // ✅ Validar cada elemento antes de asignar valor
         const elNombre = document.getElementById('funcionarioNombre');
@@ -651,29 +653,50 @@ function reasignarVehiculos() {
     // ✅ MOSTRAR MODAL ELEGANTE
     abrirModalReasignar();
 }
-
-// Función que se ejecuta cuando el usuario confirma en el modal
+// ============================================
+// ✅ REASIGNAR VEHÍCULOS DEL ACTA (CORREGIDO)
+// ============================================
 async function confirmarReasignacion() {
     cerrarModalReasignar();
     
-    if (!supabaseClient) { mostrarAlerta('❌ error de conexión con la base de datos', 'error'); return; }
+    console.log('🔍 confirmarReasignacion - INICIANDO');
+    console.log('🔍 actaActualId (original):', actaActualId, typeof actaActualId);
+    
+    if (!supabaseClient) { 
+        mostrarAlerta('❌ error de conexión con la base de datos', 'error'); 
+        return; 
+    }
     
     try {
-        // ✅ PASO 1: Obtener datos completos del acta actual
-        const {  actaData, error: errorActa } = await supabaseClient
+        // ✅ PASO 1: Convertir ID al tipo correcto (número si la BD usa enteros)
+        const idParaBuscar = isNaN(actaActualId) ? actaActualId : Number(actaActualId);
+        console.log('🔍 ID convertido para búsqueda:', idParaBuscar, typeof idParaBuscar);
+        
+        // ✅ PASO 2: Obtener datos del acta (usando .limit(1) en vez de .single() para mejor manejo de errores)
+        const {  actasData, error: errorActa } = await supabaseClient
             .from('actas_asignacion')
             .select('*')
-            .eq('id', actaActualId)
-            .single();
+            .eq('id', idParaBuscar)
+            .limit(1);
         
-        if (errorActa || !actaData) {
-            console.error('❌ Error al obtener datos del acta:', errorActa);
-            throw new Error('No se pudo obtener la información del acta');
+        console.log('📊 Respuesta de Supabase:', { actasData, error: errorActa });
+        
+        if (errorActa) {
+            console.error('❌ Error de Supabase:', errorActa);
+            throw new Error('Error de base de datos: ' + errorActa.message);
         }
         
-        // ✅ PASO 2: Registrar en historial_de_actas
+        if (!actasData || actasData.length === 0) {
+            console.error('❌ No se encontró acta con ID:', idParaBuscar);
+            throw new Error(`No se encontró el acta #${actaActualId}. Verifica que exista en la base de datos.`);
+        }
+        
+        const actaData = actasData[0];
+        console.log('✅ Acta encontrada:', actaData.id);
+        
+        // ✅ PASO 3: Registrar en historial_de_actas
         const historialData = {
-            acta_id: String(actaActualId),
+            acta_id: String(actaData.id),  // ✅ Guardar como string para compatibilidad
             funcionario_nombre: actaData.funcionario_nombre || '',
             funcionario_cedula: actaData.funcionario_cedula || '',
             unidad_asignacion: actaData.unidad_asignacion || '',
@@ -700,15 +723,15 @@ async function confirmarReasignacion() {
         
         console.log('✅ Registro guardado en historial_de_actas');
         
-        // ✅ PASO 3: Actualizar el acta original
+        // ✅ PASO 4: Actualizar el acta original (marcar como reasignada)
         const { error: errorUpdate } = await supabaseClient
             .from('actas_asignacion')
             .update({
                 estado: 'reasignado',
                 fecha_reasignacion: new Date().toISOString(),
-                vehiculos: []
+                vehiculos: []  // ✅ Limpiar vehículos para que queden disponibles
             })
-            .eq('id', actaActualId);
+            .eq('id', idParaBuscar);  // ✅ Usar el ID convertido
         
         if (errorUpdate) {
             console.error('❌ Error al actualizar acta:', errorUpdate);
@@ -717,6 +740,7 @@ async function confirmarReasignacion() {
         
         console.log('✅ Acta actualizada como reasignada');
         
+        // ✅ PASO 5: Mostrar éxito y limpiar
         mostrarAlerta('✅ vehículos reasignados exitosamente. ahora están disponibles para nuevas actas', 'success');
         
         setTimeout(() => {
