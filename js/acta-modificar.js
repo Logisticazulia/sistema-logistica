@@ -1,6 +1,7 @@
 /* ============================================ */
 /* ACTA-MODIFICAR.JS                            */
 /* Sistema de Gestión de Transporte - CCPE ZULIA */
+/* BUSCADOR DE ACTAS CON FILTROS                */
 /* ============================================ */
 
 // ============================================
@@ -17,17 +18,20 @@ let listaActas = [];
 // ✅ INICIALIZAR AL CARGAR LA PÁGINA
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 DOMContentLoaded - Iniciando acta-modificar.js');
+    
     if (typeof window.supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_KEY) {
         supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
         console.log('✅ Supabase inicializado correctamente');
     } else {
         console.error('❌ Error: Credenciales de Supabase no encontradas. Verifica config.js');
     }
+    
     actualizarFechaActa();
     agregarListenersFormulario();
     agregarListenerEnter();
     cargarEmailUsuario();
-    cargarListaActas();
+    cargarTodasLasActas(); // ✅ Cargar todas al iniciar
 });
 
 // ============================================
@@ -71,83 +75,161 @@ function cargarEmailUsuario() {
 }
 
 // ============================================
-// ✅ CARGAR LISTA DE ACTAS EXISTENTES
+// ✅ BUSCAR ACTAS CON FILTROS
 // ============================================
-async function cargarListaActas() {
-    const actaSelect = document.getElementById('actaSelect');
-    const btnCargar = document.getElementById('btnCargarActa');
-    const selectorAlert = document.getElementById('selectorAlert');
+async function buscarActas() {
+    const filterFuncionario = document.getElementById('filterFuncionario')?.value.trim() || '';
+    const filterCedula = document.getElementById('filterCedula')?.value.trim() || '';
+    const filterUnidad = document.getElementById('filterUnidad')?.value.trim() || '';
+    const filterFecha = document.getElementById('filterFecha')?.value || '';
+    const searchActaAlert = document.getElementById('searchActaAlert');
+    
+    console.log('🔍 buscarActas - Filtros:', { filterFuncionario, filterCedula, filterUnidad, filterFecha });
     
     if (!supabaseClient) {
-        mostrarAlerta('❌ error de conexión con la base de datos', 'error', selectorAlert);
+        mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchActaAlert);
         return;
     }
     
     try {
-        actaSelect.innerHTML = '<option value="">-- Cargando actas... --</option>';
-        actaSelect.disabled = true;
-        if (btnCargar) btnCargar.disabled = true;
-        
-        const { data, error } = await supabaseClient
+        let query = supabaseClient
             .from('actas_asignacion')
-            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, created_at')
+            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, vehiculos, created_at, fecha_dia, fecha_mes, fecha_anio')
             .order('created_at', { ascending: false })
             .limit(100);
+        
+        // ✅ Aplicar filtros si existen
+        if (filterFuncionario) {
+            query = query.ilike('funcionario_nombre', `%${filterFuncionario}%`);
+        }
+        if (filterCedula) {
+            query = query.ilike('funcionario_cedula', `%${filterCedula}%`);
+        }
+        if (filterUnidad) {
+            query = query.ilike('unidad_asignacion', `%${filterUnidad}%`);
+        }
+        if (filterFecha) {
+            query = query.gte('created_at', filterFecha + 'T00:00:00')
+                        .lte('created_at', filterFecha + 'T23:59:59');
+        }
+        
+        const { data, error } = await query;
+        
+        console.log('📊 Respuesta de búsqueda de actas:', { data, error });
         
         if (error) throw error;
         
         listaActas = data || [];
+        renderizarTablaActas();
         
         if (listaActas.length === 0) {
-            actaSelect.innerHTML = '<option value="">-- No hay actas registradas --</option>';
-            mostrarAlerta('ℹ️ no hay actas registradas en la base de datos', 'info', selectorAlert);
-            return;
+            mostrarAlerta('ℹ️ no se encontraron actas con los filtros aplicados', 'info', searchActaAlert);
+        } else {
+            mostrarAlerta(`✅ ${listaActas.length} acta(s) encontrada(s)`, 'success', searchActaAlert);
         }
         
-        actaSelect.innerHTML = '<option value="">-- Seleccione una acta --</option>' + 
-            listaActas.map(acta => {
-                const fecha = acta.created_at ? new Date(acta.created_at).toLocaleDateString('es-VE') : 'N/A';
-                return `<option value="${acta.id}">
-                    📄 ${acta.funcionario_nombre} | C.I: ${acta.funcionario_cedula} | ${acta.unidad_asignacion} | ${fecha}
-                </option>`;
-            }).join('');
-        
-        actaSelect.disabled = false;
-        if (btnCargar) btnCargar.disabled = false;
-        mostrarAlerta(`✅ ${listaActas.length} acta(s) cargada(s)`, 'success', selectorAlert);
-        
     } catch (error) {
-        console.error('Error al cargar actas:', error);
-        actaSelect.innerHTML = '<option value="">-- Error al cargar --</option>';
-        mostrarAlerta('❌ error al cargar la lista de actas', 'error', selectorAlert);
+        console.error('❌ Error al buscar actas:', error);
+        mostrarAlerta('❌ error al buscar actas: ' + error.message, 'error', searchActaAlert);
     }
 }
 
 // ============================================
-// ✅ RECARGAR LISTA DE ACTAS
+// ✅ CARGAR TODAS LAS ACTAS
 // ============================================
-function recargarListaActas() {
-    const selectorAlert = document.getElementById('selectorAlert');
-    mostrarAlerta('🔄 actualizando lista...', 'info', selectorAlert);
-    cargarListaActas();
+async function cargarTodasLasActas() {
+    const searchActaAlert = document.getElementById('searchActaAlert');
+    mostrarAlerta('🔄 cargando todas las actas...', 'info', searchActaAlert);
+    
+    // ✅ Limpiar filtros
+    document.getElementById('filterFuncionario').value = '';
+    document.getElementById('filterCedula').value = '';
+    document.getElementById('filterUnidad').value = '';
+    document.getElementById('filterFecha').value = '';
+    
+    await buscarActas();
 }
 
 // ============================================
-// ✅ CARGAR ACTA SELECCIONADA PARA EDITAR
+// ✅ RESETEAR FILTROS
 // ============================================
-async function cargarActaSeleccionada() {
-    const actaSelect = document.getElementById('actaSelect');
-    const selectorAlert = document.getElementById('selectorAlert');
+function resetearFiltros() {
+    document.getElementById('filterFuncionario').value = '';
+    document.getElementById('filterCedula').value = '';
+    document.getElementById('filterUnidad').value = '';
+    document.getElementById('filterFecha').value = '';
+    
+    const searchActaAlert = document.getElementById('searchActaAlert');
+    mostrarAlerta('🔄 filtros limpiados. cargando todas las actas...', 'info', searchActaAlert);
+    cargarTodasLasActas();
+}
+
+// ============================================
+// ✅ RENDERIZAR TABLA DE ACTAS
+// ============================================
+function renderizarTablaActas() {
+    const tbody = document.getElementById('actasListBody');
+    const section = document.getElementById('actaResultsSection');
+    const count = document.getElementById('actaCount');
+    
+    if (!tbody || !section || !count) return;
+    
+    if (listaActas.length === 0) {
+        section.classList.remove('active');
+        return;
+    }
+    
+    section.classList.add('active');
+    count.textContent = listaActas.length;
+    
+    tbody.innerHTML = listaActas.map(acta => {
+        const fecha = acta.created_at ? new Date(acta.created_at).toLocaleDateString('es-VE') : 'N/A';
+        let vehiculosCount = 0;
+        
+        try {
+            if (typeof acta.vehiculos === 'string') {
+                const vehiculosData = JSON.parse(acta.vehiculos);
+                vehiculosCount = Array.isArray(vehiculosData) ? vehiculosData.length : 0;
+            } else if (Array.isArray(acta.vehiculos)) {
+                vehiculosCount = acta.vehiculos.length;
+            }
+        } catch (e) {
+            vehiculosCount = 0;
+        }
+        
+        return `
+            <tr>
+                <td>${fecha}</td>
+                <td>${acta.funcionario_nombre || '---'}</td>
+                <td>${acta.funcionario_cedula || '---'}</td>
+                <td>${acta.unidad_asignacion || '---'}</td>
+                <td style="text-align: center;">${vehiculosCount}</td>
+                <td>
+                    <button class="btn-select-acta" onclick="seleccionarActa('${acta.id}')">
+                        📥 Cargar
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ============================================
+// ✅ SELECCIONAR ACTA PARA MODIFICAR
+// ============================================
+async function seleccionarActa(actaId) {
+    const searchActaAlert = document.getElementById('searchActaAlert');
     const btnActualizar = document.getElementById('btnActualizarActa');
     
-    const actaId = actaSelect?.value;
+    console.log('🔍 seleccionarActa - actaId:', actaId);
+    
     if (!actaId) {
-        mostrarAlerta('⚠️ por favor seleccione una acta', 'error', selectorAlert);
+        mostrarAlerta('⚠️ ID de acta no válido', 'error', searchActaAlert);
         return;
     }
     
     if (!supabaseClient) {
-        mostrarAlerta('❌ error de conexión', 'error', selectorAlert);
+        mostrarAlerta('❌ error de conexión', 'error', searchActaAlert);
         return;
     }
     
@@ -158,10 +240,16 @@ async function cargarActaSeleccionada() {
             .eq('id', actaId)
             .single();
         
-        if (error || !data) throw error;
+        console.log('📊 Respuesta de cargar acta:', { data, error });
         
-        // ✅ Guardar ID del acta actual
+        if (error || !data) {
+            console.error('❌ Error al cargar acta:', error);
+            throw error;
+        }
+        
+        // ✅ GUARDAR ID DEL ACTA ACTUAL
         actaActualId = data.id;
+        console.log('✅ actaActualId establecido:', actaActualId);
         
         // ✅ Cargar datos del funcionario
         document.getElementById('funcionarioNombre').value = data.funcionario_nombre || '';
@@ -191,6 +279,8 @@ async function cargarActaSeleccionada() {
         listaVehiculos = Array.isArray(vehiculosData) ? vehiculosData : [];
         vehicleCounter = listaVehiculos.length;
         
+        console.log('🚗 Vehículos cargados:', listaVehiculos.length);
+        
         // ✅ Asignar tempId a cada vehículo cargado
         listaVehiculos.forEach((v, index) => {
             if (!v.tempId) v.tempId = index + 1;
@@ -202,17 +292,20 @@ async function cargarActaSeleccionada() {
         actualizarActa();
         actualizarTextoSingularPlural();
         
-        // ✅ Habilitar botón de actualizar
-        if (btnActualizar) btnActualizar.disabled = false;
+        // ✅ HABILITAR BOTÓN DE ACTUALIZAR
+        if (btnActualizar) {
+            btnActualizar.disabled = false;
+            console.log('✅ Botón actualizar habilitado');
+        }
         
-        mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', selectorAlert);
+        mostrarAlerta(`✅ acta #${actaId} cargada. ${listaVehiculos.length} vehículo(s)`, 'success', searchActaAlert);
         
         // 🔍 Scroll hacia el formulario
         document.querySelector('.form-section')?.scrollIntoView({ behavior: 'smooth' });
         
     } catch (error) {
-        console.error('Error al cargar acta:', error);
-        mostrarAlerta('❌ error al cargar la acta seleccionada', 'error', selectorAlert);
+        console.error('❌ Error al cargar acta:', error);
+        mostrarAlerta('❌ error al cargar la acta: ' + error.message, 'error', searchActaAlert);
     }
 }
 
@@ -346,7 +439,6 @@ async function buscarVehiculo() {
             return;
         }
         
-        // 🚫 Validar si ya está en la lista temporal
         const yaEnLista = listaVehiculos.some(v => sonVehiculosIguales(v, vehiculoEncontrado));
         if (yaEnLista) {
             mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'info', searchAlert);
@@ -354,7 +446,6 @@ async function buscarVehiculo() {
             return;
         }
         
-        // ✅ Vehículo disponible
         vehiculoActual = {
             id: vehiculoEncontrado.id,
             marca: vehiculoEncontrado.marca || 'N/P',
@@ -385,7 +476,26 @@ function agregarVehiculoAlActa() {
         return;
     }
     
-    const yaExiste = listaVehiculos.some(v => sonVehiculosIguales(v, vehiculoActual));
+    const yaExiste = listaVehiculos.some(v => {
+        if (v.id && vehiculoActual.id && v.id === vehiculoActual.id) return true;
+        
+        const placa1 = (v.placa || '').toString().trim().toUpperCase();
+        const placa2 = (vehiculoActual.placa || '').toString().trim().toUpperCase();
+        const placaValida1 = placa1 && placa1 !== 'N/P' && placa1 !== 'N/D' && placa1.length >= 6;
+        const placaValida2 = placa2 && placa2 !== 'N/P' && placa2 !== 'N/D' && placa2.length >= 6;
+        
+        if (placaValida1 && placaValida2 && placa1 === placa2) return true;
+        
+        const serial1 = (v.s_carroceria || '').toString().trim().toUpperCase();
+        const serial2 = (vehiculoActual.s_carroceria || '').toString().trim().toUpperCase();
+        const serialValido1 = serial1 && serial1 !== 'N/P' && serial1 !== 'N/D' && serial1.length >= 10;
+        const serialValido2 = serial2 && serial2 !== 'N/P' && serial2 !== 'N/D' && serial2.length >= 10;
+        
+        if (serialValido1 && serialValido2 && serial1 === serial2) return true;
+        
+        return false;
+    });
+    
     if (yaExiste) {
         mostrarAlerta('⚠️ este vehículo ya está en la lista del acta', 'error');
         return;
@@ -405,9 +515,9 @@ function agregarVehiculoAlActa() {
     vehiculoActual = null;
     if (btnAgregar) btnAgregar.disabled = true;
     
-    // ✅ Habilitar botón de actualizar si hay cambios
     if (actaActualId) {
-        document.getElementById('btnActualizarActa').disabled = false;
+        const btnActualizar = document.getElementById('btnActualizarActa');
+        if (btnActualizar) btnActualizar.disabled = false;
     }
     
     mostrarAlerta(`✅ vehículo agregado. total: ${listaVehiculos.length}`, 'success');
@@ -459,9 +569,9 @@ function eliminarVehiculo(tempId) {
         if (typeof renderizarVehiculosEnActa === 'function') renderizarVehiculosEnActa();
         if (typeof actualizarTextoSingularPlural === 'function') actualizarTextoSingularPlural();
         
-        // ✅ Habilitar botón de actualizar si hay cambios
         if (actaActualId) {
-            document.getElementById('btnActualizarActa').disabled = false;
+            const btnActualizar = document.getElementById('btnActualizarActa');
+            if (btnActualizar) btnActualizar.disabled = false;
         }
         
         mostrarAlerta(
@@ -535,6 +645,19 @@ function agregarListenerEnter() {
             }
         });
     }
+    
+    // ✅ Permitir Enter en filtros de actas
+    ['filterFuncionario','filterCedula','filterUnidad','filterFecha'].forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.addEventListener('keypress', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    buscarActas();
+                }
+            });
+        }
+    });
 }
 
 // ============================================
@@ -582,7 +705,13 @@ function imprimirActa() {
 // ✅ ACTUALIZAR ACTA EN BASE DE DATOS
 // ============================================
 async function actualizarActaEnBD() {
+    console.log('🔍 actualizarActaEnBD - INICIANDO');
+    console.log('🔍 actaActualId:', actaActualId);
+    console.log('🔍 supabaseClient:', supabaseClient ? 'OK' : 'NULL');
+    console.log('🔍 listaVehiculos.length:', listaVehiculos.length);
+    
     if (!actaActualId) {
+        console.error('❌ actaActualId es null o undefined');
         mostrarAlerta('⚠️ primero debe cargar una acta para modificar', 'error');
         return;
     }
@@ -626,17 +755,32 @@ async function actualizarActaEnBD() {
     };
     
     console.log('📦 datos a actualizar:', JSON.stringify(actaData, null, 2));
+    console.log('🔍 ID del acta a actualizar:', actaActualId);
     
     try {
-        const { error } = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('actas_asignacion')
             .update(actaData)
-            .eq('id', actaActualId);
+            .eq('id', actaActualId)
+            .select();
+        
+        console.log('📊 Respuesta de update:', { data, error });
         
         if (error) throw error;
         
+        if (!data || data.length === 0) {
+            console.error('❌ No se actualizó ninguna fila - RLS o ID incorrecto');
+            mostrarAlerta('❌ no se pudo actualizar - verifique permisos o ID del acta', 'error');
+            return;
+        }
+        
+        console.log('✅ Acta actualizada exitosamente:', data[0].id);
         mostrarAlerta('✅ acta actualizada exitosamente', 'success');
         document.getElementById('btnActualizarActa').disabled = true;
+        
+        setTimeout(() => {
+            cargarTodasLasActas();
+        }, 1000);
         
     } catch (error) {
         console.error('❌ error al actualizar acta:', error);
@@ -690,8 +834,11 @@ window.mostrarAlerta = mostrarAlerta;
 window.actualizarActa = actualizarActa;
 window.cargarEmailUsuario = cargarEmailUsuario;
 window.actualizarFechaActa = actualizarFechaActa;
-window.cargarListaActas = cargarListaActas;
-window.cargarActaSeleccionada = cargarActaSeleccionada;
-window.recargarListaActas = recargarListaActas;
+window.buscarActas = buscarActas;
+window.seleccionarActa = seleccionarActa;
+window.cargarTodasLasActas = cargarTodasLasActas;
+window.resetearFiltros = resetearFiltros;
 window.normalizarTexto = normalizarTexto;
 window.sonVehiculosIguales = sonVehiculosIguales;
+
+console.log('✅ Funciones exportadas a window');
