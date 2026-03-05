@@ -542,6 +542,81 @@ function mostrarAlerta(mensaje, tipo, elemento = null) {
 }
 
 // ============================================
+// ✅ BUSCAR ACTA POR VEHÍCULO (AGREGADA)
+// ============================================
+async function buscarActaPorVehiculo() {
+    const searchInput = document.getElementById('vehicleSearchInput');
+    const searchAlert = document.getElementById('vehicleSearchAlert');
+    
+    const terminoBusqueda = searchInput?.value.trim().toUpperCase() || '';
+    
+    if (!terminoBusqueda) {
+        mostrarAlerta('⚠️ por favor ingrese un término de búsqueda', 'error', searchAlert);
+        return;
+    }
+    
+    if (!supabaseClient) {
+        mostrarAlerta('❌ error de conexión con la base de datos', 'error', searchAlert);
+        return;
+    }
+    
+    try {
+        // Buscar en todas las actas el vehículo
+        const { data: actas, error } = await supabaseClient
+            .from('actas_asignacion')
+            .select('id, funcionario_nombre, funcionario_cedula, unidad_asignacion, vehiculos, fecha_dia, fecha_mes, fecha_anio, created_at');
+        
+        if (error) throw error;
+        
+        let actasEncontradas = [];
+        
+        for (const acta of actas) {
+            let vehiculosData = null;
+            try {
+                if (typeof acta.vehiculos === 'string') {
+                    vehiculosData = JSON.parse(acta.vehiculos);
+                } else {
+                    vehiculosData = acta.vehiculos;
+                }
+            } catch (e) { continue; }
+            
+            if (Array.isArray(vehiculosData)) {
+                const encontrado = vehiculosData.some(v => {
+                    const placa = (v.placa || '').toString().trim().toUpperCase();
+                    const serial = (v.s_carroceria || '').toString().trim().toUpperCase();
+                    const facsimil = (v.facsimil || '').toString().trim().toUpperCase();
+                    const motor = (v.s_motor || '').toString().trim().toUpperCase();
+                    
+                    return placa === terminoBusqueda || 
+                           serial === terminoBusqueda || 
+                           facsimil === terminoBusqueda || 
+                           motor === terminoBusqueda;
+                });
+                
+                if (encontrado) {
+                    actasEncontradas.push(acta);
+                }
+            }
+        }
+        
+        // ✅ Aplicar filtro de vehículos > 0 también aquí
+        actasFiltradas = filtrarActasConVehiculos(actasEncontradas);
+        paginaActual = 1;
+        renderizarTablaActas();
+        
+        if (actasFiltradas.length === 0) {
+            mostrarAlerta('ℹ️ no se encontraron actas con ese vehículo', 'info', searchAlert);
+        } else {
+            mostrarAlerta(`✅ ${actasFiltradas.length} acta(s) encontrada(s)`, 'success', searchAlert);
+        }
+        
+    } catch (error) {
+        console.error('Error al buscar acta por vehículo:', error);
+        mostrarAlerta('❌ error de conexión. intente nuevamente.', 'error', searchAlert);
+    }
+}
+
+// ============================================
 // ✅ EXPORTAR FUNCIONES GLOBALES
 // ============================================
 window.buscarActas = buscarActas;
@@ -559,6 +634,7 @@ window.contarVehiculos = contarVehiculos;
 window.filtrarActasConVehiculos = filtrarActasConVehiculos;
 window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
 window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
+window.buscarActaPorVehiculo = buscarActaPorVehiculo;  // ✅ AGREGADA
 
 console.log('✅ Funciones exportadas a window');
 console.log('📊 Paginación configurada:', itemsPorPagina, 'actas por página');
