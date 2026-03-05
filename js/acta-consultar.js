@@ -3,6 +3,7 @@
 /* Sistema de Gestión de Transporte - CCPE ZULIA */
 /* CONSULTAR ACTAS - SOLO LECTURA               */
 /* PAGINACIÓN: 20 POR PÁGINA                    */
+/* FILTRO: OCULTAR ACTAS SIN VEHÍCULOS          */
 /* ============================================ */
 
 // ============================================
@@ -10,13 +11,14 @@
 // ============================================
 let supabaseClient = null;
 let actasFiltradas = [];
+let actasOriginales = [];
 let actaSeleccionada = null;
 
 // ============================================
 // ✅ VARIABLES DE PAGINACIÓN (20 POR PÁGINA)
 // ============================================
 let paginaActual = 1;
-const itemsPorPagina = 20;  // ✅ CAMBIADO de 10 a 20
+const itemsPorPagina = 20;
 
 // ============================================
 // ✅ INICIALIZAR AL CARGAR LA PÁGINA
@@ -91,6 +93,22 @@ function contarVehiculos(vehiculos) {
 }
 
 // ============================================
+// ✅ FILTRAR ACTAS - OCULTAR SIN VEHÍCULOS
+// ============================================
+function filtrarActasConVehiculos(actas) {
+    return actas.filter(acta => {
+        const vehiculosCount = contarVehiculos(acta.vehiculos);
+        const tieneVehiculos = vehiculosCount > 0;
+        
+        if (!tieneVehiculos) {
+            console.log('🗑️ Acta ocultada (sin vehículos):', acta.id);
+        }
+        
+        return tieneVehiculos;
+    });
+}
+
+// ============================================
 // ✅ BUSCAR ACTAS CON FILTROS
 // ============================================
 async function buscarActas() {
@@ -125,14 +143,21 @@ async function buscarActas() {
         const { data, error } = await query;
         if (error) throw error;
         
-        actasFiltradas = data || [];
-        paginaActual = 1;  // ✅ Resetear a página 1 al buscar
+        // ✅ Guardar todas las actas originales
+        actasOriginales = data || [];
+        console.log('📊 Total de actas en BD:', actasOriginales.length);
+        
+        // ✅ Filtrar solo actas con vehículos (OCULTAR sin vehículos)
+        actasFiltradas = filtrarActasConVehiculos(actasOriginales);
+        console.log('✅ Actas con vehículos (mostrables):', actasFiltradas.length);
+        
+        paginaActual = 1;
         renderizarTablaActas();
         
         if (actasFiltradas.length === 0) {
-            mostrarAlerta('ℹ️ no se encontraron actas con los filtros aplicados', 'info', searchAlert);
+            mostrarAlerta('ℹ️ no se encontraron actas con vehículos', 'info', searchAlert);
         } else {
-            mostrarAlerta(`✅ ${actasFiltradas.length} acta(s) encontrada(s)`, 'success', searchAlert);
+            mostrarAlerta(`✅ ${actasFiltradas.length} acta(s) con vehículos encontrada(s)`, 'success', searchAlert);
         }
         
     } catch (error) {
@@ -155,6 +180,7 @@ async function cargarTodasLasActas() {
     
     paginaActual = 1;
     actasFiltradas = [];
+    actasOriginales = [];
     
     await buscarActas();
 }
@@ -170,6 +196,7 @@ function resetearFiltros() {
     
     paginaActual = 1;
     actasFiltradas = [];
+    actasOriginales = [];
     
     const searchAlert = document.getElementById('searchAlert');
     mostrarAlerta('🔄 filtros limpiados. cargando todas las actas...', 'info', searchAlert);
@@ -245,7 +272,6 @@ function renderizarPaginacion() {
     
     if (!paginationControls || !paginationNumbers) return;
     
-    // ✅ Calcular total de páginas con 20 items
     const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
     
     if (totalPaginas <= 1) {
@@ -259,7 +285,6 @@ function renderizarPaginacion() {
     if (btnAnterior) btnAnterior.disabled = paginaActual === 1;
     if (btnSiguiente) btnSiguiente.disabled = paginaActual === totalPaginas;
     
-    // ✅ Generar números de página (máximo 5 botones visibles)
     let numerosHTML = '';
     const maxBotones = 5;
     let inicio = Math.max(1, paginaActual - Math.floor(maxBotones / 2));
@@ -531,8 +556,10 @@ window.cargarEmailUsuario = cargarEmailUsuario;
 window.mostrarAlerta = mostrarAlerta;
 window.limpiarInput = limpiarInput;
 window.contarVehiculos = contarVehiculos;
+window.filtrarActasConVehiculos = filtrarActasConVehiculos;
 window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
 window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
 
 console.log('✅ Funciones exportadas a window');
 console.log('📊 Paginación configurada:', itemsPorPagina, 'actas por página');
+console.log('🚫 Filtro activo: Ocultar actas sin vehículos');
