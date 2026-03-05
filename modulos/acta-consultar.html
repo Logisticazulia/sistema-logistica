@@ -31,22 +31,25 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 }
 
 /* ============================================ */
-/* SECCIÓN DE BÚSQUEDA DE ACTAS                 */
+/* ✅ SECCIONES DE BÚSQUEDA - MISMO TAMAÑO QUE ACTA */
 /* ============================================ */
-.search-section {
+.search-section,
+.vehicle-search-section {
   background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  padding: 25px;
+  padding: 2cm;  /* ✅ MISMO PADDING QUE .acta-container */
   border-radius: 8px;
   margin-bottom: 25px;
   box-shadow: 0 4px 12px rgba(0,51,102,0.2);
+  width: 100%;  /* ✅ MISMO ANCHO QUE .acta-container */
 }
-.search-section h3 {
+.search-section h3,
+.vehicle-search-section h3 {
   color: white;
-  margin-bottom: 15px;
-  font-size: 16px;
+  margin-bottom: 20px;
+  font-size: 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .search-filters {
   display: grid;
@@ -54,7 +57,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   gap: 15px;
   margin-bottom: 15px;
 }
-/* ✅ CAMPOS DE BÚSQUEDA MÁS LARGOS */
+/* ✅ CAMPOS DE BÚSQUEDA MÁS LARGOS - IGUAL QUE ACTA */
 .search-filters input, .search-filters select {
   padding: 14px 20px;
   border: 2px solid rgba(255,255,255,0.3);
@@ -70,7 +73,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   border-color: #fff;
   box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
 }
-/* ✅ Placeholder más visible */
 .search-filters input::placeholder {
   color: #666;
   opacity: 1;
@@ -120,14 +122,15 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 }
 
 /* ============================================ */
-/* BÚSQUEDA DE VEHÍCULOS                        */
+/* BÚSQUEDA DE VEHÍCULOS - MISMO TAMAÑO         */
 /* ============================================ */
 .vehicle-search-section {
   background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  padding: 30px;
+  padding: 2cm;  /* ✅ MISMO PADDING QUE search-section Y acta-container */
   border-radius: 8px;
   margin-bottom: 30px;
   box-shadow: 0 4px 12px rgba(0,51,102,0.2);
+  width: 100%;
 }
 .vehicle-search-section h3 {
   color: white;
@@ -145,7 +148,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 }
 .search-input {
   flex: 1;
-  min-width: 400px;
+  min-width: 500px;  /* ✅ MÁS LARGO - IGUAL QUE ANCHO DE ACTA */
   padding: 16px 24px;
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: 6px;
@@ -205,15 +208,16 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 }
 
 /* ============================================ */
-/* SECCIÓN DE RESULTADOS                        */
+/* SECCIÓN DE RESULTADOS - MÁS PEQUEÑA          */
 /* ============================================ */
 .results-section {
   background: #f8f9fa;
-  padding: 20px;
+  padding: 2cm;  /* ✅ MISMO PADDING QUE acta-container */
   border-radius: 8px;
   margin-bottom: 25px;
   border: 1px solid #ddd;
   display: none;
+  width: 100%;
 }
 .results-section.active { display: block; }
 .results-section h3 {
@@ -347,7 +351,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 /* ============================================ */
 .preview-section {
   background: white;
-  padding: 30px;
+  padding: 2cm;  /* ✅ MISMO PADDING QUE LAS BÚSQUEDAS */
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   width: 100%;
@@ -397,7 +401,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 /* ============================================ */
 .acta-container {
   border: 1px solid #ddd;
-  padding: 2cm;
+  padding: 2cm;  /* ✅ ESTE ES EL PADDING DE REFERENCIA */
   background: white;
   width: 100%;
   font-family: Arial, sans-serif;
@@ -595,14 +599,26 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     max-width: 100%;
     padding: 20px;
   }
+  .search-section,
+  .vehicle-search-section,
+  .results-section,
+  .preview-section {
+    padding: 1.5cm;  /* ✅ Reducido en tablets */
+  }
   .search-filters {
     grid-template-columns: repeat(2, 1fr);
   }
-  .acta-container {
-    padding: 1.5cm;
+  .search-input {
+    min-width: 300px;
   }
 }
 @media (max-width: 768px) {
+  .search-section,
+  .vehicle-search-section,
+  .results-section,
+  .preview-section {
+    padding: 1cm;  /* ✅ Reducido en móviles */
+  }
   .search-filters {
     grid-template-columns: 1fr;
   }
@@ -772,7 +788,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
 <div class="container">
   
-  <!-- SECCIÓN DE BÚSQUEDA DE ACTAS (4 CAMPOS EN LÍNEA) -->
+  <!-- SECCIÓN DE BÚSQUEDA DE ACTAS (MISMO TAMAÑO QUE ACTA) -->
   <div class="search-section">
     <h3>🔍 Buscar por Acta</h3>
     <div id="searchAlert" class="alert"></div>
@@ -795,7 +811,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
   </div>
 
-  <!-- SECCIÓN DE BÚSQUEDA DE VEHÍCULOS -->
+  <!-- SECCIÓN DE BÚSQUEDA DE VEHÍCULOS (MISMO TAMAÑO QUE ACTA) -->
   <div class="vehicle-search-section">
     <h3>🚗 Buscar por Vehículo</h3>
     <div id="vehicleSearchAlert" class="alert"></div>
@@ -815,7 +831,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
   </div>
 
-  <!-- TABLA DE RESULTADOS -->
+  <!-- TABLA DE RESULTADOS (MISMO TAMAÑO QUE ACTA) -->
   <div class="results-section" id="resultsSection">
     <h3>
       <span>📄 Actas Encontradas</span>
@@ -851,7 +867,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
   </div>
 
-  <!-- VISTA PREVIA DEL ACTA -->
+  <!-- VISTA PREVIA DEL ACTA (MISMO TAMAÑO QUE BÚSQUEDAS) -->
   <div class="preview-section" id="previewSection">
     <h2 style="color: #003366; margin-bottom: 20px;">Vista Previa del Acta</h2>
     <div class="action-buttons">
