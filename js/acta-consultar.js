@@ -508,5 +508,7 @@ window.cargarEmailUsuario = cargarEmailUsuario;
 window.mostrarAlerta = mostrarAlerta;
 window.limpiarInput = limpiarInput;
 window.contarVehiculos = contarVehiculos;
+window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
+window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
 
 console.log('✅ Funciones exportadas a window');
