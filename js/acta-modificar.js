@@ -13,7 +13,7 @@ let listaVehiculos = [];
 let vehicleCounter = 0;
 let actaActualId = null;
 let actasFiltradas = [];
-let actasOriginales = [];  // ✅ Guardar todas las actas para filtrar
+let actasOriginales = [];
 let actaEncontradaId = null;
 
 // ============================================
@@ -93,41 +93,39 @@ function limpiarInput(id) {
 }
 
 // ============================================
+// ✅ FUNCIÓN AUXILIAR: Contar vehículos (CORREGIDA - evita JSON.parse en objeto)
+// ============================================
+function contarVehiculos(vehiculos) {
+    try {
+        if (Array.isArray(vehiculos)) return vehiculos.length;
+        if (typeof vehiculos === 'string' && vehiculos.trim()) {
+            return JSON.parse(vehiculos).length;
+        }
+        return 0;
+    } catch (e) {
+        console.warn('⚠️ Error al contar vehículos:', e);
+        return 0;
+    }
+}
+
+// ============================================
 // ✅ FILTRAR ACTAS (SOLO LAS QUE TIENEN VEHÍCULOS Y NO HAN SIDO REASIGNADAS)
 // ============================================
 function filtrarActasMostrables(actas) {
     return actas.filter(acta => {
-        // ✅ Contar vehículos en el acta
-        let vehiculosCount = 0;
-        try {
-            if (typeof acta.vehiculos === 'string') {
-                const vehiculosData = JSON.parse(acta.vehiculos);
-                vehiculosCount = Array.isArray(vehiculosData) ? vehiculosData.length : 0;
-            } else if (Array.isArray(acta.vehiculos)) {
-                vehiculosCount = acta.vehiculos.length;
-            }
-        } catch (e) {
-            vehiculosCount = 0;
-        }
-        
-        // ✅ CRITERIO 1: Debe tener al menos 1 vehículo
+        const vehiculosCount = contarVehiculos(acta.vehiculos);
         const tieneVehiculos = vehiculosCount > 0;
-        
-        // ✅ CRITERIO 2: No debe tener fecha de reasignación (no ha sido reasignada)
         const noReasignada = !acta.fecha_reasignacion;
-        
-        // ✅ Solo mostrar si cumple AMBOS criterios
         const mostrar = tieneVehiculos && noReasignada;
         
         if (!mostrar) {
-            console.log('🗑️ Acta filtrada (no mostrable):', {
+            console.log('🗑️ Acta filtrada:', {
                 id: acta.id,
                 vehiculos: vehiculosCount,
                 fecha_reasignacion: acta.fecha_reasignacion || 'N/A',
                 razon: !tieneVehiculos ? 'Sin vehículos' : 'Ya reasignada'
             });
         }
-        
         return mostrar;
     });
 }
@@ -167,13 +165,11 @@ async function buscarActas() {
         const { data, error } = await query;
         if (error) throw error;
         
-        // ✅ Guardar todas las actas originales
         actasOriginales = data || [];
         console.log('📊 Total de actas en BD:', actasOriginales.length);
         
-        // ✅ Filtrar solo las que tienen vehículos y no han sido reasignadas
         actasFiltradas = filtrarActasMostrables(actasOriginales);
-        console.log('✅ Actas mostrables (con vehículos y no reasignadas):', actasFiltradas.length);
+        console.log('✅ Actas mostrables:', actasFiltradas.length);
         
         paginaActual = 1;
         renderizarTablaActas();
@@ -228,7 +224,7 @@ function resetearFiltros() {
 }
 
 // ============================================
-// ✅ RENDERIZAR TABLA DE ACTAS (SIN COLUMNA ESTADO)
+// ✅ RENDERIZAR TABLA DE ACTAS
 // ============================================
 function renderizarTablaActas() {
     const tbody = document.getElementById('actasListBody');
@@ -251,15 +247,7 @@ function renderizarTablaActas() {
     
     tbody.innerHTML = actasPagina.map(acta => {
         const fecha = acta.created_at ? new Date(acta.created_at).toLocaleDateString('es-VE') : 'N/A';
-        let vehiculosCount = 0;
-        try {
-            if (typeof acta.vehiculos === 'string') {
-                const vehiculosData = JSON.parse(acta.vehiculos);
-                vehiculosCount = Array.isArray(vehiculosData) ? vehiculosData.length : 0;
-            } else if (Array.isArray(acta.vehiculos)) {
-                vehiculosCount = acta.vehiculos.length;
-            }
-        } catch (e) { vehiculosCount = 0; }
+        const vehiculosCount = contarVehiculos(acta.vehiculos);
         
         return `
             <tr>
@@ -406,7 +394,11 @@ async function seleccionarActa(actaId) {
         
         let vehiculosData = null;
         try {
-            vehiculosData = typeof actaData.vehiculos === 'string' ? JSON.parse(actaData.vehiculos) : actaData.vehiculos;
+            if (typeof actaData.vehiculos === 'string') {
+                vehiculosData = JSON.parse(actaData.vehiculos);
+            } else {
+                vehiculosData = actaData.vehiculos;
+            }
         } catch (e) { vehiculosData = []; }
         
         listaVehiculos = Array.isArray(vehiculosData) ? vehiculosData : [];
@@ -824,7 +816,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================
-// ✅ REASIGNAR VEHÍCULOS - GUARDAR SIEMPRE EN HISTORIAL
+// ✅ REASIGNAR VEHÍCULOS - GUARDAR SIEMPRE EN HISTORIAL (CORREGIDO)
 // ============================================
 async function confirmarReasignacion() {
     cerrarModalReasignar();
@@ -861,8 +853,8 @@ async function confirmarReasignacion() {
             funcionario_nombre: actaData.funcionario_nombre || '',
             funcionario_cedula: actaData.funcionario_cedula || '',
             unidad_asignacion: actaData.unidad_asignacion || '',
-            vehiculos: actaData.vehiculos,  // ✅ Guardar vehículos originales antes de liberar
-            fecha_reasignacion: new Date().toISOString(),  // ✅ Fecha/hora actual de reasignación
+            vehiculos: actaData.vehiculos,
+            fecha_reasignacion: new Date().toISOString(),
             fecha_dia: actaData.fecha_dia || '',
             fecha_mes: actaData.fecha_mes || '',
             fecha_anio: actaData.fecha_anio || '',
@@ -871,10 +863,13 @@ async function confirmarReasignacion() {
             estado: 'reasignado'
         };
         
+        // ✅ CORREGIDO: Usar función auxiliar para contar vehículos (evita JSON.parse en objeto)
+        const vehiculosCount = contarVehiculos(historialData.vehiculos);
+        
         console.log('📦 Guardando en historial:', {
             acta_id: historialData.acta_id,
             fecha: historialData.fecha_reasignacion,
-            vehiculos_count: Array.isArray(historialData.vehiculos) ? JSON.parse(historialData.vehiculos || '[]').length : 0
+            vehiculos_count: vehiculosCount
         });
         
         const { error: errorHistorial } = await supabaseClient.from('historial_de_actas').insert(historialData);
@@ -892,8 +887,8 @@ async function confirmarReasignacion() {
         const { error: errorUpdate } = await supabaseClient
             .from('actas_asignacion')
             .update({
-                vehiculos: [],  // ✅ Limpiar vehículos para que queden disponibles
-                fecha_reasignacion: new Date().toISOString()  // ✅ Marcar como reasignada
+                vehiculos: [],
+                fecha_reasignacion: new Date().toISOString()
             })
             .eq('id', idParaUpdate);
         
@@ -906,21 +901,18 @@ async function confirmarReasignacion() {
         
         mostrarAlerta('✅ vehículos reasignados y registrados en historial. ahora disponibles para nuevas actas', 'success');
         
-        // ✅ ELIMINAR ACTA DE LA LISTA LOCAL (ya no debe aparecer en "Actas Encontradas")
+        // ✅ ELIMINAR ACTA DE LA LISTA LOCAL
         console.log('🗑️ Eliminando acta de la lista local:', actaActualId);
         actasFiltradas = actasFiltradas.filter(acta => String(acta.id) !== String(actaActualId));
         actasOriginales = actasOriginales.filter(acta => String(acta.id) !== String(actaActualId));
         
-        // ✅ Ajustar paginación si es necesario
         const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
         if (paginaActual > totalPaginas && totalPaginas > 0) {
             paginaActual = totalPaginas;
         }
         
-        // ✅ Re-renderizar tabla (el acta ya no aparecerá)
         renderizarTablaActas();
         
-        // ✅ Si la lista quedó vacía, ocultar sección
         if (actasFiltradas.length === 0) {
             const section = document.getElementById('actaResultsSection');
             if (section) section.classList.remove('active');
@@ -930,7 +922,6 @@ async function confirmarReasignacion() {
         
         setTimeout(() => {
             limpiarFormulario();
-            // ✅ Recargar solo si la lista quedó vacía
             if (actasFiltradas.length === 0) {
                 cargarTodasLasActas();
             }
@@ -1065,6 +1056,7 @@ window.confirmarReasignacion = confirmarReasignacion;
 window.abrirModalReasignar = abrirModalReasignar;
 window.cerrarModalReasignar = cerrarModalReasignar;
 window.limpiarInput = limpiarInput;
+window.contarVehiculos = contarVehiculos;
 window.mostrarInfoActaEncontrada = mostrarInfoActaEncontrada;
 window.irAModificarActa = irAModificarActa;
 window.filtrarActasMostrables = filtrarActasMostrables;
