@@ -2,6 +2,7 @@
 /* ACTA-CONSULTAR.JS                            */
 /* Sistema de Gestión de Transporte - CCPE ZULIA */
 /* CONSULTAR ACTAS - SOLO LECTURA               */
+/* PAGINACIÓN: 20 POR PÁGINA                    */
 /* ============================================ */
 
 // ============================================
@@ -12,10 +13,10 @@ let actasFiltradas = [];
 let actaSeleccionada = null;
 
 // ============================================
-// ✅ VARIABLES DE PAGINACIÓN
+// ✅ VARIABLES DE PAGINACIÓN (20 POR PÁGINA)
 // ============================================
 let paginaActual = 1;
-const itemsPorPagina = 10;
+const itemsPorPagina = 20;  // ✅ CAMBIADO de 10 a 20
 
 // ============================================
 // ✅ INICIALIZAR AL CARGAR LA PÁGINA
@@ -125,7 +126,7 @@ async function buscarActas() {
         if (error) throw error;
         
         actasFiltradas = data || [];
-        paginaActual = 1;
+        paginaActual = 1;  // ✅ Resetear a página 1 al buscar
         renderizarTablaActas();
         
         if (actasFiltradas.length === 0) {
@@ -186,7 +187,7 @@ function limpiarInput(id) {
 }
 
 // ============================================
-// ✅ RENDERIZAR TABLA DE ACTAS
+// ✅ RENDERIZAR TABLA DE ACTAS (20 POR PÁGINA)
 // ============================================
 function renderizarTablaActas() {
     const tbody = document.getElementById('actasListBody');
@@ -203,6 +204,7 @@ function renderizarTablaActas() {
     section.classList.add('active');
     count.textContent = actasFiltradas.length;
     
+    // ✅ Paginación de 20 en 20
     const inicio = (paginaActual - 1) * itemsPorPagina;
     const fin = inicio + itemsPorPagina;
     const actasPagina = actasFiltradas.slice(inicio, fin);
@@ -231,7 +233,7 @@ function renderizarTablaActas() {
 }
 
 // ============================================
-// ✅ RENDERIZAR PAGINACIÓN
+// ✅ RENDERIZAR PAGINACIÓN (20 POR PÁGINA)
 // ============================================
 function renderizarPaginacion() {
     const paginationControls = document.getElementById('paginationControls');
@@ -243,6 +245,7 @@ function renderizarPaginacion() {
     
     if (!paginationControls || !paginationNumbers) return;
     
+    // ✅ Calcular total de páginas con 20 items
     const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
     
     if (totalPaginas <= 1) {
@@ -256,16 +259,21 @@ function renderizarPaginacion() {
     if (btnAnterior) btnAnterior.disabled = paginaActual === 1;
     if (btnSiguiente) btnSiguiente.disabled = paginaActual === totalPaginas;
     
+    // ✅ Generar números de página (máximo 5 botones visibles)
     let numerosHTML = '';
     const maxBotones = 5;
     let inicio = Math.max(1, paginaActual - Math.floor(maxBotones / 2));
     let fin = Math.min(totalPaginas, inicio + maxBotones - 1);
     
-    if (fin - inicio < maxBotones - 1) inicio = Math.max(1, fin - maxBotones + 1);
+    if (fin - inicio < maxBotones - 1) {
+        inicio = Math.max(1, fin - maxBotones + 1);
+    }
     
     if (inicio > 1) {
         numerosHTML += `<button class="btn-page-number" onclick="irAPagina(1)">1</button>`;
-        if (inicio > 2) numerosHTML += `<span style="padding: 0 5px;">...</span>`;
+        if (inicio > 2) {
+            numerosHTML += `<span style="padding: 0 5px;">...</span>`;
+        }
     }
     
     for (let i = inicio; i <= fin; i++) {
@@ -277,7 +285,9 @@ function renderizarPaginacion() {
     }
     
     if (fin < totalPaginas) {
-        if (fin < totalPaginas - 1) numerosHTML += `<span style="padding: 0 5px;">...</span>`;
+        if (fin < totalPaginas - 1) {
+            numerosHTML += `<span style="padding: 0 5px;">...</span>`;
+        }
         numerosHTML += `<button class="btn-page-number" onclick="irAPagina(${totalPaginas})">${totalPaginas}</button>`;
     }
     
@@ -290,19 +300,32 @@ function renderizarPaginacion() {
 function cambiarPagina(direccion) {
     const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
     const nuevaPagina = paginaActual + direccion;
+    
     if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
         paginaActual = nuevaPagina;
         renderizarTablaActas();
-        document.getElementById('resultsSection')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        document.getElementById('resultsSection')?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+        });
     }
 }
 
+// ============================================
+// ✅ IR A PÁGINA ESPECÍFICA
+// ============================================
 function irAPagina(numeroPagina) {
     const totalPaginas = Math.ceil(actasFiltradas.length / itemsPorPagina);
+    
     if (numeroPagina >= 1 && numeroPagina <= totalPaginas) {
         paginaActual = numeroPagina;
         renderizarTablaActas();
-        document.getElementById('resultsSection')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        document.getElementById('resultsSection')?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+        });
     }
 }
 
@@ -508,7 +531,8 @@ window.cargarEmailUsuario = cargarEmailUsuario;
 window.mostrarAlerta = mostrarAlerta;
 window.limpiarInput = limpiarInput;
 window.contarVehiculos = contarVehiculos;
-window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
 window.renderizarVehiculosEnActa = renderizarVehiculosEnActa;
+window.actualizarTextoSingularPlural = actualizarTextoSingularPlural;
 
 console.log('✅ Funciones exportadas a window');
+console.log('📊 Paginación configurada:', itemsPorPagina, 'actas por página');
