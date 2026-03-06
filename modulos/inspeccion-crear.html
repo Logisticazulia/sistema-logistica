@@ -84,8 +84,12 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   transform: translateY(-2px);
 }
 
+/* ============================================ */
+/* ✅ ICONOS DE POLICÍA - MÁS GRANDES           */
+/* ============================================ */
 .vehicle-icon {
-  font-size: 48px;
+  font-size: 56px;  /* ✅ Aumentado de 48px a 56px */
+  line-height: 1;
 }
 
 .vehicle-btn h3 {
@@ -137,6 +141,9 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     min-width: 100%;
     max-width: 400px;
     padding: 30px 40px;
+  }
+  .vehicle-icon {
+    font-size: 48px;  /* ✅ Reducido en móviles */
   }
 }
 </style>
@@ -190,24 +197,24 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   <!-- SECCIÓN DE SELECCIÓN DE TIPO DE VEHÍCULO -->
   <div class="vehicle-type-section">
-    <h2>🚗 Seleccionar Tipo de Vehículo</h2>
-    <p>Elige la categoría del vehículo que deseas inspeccionar para continuar con el proceso</p>
+    <h2>🚓 Seleccionar Tipo de Unidad Policial</h2>
+    <p>Elige la categoría de la unidad que deseas inspeccionar para continuar con el proceso</p>
     
     <!-- BOTONES DE SELECCIÓN -->
     <div class="vehicle-buttons">
       
-      <!-- Botón 1: Inspección para Vehículos -->
+      <!-- ✅ Botón 1: Inspección para Patrullas (Vehículos) -->
       <a href="inspeccion-crear-vehiculo.html" class="vehicle-btn vehiculos">
-        <span class="vehicle-icon">🚙</span>
-        <h3>Inspección PVR para Vehículos</h3>
-        <p>Automóviles, camionetas, unidades terrestres de 4 ruedas</p>
+        <span class="vehicle-icon">🚓</span>
+        <h3>Inspección PVR para Patrullas</h3>
+        <p>Automóviles, camionetas y unidades terrestres policiales de 4 ruedas</p>
       </a>
       
-      <!-- Botón 2: Inspección para Motos -->
+      <!-- ✅ Botón 2: Inspección para Motos Policiales -->
       <a href="inspeccion-crear-moto.html" class="vehicle-btn motos">
         <span class="vehicle-icon">🏍️</span>
-        <h3>Inspección PVR para Motos</h3>
-        <p>Motocicletas, triciclos y unidades de dos ruedas</p>
+        <h3>Inspección PVR para Motos Policiales</h3>
+        <p>Motocicletas, triciclos y unidades policiales de dos ruedas</p>
       </a>
       
     </div>
