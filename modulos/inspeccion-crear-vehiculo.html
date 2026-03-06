@@ -44,18 +44,18 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
 /* GRUPOS DE FORMULARIO */
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 .form-group label {
   display: block;
   font-weight: 500;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   color: #333;
-  font-size: 13px;
+  font-size: 12px;
 }
 .form-group input, .form-group select, .form-group textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 13px;
@@ -68,15 +68,71 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 }
 
 /* FILAS DEL FORMULARIO */
-.form-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-.form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-.form-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-.form-row-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; }
+.form-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.form-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.form-row-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.form-row-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+
+/* CHECKBOXES */
+.checkbox-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 400;
+  margin: 0;
+  cursor: pointer;
+  font-size: 12px;
+}
+.checkbox-group input[type="checkbox"], .checkbox-group input[type="radio"] {
+  width: auto;
+  cursor: pointer;
+}
+
+/* TABLAS DE INSPECCIÓN */
+.inspection-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin: 15px 0;
+}
+.inspection-table th, .inspection-table td {
+  border: 1px solid #003366;
+  padding: 5px 6px;
+  text-align: left;
+}
+.inspection-table th {
+  background: #003366;
+  color: white;
+  font-weight: 600;
+}
+.inspection-table td:first-child {
+  font-weight: 500;
+  background: #f8f9fa;
+  min-width: 150px;
+}
+
+/* SECCIONES */
+.section-title {
+  background: #003366;
+  color: white;
+  padding: 8px 12px;
+  font-weight: 700;
+  margin: 20px 0 10px 0;
+  border-radius: 4px;
+  font-size: 14px;
+}
 
 /* BOTONES */
 .btn {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -96,15 +152,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-success { background: #2a9d8f; color: white; }
 .btn-success:hover { background: #218838; transform: translateY(-2px); }
 
-/* ============================================ */
-/* ✅ VISTA PREVIA - SIEMPRE VISIBLE            */
-/* ============================================ */
+/* VISTA PREVIA */
 .preview-section {
   background: white;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  display: block;  /* ✅ SIEMPRE VISIBLE */
+  display: block;
 }
 .preview-section h2 {
   color: #003366;
@@ -121,7 +175,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   background: white;
   width: 100%;
   font-family: Arial, sans-serif;
-  font-size: 10pt;
+  font-size: 9pt;
   color: #000;
 }
 .inspeccion-header {
@@ -147,19 +201,19 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   padding: 0 20px;
 }
 .inspeccion-title h1 {
-  font-size: 11pt;
+  font-size: 10pt;
   color: #000;
   margin: 2px 0;
   font-weight: 700;
 }
 .inspeccion-title h2 {
-  font-size: 10pt;
+  font-size: 9pt;
   color: #000;
   margin: 2px 0;
   font-weight: 700;
 }
 .inspeccion-title h3 {
-  font-size: 10pt;
+  font-size: 9pt;
   color: #003366;
   margin: 5px 0;
   font-weight: 700;
@@ -169,13 +223,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .inspeccion-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 9pt;
+  font-size: 8pt;
   margin: 10px 0;
   border: 1px solid #000;
 }
 .inspeccion-table th, .inspeccion-table td {
   border: 1px solid #000;
-  padding: 4px 6px;
+  padding: 3px 5px;
   text-align: center;
 }
 .inspeccion-table th {
@@ -200,7 +254,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   padding: 15px;
 }
 .signature-box h4 {
-  font-size: 10pt;
+  font-size: 9pt;
   font-weight: 700;
   margin-bottom: 10px;
   text-align: center;
@@ -208,19 +262,19 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   padding: 5px;
 }
 .signature-field {
-  margin: 10px 0;
+  margin: 8px 0;
 }
 .signature-field label {
-  font-size: 9pt;
+  font-size: 8pt;
   font-weight: 600;
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 .signature-field span {
-  font-size: 9pt;
+  font-size: 8pt;
   border-bottom: 1px solid #000;
   display: block;
-  min-height: 20px;
+  min-height: 18px;
 }
 
 /* ACTION BUTTONS */
@@ -235,17 +289,17 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
 /* RESPONSIVE */
 @media (max-width: 1200px) {
-  .form-row-4, .form-row-5, .form-row-6 {
+  .form-row-4, .form-row-5, .form-row-6, .form-row-7 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 @media (max-width: 768px) {
-  .form-row-2, .form-row-3, .form-row-4, .form-row-5, .form-row-6 {
+  .form-row-2, .form-row-3, .form-row-4, .form-row-5, .form-row-6, .form-row-7 {
     grid-template-columns: 1fr;
   }
   .inspeccion-container {
     padding: 10px;
-    font-size: 8pt;
+    font-size: 7pt;
   }
   .inspeccion-signatures {
     grid-template-columns: 1fr;
@@ -323,164 +377,518 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 <!-- Título del Módulo -->
 <section class="module-title-section">
   <h1 class="module-title">🚓 Crear Inspección PVR - Patrullas</h1>
-  <p class="module-subtitle">Formulario de inspección física vehicular para unidades de 4 ruedas</p>
+  <p class="module-subtitle">Formulario completo de inspección física vehicular</p>
 </section>
 
 <div class="container">
   
   <!-- FORMULARIO DE INSPECCIÓN -->
   <div class="form-section">
-    <h2>📋 Datos de la Inspección</h2>
     <form id="inspeccionForm">
       
       <!-- DATOS GENERALES -->
-      <div class="form-row-4">
+      <div class="section-title">📋 DATOS GENERALES DE LA INSPECCIÓN</div>
+      <div class="form-row-6">
         <div class="form-group">
-          <label>N° de Inspección *</label>
+          <label>N° DE INSPECCIÓN *</label>
           <input type="text" id="numeroInspeccion" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Fecha de Inspección *</label>
-          <input type="date" id="fechaInspeccion" required oninput="actualizarVistaPrevia()">
+          <label>FECHA DE INSPECCIÓN *</label>
+          <input type="date" id="fechaInspeccion" required onchange="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Hora *</label>
-          <input type="time" id="horaInspeccion" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>Lugar *</label>
-          <input type="text" id="lugarInspeccion" required oninput="actualizarVistaPrevia()">
-        </div>
-      </div>
-
-      <div class="form-row-3">
-        <div class="form-group">
-          <label>Motivo de la Inspección *</label>
+          <label>MOTIVO *</label>
           <select id="motivoInspeccion" required onchange="actualizarVistaPrevia()">
             <option value="">Seleccione...</option>
-            <option value="ASIGNACION">Asignación</option>
-            <option value="SUPERVISION">Supervisión</option>
+            <option value="ASIGNACIÓN">Asignación</option>
+            <option value="SUPERVISIÓN">Supervisión</option>
             <option value="MANTENIMIENTO">Mantenimiento</option>
             <option value="INCIDENTE">Incidente</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Adscrita A *</label>
-          <input type="text" id="adscritaA" required oninput="actualizarVistaPrevia()">
+          <label>HORA *</label>
+          <input type="time" id="horaInspeccion" required onchange="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Tipo *</label>
-          <select id="tipoVehiculo" required onchange="actualizarVistaPrevia()">
-            <option value="">Seleccione...</option>
-            <option value="PATRULLA">Patrulla</option>
-            <option value="CAMIONETA">Camioneta</option>
-            <option value="FURGON">Furgón</option>
-          </select>
+          <label>LUGAR *</label>
+          <input type="text" id="lugarInspeccion" required oninput="actualizarVistaPrevia()">
+        </div>
+        <div class="form-group">
+          <label>ADSCRITA A *</label>
+          <input type="text" id="adscritaA" required oninput="actualizarVistaPrevia()">
         </div>
       </div>
 
       <!-- DATOS DEL VEHÍCULO -->
-      <h2 style="margin-top: 25px;">🚗 Datos del Vehículo</h2>
-      <div class="form-row-6">
+      <div class="section-title">🚗 DATOS DEL VEHÍCULO</div>
+      <div class="form-row-7">
         <div class="form-group">
-          <label>Placa *</label>
+          <label>PLACA *</label>
           <input type="text" id="placa" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Marca *</label>
+          <label>MARCA *</label>
           <input type="text" id="marca" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Modelo *</label>
+          <label>MODELO *</label>
           <input type="text" id="modelo" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Año *</label>
+          <label>AÑO *</label>
           <input type="text" id="ano" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Color *</label>
+          <label>TIPO *</label>
+          <select id="tipoVehiculo" required onchange="actualizarVistaPrevia()">
+            <option value="">Seleccione...</option>
+            <option value="PATRULLA">Patrulla</option>
+            <option value="CAMIONETA">Camioneta</option>
+            <option value="FURGÓN">Furgón</option>
+            <option value="MOTOCICLETA">Motocicleta</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>COLOR *</label>
           <input type="text" id="color" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>KMs *</label>
+          <label>KMS *</label>
           <input type="text" id="kilometraje" required oninput="actualizarVistaPrevia()">
         </div>
       </div>
 
       <div class="form-row-2">
         <div class="form-group">
-          <label>N° de Identificación *</label>
+          <label>N° DE IDENTIFICACIÓN *</label>
           <input type="text" id="numeroIdentificacion" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
-          <label>Serial de Carrocería *</label>
+          <label>SERIAL DE CARROCERÍA *</label>
           <input type="text" id="serialCarroceria" required oninput="actualizarVistaPrevia()">
         </div>
       </div>
 
       <!-- EQUIPAMIENTO -->
-      <h2 style="margin-top: 25px;">📦 Equipamiento</h2>
-      <div class="form-row-4">
+      <div class="section-title">📦 EQUIPAMIENTO</div>
+      <div class="form-row-6">
         <div class="form-group">
-          <label>Batería</label>
+          <label>BATERÍA</label>
           <select id="bateria" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Estación Base</label>
+          <label>ESTACIÓN BASE</label>
           <select id="estacionBase" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Estación Luces</label>
-          <select id="estacionLuces" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Coctelera</label>
+          <label>COCTELERA</label>
           <select id="coctelera" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
-      </div>
-
-      <div class="form-row-4">
         <div class="form-group">
-          <label>Triangulo</label>
+          <label>TRIÁNGULO</label>
           <select id="triangulo" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Posee Placas</label>
+          <label>POSEE PLACAS</label>
           <select id="poseePlacas" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Herramientas</label>
-          <select id="herramientas" onchange="actualizarVistaPrevia()">
+          <label>HERRAMIENTAS/GATO</label>
+          <select id="herramientasGato" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Gato</label>
-          <select id="gato" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
+      </div>
+
+      <!-- INSPECCIÓN DETALLADA -->
+      <div class="section-title">🔍 INSPECCIÓN DETALLADA DE COMPONENTES</div>
+      
+      <table class="inspection-table">
+        <thead>
+          <tr>
+            <th>COMPONENTE</th>
+            <th>B</th>
+            <th>M</th>
+            <th>N/T</th>
+            <th>COMPONENTE</th>
+            <th>B</th>
+            <th>M</th>
+            <th>N/T</th>
+            <th>COMPONENTE</th>
+            <th>B</th>
+            <th>M</th>
+            <th>N/T</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GUARDAFANGO DEL IZQ</td>
+            <td><input type="radio" name="guardafango_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>VIDRIO LATERAL DEL IZQ</td>
+            <td><input type="radio" name="vidrio_lateral_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_lateral_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_lateral_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>VOLANTE</td>
+            <td><input type="radio" name="volante" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="volante" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="volante" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>GUARDAFANGO DEL DER</td>
+            <td><input type="radio" name="guardafango_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>VIDRIO LATERAL DEL DER</td>
+            <td><input type="radio" name="vidrio_lateral_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_lateral_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_lateral_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>CORNETA (PITO)</td>
+            <td><input type="radio" name="corneta" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="corneta" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="corneta" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>GUARDAFANGO TRA IZQ</td>
+            <td><input type="radio" name="guardafango_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>VIDRIO LATERAL TRA IZQ</td>
+            <td><input type="radio" name="vidrio_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>REFRIGERADOR</td>
+            <td><input type="radio" name="refrigerador" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="refrigerador" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="refrigerador" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>GUARDAFANGO TRA DER</td>
+            <td><input type="radio" name="guardafango_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="guardafango_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>VIDRIO LATERAL TRA DER</td>
+            <td><input type="radio" name="vidrio_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="vidrio_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>LUCES ALTA Y BAJA DER</td>
+            <td><input type="radio" name="luces_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="luces_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="luces_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PUERTA DEL IZQ</td>
+            <td><input type="radio" name="puerta_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>ANTENA DE GPS</td>
+            <td><input type="radio" name="antena_gps" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="antena_gps" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="antena_gps" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>LUCES ALTA Y BAJA IZQ</td>
+            <td><input type="radio" name="luces_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="luces_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="luces_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PUERTA DEL DER</td>
+            <td><input type="radio" name="puerta_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>LIMPIA PARABRISAS DEL</td>
+            <td><input type="radio" name="limpia_parabrisas" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="limpia_parabrisas" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="limpia_parabrisas" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>FARO DEL DER. NIEBLINA</td>
+            <td><input type="radio" name="faro_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PUERTA TRA IZQ</td>
+            <td><input type="radio" name="puerta_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>TABlero DE INSTRUM</td>
+            <td><input type="radio" name="tablero" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tablero" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tablero" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>FARO DEL IZQ. NIEBLINA</td>
+            <td><input type="radio" name="faro_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PUERTA TRA DER</td>
+            <td><input type="radio" name="puerta_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>TABlero Y PERILLAS A/A</td>
+            <td><input type="radio" name="tablero_perillas" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tablero_perillas" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tablero_perillas" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>CERRADURA DER</td>
+            <td><input type="radio" name="cerradura_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="cerradura_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="cerradura_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PARACHOQUE TRASERO</td>
+            <td><input type="radio" name="parachoque_tra" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parachoque_tra" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parachoque_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>STOP TRASERO DER</td>
+            <td><input type="radio" name="stop_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="stop_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="stop_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>CERRADURA IZQ</td>
+            <td><input type="radio" name="cerradura_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="cerradura_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="cerradura_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PARACHOQUE DELANTER</td>
+            <td><input type="radio" name="parachoque_del" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parachoque_del" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parachoque_del" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>STOP TRASERO IZQ</td>
+            <td><input type="radio" name="stop_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="stop_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="stop_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>BOMBA DE GAS</td>
+            <td><input type="radio" name="bomba_gas" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="bomba_gas" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="bomba_gas" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>CAPOT</td>
+            <td><input type="radio" name="capot" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="capot" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="capot" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>FARO DELANTERO DER</td>
+            <td><input type="radio" name="faro_del_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_del_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_del_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>CINTURONES DE SEGURID</td>
+            <td><input type="radio" name="cinturones" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="cinturones" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="cinturones" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PUERTA DE LA CABINA</td>
+            <td><input type="radio" name="puerta_cabina" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_cabina" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="puerta_cabina" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>FARO DELANTERO IZQ</td>
+            <td><input type="radio" name="faro_del_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_del_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="faro_del_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>CAMARA MOTOR</td>
+            <td><input type="radio" name="camara_motor" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="camara_motor" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="camara_motor" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PARABRISAS TRASERO</td>
+            <td><input type="radio" name="parabrisas_tra" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parabrisas_tra" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parabrisas_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>BUCHE DEL DER</td>
+            <td><input type="radio" name="buche_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>ELECTROVENTILADOR</td>
+            <td><input type="radio" name="electroventilador" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="electroventilador" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="electroventilador" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>PARABRISAS DELANTER</td>
+            <td><input type="radio" name="parabrisas_del" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parabrisas_del" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="parabrisas_del" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>BUCHE DEL IZQ</td>
+            <td><input type="radio" name="buche_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>ALTERNADOR</td>
+            <td><input type="radio" name="alternador" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="alternador" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="alternador" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>ESPEJO RETROVISOR DER</td>
+            <td><input type="radio" name="espejo_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="espejo_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="espejo_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>BUCHE TRAS. DER</td>
+            <td><input type="radio" name="buche_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>COMPRESOR DE A/A</td>
+            <td><input type="radio" name="compresor_aa" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="compresor_aa" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="compresor_aa" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>ESPEJO RETROVISOR IZQ</td>
+            <td><input type="radio" name="espejo_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="espejo_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="espejo_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>BUCHE TRAS. IZQ</td>
+            <td><input type="radio" name="buche_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="buche_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>RADIADOR</td>
+            <td><input type="radio" name="radiador" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="radiador" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="radiador" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>ABLES AUXILIARES DE BA</td>
+            <td><input type="radio" name="ables_aux" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="ables_aux" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="ables_aux" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>COCTELERA</td>
+            <td><input type="radio" name="coctelera_check" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="coctelera_check" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="coctelera_check" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>ASPA RADIADOR</td>
+            <td><input type="radio" name="aspa_radiador" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="aspa_radiador" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="aspa_radiador" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>TAPA DE GASOLINA</td>
+            <td><input type="radio" name="tapa_gasolina" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_gasolina" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_gasolina" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>TAPA RADIADOR</td>
+            <td><input type="radio" name="tapa_radiador" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_radiador" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_radiador" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>VARILLA MEDICION ACEIT</td>
+            <td><input type="radio" name="varilla_aceite" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="varilla_aceite" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="varilla_aceite" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>CAJA DE VELOCIDADES</td>
+            <td><input type="radio" name="caja_velocidades" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caja_velocidades" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caja_velocidades" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>TAPA DISTRIBUIDOR</td>
+            <td><input type="radio" name="tapa_distribuidor" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_distribuidor" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_distribuidor" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>TAPA BOMBA HIDRAULIC</td>
+            <td><input type="radio" name="tapa_bomba_hidraulic" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_bomba_hidraulic" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="tapa_bomba_hidraulic" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>ASIENTOS DELANTEROS</td>
+            <td><input type="radio" name="asientos_del" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="asientos_del" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="asientos_del" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>ASIENTOS TRASEROS</td>
+            <td><input type="radio" name="asientos_tra" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="asientos_tra" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="asientos_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
+            <td>ESPOLDER DEL (BABERO)</td>
+            <td><input type="radio" name="espolder" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="espolder" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="espolder" value="NT" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- CAUCHOS -->
+      <div class="section-title">🛞 ESTADO DE CAUCHOS</div>
+      <table class="inspection-table">
+        <thead>
+          <tr>
+            <th>CAUCHO</th>
+            <th>BUENO</th>
+            <th>MALO</th>
+            <th>SI</th>
+            <th>NO</th>
+            <th>TAPA</th>
+            <th>N° NUMERO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><input type="radio" name="caucho_1" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caucho_1" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_1_si" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_1_no" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_1_tapa" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_1_numero" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><input type="radio" name="caucho_2" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caucho_2" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_2_si" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_2_no" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_2_tapa" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_2_numero" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><input type="radio" name="caucho_3" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caucho_3" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_3_si" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_3_no" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_3_tapa" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_3_numero" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><input type="radio" name="caucho_4" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caucho_4" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_4_si" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_4_no" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_4_tapa" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_4_numero" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+          <tr>
+            <td>REPUESTO</td>
+            <td><input type="radio" name="caucho_repuesto" value="B" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="radio" name="caucho_repuesto" value="M" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_repuesto_si" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="checkbox" name="caucho_repuesto_no" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_repuesto_tapa" onchange="actualizarVistaPrevia()"></td>
+            <td><input type="text" name="caucho_repuesto_numero" onchange="actualizarVistaPrevia()"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- OBSERVACIONES -->
+      <div class="section-title">📝 OBSERVACIONES</div>
+      <div class="form-group">
+        <textarea id="observaciones" rows="4" placeholder="Ingrese observaciones adicionales..." oninput="actualizarVistaPrevia()"></textarea>
       </div>
 
       <!-- BOTONES DE ACCIÓN -->
@@ -498,7 +906,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </form>
   </div>
 
-  <!-- ✅ VISTA PREVIA - SIEMPRE VISIBLE -->
+  <!-- VISTA PREVIA - SIEMPRE VISIBLE -->
   <div class="preview-section" id="previewSection">
     <h2>📄 Vista Previa de la Inspección (En Tiempo Real)</h2>
     
@@ -522,19 +930,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <!-- Tabla de Datos Generales -->
       <table class="inspeccion-table">
         <tr>
-          <th style="width: 15%;">N° DE INSPECCION</th>
-          <td style="width: 18%;" id="previewNumeroInspeccion">-</td>
-          <th style="width: 15%;">MOTIVO DE LA INSPECCION</th>
-          <td style="width: 18%;" id="previewMotivo">-</td>
+          <th style="width: 12%;">N° DE INSPECCION</th>
+          <td style="width: 13%;" id="previewNumeroInspeccion">-</td>
+          <th style="width: 12%;">FECHA DE INSPECCION</th>
+          <td style="width: 13%;" id="previewFecha">-</td>
+          <th style="width: 12%;">MOTIVO DE LA INSPECCION</th>
+          <td style="width: 13%;" id="previewMotivo">-</td>
           <th style="width: 10%;">HORA</th>
-          <td style="width: 12%;" id="previewHora">-</td>
-          <th style="width: 12%;">LUGAR</th>
-          <td id="previewLugar">-</td>
+          <td style="width: 15%;" id="previewHora">-</td>
         </tr>
         <tr>
-          <th>FECHA DE INSPECCION</th>
-          <td id="previewFecha">-</td>
-          <th colspan="6">ADSCRITA A: <span id="previewAdscrita">-</span></th>
+          <th>LUGAR</th>
+          <td colspan="3" id="previewLugar">-</td>
+          <th>ADSCRITA A:</th>
+          <td colspan="3" id="previewAdscrita">-</td>
         </tr>
       </table>
 
@@ -549,18 +958,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           <td id="previewModelo">-</td>
           <th>AÑO</th>
           <td id="previewAno">-</td>
+        </tr>
+        <tr>
           <th>TIPO</th>
           <td id="previewTipo">-</td>
           <th>COLOR</th>
           <td id="previewColor">-</td>
-        </tr>
-        <tr>
-          <th>N° DE IDENTIFICACION</th>
-          <td id="previewNumeroIdentificacion">-</td>
-          <th>SERIAL DE CARROCERIA</th>
-          <td colspan="5" id="previewSerialCarroceria">-</td>
           <th>KMS</th>
           <td id="previewKilometraje">-</td>
+          <th>N° DE IDENTIFICACION</th>
+          <td id="previewNumeroIdentificacion">-</td>
+        </tr>
+        <tr>
+          <th>SERIAL DE CARROCERIA</th>
+          <td colspan="7" id="previewSerialCarroceria">-</td>
         </tr>
       </table>
 
@@ -575,12 +986,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           <td id="previewCoctelera">-</td>
           <th>TRIANGULO</th>
           <td id="previewTriangulo">-</td>
+        </tr>
+        <tr>
           <th>POSEE PLACAS</th>
           <td id="previewPoseePlacas">-</td>
-          <th>HERRAMIENTAS</th>
-          <td id="previewHerramientas">-</td>
-          <th>GATO</th>
-          <td id="previewGato">-</td>
+          <th>HERRAMIENTAS/GATO</th>
+          <td id="previewHerramientasGato">-</td>
+          <th colspan="4"></th>
         </tr>
       </table>
 
