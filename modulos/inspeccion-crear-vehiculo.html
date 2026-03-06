@@ -74,49 +74,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .form-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
 .form-row-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; }
 
-/* CHECKBOXES */
-.checkbox-group {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: 400;
-  margin: 0;
-  cursor: pointer;
-}
-.checkbox-group input[type="checkbox"] {
-  width: auto;
-  cursor: pointer;
-}
-
-/* TABLAS DE INSPECCIÓN */
-.inspection-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin: 15px 0;
-}
-.inspection-table th, .inspection-table td {
-  border: 1px solid #003366;
-  padding: 6px 8px;
-  text-align: center;
-}
-.inspection-table th {
-  background: #003366;
-  color: white;
-  font-weight: 600;
-}
-.inspection-table td:first-child {
-  text-align: left;
-  font-weight: 500;
-  background: #f8f9fa;
-}
-
 /* BOTONES */
 .btn {
   padding: 12px 24px;
@@ -139,19 +96,22 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-success { background: #2a9d8f; color: white; }
 .btn-success:hover { background: #218838; transform: translateY(-2px); }
 
-/* VISTA PREVIA */
+/* ============================================ */
+/* ✅ VISTA PREVIA - SIEMPRE VISIBLE            */
+/* ============================================ */
 .preview-section {
   background: white;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  display: none;
+  display: block;  /* ✅ SIEMPRE VISIBLE */
 }
-.preview-section.active { display: block; }
 .preview-section h2 {
   color: #003366;
   margin-bottom: 20px;
   text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #003366;
 }
 
 /* PLANILLA DE VISTA PREVIA */
@@ -377,26 +337,26 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <div class="form-row-4">
         <div class="form-group">
           <label>N° de Inspección *</label>
-          <input type="text" id="numeroInspeccion" required>
+          <input type="text" id="numeroInspeccion" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Fecha de Inspección *</label>
-          <input type="date" id="fechaInspeccion" required>
+          <input type="date" id="fechaInspeccion" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Hora *</label>
-          <input type="time" id="horaInspeccion" required>
+          <input type="time" id="horaInspeccion" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Lugar *</label>
-          <input type="text" id="lugarInspeccion" required>
+          <input type="text" id="lugarInspeccion" required oninput="actualizarVistaPrevia()">
         </div>
       </div>
 
       <div class="form-row-3">
         <div class="form-group">
           <label>Motivo de la Inspección *</label>
-          <select id="motivoInspeccion" required>
+          <select id="motivoInspeccion" required onchange="actualizarVistaPrevia()">
             <option value="">Seleccione...</option>
             <option value="ASIGNACION">Asignación</option>
             <option value="SUPERVISION">Supervisión</option>
@@ -406,11 +366,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
         </div>
         <div class="form-group">
           <label>Adscrita A *</label>
-          <input type="text" id="adscritaA" required>
+          <input type="text" id="adscritaA" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Tipo *</label>
-          <select id="tipoVehiculo" required>
+          <select id="tipoVehiculo" required onchange="actualizarVistaPrevia()">
             <option value="">Seleccione...</option>
             <option value="PATRULLA">Patrulla</option>
             <option value="CAMIONETA">Camioneta</option>
@@ -424,38 +384,38 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <div class="form-row-6">
         <div class="form-group">
           <label>Placa *</label>
-          <input type="text" id="placa" required>
+          <input type="text" id="placa" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Marca *</label>
-          <input type="text" id="marca" required>
+          <input type="text" id="marca" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Modelo *</label>
-          <input type="text" id="modelo" required>
+          <input type="text" id="modelo" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Año *</label>
-          <input type="text" id="ano" required>
+          <input type="text" id="ano" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Color *</label>
-          <input type="text" id="color" required>
+          <input type="text" id="color" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>KMs *</label>
-          <input type="text" id="kilometraje" required>
+          <input type="text" id="kilometraje" required oninput="actualizarVistaPrevia()">
         </div>
       </div>
 
       <div class="form-row-2">
         <div class="form-group">
           <label>N° de Identificación *</label>
-          <input type="text" id="numeroIdentificacion" required>
+          <input type="text" id="numeroIdentificacion" required oninput="actualizarVistaPrevia()">
         </div>
         <div class="form-group">
           <label>Serial de Carrocería *</label>
-          <input type="text" id="serialCarroceria" required>
+          <input type="text" id="serialCarroceria" required oninput="actualizarVistaPrevia()">
         </div>
       </div>
 
@@ -464,28 +424,28 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <div class="form-row-4">
         <div class="form-group">
           <label>Batería</label>
-          <select id="bateria">
+          <select id="bateria" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
           <label>Estación Base</label>
-          <select id="estacionBase">
+          <select id="estacionBase" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
           <label>Estación Luces</label>
-          <select id="estacionLuces">
+          <select id="estacionLuces" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
           <label>Coctelera</label>
-          <select id="coctelera">
+          <select id="coctelera" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
@@ -495,28 +455,28 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <div class="form-row-4">
         <div class="form-group">
           <label>Triangulo</label>
-          <select id="triangulo">
+          <select id="triangulo" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
           <label>Posee Placas</label>
-          <select id="poseePlacas">
+          <select id="poseePlacas" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
           <label>Herramientas</label>
-          <select id="herramientas">
+          <select id="herramientas" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
         </div>
         <div class="form-group">
           <label>Gato</label>
-          <select id="gato">
+          <select id="gato" onchange="actualizarVistaPrevia()">
             <option value="SI">Sí</option>
             <option value="NO">No</option>
           </select>
@@ -528,27 +488,19 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
         <button type="button" class="btn btn-secondary" onclick="window.location.href='inspeccion-crear.html'">
           ← Volver
         </button>
-        <button type="button" class="btn btn-primary" onclick="generarVistaPrevia()">
-          👁️ Generar Vista Previa
-        </button>
         <button type="button" class="btn btn-success" onclick="guardarInspeccion()">
           💾 Guardar Inspección
+        </button>
+        <button type="button" class="btn btn-primary" onclick="imprimirInspeccion()">
+          🖨️ Imprimir
         </button>
       </div>
     </form>
   </div>
 
-  <!-- VISTA PREVIA DE LA INSPECCIÓN -->
+  <!-- ✅ VISTA PREVIA - SIEMPRE VISIBLE -->
   <div class="preview-section" id="previewSection">
-    <h2>📄 Vista Previa de la Inspección</h2>
-    <div class="action-buttons" style="margin-bottom: 20px;">
-      <button type="button" class="btn btn-secondary" onclick="cerrarVistaPrevia()">
-        ← Volver al Formulario
-      </button>
-      <button type="button" class="btn btn-success" onclick="imprimirInspeccion()">
-        🖨️ Imprimir
-      </button>
-    </div>
+    <h2>📄 Vista Previa de la Inspección (En Tiempo Real)</h2>
     
     <div class="inspeccion-container" id="inspeccionPreview">
       <!-- Encabezado -->
@@ -571,18 +523,18 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <table class="inspeccion-table">
         <tr>
           <th style="width: 15%;">N° DE INSPECCION</th>
-          <td style="width: 18%;" id="previewNumeroInspeccion"></td>
+          <td style="width: 18%;" id="previewNumeroInspeccion">-</td>
           <th style="width: 15%;">MOTIVO DE LA INSPECCION</th>
-          <td style="width: 18%;" id="previewMotivo"></td>
+          <td style="width: 18%;" id="previewMotivo">-</td>
           <th style="width: 10%;">HORA</th>
-          <td style="width: 12%;" id="previewHora"></td>
+          <td style="width: 12%;" id="previewHora">-</td>
           <th style="width: 12%;">LUGAR</th>
-          <td id="previewLugar"></td>
+          <td id="previewLugar">-</td>
         </tr>
         <tr>
           <th>FECHA DE INSPECCION</th>
-          <td id="previewFecha"></td>
-          <th colspan="6">ADSCRITA A: <span id="previewAdscrita"></span></th>
+          <td id="previewFecha">-</td>
+          <th colspan="6">ADSCRITA A: <span id="previewAdscrita">-</span></th>
         </tr>
       </table>
 
@@ -590,25 +542,25 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <table class="inspeccion-table">
         <tr>
           <th>PLACA</th>
-          <td id="previewPlaca"></td>
+          <td id="previewPlaca">-</td>
           <th>MARCA</th>
-          <td id="previewMarca"></td>
+          <td id="previewMarca">-</td>
           <th>MODELO</th>
-          <td id="previewModelo"></td>
+          <td id="previewModelo">-</td>
           <th>AÑO</th>
-          <td id="previewAno"></td>
+          <td id="previewAno">-</td>
           <th>TIPO</th>
-          <td id="previewTipo"></td>
+          <td id="previewTipo">-</td>
           <th>COLOR</th>
-          <td id="previewColor"></td>
+          <td id="previewColor">-</td>
         </tr>
         <tr>
           <th>N° DE IDENTIFICACION</th>
-          <td id="previewNumeroIdentificacion"></td>
+          <td id="previewNumeroIdentificacion">-</td>
           <th>SERIAL DE CARROCERIA</th>
-          <td colspan="5" id="previewSerialCarroceria"></td>
+          <td colspan="5" id="previewSerialCarroceria">-</td>
           <th>KMS</th>
-          <td id="previewKilometraje"></td>
+          <td id="previewKilometraje">-</td>
         </tr>
       </table>
 
@@ -616,19 +568,19 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <table class="inspeccion-table">
         <tr>
           <th>BATERIA</th>
-          <td id="previewBateria"></td>
+          <td id="previewBateria">-</td>
           <th>ESTACION BASE</th>
-          <td id="previewEstacionBase"></td>
+          <td id="previewEstacionBase">-</td>
           <th>COCTELERA</th>
-          <td id="previewCoctelera"></td>
+          <td id="previewCoctelera">-</td>
           <th>TRIANGULO</th>
-          <td id="previewTriangulo"></td>
+          <td id="previewTriangulo">-</td>
           <th>POSEE PLACAS</th>
-          <td id="previewPoseePlacas"></td>
+          <td id="previewPoseePlacas">-</td>
           <th>HERRAMIENTAS</th>
-          <td id="previewHerramientas"></td>
+          <td id="previewHerramientas">-</td>
           <th>GATO</th>
-          <td id="previewGato"></td>
+          <td id="previewGato">-</td>
         </tr>
       </table>
 
