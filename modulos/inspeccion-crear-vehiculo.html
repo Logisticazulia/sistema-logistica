@@ -28,84 +28,108 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 }
 
 /* ============================================ */
-/* ✅ SECCIÓN DE BÚSQUEDA                       */
+/* ✅ SECCIÓN DE BÚSQUEDA - ESTILO FICHA        */
 /* ============================================ */
 .search-section {
   background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  padding: 25px;
+  padding: 30px;
   border-radius: 8px;
   margin-bottom: 25px;
   box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
 .search-section h3 {
   color: white;
-  margin-bottom: 15px;
-  font-size: 16px;
+  margin-bottom: 20px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   gap: 10px;
+  font-weight: 600;
 }
-.search-filters {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 15px;
+.search-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: stretch;
 }
-.search-filters input, .search-filters select {
-  padding: 12px 16px;
+.search-input {
+  flex: 1;
+  min-width: 400px;
+  padding: 14px 20px;
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: 6px;
   font-size: 15px;
   background: rgba(255,255,255,0.95);
+  transition: all 0.3s ease;
   font-family: 'Roboto', sans-serif;
 }
-.search-filters input:focus, .search-filters select:focus {
+.search-input:focus {
   outline: none;
   border-color: #fff;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
 }
-.search-buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.btn-search, .btn-reset, .btn-success {
-  padding: 12px 28px;
-  font-size: 15px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  border: none;
-  white-space: nowrap;
-}
-.btn-search {
+.btn-search-vehicle {
+  padding: 14px 32px;
   background: #2a9d8f;
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
-.btn-search:hover {
+.btn-search-vehicle:hover {
   background: #218838;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(40,167,69,0.3);
 }
-.btn-reset {
+.btn-clear-search {
+  padding: 14px 32px;
   background: #e9c46a;
   color: #000;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
-.btn-reset:hover {
+.btn-clear-search:hover {
   background: #d4a84a;
   transform: translateY(-2px);
 }
-.btn-success {
-  background: #2a9d8f;
-  color: white;
+.search-hint {
+  color: #ffffff;
+  font-size: 14px;
+  margin-top: 20px;
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
-.btn-success:hover {
-  background: #218838;
-  transform: translateY(-2px);
+.search-hint span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  background: rgba(255,255,255,0.1);
+  padding: 5px 12px;
+  border-radius: 4px;
+}
+.search-hint span:first-child {
+  background: transparent;
+  padding: 0;
+  font-weight: 600;
 }
 
 /* ALERTAS */
@@ -388,16 +412,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   .form-row-4, .form-row-5, .form-row-6, .form-row-7 {
     grid-template-columns: repeat(2, 1fr);
   }
-  .search-filters {
-    grid-template-columns: repeat(2, 1fr);
+  .search-input {
+    min-width: 300px;
   }
 }
 @media (max-width: 768px) {
   .form-row-2, .form-row-3, .form-row-4, .form-row-5, .form-row-6, .form-row-7 {
     grid-template-columns: 1fr;
   }
-  .search-filters {
-    grid-template-columns: 1fr;
+  .search-container {
+    flex-direction: column;
+  }
+  .search-input {
+    min-width: 100%;
+  }
+  .btn-search-vehicle, .btn-clear-search {
+    width: 100%;
+    justify-content: center;
   }
   .inspeccion-container {
     padding: 10px;
@@ -484,29 +515,28 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
 <div class="container">
   
-  <!-- ✅ SECCIÓN DE BÚSQUEDA DE VEHÍCULOS -->
+  <!-- ✅ SECCIÓN DE BÚSQUEDA - ESTILO FICHA -->
   <div class="search-section">
-    <h3>🔍 Buscar Vehículo para Inspeccionar</h3>
+    <h3>🔍 Buscar Vehículo</h3>
     <div id="searchAlert" class="alert"></div>
-    <div class="search-filters">
-      <input type="text" id="searchPlaca" placeholder="Placa del vehículo..." autocomplete="off">
-      <input type="text" id="searchSerial" placeholder="Serial de carrocería..." autocomplete="off">
-      <input type="text" id="searchIdentificacion" placeholder="N° de identificación..." autocomplete="off">
-      <select id="searchTipo">
-        <option value="">Todos los tipos...</option>
-        <option value="PATRULLA">Patrulla</option>
-        <option value="CAMIONETA">Camioneta</option>
-        <option value="FURGÓN">Furgón</option>
-        <option value="MOTOCICLETA">Motocicleta</option>
-      </select>
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" 
+        placeholder="Ingrese placa, facsimilar, serial de carrocería, serial de motor o marca..." 
+        autocomplete="off">
+      <button class="btn-search-vehicle" onclick="buscarVehiculo()">
+        <span>🔍</span><span>Buscar</span>
+      </button>
+      <button class="btn-clear-search" onclick="limpiarBusqueda()">
+        <span>🔄</span><span>Limpiar</span>
+      </button>
     </div>
-    <div class="search-buttons">
-      <button class="btn-search" onclick="buscarVehiculo()">
-        <span>🔍</span><span>Buscar Vehículo</span>
-      </button>
-      <button class="btn-reset" onclick="limpiarBusqueda()">
-        <span>🔄</span><span>Limpiar Búsqueda</span>
-      </button>
+    <div class="search-hint">
+      <span>💡 Busque por:</span>
+      <span>🚗 Placa</span>
+      <span>📄 Facsimilar</span>
+      <span>🔢 Serial Carrocería</span>
+      <span>⚙️ Serial Motor</span>
+      <span>🏷️ Marca/Modelo</span>
     </div>
   </div>
 
@@ -683,8 +713,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           </tr>
         </thead>
         <tbody>
-          <!-- TODAS LAS FILAS DE COMPONENTES (27 filas) -->
-          <!-- Por brevedad, incluyo solo las primeras filas como ejemplo -->
+          <!-- FILA 1 -->
           <tr>
             <td>GUARDAFANGO DEL IZQ</td>
             <td><input type="radio" name="guardafango_izq" value="B" onchange="actualizarVistaPrevia()"></td>
@@ -699,7 +728,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <td><input type="radio" name="volante" value="M" onchange="actualizarVistaPrevia()"></td>
             <td><input type="radio" name="volante" value="NT" onchange="actualizarVistaPrevia()"></td>
           </tr>
-          <!-- ... continuar con todas las filas restantes ... -->
+          <!-- ... continuar con todas las filas restantes de componentes ... -->
         </tbody>
       </table>
 
