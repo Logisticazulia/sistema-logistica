@@ -424,7 +424,235 @@ async function guardarInspeccion() {
 function imprimirInspeccion() {
     window.print();
 }
+// ============================================
+// ✅ OBTENER PRÓXIMO NÚMERO DE INSPECCIÓN
+// ============================================
+async function obtenerNumeroInspeccion() {
+    if (!supabaseClient) {
+        console.error('❌ Supabase no inicializado');
+        return '00000001';
+    }
+    
+    try {
+        // Opción 1: Usar la función de PostgreSQL
+        const { data, error } = await supabaseClient.rpc('generar_numero_inspeccion');
+        
+        if (error) throw error;
+        
+        const numeroInspeccion = data || '00000001';
+        console.log('✅ Número de inspección generado:', numeroInspeccion);
+        
+        return numeroInspeccion;
+        
+    } catch (error) {
+        console.error('❌ Error al generar número de inspección:', error);
+        
+        // Opción 2: Fallback - Obtener el último registro y sumar 1
+        try {
+            const { data: ultimoRegistro, error: error2 } = await supabaseClient
+                .from('inspecciones_pvr')
+                .select('numero_inspeccion')
+                .order('id', { ascending: false })
+                .limit(1);
+            
+            if (error2 || !ultimoRegistro || ultimoRegistro.length === 0) {
+                return '00000001';
+            }
+            
+            const ultimoNumero = parseInt(ultimoRegistro[0].numero_inspeccion);
+            const nuevoNumero = ultimoNumero + 1;
+            const numeroFormateado = nuevoNumero.toString().padStart(8, '0');
+            
+            return numeroFormateado;
+            
+        } catch (error3) {
+            console.error('❌ Error en fallback:', error3);
+            return '00000001';
+        }
+    }
+}
 
+// ============================================
+// ✅ CARGAR NÚMERO DE INSPECCIÓN AL INICIAR
+// ============================================
+async function cargarNumeroInspeccion() {
+    const numeroElement = document.getElementById('numeroInspeccion');
+    if (!numeroElement) return;
+    
+    mostrarAlerta('🔄 Generando número de inspección...', 'info');
+    
+    const numero = await obtenerNumeroInspeccion();
+    numeroElement.value = numero;
+    
+    mostrarAlerta(`✅ Número de inspección: ${numero}`, 'success');
+}
+
+// ============================================
+// ✅ GUARDAR INSPECCIÓN COMPLETA
+// ============================================
+async function guardarInspeccion() {
+    // Validar campos requeridos
+    const camposRequeridos = [
+        'numeroInspeccion', 'motivoInspeccion', 'horaInspeccion', 
+        'lugarInspeccion', 'placa', 'marca', 'modelo'
+    ];
+    
+    for (const campo of camposRequeridos) {
+        const elemento = document.getElementById(campo);
+        if (!elemento || !elemento.value.trim()) {
+            mostrarAlerta(`⚠️ El campo ${campo} es requerido`, 'error');
+            elemento?.focus();
+            return;
+        }
+    }
+    
+    if (!confirm('¿Está seguro de guardar esta inspección?')) {
+        return;
+    }
+    
+    try {
+        // Recolectar datos de cauchos
+        const cauchos = recolectarDatosCauchos();
+        
+        // Recolectar datos de componentes
+        const componentes = recolectarDatosComponentes();
+        
+        // Datos de la inspección
+        const inspeccionData = {
+            numero_inspeccion: document.getElementById('numeroInspeccion').value,
+            fecha_inspeccion: document.getElementById('fechaInspeccion').value || new Date().toISOString().split('T')[0],
+            hora_inspeccion: document.getElementById('horaInspeccion').value,
+            motivo_inspeccion: document.getElementById('motivoInspeccion').value,
+            lugar: document.getElementById('lugarInspeccion').value,
+            
+            // Datos del vehículo
+            placa: document.getElementById('placa').value,
+            marca: document.getElementById('marca').value,
+            modelo: document.getElementById('modelo').value,
+            ano: document.getElementById('ano').value,
+            tipo: document.getElementById('tipoVehiculo').value,
+            color: document.getElementById('color').value,
+            numero_identificacion: document.getElementById('numeroIdentificacion').value,
+            serial_carroceria: document.getElementById('serialCarroceria').value,
+            kms: document.getElementById('kilometraje').value,
+            adscrita_a: document.getElementById('adscritaA').value,
+            
+            // Equipamiento
+            bateria: document.getElementById('bateria').value,
+            estacion_base: document.getElementById('estacionBase').value,
+            coctelera: document.getElementById('coctelera').value,
+            triangulo: document.getElementById('triangulo').value,
+            posee_placas: document.getElementById('poseePlacas').value,
+            herramientas: document.getElementById('herramientas').value,
+            estacion_luces: document.getElementById('estacionLuces').value,
+            
+            // Cauchos y Componentes (JSON)
+            cauchos: cauchos,
+            componentes: componentes,
+            
+            // Observaciones
+            observaciones: document.getElementById('observaciones').value,
+            
+            // Usuario
+            usuario_creo: sessionStorage.getItem('usuario') ? 
+                JSON.parse(sessionStorage.getItem('usuario')).email : 'usuario@institucion.com'
+        };
+        
+        console.log('💾 Guardando inspección:', inspeccionData);
+        
+        if (supabaseClient) {
+            const { data, error } = await supabaseClient
+                .from('inspecciones_pvr')
+                .insert([inspeccionData]);
+            
+            if (error) throw error;
+            
+            mostrarAlerta('✅ Inspección guardada exitosamente', 'success');
+            
+            // Generar nuevo número para la próxima inspección
+            if (confirm('¿Desea crear una nueva inspección?')) {
+                document.getElementById('inspeccionForm').reset();
+                await cargarNumeroInspeccion();
+                actualizarVistaPrevia();
+            }
+        } else {
+            mostrarAlerta('⚠️ Simulación: Inspección guardada (Supabase no disponible)', 'info');
+            console.log('Datos a guardar:', inspeccionData);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al guardar inspección:', error);
+        mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+    }
+}
+
+// ============================================
+// ✅ RECOLECTAR DATOS DE CAUCHOS
+// ============================================
+function recolectarDatosCauchos() {
+    const cauchos = [];
+    
+    for (let i = 1; i <= 4; i++) {
+        const tapaChecked = document.querySelector(`input[name="caucho_${i}_tapa_si"]:checked`);
+        const rinNumero = document.querySelector(`input[name="caucho_${i}_rin"]`)?.value || '';
+        
+        cauchos.push({
+            posicion: i,
+            tapa: tapaChecked ? 'SI' : 'NO',
+            rin_numero: rinNumero
+        });
+    }
+    
+    // Cauchp de repuesto
+    const repuestoTapaChecked = document.querySelector(`input[name="caucho_repuesto_tapa_si"]:checked`);
+    const repuestoRinNumero = document.querySelector(`input[name="caucho_repuesto_rin"]`)?.value || '';
+    
+    cauchos.push({
+        posicion: 'REPUESTO',
+        tapa: repuestoTapaChecked ? 'SI' : 'NO',
+        rin_numero: repuestoRinNumero
+    });
+    
+    return cauchos;
+}
+
+// ============================================
+// ✅ RECOLECTAR DATOS DE COMPONENTES
+// ============================================
+function recolectarDatosComponentes() {
+    const componentes = {};
+    
+    // Lista de todos los componentes
+    const listaComponentes = [
+        'guardafango_izq', 'guardafango_der', 'guardafango_tra_izq', 'guardafango_tra_der',
+        'puerta_izq', 'puerta_der', 'puerta_tra_izq', 'puerta_tra_der',
+        'parachoque_trasero', 'parachoque_delantero', 'capot', 'puerta_cabina',
+        'parabrisas_trasero', 'parabrisas_delantero', 'espejo_der', 'espejo_izq',
+        'cables_auxiliares', 'tapa_gasolina', 'caja_velocidades', 'asientos_del',
+        'vidrio_lateral_izq', 'vidrio_lateral_der', 'vidrio_tra_izq', 'vidrio_tra_der',
+        'antena_gps', 'limpia_parabrisas', 'tablero', 'tablero_perillas',
+        'stop_tra_der', 'stop_tra_izq', 'faro_del_der', 'faro_del_izq',
+        'buche_der', 'buche_izq', 'buche_tra_der', 'buche_tra_izq',
+        'coctelera_check', 'tapa_radiador', 'tapa_distribuidor', 'asientos_tra',
+        'volante', 'corneta', 'reproductor', 'luces_der', 'luces_izq',
+        'faro_der', 'faro_izq', 'cerradura_der', 'cerradura_izq',
+        'bombonas_gas', 'cinturones', 'camara_motor', 'electroventilador',
+        'alternador', 'compresor_aa', 'radiador', 'aspa_radiador',
+        'varilla_aceite', 'tapa_bomba_hidraulic', 'espolder',
+        'radiador_aa', 'arranque', 'computadora', 'bomba_freno',
+        'bomba_direccion', 'fan_cooler', 'cajetin_direccion', 'diferencial',
+        'disco_freno_der', 'disco_freno_izq', 'tambor_freno_der', 'tambor_freno_izq',
+        'cuerpo_aceleracion', 'parrilla_delantera', 'llave_cruz',
+        'cuna_inmovilizacion', 'extintor', 'gencero', 'cardan_del', 'cardan_tra'
+    ];
+    
+    listaComponentes.forEach(componente => {
+        const estado = document.querySelector(`input[name="${componente}"]:checked`);
+        componentes[componente] = estado ? estado.value : 'NT';
+    });
+    
+    return componentes;
+}
 // ============================================
 // ✅ EXPORTAR FUNCIONES GLOBALES
 // ============================================
