@@ -1206,202 +1206,201 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   </div>
 
   <!-- VISTA PREVIA -->
-  <div class="preview-section" id="previewSection">
-    <h2>📄 Vista Previa de la Inspección (En Tiempo Real)</h2>
-    
-    <div class="inspeccion-container" id="inspeccionPreview">
-      <!-- Encabezado -->
-      <div class="inspeccion-header">
-        <div class="inspeccion-logos">
-          <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
-        </div>
-        <div class="inspeccion-title">
-          <h1>REPÚBLICA BOLIVARIANA DE VENEZUELA</h1>
-          <h1>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h1>
-          <h2>CUERPO DE POLICÍA NACIONAL BOLIVARIANA</h2>
-          <h3>DEPARTAMENTO DE TRANSPORTE</h3>
-        </div>
-        <div class="inspeccion-logos">
-          <img src="../img/logo.png" alt="Logo CPNB" onerror="this.style.display='none'">
-        </div>
+<!-- VISTA PREVIA -->
+<div class="preview-section" id="previewSection">
+  <h2>📄 Vista Previa de la Inspección (En Tiempo Real)</h2>
+  
+  <div class="inspeccion-container" id="inspeccionPreview">
+    <!-- Encabezado -->
+    <div class="inspeccion-header">
+      <div class="inspeccion-logos">
+        <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
       </div>
-
-      <!-- Tabla de Datos Generales -->
-      <table class="inspeccion-table">
-        <tr>
-          <th style="width: 12%;">N° DE INSPECCION</th>
-          <td style="width: 13%;" id="previewNumeroInspeccion">-</td>
-          <th style="width: 12%;">FECHA DE INSPECCION</th>
-          <td style="width: 13%;" id="previewFecha">-</td>
-          <th style="width: 12%;">MOTIVO DE LA INSPECCION</th>
-          <td style="width: 13%;" id="previewMotivo">-</td>
-          <th style="width: 10%;">HORA</th>
-          <td style="width: 15%;" id="previewHora">-</td>
-        </tr>
-        <tr>
-          <th>LUGAR</th>
-          <td colspan="3" id="previewLugar">-</td>
-          <th>ADSCRITA A:</th>
-          <td colspan="3" id="previewAdscrita">-</td>
-        </tr>
-      </table>
-
-      <!-- Datos del Vehículo -->
-      <table class="inspeccion-table">
-        <tr>
-          <th>PLACA</th>
-          <td id="previewPlaca">-</td>
-          <th>MARCA</th>
-          <td id="previewMarca">-</td>
-          <th>MODELO</th>
-          <td id="previewModelo">-</td>
-          <th>AÑO</th>
-          <td id="previewAno">-</td>
-        </tr>
-        <tr>
-          <th>TIPO</th>
-          <td id="previewTipo">-</td>
-          <th>COLOR</th>
-          <td id="previewColor">-</td>
-          <th>KMS</th>
-          <td id="previewKilometraje">-</td>
-          <th>N° DE IDENTIFICACION</th>
-          <td id="previewNumeroIdentificacion">-</td>
-        </tr>
-        <tr>
-          <th>SERIAL DE CARROCERIA</th>
-          <td colspan="7" id="previewSerialCarroceria">-</td>
-        </tr>
-      </table>
-
-      <!-- Equipamiento -->
-      <table class="inspeccion-table">
-        <tr>
-          <th>BATERIA</th>
-          <td id="previewBateria">-</td>
-          <th>ESTACION BASE</th>
-          <td id="previewEstacionBase">-</td>
-          <th>ESTACION LUCES</th>
-          <td id="previewEstacionLuces">-</td>
-          <th>COCTELERA</th>
-          <td id="previewCoctelera">-</td>
-        </tr>
-        <tr>
-          <th>TRIANGULO</th>
-          <td id="previewTriangulo">-</td>
-          <th>POSEE PLACAS NO</th>
-          <td id="previewPoseePlacas">-</td>
-          <th>HERRAMIENTAS</th>
-          <td id="previewHerramientas">-</td>
-          <th>GATO</th>
-          <td id="previewGato">-</td>
-        </tr>
-      </table>
-
-      <!-- TABLA DE COMPONENTES (Se llena dinámicamente) -->
-      <table class="inspeccion-table">
-        <thead>
-          <tr>
-            <th>COMPONENTE</th>
-            <th>B</th>
-            <th>M</th>
-            <th>N/T</th>
-            <th>COMPONENTE</th>
-            <th>B</th>
-            <th>M</th>
-            <th>N/T</th>
-            <th>COMPONENTE</th>
-            <th>B</th>
-            <th>M</th>
-            <th>N/T</th>
-          </tr>
-        </thead>
-        <tbody id="previewComponentesBody">
-          <!-- Se llena dinámicamente con JavaScript -->
-        </tbody>
-      </table>
-
-      <!-- TABLA DE CAUCHOS (Se llena dinámicamente) -->
-      <table class="inspeccion-table">
-        <thead>
-          <tr>
-            <th>CAUCHO</th>
-            <th>BUENO</th>
-            <th>MALO</th>
-            <th>SI</th>
-            <th>NO</th>
-            <th>TAPA</th>
-            <th>N° NUMERO</th>
-          </tr>
-        </thead>
-        <tbody id="previewCauchoBody">
-          <!-- Se llena dinámicamente con JavaScript -->
-        </tbody>
-      </table>
-
-      <!-- OBSERVACIONES -->
-      <div style="margin: 15px 0; padding: 10px; border: 1px solid #000;">
-        <strong>OBSERVACIONES:</strong>
-        <p id="previewObservaciones" style="margin: 10px 0 0 0; min-height: 60px; white-space: pre-wrap;">-</p>
+      <div class="inspeccion-title">
+        <h1>REPÚBLICA BOLIVARIANA DE VENEZUELA</h1>
+        <h1>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h1>
+        <h2>CUERPO DE POLICÍA NACIONAL BOLIVARIANA</h2>
+        <h3>DEPARTAMENTO DE TRANSPORTE</h3>
       </div>
-
-      <!-- Firmas -->
-      <div class="inspeccion-signatures">
-        <div class="signature-box">
-          <h4>POR LA COORDINACION</h4>
-          <div class="signature-field">
-            <label>APELLIDO Y NOMBRE:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>RANGO:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>N° DE CEDULA:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>N° DE TELEFONO:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>FIRMA:</label>
-            <span style="min-height: 50px;"></span>
-          </div>
-        </div>
-        <div class="signature-box">
-          <h4>INSPECCION REALIZADA POR:</h4>
-          <div class="signature-field">
-            <label>APELLIDO Y NOMBRE:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>RANGO:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>N° DE CEDULA:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>N° DE TELEFONO:</label>
-            <span></span>
-          </div>
-          <div class="signature-field">
-            <label>FIRMA:</label>
-            <span style="min-height: 50px;"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div style="margin-top: 20px; text-align: center; border: 2px solid #000; padding: 10px; background: #e0e0e0;">
-        <strong>(USO OFICIAL DEL DEPARTAMENTO DE TRANSPORTE Y LOGISTICA)</strong>
+      <div class="inspeccion-logos">
+        <img src="../img/logo.png" alt="Logo CPNB" onerror="this.style.display='none'">
       </div>
     </div>
-  </div>
 
+    <!-- Tabla de Datos Generales -->
+    <table class="inspeccion-table">
+      <tr>
+        <th style="width: 12%;">N° DE INSPECCION</th>
+        <td style="width: 13%;" id="previewNumeroInspeccion">-</td>
+        <th style="width: 12%;">FECHA DE INSPECCION</th>
+        <td style="width: 13%;" id="previewFecha">-</td>
+        <th style="width: 12%;">MOTIVO DE LA INSPECCION</th>
+        <td style="width: 13%;" id="previewMotivo">-</td>
+        <th style="width: 10%;">HORA</th>
+        <td style="width: 15%;" id="previewHora">-</td>
+      </tr>
+      <tr>
+        <th>LUGAR</th>
+        <td colspan="3" id="previewLugar">-</td>
+        <th>ADSCRITA A:</th>
+        <td colspan="3" id="previewAdscrita">-</td>
+      </tr>
+    </table>
+
+    <!-- Datos del Vehículo -->
+    <table class="inspeccion-table">
+      <tr>
+        <th>PLACA</th>
+        <td id="previewPlaca">-</td>
+        <th>MARCA</th>
+        <td id="previewMarca">-</td>
+        <th>MODELO</th>
+        <td id="previewModelo">-</td>
+        <th>AÑO</th>
+        <td id="previewAno">-</td>
+      </tr>
+      <tr>
+        <th>TIPO</th>
+        <td id="previewTipo">-</td>
+        <th>COLOR</th>
+        <td id="previewColor">-</td>
+        <th>KMS</th>
+        <td id="previewKilometraje">-</td>
+        <th>N° DE IDENTIFICACION</th>
+        <td id="previewNumeroIdentificacion">-</td>
+      </tr>
+      <tr>
+        <th>SERIAL DE CARROCERIA</th>
+        <td colspan="7" id="previewSerialCarroceria">-</td>
+      </tr>
+    </table>
+
+    <!-- Equipamiento -->
+    <table class="inspeccion-table">
+      <tr>
+        <th>BATERIA</th>
+        <td id="previewBateria">-</td>
+        <th>ESTACION BASE</th>
+        <td id="previewEstacionBase">-</td>
+        <th>ESTACION LUCES</th>
+        <td id="previewEstacionLuces">-</td>
+        <th>COCTELERA</th>
+        <td id="previewCoctelera">-</td>
+      </tr>
+      <tr>
+        <th>TRIANGULO</th>
+        <td id="previewTriangulo">-</td>
+        <th>POSEE PLACAS NO</th>
+        <td id="previewPoseePlacas">-</td>
+        <th>HERRAMIENTAS</th>
+        <td id="previewHerramientas">-</td>
+        <th>GATO</th>
+        <td id="previewGato">-</td>
+      </tr>
+    </table>
+
+    <!-- ✅ TABLA DE COMPONENTES INSPECCIONADOS (EN VISTA PREVIA) -->
+    <table class="inspeccion-table">
+      <thead>
+        <tr>
+          <th>COMPONENTE</th>
+          <th>B</th>
+          <th>M</th>
+          <th>N/T</th>
+          <th>COMPONENTE</th>
+          <th>B</th>
+          <th>M</th>
+          <th>N/T</th>
+          <th>COMPONENTE</th>
+          <th>B</th>
+          <th>M</th>
+          <th>N/T</th>
+        </tr>
+      </thead>
+      <tbody id="previewComponentesBody">
+        <!-- Se llena dinámicamente con JavaScript -->
+      </tbody>
+    </table>
+
+    <!-- TABLA DE CAUCHOS (EN VISTA PREVIA) -->
+    <table class="inspeccion-table">
+      <thead>
+        <tr>
+          <th>CAUCHO</th>
+          <th>BUENO</th>
+          <th>MALO</th>
+          <th>SI</th>
+          <th>NO</th>
+          <th>TAPA</th>
+          <th>N° NUMERO</th>
+        </tr>
+      </thead>
+      <tbody id="previewCauchoBody">
+        <!-- Se llena dinámicamente con JavaScript -->
+      </tbody>
+    </table>
+
+    <!-- OBSERVACIONES -->
+    <div style="margin: 15px 0; padding: 10px; border: 1px solid #000;">
+      <strong>OBSERVACIONES:</strong>
+      <p id="previewObservaciones" style="margin: 10px 0 0 0; min-height: 60px; white-space: pre-wrap;">-</p>
+    </div>
+
+    <!-- Firmas -->
+    <div class="inspeccion-signatures">
+      <div class="signature-box">
+        <h4>POR LA COORDINACION</h4>
+        <div class="signature-field">
+          <label>APELLIDO Y NOMBRE:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>RANGO:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>N° DE CEDULA:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>N° DE TELEFONO:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>FIRMA:</label>
+          <span style="min-height: 50px;"></span>
+        </div>
+      </div>
+      <div class="signature-box">
+        <h4>INSPECCION REALIZADA POR:</h4>
+        <div class="signature-field">
+          <label>APELLIDO Y NOMBRE:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>RANGO:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>N° DE CEDULA:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>N° DE TELEFONO:</label>
+          <span></span>
+        </div>
+        <div class="signature-field">
+          <label>FIRMA:</label>
+          <span style="min-height: 50px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top: 20px; text-align: center; border: 2px solid #000; padding: 10px; background: #e0e0e0;">
+      <strong>(USO OFICIAL DEL DEPARTAMENTO DE TRANSPORTE Y LOGISTICA)</strong>
+    </div>
+  </div>
 </div>
 </main>
 
