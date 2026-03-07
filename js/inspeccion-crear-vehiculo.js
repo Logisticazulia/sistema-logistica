@@ -68,9 +68,6 @@ function cargarEmailUsuario() {
     }
 }
 
-// ============================================
-// ✅ BUSCAR VEHÍCULO EN LA BASE DE DATOS
-// ============================================
 async function buscarVehiculo() {
     const searchInput = document.getElementById('searchInput');
     const searchAlert = document.getElementById('searchAlert');
@@ -89,12 +86,11 @@ async function buscarVehiculo() {
     try {
         mostrarAlerta('🔄 Buscando vehículo...', 'info', searchAlert);
         
-        // ✅ Buscar en la tabla de vehículos
-        // Buscamos por placa, facsimilar, serial_carroceria, serial_motor, marca, modelo
+        // ✅ CORREGIDO: facsimil en lugar de facsimilar
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
-            .or(`placa.eq.${terminoBusqueda},facsimilar.eq.${terminoBusqueda},serial_carroceria.eq.${terminoBusqueda},serial_motor.eq.${terminoBusqueda},marca.ilike.%${terminoBusqueda}%,modelo.ilike.%${terminoBusqueda}%`)
+            .or(`placa.eq.${terminoBusqueda},facsimil.eq.${terminoBusqueda},s_carroceria.eq.${terminoBusqueda},s_motor.eq.${terminoBusqueda},marca.ilike.%${terminoBusqueda}%,modelo.ilike.%${terminoBusqueda}%`)
             .limit(1);
         
         if (error) throw error;
@@ -105,11 +101,9 @@ async function buscarVehiculo() {
             return;
         }
         
-        // ✅ Vehículo encontrado
         vehiculoEncontrado = data[0];
         console.log('✅ Vehículo encontrado:', vehiculoEncontrado);
         
-        // ✅ Autollenar el formulario
         autollenarFormulario(vehiculoEncontrado);
         
         mostrarAlerta(`✅ Vehículo encontrado: ${vehiculoEncontrado.marca} ${vehiculoEncontrado.modelo} - Placa: ${vehiculoEncontrado.placa}`, 'success', searchAlert);
