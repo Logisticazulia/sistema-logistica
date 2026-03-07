@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Crear Inspección PVR - Patrullas - Sistema de Logística">
+<meta name="description" content="Consultar Acta de Asignación - Sistema de Logística">
 <meta name="theme-color" content="#003366">
-<title>Crear Inspección PVR - Patrullas | Transporte</title>
+<title>Consultar Acta de Asignación | Transporte</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,38 +13,121 @@
 <link rel="stylesheet" href="../css/style.css">
 <style>
 /* ============================================ */
-/* ESTILOS ESPECÍFICOS PARA INSPECCIÓN PVR      */
+/* ESTILOS GENERALES                            */
 /* ============================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
+/* ============================================ */
+/* CONTENEDOR PRINCIPAL - MÁS ANCHO             */
+/* ============================================ */
 .container {
   max-width: 1920px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px 50px;
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
 
 /* ============================================ */
-/* ✅ SECCIÓN DE BÚSQUEDA - ESTILO FICHA        */
+/* SECCIÓN DE BÚSQUEDA DE ACTAS                 */
 /* ============================================ */
 .search-section {
   background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  padding: 30px;
+  padding: 25px;
   border-radius: 8px;
   margin-bottom: 25px;
   box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
 .search-section h3 {
   color: white;
+  margin-bottom: 15px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.search-filters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.search-filters input, .search-filters select {
+  padding: 12px 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  font-size: 15px;
+  background: rgba(255,255,255,0.95);
+  font-family: 'Roboto', sans-serif;
+}
+.search-filters input:focus, .search-filters select:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+.search-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-search, .btn-reset, .btn-success {
+  padding: 12px 28px;
+  font-size: 15px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: none;
+  white-space: nowrap;
+}
+.btn-search {
+  background: #2a9d8f;
+  color: white;
+}
+.btn-search:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+.btn-reset {
+  background: #e9c46a;
+  color: #000;
+}
+.btn-reset:hover {
+  background: #d4a84a;
+  transform: translateY(-2px);
+}
+.btn-success {
+  background: #2a9d8f;
+  color: white;
+}
+.btn-success:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+/* ============================================ */
+/* BÚSQUEDA DE VEHÍCULOS                        */
+/* ============================================ */
+.vehicle-search-section {
+  background: linear-gradient(135deg, #003366 0%, #004080 100%);
+  padding: 30px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0,51,102,0.2);
+}
+.vehicle-search-section h3 {
+  color: white;
   margin-bottom: 20px;
   font-size: 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 600;
+  gap: 12px;
 }
 .search-container {
   display: flex;
@@ -88,25 +171,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(40,167,69,0.3);
 }
-.btn-clear-search {
-  padding: 14px 32px;
-  background: #e9c46a;
-  color: #000;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-.btn-clear-search:hover {
-  background: #d4a84a;
-  transform: translateY(-2px);
-}
 .search-hint {
   color: #ffffff;
   font-size: 14px;
@@ -132,134 +196,182 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   font-weight: 600;
 }
 
-/* ALERTAS */
-.alert {
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin: 15px 0;
-  display: none;
-  font-weight: 500;
-}
-.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-.alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-
-/* FORMULARIO */
-.form-section {
-  background: white;
-  padding: 30px;
+/* ============================================ */
+/* SECCIÓN DE RESULTADOS                        */
+/* ============================================ */
+.results-section {
+  background: #f8f9fa;
+  padding: 25px 50px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-.form-section h2 {
-  color: #003366;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #003366;
-  font-size: 18px;
-}
-
-/* GRUPOS DE FORMULARIO */
-.form-group {
-  margin-bottom: 12px;
-}
-.form-group label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #333;
-  font-size: 12px;
-}
-.form-group input, .form-group select, .form-group textarea {
-  width: 100%;
-  padding: 6px 10px;
+  margin-bottom: 25px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 13px;
-  font-family: 'Roboto', sans-serif;
+  display: none;
 }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  outline: none;
-  border-color: #003366;
-  box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
-}
-
-/* FILAS DEL FORMULARIO */
-.form-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.form-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-.form-row-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
-.form-row-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
-
-/* CHECKBOXES Y RADIOS */
-.checkbox-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.checkbox-group label {
+.results-section.active { display: block; }
+.results-section h3 {
+  color: #003366;
+  margin-bottom: 15px;
+  font-size: 16px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-weight: 400;
-  margin: 0;
-  cursor: pointer;
-  font-size: 12px;
+  gap: 8px;
 }
-.checkbox-group input[type="checkbox"], .checkbox-group input[type="radio"] {
-  width: auto;
-  cursor: pointer;
-}
-
-/* TABLAS DE INSPECCIÓN */
-.inspection-table {
+.actas-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
-  margin: 15px 0;
-}
-.inspection-table th, .inspection-table td {
-  border: 1px solid #003366;
-  padding: 5px 6px;
-  text-align: left;
-}
-.inspection-table th {
-  background: #003366;
-  color: white;
-  font-weight: 600;
-}
-.inspection-table td:first-child {
-  font-weight: 500;
-  background: #f8f9fa;
-  min-width: 150px;
-}
-.inspection-table td {
-  text-align: center;
-}
-
-/* SECCIONES */
-.section-title {
-  background: #003366;
-  color: white;
-  padding: 8px 12px;
-  font-weight: 700;
-  margin: 20px 0 10px 0;
-  border-radius: 4px;
   font-size: 14px;
 }
+.actas-table th {
+  background: #003366;
+  color: white;
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #002244;
+  font-size: 14px;
+}
+.actas-table td {
+  padding: 12px 10px;
+  border: 1px solid #ddd;
+  background: white;
+  font-size: 14px;
+}
+.actas-table tr:nth-child(even) { background: #f8f9fa; }
+.actas-table tr:hover {
+  background: #e3f2fd;
+  cursor: pointer;
+}
+.btn-view-acta {
+  padding: 8px 16px;
+  background: #003366;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-view-acta:hover {
+  background: #002244;
+  transform: translateY(-2px);
+}
+.acta-count {
+  background: #003366;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 10px;
+}
 
-/* BOTONES */
-.btn {
+/* ============================================ */
+/* PAGINACIÓN - 20 POR PÁGINA                   */
+/* ============================================ */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+.btn-pagination {
   padding: 10px 20px;
+  background: #003366;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  margin-top: 20px;
-  margin-right: 10px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-pagination:hover {
+  background: #002244;
+  transform: translateY(-2px);
+}
+.btn-pagination:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.6;
+}
+.pagination-numbers { display: flex; gap: 5px; }
+.btn-page-number {
+  padding: 8px 14px;
+  background: white;
+  color: #003366;
+  border: 1px solid #003366;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 40px;
+}
+.btn-page-number:hover { background: #e3f2fd; }
+.btn-page-number.active {
+  background: #003366;
+  color: white;
+  font-weight: 600;
+}
+.pagination-info {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+/* ============================================ */
+/* VISTA PREVIA DEL ACTA                        */
+/* ============================================ */
+.preview-section {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  width: 100%;
+  display: none;
+}
+.preview-section.active { display: block; }
+.preview-section h2 {
+  color: #003366;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* ============================================ */
+/* BOTONES DE ACCIÓN                            */
+/* ============================================ */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -272,144 +384,210 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-success { background: #2a9d8f; color: white; }
 .btn-success:hover { background: #218838; transform: translateY(-2px); }
 
-/* VISTA PREVIA */
-.preview-section {
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  display: block;
-}
-.preview-section h2 {
-  color: #003366;
-  margin-bottom: 20px;
-  text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #003366;
-}
-
-/* PLANILLA DE VISTA PREVIA */
-.inspeccion-container {
-  border: 2px solid #003366;
-  padding: 15px;
+/* ============================================ */
+/* ACTA - FORMATO EXACTO                        */
+/* ============================================ */
+.acta-container {
+  border: 1px solid #ddd;
+  padding: 2cm;
   background: white;
   width: 100%;
   font-family: Arial, sans-serif;
-  font-size: 9pt;
+  font-size: 12pt;
+  line-height: 1.5;
   color: #000;
+  position: relative;
 }
-.inspeccion-header {
+.acta-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
   border-bottom: 2px solid #003366;
+  position: relative;
+  min-height: 80px;
 }
-.inspeccion-logos {
+.acta-logos {
   display: flex;
   gap: 15px;
   align-items: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
-.inspeccion-logos img {
-  height: 70px;
-  width: auto;
+.acta-logos:first-child { left: 0; }
+.acta-logos:last-child { right: 0; }
+.acta-logos img { height: 80px; width: auto; }
+.acta-logos:last-child img { height: 120px; width: auto; }
+.acta-title {
+  text-align: center !important;
+  flex: 1 !important;
+  padding: 0 15px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
-.inspeccion-title {
-  text-align: center;
-  flex: 1;
-  padding: 0 20px;
+.acta-title h1 {
+  font-size: 10pt !important;
+  color: #000000 !important;
+  margin: 2px 0 !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  display: block !important;
 }
-.inspeccion-title h1 {
-  font-size: 10pt;
+.acta-title h2 {
+  font-size: 10pt !important;
+  color: #000000 !important;
+  margin: 2px 0 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  display: block !important;
+}
+.acta-title h3 {
+  font-size: 10pt !important;
+  color: #003366 !important;
+  margin: 5px 0 3px 0 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  display: block !important;
+}
+.acta-title .acta-subtitle {
+  font-size: 11pt !important;
+  color: #000 !important;
+  margin-top: 8px !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-align: center !important;
+  display: block !important;
+}
+.acta-body {
+  font-size: 12pt;
+  line-height: 1.5;
   color: #000;
-  margin: 2px 0;
-  font-weight: 700;
+  text-align: justify;
 }
-.inspeccion-title h2 {
-  font-size: 9pt;
-  color: #000;
-  margin: 2px 0;
-  font-weight: 700;
-}
-.inspeccion-title h3 {
-  font-size: 9pt;
-  color: #003366;
-  margin: 5px 0;
-  font-weight: 700;
-}
-
-/* TABLA DE INSPECCIÓN - VISTA PREVIA */
-.inspeccion-table {
+.acta-body p { margin: 10px 0; }
+.acta-body strong { font-weight: 700; }
+.acta-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 8pt;
-  margin: 10px 0;
+  margin: 15px 0;
   border: 1px solid #000;
 }
-.inspeccion-table th, .inspeccion-table td {
-  border: 1px solid #000;
-  padding: 3px 5px;
+.acta-table th {
+  background: #fff;
+  color: #000;
+  padding: 8px 10px;
   text-align: center;
-}
-.inspeccion-table th {
-  background: #e0e0e0;
+  font-size: 11pt;
+  border: 1px solid #000;
   font-weight: 700;
 }
-.inspeccion-table td:first-child {
-  text-align: left;
-  font-weight: 600;
-  background: #f5f5f5;
-}
-
-/* FIRMAS */
-.inspeccion-signatures {
-  margin-top: 30px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-}
-.signature-box {
+.acta-table td {
+  padding: 8px 10px;
   border: 1px solid #000;
-  padding: 15px;
-}
-.signature-box h4 {
-  font-size: 9pt;
-  font-weight: 700;
-  margin-bottom: 10px;
+  font-size: 11pt;
   text-align: center;
-  background: #e0e0e0;
-  padding: 5px;
 }
-.signature-field {
-  margin: 8px 0;
+.acta-section {
+  margin: 12px 0;
+  padding: 10px 12px;
+  text-align: justify;
+  font-size: 12pt;
 }
-.signature-field label {
-  font-size: 8pt;
-  font-weight: 600;
-  display: block;
-  margin-bottom: 2px;
-}
-.signature-field span {
-  font-size: 8pt;
-  border-bottom: 1px solid #000;
-  display: block;
-  min-height: 18px;
-}
-
-/* ACTION BUTTONS */
-.action-buttons {
+.acta-section.citation { font-style: italic; text-align: justify; }
+.acta-body ol { margin: 10px 0; padding-left: 25px; }
+.acta-body li { margin: 5px 0; text-align: justify; }
+.acta-signatures {
+  margin-top: 40px;
   display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 25px;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 40px;
+}
+.signature-box { width: 100%; max-width: none; }
+.signature-box.funcionario { text-align: left; padding-right: 50%; }
+.signature-box.director {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 500px;
+  margin-top: -10px !important;
+}
+.signature-box p {
+  font-size: 12pt;
+  font-weight: 600;
+  margin: 5px 0;
+  color: #000;
+  line-height: 1.4;
+}
+.signature-box .firma-line {
+  border-top: 1px solid #000;
+  margin: 30px 0 10px 0;
+  padding-top: 10px;
+  width: 80%;
+}
+.signature-box.funcionario .firma-line { margin: 30px 0 10px 0; }
+.signature-box.director .firma-line { margin: 30px auto 10px auto; }
+.signature-box .cargo { font-size: 11pt; font-weight: 400; }
+.acta-footer {
+  margin-top: 30px !important;
+  text-align: center !important;
+  font-size: 9pt !important;
+  padding-top: 15px !important;
+  border-top: 1px solid #ddd !important;
+  position: relative !important;
+  z-index: 1 !important;
+  page-break-inside: avoid !important;
+  width: 100% !important;
+}
+.acta-footer p {
+  margin: 5px 0 !important;
+  font-weight: 700 !important;
+  color: #dc2626 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+}
+.acta-watermark {
+  position: absolute;
+  bottom: 0;
+  left: 57%;
+  transform: translateX(-50%);
+  width: 128.5%;
+  height: auto;
+  max-height: 3000px;
+  object-fit: contain;
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
 }
 
-/* RESPONSIVE */
+/* ============================================ */
+/* ALERTAS                                      */
+/* ============================================ */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin: 15px 0;
+  display: none;
+  font-weight: 500;
+}
+.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
 @media (max-width: 1200px) {
-  .form-row-4, .form-row-5, .form-row-6, .form-row-7 {
+  .container {
+    max-width: 100%;
+    padding: 30px 40px;
+  }
+  .search-filters {
     grid-template-columns: repeat(2, 1fr);
   }
   .search-input {
@@ -417,36 +595,64 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   }
 }
 @media (max-width: 768px) {
-  .form-row-2, .form-row-3, .form-row-4, .form-row-5, .form-row-6, .form-row-7 {
+  .container {
+    padding: 20px;
+  }
+  .search-filters {
     grid-template-columns: 1fr;
   }
-  .search-container {
+  .search-buttons, .search-container {
     flex-direction: column;
   }
-  .search-input {
+  .search-filters input, .search-input {
     min-width: 100%;
   }
-  .btn-search-vehicle, .btn-clear-search {
+  .btn-search, .btn-reset, .btn-success, .btn-search-vehicle {
     width: 100%;
     justify-content: center;
   }
-  .inspeccion-container {
-    padding: 10px;
-    font-size: 7pt;
+  .acta-container {
+    padding: 1.5cm;
   }
-  .inspeccion-signatures {
-    grid-template-columns: 1fr;
+  .acta-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .actas-table {
+    font-size: 12px;
+  }
+  .actas-table th, .actas-table td {
+    padding: 8px 6px;
+  }
+  .pagination-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pagination-numbers {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pagination-info {
+    margin-left: 0;
+    text-align: center;
+  }
+  .search-hint {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
-/* ESTILOS DE IMPRESIÓN */
+/* ============================================ */
+/* ESTILOS DE IMPRESIÓN                         */
+/* ============================================ */
 @media print {
   @page {
-    size: letter landscape;
-    margin: 1cm;
+    size: letter portrait;
+    margin: 1.27cm 1.7cm 1.7cm 1.27cm;
   }
   .navbar, .module-header, .module-title-section,
-  .btn, .form-section, .action-buttons, .search-section {
+  .btn, .search-section, .vehicle-search-section, .results-section,
+  .preview-section h2, .action-buttons {
     display: none !important;
   }
   body {
@@ -457,11 +663,59 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   .container { display: block; padding: 0; margin: 0; }
   .preview-section {
     box-shadow: none; padding: 0; margin: 0;
+    page-break-inside: avoid; display: block !important;
+  }
+  .acta-container {
+    border: none; width: 100%; padding: 0; margin: 0;
+    font-size: 11pt; line-height: 1.3;
+  }
+  .acta-header {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #003366;
+    page-break-inside: avoid;
+    width: 100%;
+  }
+  .acta-logos {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    align-items: center !important;
+    flex: 0 0 auto;
+  }
+  .acta-logos:first-child { margin-right: 15px; margin-left: -15px !important; }
+  .acta-logos:last-child { margin-left: 15px; }
+  .acta-logos img { height: 60px !important; width: auto !important; }
+  .acta-title {
+    text-align: center !important;
+    flex: 1 !important;
+    padding: 0 15px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  .acta-title h1, .acta-title h2, .acta-title h3 {
+    font-size: 10pt !important;
+    color: #000000 !important;
+    margin: 2px 0 !important;
+    font-weight: 700 !important;
+    text-align: center !important;
     display: block !important;
   }
-  .inspeccion-container {
-    border: 2px solid #000;
-    padding: 10px;
+  .acta-title .acta-subtitle {
+    font-size: 11pt !important;
+    color: #000 !important;
+    margin-top: 8px !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+    text-align: center !important;
+    display: block !important;
   }
 }
 </style>
@@ -496,917 +750,241 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     <span class="breadcrumb-separator">/</span>
     <a href="transporte.html" class="breadcrumb-link">Transporte</a>
     <span class="breadcrumb-separator">/</span>
-    <a href="inspeccion.html" class="breadcrumb-link">Inspección PVR</a>
+    <a href="acta.html" class="breadcrumb-link">Acta de Asignación</a>
     <span class="breadcrumb-separator">/</span>
-    <a href="inspeccion-crear.html" class="breadcrumb-link">Crear</a>
-    <span class="breadcrumb-separator">/</span>
-    <span class="breadcrumb-current">Patrullas</span>
+    <span class="breadcrumb-current">Consultar Acta</span>
   </div>
-  <button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion-crear.html'">
-    ← Volver
+  <button class="btn btn-secondary btn-sm" onclick="window.location.href='acta.html'">
+    ← Volver a Acta
   </button>
 </header>
 
 <!-- Título del Módulo -->
 <section class="module-title-section">
-  <h1 class="module-title">🚓 Crear Inspección PVR - Patrullas</h1>
-  <p class="module-subtitle">Formulario completo de inspección física vehicular</p>
+  <h1 class="module-title">🔍 Consultar Acta de Asignación</h1>
+  <p class="module-subtitle">Busque y visualice las actas de asignación registradas</p>
 </section>
 
 <div class="container">
   
-  <!-- ✅ SECCIÓN DE BÚSQUEDA - ESTILO FICHA -->
+  <!-- SECCIÓN DE BÚSQUEDA DE ACTAS -->
   <div class="search-section">
-    <h3>🔍 Buscar Vehículo</h3>
+    <h3>🔍 Buscar por Acta</h3>
     <div id="searchAlert" class="alert"></div>
-    <div class="search-container">
-      <input type="text" id="searchInput" class="search-input" 
-        placeholder="Ingrese placa, facsimilar, serial de carrocería, serial de motor o marca..." 
-        autocomplete="off">
-      <button class="btn-search-vehicle" onclick="buscarVehiculo()">
+    <div class="search-filters">
+      <input type="text" id="filterFuncionario" placeholder="Nombre del funcionario..." autocomplete="off">
+      <input type="text" id="filterCedula" placeholder="Cédula de identidad..." autocomplete="off">
+      <input type="text" id="filterUnidad" placeholder="Unidad de asignación..." autocomplete="off">
+      <input type="date" id="filterFecha" placeholder="Fecha..." style="color: #666;">
+    </div>
+    <div class="search-buttons">
+      <button class="btn-search" onclick="buscarActas()">
         <span>🔍</span><span>Buscar</span>
       </button>
-      <button class="btn-clear-search" onclick="limpiarBusqueda()">
-        <span>🔄</span><span>Limpiar</span>
+      <button class="btn-reset" onclick="resetearFiltros()">
+        <span>🔄</span><span>Limpiar Filtros</span>
+      </button>
+      <button class="btn btn-success" onclick="cargarTodasLasActas()">
+        <span>📋</span><span>Ver Todas</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN DE BÚSQUEDA DE VEHÍCULOS -->
+  <div class="vehicle-search-section">
+    <h3>🚗 Buscar por Vehículo</h3>
+    <div id="vehicleSearchAlert" class="alert"></div>
+    <div class="search-container">
+      <input type="text" id="vehicleSearchInput" class="search-input"
+        placeholder="Ingrese placa, facsímil o serial de carrocería..." autocomplete="off">
+      <button class="btn-search-vehicle" onclick="buscarActaPorVehiculo()">
+        <span>🔍</span><span>Buscar</span>
       </button>
     </div>
     <div class="search-hint">
       <span>💡 Busque por:</span>
       <span>🚗 Placa</span>
-      <span>📄 Facsimilar</span>
+      <span>📄 Facsímil</span>
       <span>🔢 Serial Carrocería</span>
       <span>⚙️ Serial Motor</span>
-      <span>🏷️ Marca/Modelo</span>
     </div>
   </div>
 
-  <!-- FORMULARIO DE INSPECCIÓN -->
-  <div class="form-section">
-    <form id="inspeccionForm">
-      
-      <!-- DATOS GENERALES -->
-      <div class="section-title">📋 DATOS GENERALES DE LA INSPECCIÓN</div>
-      <div class="form-row-6">
-        <div class="form-group">
-          <label>N° DE INSPECCIÓN *</label>
-          <input type="text" id="numeroInspeccion" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>FECHA DE INSPECCIÓN *</label>
-          <input type="date" id="fechaInspeccion" required onchange="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>MOTIVO *</label>
-          <select id="motivoInspeccion" required onchange="actualizarVistaPrevia()">
-            <option value="">Seleccione...</option>
-            <option value="ASIGNACIÓN">Asignación</option>
-            <option value="SUPERVISIÓN">Supervisión</option>
-            <option value="MANTENIMIENTO">Mantenimiento</option>
-            <option value="INCIDENTE">Incidente</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>HORA *</label>
-          <input type="time" id="horaInspeccion" required onchange="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>LUGAR *</label>
-          <input type="text" id="lugarInspeccion" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>ADSCRITA A *</label>
-          <input type="text" id="adscritaA" required oninput="actualizarVistaPrevia()">
-        </div>
-      </div>
-
-      <!-- DATOS DEL VEHÍCULO -->
-      <div class="section-title">🚗 DATOS DEL VEHÍCULO</div>
-      <div class="form-row-7">
-        <div class="form-group">
-          <label>PLACA *</label>
-          <input type="text" id="placa" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>MARCA *</label>
-          <input type="text" id="marca" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>MODELO *</label>
-          <input type="text" id="modelo" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>AÑO *</label>
-          <input type="text" id="ano" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>TIPO *</label>
-          <select id="tipoVehiculo" required onchange="actualizarVistaPrevia()">
-            <option value="">Seleccione...</option>
-            <option value="PATRULLA">Patrulla</option>
-            <option value="CAMIONETA">Camioneta</option>
-            <option value="FURGÓN">Furgón</option>
-            <option value="MOTOCICLETA">Motocicleta</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>COLOR *</label>
-          <input type="text" id="color" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>KMS *</label>
-          <input type="text" id="kilometraje" required oninput="actualizarVistaPrevia()">
-        </div>
-      </div>
-
-      <div class="form-row-2">
-        <div class="form-group">
-          <label>N° DE IDENTIFICACIÓN *</label>
-          <input type="text" id="numeroIdentificacion" required oninput="actualizarVistaPrevia()">
-        </div>
-        <div class="form-group">
-          <label>SERIAL DE CARROCERÍA *</label>
-          <input type="text" id="serialCarroceria" required oninput="actualizarVistaPrevia()">
-        </div>
-      </div>
-
-      <!-- EQUIPAMIENTO -->
-      <div class="section-title">📦 EQUIPAMIENTO</div>
-      <div class="form-row-6">
-        <div class="form-group">
-          <label>BATERÍA</label>
-          <select id="bateria" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>ESTACIÓN BASE</label>
-          <select id="estacionBase" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>ESTACIÓN LUCES</label>
-          <select id="estacionLuces" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>COCTELERA</label>
-          <select id="coctelera" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>TRIÁNGULO</label>
-          <select id="triangulo" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>POSEE PLACAS NO</label>
-          <select id="poseePlacas" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row-2">
-        <div class="form-group">
-          <label>HERRAMIENTAS</label>
-          <select id="herramientas" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>GATO</label>
-          <select id="gato" onchange="actualizarVistaPrevia()">
-            <option value="SI">Sí</option>
-            <option value="NO">No</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- INSPECCIÓN DETALLADA - TODOS LOS ITEMS -->
-      <div class="section-title">🔍 INSPECCIÓN DETALLADA DE COMPONENTES</div>
-      
-      <table class="inspection-table">
+  <!-- TABLA DE RESULTADOS -->
+  <div class="results-section" id="resultsSection">
+    <h3>
+      <span>📄 Actas Encontradas</span>
+      <span class="acta-count" id="actaCount">0</span>
+    </h3>
+    <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+      <table class="actas-table">
         <thead>
           <tr>
-            <th>COMPONENTE</th>
-            <th>B</th>
-            <th>M</th>
-            <th>N/T</th>
-            <th>COMPONENTE</th>
-            <th>B</th>
-            <th>M</th>
-            <th>N/T</th>
-            <th>COMPONENTE</th>
-            <th>B</th>
-            <th>M</th>
-            <th>N/T</th>
+            <th>Fecha</th>
+            <th>Funcionario</th>
+            <th>Cédula</th>
+            <th>Unidad</th>
+            <th>Vehículos</th>
+            <th>Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- FILA 1 -->
-          <tr>
-            <td>GUARDAFANGO DEL IZQ</td>
-            <td><input type="radio" name="guardafango_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>VIDRIO LATERAL DEL IZQ</td>
-            <td><input type="radio" name="vidrio_lateral_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_lateral_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_lateral_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>VOLANTE</td>
-            <td><input type="radio" name="volante" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="volante" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="volante" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 2 -->
-          <tr>
-            <td>GUARDAFANGO DEL DER</td>
-            <td><input type="radio" name="guardafango_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>VIDRIO LATERAL DEL DER</td>
-            <td><input type="radio" name="vidrio_lateral_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_lateral_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_lateral_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>CORNETA (PITO)</td>
-            <td><input type="radio" name="corneta" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="corneta" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="corneta" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 3 -->
-          <tr>
-            <td>GUARDAFANGO TRA IZQ</td>
-            <td><input type="radio" name="guardafango_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>VIDRIO LATERAL TRA IZQ</td>
-            <td><input type="radio" name="vidrio_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>REFRIGERADOR</td>
-            <td><input type="radio" name="refrigerador" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="refrigerador" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="refrigerador" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 4 -->
-          <tr>
-            <td>GUARDAFANGO TRA DER</td>
-            <td><input type="radio" name="guardafango_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="guardafango_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>VIDRIO LATERAL TRA DER</td>
-            <td><input type="radio" name="vidrio_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="vidrio_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>LUCES ALTA Y BAJA DER</td>
-            <td><input type="radio" name="luces_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="luces_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="luces_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 5 -->
-          <tr>
-            <td>PUERTA DEL IZQ</td>
-            <td><input type="radio" name="puerta_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ANTENA DE GPS</td>
-            <td><input type="radio" name="antena_gps" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="antena_gps" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="antena_gps" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>LUCES ALTA Y BAJA IZQ</td>
-            <td><input type="radio" name="luces_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="luces_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="luces_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 6 -->
-          <tr>
-            <td>PUERTA DEL DER</td>
-            <td><input type="radio" name="puerta_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>LIMPIA PARABRISAS DEL</td>
-            <td><input type="radio" name="limpia_parabrisas" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="limpia_parabrisas" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="limpia_parabrisas" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>FARO DEL DER. NIEBLINA</td>
-            <td><input type="radio" name="faro_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 7 -->
-          <tr>
-            <td>PUERTA TRA IZQ</td>
-            <td><input type="radio" name="puerta_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TABLERO DE INSTRUM</td>
-            <td><input type="radio" name="tablero" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tablero" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tablero" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>FARO DEL IZQ. NIEBLINA</td>
-            <td><input type="radio" name="faro_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 8 -->
-          <tr>
-            <td>PUERTA TRA DER</td>
-            <td><input type="radio" name="puerta_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TABLERO Y PERILLAS A/A</td>
-            <td><input type="radio" name="tablero_perillas" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tablero_perillas" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tablero_perillas" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>CERRADURA DER</td>
-            <td><input type="radio" name="cerradura_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cerradura_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cerradura_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 9 -->
-          <tr>
-            <td>PARACHOQUE TRASERO</td>
-            <td><input type="radio" name="parachoque_tra" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parachoque_tra" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parachoque_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>STOP TRASERO DER</td>
-            <td><input type="radio" name="stop_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="stop_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="stop_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>CERRADURA IZQ</td>
-            <td><input type="radio" name="cerradura_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cerradura_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cerradura_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 10 -->
-          <tr>
-            <td>PARACHOQUE DELANTER</td>
-            <td><input type="radio" name="parachoque_del" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parachoque_del" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parachoque_del" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>STOP TRASERO IZQ</td>
-            <td><input type="radio" name="stop_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="stop_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="stop_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>BOMBONA DE GAS</td>
-            <td><input type="radio" name="bombona_gas" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="bombona_gas" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="bombona_gas" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 11 -->
-          <tr>
-            <td>CAPOT</td>
-            <td><input type="radio" name="capot" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="capot" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="capot" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>FARO DELANTERO DER</td>
-            <td><input type="radio" name="faro_del_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_del_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_del_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>CINTURONES DE SEGURID</td>
-            <td><input type="radio" name="cinturones" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cinturones" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cinturones" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 12 -->
-          <tr>
-            <td>PUERTA DE LA CABINA</td>
-            <td><input type="radio" name="puerta_cabina" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_cabina" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="puerta_cabina" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>FARO DELANTERO IZQ</td>
-            <td><input type="radio" name="faro_del_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_del_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="faro_del_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>CAMARA MOTOR</td>
-            <td><input type="radio" name="camara_motor" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="camara_motor" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="camara_motor" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 13 -->
-          <tr>
-            <td>PARABRISAS TRASERO</td>
-            <td><input type="radio" name="parabrisas_tra" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parabrisas_tra" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parabrisas_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>BUCHE DEL DER</td>
-            <td><input type="radio" name="buche_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ELECTROVENTILADOR</td>
-            <td><input type="radio" name="electroventilador" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="electroventilador" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="electroventilador" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 14 -->
-          <tr>
-            <td>PARABRISAS DELANTER</td>
-            <td><input type="radio" name="parabrisas_del" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parabrisas_del" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parabrisas_del" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>BUCHE DEL IZQ</td>
-            <td><input type="radio" name="buche_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ALTERNADOR</td>
-            <td><input type="radio" name="alternador" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="alternador" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="alternador" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 15 -->
-          <tr>
-            <td>ESPEJO RETROVISOR DER</td>
-            <td><input type="radio" name="espejo_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="espejo_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="espejo_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>BUCHE TRAS. DER</td>
-            <td><input type="radio" name="buche_tra_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_tra_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_tra_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>COMPRESOR DE A/A</td>
-            <td><input type="radio" name="compresor_aa" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="compresor_aa" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="compresor_aa" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 16 -->
-          <tr>
-            <td>ESPEJO RETROVISOR IZQ</td>
-            <td><input type="radio" name="espejo_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="espejo_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="espejo_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>BUCHE TRAS. IZQ</td>
-            <td><input type="radio" name="buche_tra_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_tra_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="buche_tra_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>RADIADOR</td>
-            <td><input type="radio" name="radiador" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="radiador" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="radiador" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 17 -->
-          <tr>
-            <td>ABLES AUXILIARES DE BA</td>
-            <td><input type="radio" name="ables_aux" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="ables_aux" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="ables_aux" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>COCTELERA</td>
-            <td><input type="radio" name="coctelera_check" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="coctelera_check" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="coctelera_check" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ASFA RADIADOR</td>
-            <td><input type="radio" name="asfa_radiador" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="asfa_radiador" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="asfa_radiador" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 18 -->
-          <tr>
-            <td>TAPA DE GASOLINA</td>
-            <td><input type="radio" name="tapa_gasolina" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_gasolina" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_gasolina" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TAPA RADIADOR</td>
-            <td><input type="radio" name="tapa_radiador" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_radiador" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_radiador" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>VARILLA MEDICION ACEIT</td>
-            <td><input type="radio" name="varilla_aceite" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="varilla_aceite" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="varilla_aceite" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 19 -->
-          <tr>
-            <td>CAJA DE VELOCIDADES</td>
-            <td><input type="radio" name="caja_velocidades" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caja_velocidades" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caja_velocidades" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TAPA DISTRIBUIDOR</td>
-            <td><input type="radio" name="tapa_distribuidor" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_distribuidor" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_distribuidor" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TAPA BOMBA HIDRAULIC</td>
-            <td><input type="radio" name="tapa_bomba_hidraulic" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_bomba_hidraulic" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tapa_bomba_hidraulic" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 20 -->
-          <tr>
-            <td>ASIENTOS DELANTEROS</td>
-            <td><input type="radio" name="asientos_del" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="asientos_del" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="asientos_del" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ASIENTOS TRASEROS</td>
-            <td><input type="radio" name="asientos_tra" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="asientos_tra" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="asientos_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ESPOLDER DEL (BABERO)</td>
-            <td><input type="radio" name="espolder" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="espolder" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="espolder" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 21 -->
-          <tr>
-            <td>RADIADOR DE A/A (EVA)</td>
-            <td><input type="radio" name="radiador_aa" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="radiador_aa" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="radiador_aa" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>ARRANQUE</td>
-            <td><input type="radio" name="arranque" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="arranque" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="arranque" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>COMPUTADORA</td>
-            <td><input type="radio" name="computadora" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="computadora" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="computadora" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 22 -->
-          <tr>
-            <td>BOMBA DE FRENO</td>
-            <td><input type="radio" name="bomba_freno" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="bomba_freno" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="bomba_freno" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>BOMBA DE DIRECCION</td>
-            <td><input type="radio" name="bomba_direccion" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="bomba_direccion" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="bomba_direccion" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>FAN COOLER</td>
-            <td><input type="radio" name="fan_cooler" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="fan_cooler" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="fan_cooler" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 23 -->
-          <tr>
-            <td>CAJETIN DE DIRECCION</td>
-            <td><input type="radio" name="cajetin_direccion" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cajetin_direccion" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cajetin_direccion" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>DIFERENCIAL DE TRANSMISION</td>
-            <td><input type="radio" name="diferencial" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="diferencial" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="diferencial" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>DISCO DE FRENO D/DERECHO</td>
-            <td><input type="radio" name="disco_freno_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="disco_freno_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="disco_freno_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 24 -->
-          <tr>
-            <td>DISCO DE FRENO D/IZQUIERDO</td>
-            <td><input type="radio" name="disco_freno_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="disco_freno_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="disco_freno_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TAMBOR DE FRENO IZQUIERDO</td>
-            <td><input type="radio" name="tambor_freno_izq" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tambor_freno_izq" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tambor_freno_izq" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>TAMBOR DE FRENO DERECHO</td>
-            <td><input type="radio" name="tambor_freno_der" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tambor_freno_der" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="tambor_freno_der" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 25 -->
-          <tr>
-            <td>CUERPO DE ACELERACION</td>
-            <td><input type="radio" name="cuerpo_aceleracion" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cuerpo_aceleracion" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cuerpo_aceleracion" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>PARRILLA DELANTERA</td>
-            <td><input type="radio" name="parrilla_delantera" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parrilla_delantera" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="parrilla_delantera" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>LLAVE DE CRUZ</td>
-            <td><input type="radio" name="llave_cruz" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="llave_cruz" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="llave_cruz" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 26 -->
-          <tr>
-            <td>CUNA DE INMOVILIZACION (CALZA)</td>
-            <td><input type="radio" name="cuna_inmovilizacion" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cuna_inmovilizacion" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cuna_inmovilizacion" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>EXTINTOR DE INCENDIO</td>
-            <td><input type="radio" name="extintor" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="extintor" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="extintor" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>GENCERO</td>
-            <td><input type="radio" name="gencero" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="gencero" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="gencero" value="NT" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <!-- FILA 27 -->
-          <tr>
-            <td>CARDAN DEL</td>
-            <td><input type="radio" name="cardan_del" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cardan_del" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cardan_del" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td>CARDAN TRAS</td>
-            <td><input type="radio" name="cardan_tra" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cardan_tra" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="cardan_tra" value="NT" onchange="actualizarVistaPrevia()"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
+        <tbody id="actasListBody"></tbody>
       </table>
-
-      <!-- CAUCHOS -->
-      <div class="section-title">🛞 ESTADO DE CAUCHOS</div>
-      <table class="inspection-table">
-        <thead>
-          <tr>
-            <th>CAUCHOS</th>
-            <th>BUENO</th>
-            <th>MALO</th>
-            <th>SI</th>
-            <th>NO</th>
-            <th>TAPA</th>
-            <th>N° NUMERO</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td><input type="radio" name="caucho_1_estado" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caucho_1_estado" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_1_si" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_1_no" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_1_tapa" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_1_numero" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td><input type="radio" name="caucho_2_estado" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caucho_2_estado" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_2_si" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_2_no" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_2_tapa" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_2_numero" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td><input type="radio" name="caucho_3_estado" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caucho_3_estado" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_3_si" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_3_no" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_3_tapa" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_3_numero" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td><input type="radio" name="caucho_4_estado" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caucho_4_estado" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_4_si" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_4_no" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_4_tapa" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_4_numero" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-          <tr>
-            <td>REPUESTO</td>
-            <td><input type="radio" name="caucho_repuesto_estado" value="B" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="radio" name="caucho_repuesto_estado" value="M" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_repuesto_si" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="checkbox" name="caucho_repuesto_no" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_repuesto_tapa" onchange="actualizarVistaPrevia()"></td>
-            <td><input type="text" name="caucho_repuesto_numero" onchange="actualizarVistaPrevia()"></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- OBSERVACIONES -->
-      <div class="section-title">📝 OBSERVACIONES</div>
-      <div class="form-group">
-        <textarea id="observaciones" rows="4" placeholder="Ingrese observaciones adicionales..." oninput="actualizarVistaPrevia()"></textarea>
+    </div>
+    <!-- PAGINACIÓN -->
+    <div class="pagination-controls" id="paginationControls" style="display: none;">
+      <button class="btn-pagination" onclick="cambiarPagina(-1)" id="btnAnterior">
+        <span>⬅️</span><span>Anterior</span>
+      </button>
+      <div class="pagination-numbers" id="paginationNumbers"></div>
+      <button class="btn-pagination" onclick="cambiarPagina(1)" id="btnSiguiente">
+        <span>Siguiente</span><span>➡️</span>
+      </button>
+      <div class="pagination-info">
+        Mostrando <span id="paginaActual">1</span> de <span id="totalPaginas">1</span> páginas
       </div>
-
-      <!-- BOTONES DE ACCIÓN -->
-      <div class="action-buttons">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='inspeccion-crear.html'">
-          ← Volver
-        </button>
-        <button type="button" class="btn btn-success" onclick="guardarInspeccion()">
-          💾 Guardar Inspección
-        </button>
-        <button type="button" class="btn btn-primary" onclick="imprimirInspeccion()">
-          🖨️ Imprimir
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
 
-  <!-- VISTA PREVIA -->
-<!-- VISTA PREVIA -->
-<div class="preview-section" id="previewSection">
-  <h2>📄 Vista Previa de la Inspección (En Tiempo Real)</h2>
-  
-  <div class="inspeccion-container" id="inspeccionPreview">
-    <!-- Encabezado -->
-    <div class="inspeccion-header">
-      <div class="inspeccion-logos">
-        <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
-      </div>
-      <div class="inspeccion-title">
-        <h1>REPÚBLICA BOLIVARIANA DE VENEZUELA</h1>
-        <h1>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h1>
-        <h2>CUERPO DE POLICÍA NACIONAL BOLIVARIANA</h2>
-        <h3>DEPARTAMENTO DE TRANSPORTE</h3>
-      </div>
-      <div class="inspeccion-logos">
-        <img src="../img/logo.png" alt="Logo CPNB" onerror="this.style.display='none'">
-      </div>
+  <!-- VISTA PREVIA DEL ACTA -->
+  <div class="preview-section" id="previewSection">
+    <h2 style="color: #003366; margin-bottom: 20px;">Vista Previa del Acta</h2>
+    <div class="action-buttons">
+      <button type="button" class="btn btn-secondary" onclick="cerrarVistaPrevia()">
+        ← Volver a la lista
+      </button>
+      <button type="button" class="btn btn-success" onclick="imprimirActa()">
+        🖨️ Imprimir Acta
+      </button>
     </div>
-
-    <!-- Tabla de Datos Generales -->
-    <table class="inspeccion-table">
-      <tr>
-        <th style="width: 12%;">N° DE INSPECCION</th>
-        <td style="width: 13%;" id="previewNumeroInspeccion">-</td>
-        <th style="width: 12%;">FECHA DE INSPECCION</th>
-        <td style="width: 13%;" id="previewFecha">-</td>
-        <th style="width: 12%;">MOTIVO DE LA INSPECCION</th>
-        <td style="width: 13%;" id="previewMotivo">-</td>
-        <th style="width: 10%;">HORA</th>
-        <td style="width: 15%;" id="previewHora">-</td>
-      </tr>
-      <tr>
-        <th>LUGAR</th>
-        <td colspan="3" id="previewLugar">-</td>
-        <th>ADSCRITA A:</th>
-        <td colspan="3" id="previewAdscrita">-</td>
-      </tr>
-    </table>
-
-    <!-- Datos del Vehículo -->
-    <table class="inspeccion-table">
-      <tr>
-        <th>PLACA</th>
-        <td id="previewPlaca">-</td>
-        <th>MARCA</th>
-        <td id="previewMarca">-</td>
-        <th>MODELO</th>
-        <td id="previewModelo">-</td>
-        <th>AÑO</th>
-        <td id="previewAno">-</td>
-      </tr>
-      <tr>
-        <th>TIPO</th>
-        <td id="previewTipo">-</td>
-        <th>COLOR</th>
-        <td id="previewColor">-</td>
-        <th>KMS</th>
-        <td id="previewKilometraje">-</td>
-        <th>N° DE IDENTIFICACION</th>
-        <td id="previewNumeroIdentificacion">-</td>
-      </tr>
-      <tr>
-        <th>SERIAL DE CARROCERIA</th>
-        <td colspan="7" id="previewSerialCarroceria">-</td>
-      </tr>
-    </table>
-
-    <!-- Equipamiento -->
-    <table class="inspeccion-table">
-      <tr>
-        <th>BATERIA</th>
-        <td id="previewBateria">-</td>
-        <th>ESTACION BASE</th>
-        <td id="previewEstacionBase">-</td>
-        <th>ESTACION LUCES</th>
-        <td id="previewEstacionLuces">-</td>
-        <th>COCTELERA</th>
-        <td id="previewCoctelera">-</td>
-      </tr>
-      <tr>
-        <th>TRIANGULO</th>
-        <td id="previewTriangulo">-</td>
-        <th>POSEE PLACAS NO</th>
-        <td id="previewPoseePlacas">-</td>
-        <th>HERRAMIENTAS</th>
-        <td id="previewHerramientas">-</td>
-        <th>GATO</th>
-        <td id="previewGato">-</td>
-      </tr>
-    </table>
-
-    <!-- ✅ TABLA DE COMPONENTES INSPECCIONADOS (EN VISTA PREVIA) -->
-    <table class="inspeccion-table">
-      <thead>
-        <tr>
-          <th>COMPONENTE</th>
-          <th>B</th>
-          <th>M</th>
-          <th>N/T</th>
-          <th>COMPONENTE</th>
-          <th>B</th>
-          <th>M</th>
-          <th>N/T</th>
-          <th>COMPONENTE</th>
-          <th>B</th>
-          <th>M</th>
-          <th>N/T</th>
-        </tr>
-      </thead>
-      <tbody id="previewComponentesBody">
-        <!-- Se llena dinámicamente con JavaScript -->
-      </tbody>
-    </table>
-
-    <!-- TABLA DE CAUCHOS (EN VISTA PREVIA) -->
-    <table class="inspeccion-table">
-      <thead>
-        <tr>
-          <th>CAUCHO</th>
-          <th>BUENO</th>
-          <th>MALO</th>
-          <th>SI</th>
-          <th>NO</th>
-          <th>TAPA</th>
-          <th>N° NUMERO</th>
-        </tr>
-      </thead>
-      <tbody id="previewCauchoBody">
-        <!-- Se llena dinámicamente con JavaScript -->
-      </tbody>
-    </table>
-
-    <!-- OBSERVACIONES -->
-    <div style="margin: 15px 0; padding: 10px; border: 1px solid #000;">
-      <strong>OBSERVACIONES:</strong>
-      <p id="previewObservaciones" style="margin: 10px 0 0 0; min-height: 60px; white-space: pre-wrap;">-</p>
-    </div>
-
-    <!-- Firmas -->
-    <div class="inspeccion-signatures">
-      <div class="signature-box">
-        <h4>POR LA COORDINACION</h4>
-        <div class="signature-field">
-          <label>APELLIDO Y NOMBRE:</label>
-          <span></span>
+    <div class="acta-container">
+      <!-- Encabezado -->
+      <div class="acta-header">
+        <div class="acta-logos">
+          <img src="../img/logo_izquierdo.png" alt="Logo Institucional" onerror="this.style.display='none'">
         </div>
-        <div class="signature-field">
-          <label>RANGO:</label>
-          <span></span>
+        <div class="acta-title">
+          <h1>Ministerio del Poder Popular para</h1>
+          <h1>Relaciones Interiores, Justicia y Paz</h1>
+          <h2>Cuerpo de Policía Nacional Bolivariana</h2>
+          <h2>Dirección Nacional</h2>
+          <p class="acta-subtitle">Acta de asignación de unidad vehicular</p>
         </div>
-        <div class="signature-field">
-          <label>N° DE CEDULA:</label>
-          <span></span>
-        </div>
-        <div class="signature-field">
-          <label>N° DE TELEFONO:</label>
-          <span></span>
-        </div>
-        <div class="signature-field">
-          <label>FIRMA:</label>
-          <span style="min-height: 50px;"></span>
+        <div class="acta-logos">
+          <img src="../img/logo.png" alt="Logo CPNB" onerror="this.style.display='none'">
         </div>
       </div>
-      <div class="signature-box">
-        <h4>INSPECCION REALIZADA POR:</h4>
-        <div class="signature-field">
-          <label>APELLIDO Y NOMBRE:</label>
-          <span></span>
+      
+      <!-- Cuerpo del Acta -->
+      <div class="acta-body">
+        <p>
+          Quien suscribe, Ciudadano Comisario Mayor (CPNB) Dr. Guillermo Parra Pulido, Director de la Redip Occidental y Coordinador del Centro Coordinación Policial Estadal Zulia, según resolución OGH-0262 de Fecha 05 de Septiembre del 2022, mediante la presente, dejo constancia de la entrega formal, en calidad de asignación para asuntos del servicio de la siguiente unidad del CCPE Estadal Zulia:
+        </p>
+        
+        <!-- TABLA DE VEHÍCULOS -->
+        <table class="acta-table">
+          <thead>
+            <tr>
+              <th>Marca- Modelo</th>
+              <th>Serial Carrocería</th>
+              <th>Serial Motor</th>
+              <th>Placa</th>
+              <th>Facsímil</th>
+            </tr>
+          </thead>
+          <tbody id="actaVehiclesBody">
+            <tr><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td></tr>
+          </tbody>
+        </table>
+        
+        <!-- TEXTO SINGULAR/PLURAL -->
+        <p>
+          <strong id="textoUnidad">Esta unidad es asignada</strong> a la <strong id="previewUnidadAsignacion">---</strong> en la figura jurídica del ciudadano <strong id="previewFuncionarioNombre">---</strong>, Cédula de Identidad numero <strong id="previewFuncionarioCedula">---</strong>, <strong id="textoUso">esta unidad es asignada</strong> para uso netamente del servicio y labores de patrullaje en el referido Estado. Obedeciendo al Reimpulso de la gran misión cuadrante de Paz. En atención que <strong id="textoUnidad2">la unidad descrita es</strong> un bien público, no podrá ser cedido temporal o definitivamente a terceras personas y en concordancia a lo dispuesto en el artículo 45 de la ley de Bienes Públicos:
+        </p>
+        
+        <p class="acta-section citation">
+          "El órgano o ente que tenga la propiedad, custodia, protección, adscripción o asignación de un bien público, nombrara un encargado o encargada, quien tendrá la responsabilidad de mantener y administrar el mismo, respondiendo patrimonialmente por cualquier daño, pérdida o deterioro sufrido por el bien custodiado, en cuanto le sea imputable."
+        </p>
+        
+        <p>
+          El vehículo descrito, deberá mantenerse sin alteraciones en sus características originales y cualquier daño visible u oculto, modificación, alteración, deterioro, colisión o extravío, será responsabilidad única del funcionario antes identificado; quien se compromete a cuidar, mantener, resguardar y custodiar, el bien del Estado asignado y que al momento de detectar cualquier falla, anomalía, desperfecto o irregularidad del mismo, deberá reportarla inmediatamente a las siguientes autoridades: Jefe de los servicios, Jefe del área de gestión administrativa y Jefe de del parque automotor del Centro de Coordinación Policial Zulia, a los fines de corregirlas y subsanarlas en su totalidad para evitar un daño mayor.
+        </p>
+        
+        <p>
+          La conducta contraria a lo antes señalado, será tomada como perjuicio material y daño patrimonial causado intencionalmente o por negligencia manifiesta al instituto y en consecuencia al Estado Venezolano; y se procederá de acuerdo a lo establecido en el artículo 92 de la Ley de Bienes Público:
+        </p>
+        
+        <p class="acta-section citation">
+          "Los funcionarios o funcionarias públicos responderán penal, civil, administrativa y disciplinariamente por los delitos, faltas, hechos ilícitos e irregularidades administrativas cometidas en el ejercicio de su funciones con ocasión a la adquisición, uso, administración, mantenimiento, registro, supervisión y disposición de los Bienes Públicos. Esta responsabilidad no excluirá la que pudiere corresponderles por efecto de otras leyes o de su condición de ciudadanos o ciudadanas."
+        </p>
+        
+        <p>
+          Pudiendo ser sancionado con la destitución del Funcionario, de conformidad con lo establecido en el artículo 97 numeral, 10 del Estatuto de la Función Policial: "Son causales de aplicación de la medida de destitución las siguientes:
+        </p>
+        
+        <ol>
+          <li>2.- Comisión intencional o por imprudencia, negligencia o impericias graves, de un hecho delictivo que afecte la prestación del servicio policial o la credibilidad y respetabilidad de la función policial.</li>
+          <li>10.- cualquier otra falta prevista en la Ley del Estatuto de la Función Publica</li>
+        </ol>
+        
+        <p>Como causal de destitución."</p>
+        
+        <p>
+          En concordancia con el artículo 86 numeral 8 del Estatuto de la Función Pública: "Serán causales de destitución:
+        </p>
+        
+        <ol>
+          <li>8.- Perjuicio material severo causado intencionalmente o por negligencia manifiesta al patrimonio de la República."</li>
+        </ol>
+        
+        <p>
+          Es obligación expresa del funcionario (a) conductor (a) de la unidad motorizada, realizar y registrar la inspección diaria de la unidad, que será supervisada y certificada por el Coordinador de este Centro de Coordinación policial. La negativa u omisión a realizar la inspección diaria señalada, se
+        </p>
+        
+        <p>
+          tendrá como indicador de manipulación irresponsable del vehículo asignado, incurriendo en desobediencia a instrucciones de servicio o normas y pautas de conducta para el ejercicio de la Función Policial. (...)
+        </p>
+        
+        <p>
+          3.- Conductas de desobediencia, insubordinación, obstaculización, sabotaje, daño material o indisposición frente a instrucciones de servicio o normas y pautas de conducta para el ejercicio de la Función Policial.
+        </p>
+        
+        <p>
+          Se levanta la presente <strong>Acta de Entrega</strong> obligándose y comprometiéndose al funcionario (a) antes identificado (a), al cumplimiento de lo aquí pautado. Se elaboran tres (03) ejemplares aun mismo tenor. En el Centro de Coordinación Policial del Estado Zulia, a los días <strong id="previewDia">---</strong> del mes de <strong id="previewMes">---</strong> del año <strong id="previewAnio">---</strong>.
+        </p>
+        
+        <!-- Firmas -->
+        <div class="acta-signatures">
+          <div class="signature-box funcionario">
+            <p>Funcionario Responsable quien recibe las unidades:</p>
+            <p class="firma-line" id="previewFirmaFuncionario"></p>
+            <p class="cargo" id="previewCargoFuncionario"></p>
+          </div>
+          <div class="signature-box director">
+            <p class="firma-line">COMISARIO MAYOR (CPNB) DR GUILLERMO PARRA PULIDO</p>
+            <p class="cargo">Director de la Redip Occidental y Coordinador del CCPE- Zulia</p>
+          </div>
         </div>
-        <div class="signature-field">
-          <label>RANGO:</label>
-          <span></span>
-        </div>
-        <div class="signature-field">
-          <label>N° DE CEDULA:</label>
-          <span></span>
-        </div>
-        <div class="signature-field">
-          <label>N° DE TELEFONO:</label>
-          <span></span>
-        </div>
-        <div class="signature-field">
-          <label>FIRMA:</label>
-          <span style="min-height: 50px;"></span>
+        
+        <!-- Footer -->
+        <div class="acta-footer">
+          <p>¡Chávez Vive!... La Patria Sigue...</p>
+          <p>¡Independencia y Patria Socialista...! ¡Viviremos y Venceremos!</p>
+          <p>PROTEGER, DEFENDER Y SERVIR A NUESTRO PUEBLO</p>
         </div>
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div style="margin-top: 20px; text-align: center; border: 2px solid #000; padding: 10px; background: #e0e0e0;">
-      <strong>(USO OFICIAL DEL DEPARTAMENTO DE TRANSPORTE Y LOGISTICA)</strong>
+      
+      <!-- Marca de Agua -->
+      <img src="../img/fondo.png" alt="Marca de Agua" class="acta-watermark" onerror="this.style.display='none'">
     </div>
   </div>
+
 </div>
 </main>
 
 <!-- ================= SCRIPTS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/config.js"></script>
-<script src="../js/inspeccion-crear-vehiculo.js"></script>
+<script src="../js/acta-consultar.js"></script>
 </body>
 </html>
