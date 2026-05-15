@@ -47,7 +47,6 @@ cursor: pointer;
 outline: none;
 border-color: #005b96;
 }
-/* Nueva barra de búsqueda */
 .search-container {
 display: flex;
 gap: 10px;
@@ -59,13 +58,12 @@ background: #f8f9fa;
 border-radius: 8px;
 }
 .search-input {
-flex: 1;              /* Esto hace que ocupe todo el espacio disponible */
+flex: 1;
 padding: 10px 15px;
 border: 2px solid #ddd;
 border-radius: 6px;
 font-size: 0.9rem;
-max-width: none;      /* Eliminamos la restricción de 400px */
-width: 100%;          /* Aseguramos que use el ancho completo */
+width: 100%;
 }
 .search-input:focus {
 outline: none;
@@ -84,9 +82,7 @@ display: flex;
 align-items: center;
 gap: 5px;
 }
-.btn-buscar:hover {
-background: #003366;
-}
+.btn-buscar:hover { background: #003366; }
 .btn-limpiar {
 background: #6c757d;
 color: white;
@@ -100,9 +96,7 @@ display: flex;
 align-items: center;
 gap: 5px;
 }
-.btn-limpiar:hover {
-background: #5a6268;
-}
+.btn-limpiar:hover { background: #5a6268; }
 .btn-exportar {
 background: #28a745;
 color: white;
@@ -117,31 +111,32 @@ align-items: center;
 gap: 5px;
 margin-left: auto;
 }
-.btn-exportar:hover {
-background: #218838;
-}
+.btn-exportar:hover { background: #218838; }
 .action-buttons {
 display: flex;
 gap: 10px;
 align-items: flex-end;
 }
+/* ✅ CORRECCIÓN AQUÍ: Contenedor ajustado */
 .table-container {
 background: white;
 border-radius: 10px;
 box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
-overflow: hidden;
-overflow-x: auto;
+overflow-x: auto; /* Solo scroll horizontal si la pantalla es pequeña */
+width: 100%;
 }
+/* ✅ CORRECCIÓN AQUÍ: Tabla ocupa el 100% sin forzar ancho mínimo */
 .data-table {
 width: 100%;
 border-collapse: collapse;
-min-width: 1200px;
+table-layout: auto; /* Distribuye proporcionalmente al contenido */
 }
 .data-table thead {
 background: linear-gradient(135deg, #003366 0%, #005b96 100%);
 color: white;
 position: sticky;
 top: 0;
+z-index: 10;
 }
 .data-table th {
 padding: 12px 10px;
@@ -159,15 +154,9 @@ font-size: 0.85rem;
 cursor: pointer;
 transition: background 0.3s;
 }
-.data-table tbody tr:hover {
-background: #e3f2fd;
-}
-.data-table tbody tr:nth-child(even) {
-background: #fafbfc;
-}
-.data-table tbody tr:nth-child(even):hover {
-background: #e3f2fd;
-}
+.data-table tbody tr:hover { background: #e3f2fd; }
+.data-table tbody tr:nth-child(even) { background: #fafbfc; }
+.data-table tbody tr:nth-child(even):hover { background: #e3f2fd; }
 .badge {
 padding: 4px 10px;
 border-radius: 12px;
@@ -219,7 +208,6 @@ background: #f8f9fa;
 border-radius: 6px;
 font-size: 0.85rem;
 }
-/* Modal de Ficha */
 .modal-ficha {
 display: none;
 position: fixed;
@@ -254,32 +242,15 @@ display: flex;
 justify-content: space-between;
 align-items: center;
 }
-.modal-header h2 {
-margin: 0;
-font-size: 1.5rem;
-}
+.modal-header h2 { margin: 0; font-size: 1.5rem; }
 .modal-close {
-background: none;
-border: none;
-color: white;
-font-size: 2rem;
-cursor: pointer;
-line-height: 1;
+background: none; border: none; color: white;
+font-size: 2rem; cursor: pointer; line-height: 1;
 }
-.modal-close:hover {
-color: #ffc107;
-}
-.modal-body {
-padding: 25px;
-}
-.ficha-logo {
-text-align: center;
-margin-bottom: 20px;
-}
-.ficha-logo img {
-max-width: 150px;
-height: auto;
-}
+.modal-close:hover { color: #ffc107; }
+.modal-body { padding: 25px; }
+.ficha-logo { text-align: center; margin-bottom: 20px; }
+.ficha-logo img { max-width: 150px; height: auto; }
 .ficha-grid {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -293,117 +264,48 @@ border-radius: 6px;
 border-left: 4px solid #005b96;
 }
 .ficha-field label {
-display: block;
-font-size: 0.75rem;
-color: #666;
-font-weight: 600;
-text-transform: uppercase;
-margin-bottom: 5px;
+display: block; font-size: 0.75rem; color: #666;
+font-weight: 600; text-transform: uppercase; margin-bottom: 5px;
 }
-.ficha-field span {
-font-size: 0.95rem;
-color: #333;
-font-weight: 500;
-}
+.ficha-field span { font-size: 0.95rem; color: #333; font-weight: 500; }
 .ficha-observacion {
-background: #fff3cd;
-padding: 15px;
-border-radius: 6px;
-border-left: 4px solid #ffc107;
-margin-top: 15px;
+background: #fff3cd; padding: 15px; border-radius: 6px;
+border-left: 4px solid #ffc107; margin-top: 15px;
 }
 .ficha-observacion label {
-font-size: 0.75rem;
-color: #856404;
-font-weight: 600;
-text-transform: uppercase;
-display: block;
-margin-bottom: 5px;
+font-size: 0.75rem; color: #856404; font-weight: 600;
+text-transform: uppercase; display: block; margin-bottom: 5px;
 }
-.ficha-observacion span {
-font-size: 0.9rem;
-color: #856404;
-}
+.ficha-observacion span { font-size: 0.9rem; color: #856404; }
 .modal-footer {
-padding: 15px 25px;
-background: #f8f9fa;
-border-radius: 0 0 10px 10px;
-display: flex;
-justify-content: flex-end;
-gap: 10px;
+padding: 15px 25px; background: #f8f9fa;
+border-radius: 0 0 10px 10px; display: flex;
+justify-content: flex-end; gap: 10px;
 }
 .btn-modal {
-padding: 10px 20px;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-font-size: 0.85rem;
-font-weight: 500;
-display: flex;
-align-items: center;
-gap: 5px;
+padding: 10px 20px; border: none; border-radius: 6px;
+cursor: pointer; font-size: 0.85rem; font-weight: 500;
+display: flex; align-items: center; gap: 5px;
 }
-.btn-pdf {
-background: #dc3545;
-color: white;
-}
-.btn-pdf:hover {
-background: #c82333;
-}
-.btn-imprimir {
-background: #17a2b8;
-color: white;
-}
-.btn-imprimir:hover {
-background: #138496;
-}
-.btn-cerrar {
-background: #6c757d;
-color: white;
-}
-.btn-cerrar:hover {
-background: #5a6268;
-}
-/* Estilos para impresión */
+.btn-pdf { background: #dc3545; color: white; }
+.btn-pdf:hover { background: #c82333; }
+.btn-imprimir { background: #17a2b8; color: white; }
+.btn-imprimir:hover { background: #138496; }
+.btn-cerrar { background: #6c757d; color: white; }
+.btn-cerrar:hover { background: #5a6268; }
 @media print {
-.modal-footer, .modal-close {
-display: none !important;
-}
-.modal-ficha-content {
-box-shadow: none;
-margin: 0;
-width: 100%;
-max-width: 100%;
-}
+.modal-footer, .modal-close { display: none !important; }
+.modal-ficha-content { box-shadow: none; margin: 0; width: 100%; max-width: 100%; }
 }
 @media (max-width: 768px) {
-.filters-row {
-grid-template-columns: 1fr;
+.filters-row { grid-template-columns: 1fr; }
+.search-container { flex-direction: column; align-items: stretch; }
+.search-input { max-width: 100%; }
+.action-buttons { flex-wrap: wrap; }
 }
-.search-container {
-flex-direction: column;
-align-items: stretch;
-}
-.search-input {
-max-width: 100%;
-}
-.action-buttons {
-flex-wrap: wrap;
-}
-}
-.nav-brand {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-.nav-logo {
-object-fit: contain;
-}
-.nav-logo-large {
-width: 50px !important;
-height: 50px !important;
-object-fit: contain;
-}
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logo { object-fit: contain; }
+.nav-logo-large { width: 50px !important; height: 50px !important; object-fit: contain; }
 </style>
 </head>
 <body class="dashboard-page">
@@ -429,31 +331,22 @@ object-fit: contain;
 <span class="breadcrumb-separator">/</span>
 <span class="breadcrumb-current">Consultar</span>
 </div>
-<button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
-← Volver a Planilla
-</button>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">← Volver a Planilla</button>
 </header>
 <section class="module-title-section">
 <h1 class="module-title">📋 Consulta de Vehículos</h1>
 <p class="module-subtitle">Búsqueda y visualización del parque automotor</p>
 </section>
 <div class="consultar-header">
-<!-- Barra de Búsqueda -->
 <div class="search-container">
 <div class="filter-group" style="flex: 1;">
 <label for="searchInput">🔍 Buscar por Placa, Facsímil o Serial</label>
 <input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsímil o serial...">
 </div>
 <div class="action-buttons">
-<button class="btn-buscar" onclick="buscarPorPlacaFacsímil()">
-🔍 Buscar
-</button>
-<button class="btn-limpiar" onclick="limpiarFiltros()">
-🧹 Limpiar
-</button>
-<button class="btn-exportar" onclick="exportarExcel()">
-📊 Exportar Excel
-</button>
+<button class="btn-buscar" onclick="buscarPorPlacaFacsímil()">🔍 Buscar</button>
+<button class="btn-limpiar" onclick="limpiarFiltros()">🧹 Limpiar</button>
+<button class="btn-exportar" onclick="exportarExcel()">📊 Exportar Excel</button>
 </div>
 </div>
 <div class="filters-row">
@@ -519,7 +412,6 @@ object-fit: contain;
 <label for="filterUnidad">Unidad Administrativa</label>
 <select id="filterUnidad" class="filter-select">
 <option value="">Todas</option>
-<!-- Se llena dinámicamente -->
 </select>
 </div>
 <div class="filter-group">
@@ -588,14 +480,11 @@ object-fit: contain;
 <th>Estatus</th>
 </tr>
 </thead>
-<tbody id="vehiclesTableBody">
-</tbody>
+<tbody id="vehiclesTableBody"></tbody>
 </table>
-<div class="pagination" id="pagination">
-</div>
+<div class="pagination" id="pagination"></div>
 </div>
 </main>
-<!-- Modal de Ficha del Vehículo -->
 <div id="modalFicha" class="modal-ficha">
 <div class="modal-ficha-content" id="fichaContent">
 <div class="modal-header">
@@ -607,24 +496,16 @@ object-fit: contain;
 <img src="../img/logo.png" alt="Logo Institucional">
 <img src="../img/logo_derecho.png" alt="Logo Secundario" class="ficha-logo-img">
 </div>
-<div class="ficha-grid" id="fichaData">
-<!-- Datos se llenan dinámicamente -->
-</div>
+<div class="ficha-grid" id="fichaData"></div>
 <div class="ficha-observacion" id="fichaObservacion" style="display: none;">
 <label>📝 Observación:</label>
 <span id="observacionText"></span>
 </div>
 </div>
 <div class="modal-footer">
-<button class="btn-modal btn-pdf" onclick="exportarPDF()">
-📄 Exportar PDF
-</button>
-<button class="btn-modal btn-imprimir" onclick="imprimirFicha()">
-🖨️ Imprimir
-</button>
-<button class="btn-modal btn-cerrar" onclick="cerrarFicha()">
-❌ Cerrar
-</button>
+<button class="btn-modal btn-pdf" onclick="exportarPDF()">📄 Exportar PDF</button>
+<button class="btn-modal btn-imprimir" onclick="imprimirFicha()">🖨️ Imprimir</button>
+<button class="btn-modal btn-cerrar" onclick="cerrarFicha()">❌ Cerrar</button>
 </div>
 </div>
 </div>
