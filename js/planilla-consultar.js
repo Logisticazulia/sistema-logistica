@@ -44,7 +44,7 @@ aplicarFiltros();
 console.error('Error cargando vehículos:', error);
 document.getElementById('vehiclesTableBody').innerHTML = `
 <tr>
-<td colspan="13" style="text-align: center; color: #dc2626;">
+<td colspan="11" style="text-align: center; color: #dc2626;">
 Error al cargar los datos: ${error.message}
 </td>
 </tr>
@@ -225,7 +225,7 @@ const pageVehicles = filteredVehicles.slice(start, end);
 if (pageVehicles.length === 0) {
 document.getElementById('vehiclesTableBody').innerHTML = `
 <tr>
-<td colspan="13" style="text-align: center; color: #666;">
+<td colspan="11" style="text-align: center; color: #666;">
 No hay vehículos que mostrar
 </td>
 </tr>
@@ -245,8 +245,6 @@ document.getElementById('vehiclesTableBody').innerHTML = pageVehicles.map(v => `
 <td>${v.color || 'N/A'}</td>
 <td>${v.s_carroceria || 'N/A'}</td>
 <td>${v.s_motor || 'N/A'}</td>
-<td>${v.cuadrante || 'N/A'}</td>
-<td>${v.comuna || 'N/A'}</td>
 <td>${getEstatusBadge(v.estatus)}</td>
 </tr>
 `).join('');
