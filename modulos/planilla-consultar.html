@@ -59,13 +59,13 @@ background: #f8f9fa;
 border-radius: 8px;
 }
 .search-input {
-flex: 1;
+flex: 1;              /* Esto hace que ocupe todo el espacio disponible */
 padding: 10px 15px;
 border: 2px solid #ddd;
 border-radius: 6px;
 font-size: 0.9rem;
-max-width: none;
-width: 100%;
+max-width: none;      /* Eliminamos la restricción de 400px */
+width: 100%;          /* Aseguramos que use el ancho completo */
 }
 .search-input:focus {
 outline: none;
@@ -585,8 +585,6 @@ object-fit: contain;
 <th>Color</th>
 <th>S/Carrocería</th>
 <th>S/Motor</th>
-<th>Cuadrante</th>
-<th>Comuna</th>
 <th>Estatus</th>
 </tr>
 </thead>
