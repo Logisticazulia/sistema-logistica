@@ -260,6 +260,8 @@ async function guardarVehiculo(event) {
             ccpe: limpiarTexto(document.getElementById('ccpe')?.value),
             epm: limpiarTexto(document.getElementById('epm')?.value),
             epp: limpiarTexto(document.getElementById('epp')?.value),
+             cuadrante: limpiarTexto(document.getElementById('cuadrante')?.value),
+  comuna: limpiarTexto(document.getElementById('comuna')?.value),
             certificado_origen: limpiarTexto(document.getElementById('certificado_origen')?.value),
             fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value || null,
             n_tramite: limpiarTexto(document.getElementById('n_tramite')?.value),
