@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const alertSuccess = document.getElementById('alertSuccess');
   const alertError = document.getElementById('alertError');
   const alertInfo = document.getElementById('alertInfo');
+  const previewWrapper = document.getElementById('previewWrapper');
+  const btnPreviewToggle = document.getElementById('btnPreviewToggle');
+  const btnHidePreview = document.getElementById('btnHidePreview');
 
   function mostrarAlerta(tipo, mensaje) {
     [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const f = document.getElementById('fecha_inspeccion'); if (f) f.value = now.toISOString().split('T')[0];
     const h = document.getElementById('hora'); if (h) h.value = now.toTimeString().slice(0, 5);
     const n = document.getElementById('n_inspeccion'); if (n) n.value = generarNInspeccion();
+    updatePreview();
   }
 
   async function buscarVehiculo() {
@@ -94,102 +98,135 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function limpiarFormulario() {
     searchInput.value = ''; toggleFormState(false); inspectionForm.reset(); vehicleIdInput.value = '';
+    previewWrapper.classList.remove('active');
     mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
   }
 
-  function getComponentesValues() {
-    const componentes = {};
-    document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => {
-      if (!componentes[r.name]) componentes[r.name] = 'NT';
-      if (r.checked) componentes[r.name] = r.value;
+  // 🆕 ACTUALIZAR VISTA PREVIA EN VIVO
+  function updatePreview() {
+    const v = id => document.getElementById(id)?.value || '-';
+    const vr = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '-';
+    const vs = id => { const el = document.getElementById(id); return el?.options[el.selectedIndex]?.text || '-'; }
+
+    // Mapeo directo a la vista previa
+    document.getElementById('pv_n_inspeccion').textContent = v('n_inspeccion');
+    document.getElementById('pv_fecha').textContent = v('fecha_inspeccion');
+    document.getElementById('pv_hora').textContent = v('hora');
+    document.getElementById('pv_motivo').textContent = v('motivo_inspeccion');
+    document.getElementById('pv_lugar').textContent = `${v('lugar')} / ${v('asignacion')}`;
+
+    document.getElementById('pv_placa').textContent = v('placa');
+    document.getElementById('pv_marca_modelo').textContent = `${v('marca')} ${v('modelo')}`;
+    document.getElementById('pv_ano_tipo').textContent = `${v('ano')} - ${v('tipo')}`;
+    document.getElementById('pv_color').textContent = v('color');
+    document.getElementById('pv_s_carroceria').textContent = v('s_carroceria');
+    document.getElementById('pv_n_id').textContent = v('n_identificacion');
+    document.getElementById('pv_kms').textContent = v('kms');
+    document.getElementById('pv_rin').textContent = v('rin_numero');
+
+    document.getElementById('pv_bateria').textContent = vs('bateria');
+    document.getElementById('pv_est_base').textContent = vs('estacion_base');
+    document.getElementById('pv_coctelera').textContent = vs('coctelera');
+    document.getElementById('pv_triangulo').textContent = vs('triangulo');
+    document.getElementById('pv_placas').textContent = vs('placas');
+    document.getElementById('pv_herramientas').textContent = vs('herramientas');
+    document.getElementById('pv_gato').textContent = vs('gato');
+    document.getElementById('pv_luces').textContent = vs('sestacion_luces');
+
+    document.getElementById('pv_ca_d_izq').textContent = vr('caucho_del_izq');
+    document.getElementById('pv_ca_d_der').textContent = vr('caucho_del_der');
+    document.getElementById('pv_ca_t_izq').textContent = vr('caucho_tra_izq');
+    document.getElementById('pv_ca_t_der').textContent = vr('caucho_tra_der');
+    document.getElementById('pv_ca_rep').textContent = vr('caucho_repuesto');
+    document.getElementById('pv_tapa').textContent = vr('tapa_cauchos');
+
+    document.getElementById('pv_observaciones').textContent = v('observaciones') || 'Sin observaciones.';
+
+    document.getElementById('pv_coord_nombre').textContent = v('coord_nombre');
+    document.getElementById('pv_coord_rango').textContent = vs('coord_rango');
+    document.getElementById('pv_coord_cedula').textContent = v('coord_cedula');
+
+    document.getElementById('pv_insp_nombre').textContent = v('insp_nombre');
+    document.getElementById('pv_insp_rango').textContent = vs('insp_rango');
+    document.getElementById('pv_insp_cedula').textContent = v('insp_cedula');
+
+    // Componentes Grid
+    const compGrid = document.getElementById('pv_comps_grid');
+    compGrid.innerHTML = '';
+    const compItems = document.querySelectorAll('.inspection-item');
+    compItems.forEach(item => {
+      const label = item.querySelector('.item-label')?.textContent || '';
+      const radio = item.querySelector('input:checked');
+      const val = radio?.value || '-';
+      const cls = val === 'B' ? 'status-B' : val === 'M' ? 'status-M' : val === 'NT' ? 'status-NT' : '';
+      
+      const div = document.createElement('div');
+      div.className = 'pv-comp';
+      div.innerHTML = `<div style="font-size:7pt; margin-bottom:2px; color:#475569; font-weight:600;">${label}</div><div class="pv-comp-status ${cls}">${val}</div>`;
+      compGrid.appendChild(div);
     });
-    return componentes;
   }
 
-  async function guardarInspeccion(e) {
+  // 🎧 Event Listeners
+  btnSearch?.addEventListener('click', buscarVehiculo);
+  searchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarVehiculo(); });
+  btnClear?.addEventListener('click', limpiarFormulario);
+  inspectionForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!usuarioActual) { mostrarAlerta('error', '🔐 Inicie sesión para guardar'); return; }
     if (!vehicleIdInput.value) { mostrarAlerta('error', 'Busque un vehículo primero'); return; }
-
-    // Validar Rin (2 dígitos exactos)
+    
     const rinVal = document.getElementById('rin_numero')?.value;
-    if (rinVal && !/^\d{2}$/.test(rinVal)) {
-      mostrarAlerta('error', 'El Nº de Rin debe contener exactamente 2 dígitos numéricos.');
-      document.getElementById('rin_numero').focus();
-      return;
-    }
+    if (rinVal && !/^\d{2}$/.test(rinVal)) { mostrarAlerta('error', 'El Nº de Rin debe contener exactamente 2 dígitos.'); return; }
 
-    btnSubmit.disabled = true;
-    btnSubmit.querySelector('.btn-text').style.display = 'none';
-    btnSubmit.querySelector('.btn-loader').style.display = 'inline';
-
+    btnSubmit.disabled = true; btnSubmit.querySelector('.btn-text').style.display = 'none'; btnSubmit.querySelector('.btn-loader').style.display = 'inline';
     try {
       const payload = {
-        vehiculo_id: vehicleIdInput.value,
-        n_inspeccion: document.getElementById('n_inspeccion')?.value,
-        fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value,
-        hora: document.getElementById('hora')?.value,
-        motivo: document.getElementById('motivo_inspeccion')?.value,
-        lugar: document.getElementById('lugar')?.value,
-        asignacion: document.getElementById('asignacion')?.value,
-        supervision: document.getElementById('supervision')?.value,
-        placa: document.getElementById('placa')?.value,
-        marca: document.getElementById('marca')?.value,
-        modelo: document.getElementById('modelo')?.value,
-        ano: document.getElementById('ano')?.value,
-        tipo: document.getElementById('tipo')?.value,
-        color: document.getElementById('color')?.value,
-        n_identificacion: document.getElementById('n_identificacion')?.value,
-        s_carroceria: document.getElementById('s_carroceria')?.value,
-        kms: parseFloat(document.getElementById('kms')?.value) || 0,
-        inspector: usuarioActual.email || 'sistema',
-        created_at: new Date().toISOString(),
-        bateria: document.getElementById('bateria')?.value || 'NO',
-        estacion_base: document.getElementById('estacion_base')?.value || 'NO',
-        coctelera: document.getElementById('coctelera')?.value || 'NO',
-        triangulo: document.getElementById('triangulo')?.value || 'NO',
-        placas: document.getElementById('placas')?.value || 'NO',
-        herramientas: document.getElementById('herramientas')?.value || 'NO',
-        gato: document.getElementById('gato')?.value || 'NO',
-        sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
-        ...getComponentesValues(),
-        // 🛞 Cauchos y Rines
+        vehiculo_id: vehicleIdInput.value, n_inspeccion: document.getElementById('n_inspeccion')?.value,
+        fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value, hora: document.getElementById('hora')?.value,
+        motivo: document.getElementById('motivo_inspeccion')?.value, lugar: document.getElementById('lugar')?.value,
+        asignacion: document.getElementById('asignacion')?.value, supervision: document.getElementById('supervision')?.value,
+        placa: document.getElementById('placa')?.value, marca: document.getElementById('marca')?.value,
+        modelo: document.getElementById('modelo')?.value, ano: document.getElementById('ano')?.value, tipo: document.getElementById('tipo')?.value,
+        color: document.getElementById('color')?.value, n_identificacion: document.getElementById('n_identificacion')?.value,
+        s_carroceria: document.getElementById('s_carroceria')?.value, kms: parseFloat(document.getElementById('kms')?.value) || 0,
+        inspector: usuarioActual.email || 'sistema', created_at: new Date().toISOString(),
+        bateria: document.getElementById('bateria')?.value || 'NO', estacion_base: document.getElementById('estacion_base')?.value || 'NO',
+        coctelera: document.getElementById('coctelera')?.value || 'NO', triangulo: document.getElementById('triangulo')?.value || 'NO',
+        placas: document.getElementById('placas')?.value || 'NO', herramientas: document.getElementById('herramientas')?.value || 'NO',
+        gato: document.getElementById('gato')?.value || 'NO', sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
         caucho_del_izq: document.querySelector('input[name="caucho_del_izq"]:checked')?.value || 'M',
         caucho_del_der: document.querySelector('input[name="caucho_del_der"]:checked')?.value || 'M',
         caucho_tra_izq: document.querySelector('input[name="caucho_tra_izq"]:checked')?.value || 'M',
         caucho_tra_der: document.querySelector('input[name="caucho_tra_der"]:checked')?.value || 'M',
         caucho_repuesto: document.querySelector('input[name="caucho_repuesto"]:checked')?.value || 'M',
         tapa_cauchos: document.querySelector('input[name="tapa_cauchos"]:checked')?.value || 'NO',
-        rin_numero: rinVal || '',
-        observaciones: document.getElementById('observaciones')?.value || '',
-        // 👥 Responsables
-        coord_nombre: document.getElementById('coord_nombre')?.value || '',
-        coord_rango: document.getElementById('coord_rango')?.value || '',
-        coord_cedula: document.getElementById('coord_cedula')?.value || '',
-        coord_telefono: document.getElementById('coord_telefono')?.value || '',
-        insp_nombre: document.getElementById('insp_nombre')?.value || '',
-        insp_rango: document.getElementById('insp_rango')?.value || '',
-        insp_cedula: document.getElementById('insp_cedula')?.value || '',
-        insp_telefono: document.getElementById('insp_telefono')?.value || ''
+        rin_numero: rinVal || '', observaciones: document.getElementById('observaciones')?.value || '',
+        coord_nombre: document.getElementById('coord_nombre')?.value || '', coord_rango: document.getElementById('coord_rango')?.value || '',
+        coord_cedula: document.getElementById('coord_cedula')?.value || '', coord_telefono: document.getElementById('coord_telefono')?.value || '',
+        insp_nombre: document.getElementById('insp_nombre')?.value || '', insp_rango: document.getElementById('insp_rango')?.value || '',
+        insp_cedula: document.getElementById('insp_cedula')?.value || '', insp_telefono: document.getElementById('insp_telefono')?.value || '',
+        ...getComponentesValues()
       };
-
       const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
-      if (error) throw error;
-      mostrarAlerta('success', '✅ Inspección PVR registrada correctamente');
-      limpiarFormulario();
-    } catch (err) {
-      console.error('Error al guardar:', err); mostrarAlerta('error', `No se pudo guardar: ${err.message}`);
-    } finally {
-      btnSubmit.disabled = false;
-      btnSubmit.querySelector('.btn-text').style.display = 'inline';
-      btnSubmit.querySelector('.btn-loader').style.display = 'none';
-    }
-  }
+      if (error) throw error; mostrarAlerta('success', '✅ Inspección PVR registrada correctamente'); limpiarFormulario();
+    } catch (err) { console.error('Error al guardar:', err); mostrarAlerta('error', `No se pudo guardar: ${err.message}`); } 
+    finally { btnSubmit.disabled = false; btnSubmit.querySelector('.btn-text').style.display = 'inline'; btnSubmit.querySelector('.btn-loader').style.display = 'none'; }
+  });
 
-  btnSearch?.addEventListener('click', buscarVehiculo);
-  searchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarVehiculo(); });
-  btnClear?.addEventListener('click', limpiarFormulario);
-  inspectionForm?.addEventListener('submit', guardarInspeccion);
+  // Toggle Preview
+  btnPreviewToggle?.addEventListener('click', () => { previewWrapper.classList.toggle('active'); updatePreview(); });
+  btnHidePreview?.addEventListener('click', () => { previewWrapper.classList.remove('active'); });
+
+  // Live Update on any input change
+  inspectionForm?.addEventListener('input', updatePreview);
+  inspectionForm?.addEventListener('change', updatePreview);
+
+  function getComponentesValues() {
+    const componentes = {};
+    document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => { if (!componentes[r.name]) componentes[r.name] = 'NT'; if (r.checked) componentes[r.name] = r.value; });
+    return componentes;
+  }
 
   setDefaults();
   mostrarAlerta('info', '🔍 Busque un vehículo para habilitar el formulario');
