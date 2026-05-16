@@ -1,6 +1,6 @@
 /**
 * CONSULTA DE VEHÍCULOS - PLANILLA
-* VERSIÓN INAMOVIBLE + EXCLUSIVIDAD GARANTIZADA
+* VERSIÓN ESTABLE + FILAS COMPACTAS
 */
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 let allVehicles = [];
@@ -23,7 +23,8 @@ function getDOMElements() {
 
 async function cargarVehiculos() {
     try {
-        document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 100px 10px;">⏳ Cargando vehículos...</td></tr>`;
+        // ✅ Mensaje de carga centrado sin romper alturas fijas
+        document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 60px 10px; vertical-align: middle;">⏳ Cargando vehículos...</td></tr>`;
         const { data, error } = await supabaseClient.from('vehiculos').select('*').order('marca', { ascending: true });
         if (error) throw error;
         allVehicles = data || [];
@@ -32,7 +33,7 @@ async function cargarVehiculos() {
         setupFilterExclusivity();
         aplicarFiltros();
     } catch (error) {
-        document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align: center; color: #dc2626; padding: 100px 10px;">❌ Error: ${error.message}</td></tr>`;
+        document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align: center; color: #dc2626; padding: 60px 10px; vertical-align: middle;">❌ Error: ${error.message}</td></tr>`;
     }
 }
 
@@ -51,7 +52,6 @@ function populateFilters() {
     }
 }
 
-// 🔒 LÓGICA DE EXCLUSIVIDAD BLINDADA
 function setupFilterExclusivity() {
     const unidad = filterUnidad;
     const epm = filterEPM;
@@ -156,7 +156,7 @@ function renderTable() {
     const tbody = document.getElementById('vehiclesTableBody');
     
     if (pageVehicles.length === 0) {
-        // 🔒 Padding optimizado para no romper la altura fija del contenedor
+        // ✅ Sin padding excesivo. Se centra verticalmente y mantiene el contenedor fijo.
         tbody.innerHTML = `
         <tr>
             <td colspan="11" style="text-align: center; color: #666; padding: 40px 10px; vertical-align: middle;">
