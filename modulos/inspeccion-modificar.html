@@ -98,22 +98,27 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     text-align: center;
 }
 /* ============================================ */
-/* ✅ VARIANTES DE COLOR PARA CADA TIPO         */
+/* ✅ VARIANTES DE COLOR CORREGIDAS             */
 /* ============================================ */
+
+/* 🔵 Patrullas (VERDE) */
 .vehicle-btn.vehiculos {
+    background: linear-gradient(135deg, #2a9d8f 0%, #218838 100%);
+}
+.vehicle-btn.vehiculos:hover {
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+}
+
+/* 🟠 Motos (NARANJA) */
+.vehicle-btn.motos {
     background: linear-gradient(135deg, #e9c46a 0%, #d4a84a 100%);
     color: #000;
 }
-.vehicle-btn.vehiculos:hover {
+.vehicle-btn.motos:hover {
     background: linear-gradient(135deg, #d4a84a 0%, #c1943a 100%);
 }
-.vehicle-btn.vehiculos p { color: #000; }
-
-.vehicle-btn.motos {
-    background: linear-gradient(135deg, #2a9d8f 0%, #218838 100%);
-}
-.vehicle-btn.motos:hover {
-    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+.vehicle-btn.motos p {
+    color: #000;
 }
 /* ============================================ */
 /* RESPONSIVE                                   */
