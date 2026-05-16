@@ -112,10 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('pv_s_carroceria').textContent = v('s_carroceria');
     document.getElementById('pv_s_motor').textContent = v('s_motor');
     document.getElementById('pv_n_id').textContent = v('n_identificacion');
-    document.getElementById('pv_ca_del').textContent = vs('caucho_del');
-    document.getElementById('pv_ca_tra').textContent = vs('caucho_tra');
-    document.getElementById('pv_ca_rep').textContent = vs('caucho_repuesto');
-    document.getElementById('pv_tapa').textContent = vs('tapa_cauchos');
     document.getElementById('pv_observaciones').textContent = v('observaciones') || 'Sin observaciones.';
     document.getElementById('pv_coord_nombre').textContent = v('coord_nombre');
     document.getElementById('pv_coord_rango').textContent = vs('coord_rango');
@@ -169,8 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         modelo: document.getElementById('modelo').value, ano: document.getElementById('ano').value,
         color: document.getElementById('color').value, s_carroceria: document.getElementById('s_carroceria').value,
         s_motor: document.getElementById('s_motor').value, n_identificacion: document.getElementById('n_identificacion').value,
-        caucho_del: document.getElementById('caucho_del').value, caucho_tra: document.getElementById('caucho_tra').value,
-        caucho_repuesto: document.getElementById('caucho_repuesto').value, tapa_cauchos: document.getElementById('tapa_cauchos').value,
         observaciones: document.getElementById('observaciones').value,
         coord_nombre: document.getElementById('coord_nombre').value, coord_rango: document.getElementById('coord_rango').value,
         coord_cedula: document.getElementById('coord_cedula').value, coord_telefono: document.getElementById('coord_telefono').value,
