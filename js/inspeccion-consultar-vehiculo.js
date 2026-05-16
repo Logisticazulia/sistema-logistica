@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // 🔹 CONFIGURACIÓN DE PAGINACIÓN
+  const ITEMS_PER_PAGE = 15;
+  let currentPage = 1;
+  let allInspections = [];
+  let filteredInspections = [];
+
   // 🔹 INICIALIZACIÓN SUPABASE
   async function initSupabase() {
     let attempts = 0;
@@ -38,6 +44,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const alertSuccess = document.getElementById('alertSuccess');
   const alertError = document.getElementById('alertError');
   const alertInfo = document.getElementById('alertInfo');
+  const filterPlaca = document.getElementById('filterPlaca');
+  const btnApplyFilter = document.getElementById('btnApplyFilter');
+  const btnClearFilter = document.getElementById('btnClearFilter');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const currentPageNum = document.getElementById('currentPageNum');
+  const totalPagesNum = document.getElementById('totalPagesNum');
 
   // 🔹 FUNCIONES AUXILIARES
   function mostrarAlerta(tipo, mensaje) {
@@ -58,7 +71,108 @@ document.addEventListener('DOMContentLoaded', async () => {
     return 'status-NT';
   }
 
-  // 🔹 BUSCAR VEHÍCULO EN TABLA `vehiculos`
+  // 🔹 CARGAR TODAS LAS INSPECCIONES (CON PAGINACIÓN)
+  async function cargarTodasInspecciones(page = 1) {
+    try {
+      resultsCount.textContent = '🔄 Cargando...';
+      
+      // Contar total de registros
+      const { count, error: countError } = await supabase.from('inspecciones_pvr')
+        .select('*', { count: 'exact', head: true });
+      if (countError) throw countError;
+
+      // Obtener página actual (ordenado por fecha DESC)
+      const from = (page - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+      
+      const { data, error } = await supabase.from('inspecciones_pvr')
+        .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo, vehiculo_id')
+        .order('fecha_inspeccion', { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
+      allInspections = data || [];
+      filteredInspections = [...allInspections];
+      currentPage = page;
+      
+      renderTabla();
+      updatePaginationControls(count || 0);
+      
+      if (filteredInspections.length === 0) {
+        resultsSection.classList.remove('active');
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = '<div class="icon">📭</div><p>No hay inspecciones registradas aún</p>';
+      } else {
+        resultsSection.classList.add('active');
+        emptyState.style.display = 'none';
+      }
+    } catch (err) {
+      console.error('❌ Error cargando inspecciones:', err);
+      mostrarAlerta('error', `No se pudo cargar el listado: ${err.message}`);
+    }
+  }
+
+  // 🔹 RENDERIZAR TABLA CON DATOS FILTRADOS/PAGINADOS
+  function renderTabla() {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const pageData = filteredInspections.slice(start, start + ITEMS_PER_PAGE);
+    
+    resultsBody.innerHTML = '';
+    
+    if (pageData.length === 0) {
+      resultsBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #64748b;">No se encontraron resultados</td></tr>';
+      return;
+    }
+    
+    pageData.forEach(insp => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="n-inspeccion">${insp.n_inspeccion || '-'}</td>
+        <td class="fecha">${formatDate(insp.fecha_inspeccion)}</td>
+        <td class="fecha">${insp.hora || '-'}</td>
+        <td class="placa">${insp.placa || '-'}</td>
+        <td class="s-carroceria">${insp.s_carroceria || '-'}</td>
+        <td class="motivo" title="${insp.motivo || ''}">${insp.motivo || '-'}</td>
+        <td><button class="btn-ver" data-id="${insp.id}">👁️ Ver Detalle</button></td>
+      `;
+      resultsBody.appendChild(tr);
+    });
+
+    // Agregar listeners a botones "Ver Detalle"
+    resultsBody.querySelectorAll('.btn-ver').forEach(btn => {
+      btn.addEventListener('click', () => abrirDetalle(btn.dataset.id));
+    });
+  }
+
+  // 🔹 ACTUALIZAR CONTROLES DE PAGINACIÓN
+  function updatePaginationControls(totalItems) {
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    currentPageNum.textContent = currentPage;
+    totalPagesNum.textContent = totalPages || 1;
+    
+    btnPrev.disabled = currentPage <= 1;
+    btnNext.disabled = currentPage >= totalPages;
+    
+    resultsCount.textContent = `${filteredInspections.length} registro${filteredInspections.length !== 1 ? 's' : ''} encontrado${filteredInspections.length !== 1 ? 's' : ''}`;
+  }
+
+  // 🔹 FILTRAR POR PLACA
+  function aplicarFiltroPlaca() {
+    const filtro = filterPlaca.value.trim().toUpperCase();
+    if (!filtro) {
+      filteredInspections = [...allInspections];
+    } else {
+      filteredInspections = allInspections.filter(insp => 
+        (insp.placa || '').toUpperCase().includes(filtro)
+      );
+    }
+    currentPage = 1;
+    renderTabla();
+    updatePaginationControls(filteredInspections.length);
+  }
+
+  // 🔹 BUSCAR VEHÍCULO Y FILTRAR SUS INSPECCIONES
   async function buscarVehiculo() {
     const rawQuery = searchInput?.value.trim();
     if (!rawQuery) { mostrarAlerta('info', 'Ingrese Placa, Facsímil o Serial para buscar'); return; }
@@ -68,74 +182,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const q = rawQuery.replace(/\s+/g, '').toUpperCase();
-      const { data: vehiculo, error } = await supabase.from('vehiculos').select('id, placa, marca, modelo, s_carroceria')
+      const { data: vehiculo, error } = await supabase.from('vehiculos').select('id')
         .or(`placa.ilike.${q},facsimil.ilike.${q},s_carroceria.ilike.${q},s_motor.ilike.${q}`)
         .limit(1).maybeSingle();
 
       if (error) throw error;
       if (!vehiculo) { 
         mostrarAlerta('error', '❌ Vehículo no encontrado'); 
-        resultsSection.classList.remove('active'); 
-        emptyState.style.display = 'block';
         return; 
       }
 
-      // ✅ Vehículo encontrado: cargar sus inspecciones
-      await cargarInspecciones(vehiculo.id);
-      mostrarAlerta('success', `✅ Vehículo encontrado: ${vehiculo.placa || vehiculo.s_carroceria}`);
+      // ✅ Cargar solo inspecciones de este vehículo
+      const { data, error: inspError } = await supabase.from('inspecciones_pvr')
+        .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo')
+        .eq('vehiculo_id', vehiculo.id)
+        .order('fecha_inspeccion', { ascending: false });
+
+      if (inspError) throw inspError;
+
+      allInspections = data || [];
+      filteredInspections = [...allInspections];
+      currentPage = 1;
+      
+      if (filteredInspections.length === 0) {
+        resultsSection.classList.remove('active');
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = '<div class="icon">📭</div><p>Este vehículo no tiene inspecciones registradas</p>';
+      } else {
+        resultsSection.classList.add('active');
+        emptyState.style.display = 'none';
+        renderTabla();
+        updatePaginationControls(filteredInspections.length);
+      }
+      
+      mostrarAlerta('success', `✅ Vehículo encontrado. Mostrando ${filteredInspections.length} inspección(es).`);
     } catch (err) {
       console.error('❌ Error búsqueda:', err); 
       mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
       if (btnSearch) { btnSearch.disabled = false; btnSearchText.style.display = 'inline'; btnSearchLoader.style.display = 'none'; }
-    }
-  }
-
-  // 🔹 CARGAR HISTORIAL DE INSPECCIONES PARA UN VEHÍCULO
-  async function cargarInspecciones(vehiculoId) {
-    try {
-      const { data, error } = await supabase.from('inspecciones_pvr')
-        .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo')
-        .eq('vehiculo_id', vehiculoId)
-        .order('fecha_inspeccion', { ascending: false });
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        resultsSection.classList.remove('active');
-        emptyState.innerHTML = '<div class="icon">📭</div><p>Este vehículo no tiene inspecciones registradas aún</p>';
-        emptyState.style.display = 'block';
-        return;
-      }
-
-      // ✅ Renderizar tabla
-      resultsBody.innerHTML = '';
-      data.forEach(insp => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="n-inspeccion">${insp.n_inspeccion || '-'}</td>
-          <td class="fecha">${formatDate(insp.fecha_inspeccion)}</td>
-          <td class="fecha">${insp.hora || '-'}</td>
-          <td class="placa">${insp.placa || '-'}</td>
-          <td class="s-carroceria">${insp.s_carroceria || '-'}</td>
-          <td class="motivo" title="${insp.motivo || ''}">${insp.motivo || '-'}</td>
-          <td><button class="btn-ver" data-id="${insp.id}">👁️ Ver Detalle</button></td>
-        `;
-        resultsBody.appendChild(tr);
-      });
-
-      resultsCount.textContent = `${data.length} registro${data.length > 1 ? 's' : ''} encontrado${data.length > 1 ? 's' : ''}`;
-      resultsSection.classList.add('active');
-      emptyState.style.display = 'none';
-
-      // ✅ Agregar listeners a botones "Ver Detalle"
-      resultsBody.querySelectorAll('.btn-ver').forEach(btn => {
-        btn.addEventListener('click', () => abrirDetalle(btn.dataset.id));
-      });
-
-    } catch (err) {
-      console.error('❌ Error cargando inspecciones:', err);
-      mostrarAlerta('error', `No se pudo cargar el historial: ${err.message}`);
     }
   }
 
@@ -148,7 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       modalNInspeccion.textContent = data.n_inspeccion || '';
       
-      // Construir HTML del detalle
       let html = `
         <div class="detail-grid">
           <div class="detail-item"><span class="detail-label">N° Inspección</span><div class="detail-value">${data.n_inspeccion || '-'}</div></div>
@@ -304,7 +388,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
       modalBody.innerHTML = html;
       detailModal.classList.add('active');
-      document.body.style.overflow = 'hidden'; // Evitar scroll en fondo
+      document.body.style.overflow = 'hidden';
     } catch (err) {
       console.error('❌ Error cargando detalle:', err);
       mostrarAlerta('error', `No se pudo cargar el detalle: ${err.message}`);
@@ -332,10 +416,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 🎧 EVENT LISTENERS
   btnSearch?.addEventListener('click', buscarVehiculo);
   searchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarVehiculo(); });
+  
+  // Filtros rápidos
+  btnApplyFilter?.addEventListener('click', aplicarFiltroPlaca);
+  filterPlaca?.addEventListener('keypress', (e) => { if (e.key === 'Enter') aplicarFiltroPlaca(); });
+  btnClearFilter?.addEventListener('click', () => { filterPlaca.value = ''; filteredInspections = [...allInspections]; currentPage = 1; renderTabla(); updatePaginationControls(filteredInspections.length); });
+  
+  // Paginación
+  btnPrev?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTabla(); updatePaginationControls(filteredInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
+  btnNext?.addEventListener('click', () => { const totalPages = Math.ceil(filteredInspections.length / ITEMS_PER_PAGE); if (currentPage < totalPages) { currentPage++; renderTabla(); updatePaginationControls(filteredInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
+  
   modalClose?.addEventListener('click', cerrarModal);
   detailModal?.addEventListener('click', (e) => { if (e.target === detailModal) cerrarModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal.classList.contains('active')) cerrarModal(); });
 
-  // 🚀 INICIALIZACIÓN
-  mostrarAlerta('info', '🔍 Busque un vehículo para ver su historial de inspecciones');
+  // 🚀 INICIALIZACIÓN: Cargar todas las inspecciones al abrir la página
+  await cargarTodasInspecciones(1);
 });
