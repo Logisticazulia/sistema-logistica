@@ -1,30 +1,59 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // 🔍 Verificar que Supabase esté disponible
-  if (typeof window.supabase === 'undefined') {
-    console.error('❌ Supabase no está disponible. Verifica el orden de carga de scripts.');
-    mostrarAlerta('error', 'Error de configuración. Recarga la página (Ctrl+F5).');
-    return;
-  }
   
-  const supabase = window.supabase; // Usar referencia global
+  // 🔧 INICIALIZAR SUPABASE SI NO EXISTE (usando tus credenciales de config.js)
+  async function initSupabase() {
+    if (typeof window.supabase !== 'undefined' && window.supabase?.auth) {
+      return window.supabase;
+    }
+    
+    // Esperar a que createClient esté disponible desde el CDN
+    let attempts = 0;
+    while (typeof createClient === 'undefined' && attempts < 50) {
+      await new Promise(res => setTimeout(res, 100));
+      attempts++;
+    }
+    
+    if (typeof createClient === 'undefined') {
+      console.error('❌ No se pudo cargar createClient desde el CDN de Supabase');
+      mostrarAlerta('error', 'Error de carga. Recarga con Ctrl+F5');
+      return null;
+    }
+    
+    // Crear cliente con tus credenciales de config.js
+    if (window.SUPABASE_URL && window.SUPABASE_KEY) {
+      try {
+        window.supabase = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+        console.log('✅ Cliente Supabase inicializado desde config.js');
+        return window.supabase;
+      } catch (err) {
+        console.error('❌ Error al crear cliente Supabase:', err);
+        return null;
+      }
+    }
+    
+    console.error('❌ Faltan credenciales en config.js (SUPABASE_URL o SUPABASE_KEY)');
+    return null;
+  }
 
-  // 🔐 Configuración de rutas (AJUSTA SEGÚN TU ESTRUCTURA REAL EN GITHUB PAGES)
+  const supabase = await initSupabase();
+  if (!supabase) return;
+
+  // 🔐 Rutas (ajusta según tu estructura real en GitHub Pages)
   const RUTAS = {
-    login: '/sistema-logistica/login.html',  // ← Ruta absoluta desde root de GitHub Pages
+    login: '/sistema-logistica/login.html',
     dashboard: '/sistema-logistica/dashboard.html',
     transporte: '/sistema-logistica/transporte.html',
     inspeccion: '/sistema-logistica/inspeccion/inspeccion.html'
   };
 
-  // 🔒 Verificar autenticación de forma NO bloqueante
+  // 🔒 Verificar autenticación (NO bloqueante - sin redirección agresiva)
   let usuarioActual = null;
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
-      console.warn('⚠️ Warning auth:', error.message);
+      console.warn('⚠️ Auth warning:', error.message);
     } else if (user) {
       usuarioActual = user;
-      // Actualizar email en navbar
       const userEmailEl = document.getElementById('userEmail');
       if (userEmailEl) userEmailEl.textContent = user.email || 'Usuario';
     }
@@ -32,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('❌ Error en auth:', err);
   }
 
-  // 🎯 Referencias DOM (con verificación)
+  // 🎯 Referencias DOM
   const searchInput = document.getElementById('searchVehicle');
   const btnSearch = document.getElementById('btnSearch');
   const btnSearchText = btnSearch?.querySelector('.btn-search-text');
@@ -79,9 +108,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!inspectionForm) return;
     inspectionForm.style.opacity = activo ? '1' : '0.6';
     inspectionForm.style.pointerEvents = activo ? 'auto' : 'none';
-    if (btnSubmit) btnSubmit.disabled = !activo || !usuarioActual;
-    if (!usuarioActual && btnSubmit) {
-      btnSubmit.title = '🔐 Requiere iniciar sesión para guardar';
+    if (btnSubmit) {
+      btnSubmit.disabled = !activo || !usuarioActual;
+      if (!usuarioActual && btnSubmit) {
+        btnSubmit.title = '🔐 Requiere iniciar sesión para guardar';
+      }
     }
     if (vehicleDisplay) vehicleDisplay.style.display = activo ? 'block' : 'none';
   }
@@ -112,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Rellenar datos
+      // Rellenar datos encontrados
       disp.placa.textContent = data.placa || 'N/A';
       disp.marca.textContent = data.marca?.toUpperCase() || 'N/A';
       disp.modelo.textContent = data.modelo?.toUpperCase() || 'N/A';
@@ -139,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 🗑️ Limpiar
+  // 🗑️ Limpiar búsqueda
   function limpiarBusqueda() {
     if (searchInput) searchInput.value = '';
     toggleFormState(false);
@@ -174,9 +205,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         vehiculo_id: vehicleIdInput.value,
         inspector: usuarioActual.email || 'sistema',
         fecha_creacion: new Date().toISOString()
-        // 👇 Aquí agregarás los ítems que me indiques
+        // 👇 Aquí agregarás los ítems de inspección que me indiques
       };
 
+      // ⚠️ Cambia 'inspecciones_pvr' por el nombre real de tu tabla
       const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
       if (error) throw error;
 
