@@ -20,29 +20,33 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
 .btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
 .search-hint { color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-top: 8px; display: block; }
-.form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; width: 100%; margin-bottom: 25px; }
 .form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid; min-width: 0; transition: box-shadow 0.3s ease, transform 0.3s ease; height: 100%; }
 .form-section:hover { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
 .form-section.identificacion { border-color: #005b96; }
 .form-section.caracteristicas { border-color: #2a9d8f; }
 .form-section.accesorios { border-color: #e9c46a; }
-.form-section.kms { border-color: #f15bb5; }
 .form-section.componentes { border-color: #e76f51; }
+.form-section.cauchos { border-color: #6b7280; }
+.form-section.observaciones { border-color: #9b5de5; }
+.form-section.responsables { border-color: #f59e0b; }
 .form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
 .form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
 .form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
 .form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.2); }
 .form-section.accesorios .form-section-icon { background: rgba(233, 196, 106, 0.2); }
-.form-section.kms .form-section-icon { background: rgba(241, 91, 181, 0.2); }
 .form-section.componentes .form-section-icon { background: rgba(231, 111, 81, 0.2); }
+.form-section.cauchos .form-section-icon { background: rgba(107, 114, 128, 0.2); }
+.form-section.observaciones .form-section-icon { background: rgba(155, 93, 229, 0.2); }
+.form-section.responsables .form-section-icon { background: rgba(245, 158, 11, 0.2); }
 .form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 0.8px; }
 .form-fields-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .form-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-.form-input, .form-select { width: 100%; max-width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; transition: all 0.25s ease; background: white; color: #2d3748; }
-.form-input:focus, .form-select:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12); background: #fff; }
-.form-input:disabled, .form-select:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+.form-input, .form-select, .form-textarea { width: 100%; max-width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; transition: all 0.25s ease; background: white; color: #2d3748; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12); background: #fff; }
+.form-input:disabled, .form-select:disabled, .form-textarea:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
 .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px; }
+.form-textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
 .form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
 .btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; border: none; white-space: nowrap; }
 .btn-secondary { background: #6c757d; color: white; }
@@ -56,7 +60,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
 
-/* 🆕 ESTILOS NUEVOS: INSPECCIÓN DE COMPONENTES */
+/* 🆕 ESTILOS NUEVOS: COMPONENTES B/M/NT */
 .inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
 .inspection-item { background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
@@ -71,8 +75,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .opt-group label:nth-child(2):has(input:checked) { background: #ef4444; border-color: #ef4444; }
 .opt-group label:nth-child(3):has(input:checked) { background: #f59e0b; border-color: #f59e0b; }
 
-@media (max-width: 1200px) { .inspection-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid { grid-template-columns: 1fr; } .inspection-col { max-height: none; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
+/* 🆕 ESTILOS CAUCHOS Y RINES */
+.tires-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.tire-item { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center; }
+.tire-item .item-label { margin-bottom: 10px; }
+.tires-grid .opt-group { justify-content: center; }
+.rin-input { width: 100%; text-align: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; }
+
+/* 🆕 ESTILOS RESPONSABLES */
+.responsibles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+.resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #005b96; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; letter-spacing: 0.5px; }
+
+@media (max-width: 1200px) { .tires-grid { grid-template-columns: repeat(3, 1fr); } .inspection-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 992px) { .tires-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .tires-grid, .responsibles-grid { grid-template-columns: 1fr; } .inspection-col { max-height: none; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
 </style>
 </head>
 <body class="dashboard-page">
@@ -127,6 +143,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
     <form id="inspectionForm" class="form-disabled" style="opacity: 0.6; pointer-events: none;">
       <input type="hidden" id="vehicleId" name="vehicleId">
 
+      <!-- 📋 DATOS DE LA INSPECCIÓN -->
       <div class="form-section identificacion full-width">
         <div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Datos de la Inspección</h2></div>
         <div class="form-fields-grid">
@@ -140,6 +157,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
         </div>
       </div>
 
+      <!-- 🚗 DATOS DEL VEHÍCULO (Auto) -->
       <div class="form-section caracteristicas full-width">
         <div class="form-section-header"><span class="form-section-icon">🚘</span><h2 class="form-section-title">Datos del Vehículo (Automático)</h2></div>
         <div class="form-fields-grid">
@@ -154,6 +172,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
         </div>
       </div>
 
+      <!-- 📦 ACCESORIOS -->
       <div class="form-section accesorios full-width">
         <div class="form-section-header"><span class="form-section-icon">📦</span><h2 class="form-section-title">Accesorios y Equipamiento</h2></div>
         <div class="form-fields-grid">
@@ -168,15 +187,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
         </div>
       </div>
 
-      <div class="form-section kms">
-        <div class="form-section-header"><span class="form-section-icon">🛣️</span><h2 class="form-section-title">Estado Actual</h2></div>
-        <div class="form-fields-grid"><div class="form-group"><label>KMS (Kilometraje) <span style="color:#dc2626">*</span></label><input type="number" id="kms" name="kms" class="form-input" placeholder="Ej: 45000" required></div></div>
-      </div>
-
+      <!-- 🔧 COMPONENTES (80 ÍTEMS) -->
       <div class="form-section componentes full-width">
         <div class="form-section-header"><span class="form-section-icon">🔧</span><h2 class="form-section-title">Inspección de Componentes (B=Bueno | M=Malo | N/T=No Tiene)</h2></div>
         <div class="inspection-grid">
-          <!-- COLUMNA 1 -->
           <div class="inspection-col">
             <div class="inspection-item"><span class="item-label">GUARDAFANGO DEL IZQ.</span><div class="opt-group"><label><input type="radio" name="guardafango_del_izq" value="B"><span>B</span></label><label><input type="radio" name="guardafango_del_izq" value="M"><span>M</span></label><label><input type="radio" name="guardafango_del_izq" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">GUARDAFANGO DEL DER.</span><div class="opt-group"><label><input type="radio" name="guardafango_del_der" value="B"><span>B</span></label><label><input type="radio" name="guardafango_del_der" value="M"><span>M</span></label><label><input type="radio" name="guardafango_del_der" value="NT"><span>N/T</span></label></div></div>
@@ -199,8 +213,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
             <div class="inspection-item"><span class="item-label">CAJA DE VELOCIDADES</span><div class="opt-group"><label><input type="radio" name="caja_velocidades" value="B"><span>B</span></label><label><input type="radio" name="caja_velocidades" value="M"><span>M</span></label><label><input type="radio" name="caja_velocidades" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">ASIENTOS DELANTEROS</span><div class="opt-group"><label><input type="radio" name="asientos_delanteros" value="B"><span>B</span></label><label><input type="radio" name="asientos_delanteros" value="M"><span>M</span></label><label><input type="radio" name="asientos_delanteros" value="NT"><span>N/T</span></label></div></div>
           </div>
-
-          <!-- COLUMNA 2 -->
           <div class="inspection-col">
             <div class="inspection-item"><span class="item-label">VIDRIO LATERAL DEL IZQ.</span><div class="opt-group"><label><input type="radio" name="vidrio_lat_del_izq" value="B"><span>B</span></label><label><input type="radio" name="vidrio_lat_del_izq" value="M"><span>M</span></label><label><input type="radio" name="vidrio_lat_del_izq" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">VIDRIO LATERAL DEL DER.</span><div class="opt-group"><label><input type="radio" name="vidrio_lat_del_der" value="B"><span>B</span></label><label><input type="radio" name="vidrio_lat_del_der" value="M"><span>M</span></label><label><input type="radio" name="vidrio_lat_del_der" value="NT"><span>N/T</span></label></div></div>
@@ -223,8 +235,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
             <div class="inspection-item"><span class="item-label">TAPA DISTRIBUIDOR</span><div class="opt-group"><label><input type="radio" name="tapa_distribuidor" value="B"><span>B</span></label><label><input type="radio" name="tapa_distribuidor" value="M"><span>M</span></label><label><input type="radio" name="tapa_distribuidor" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">ASIENTOS TRASEROS</span><div class="opt-group"><label><input type="radio" name="asientos_traseros" value="B"><span>B</span></label><label><input type="radio" name="asientos_traseros" value="M"><span>M</span></label><label><input type="radio" name="asientos_traseros" value="NT"><span>N/T</span></label></div></div>
           </div>
-
-          <!-- COLUMNA 3 -->
           <div class="inspection-col">
             <div class="inspection-item"><span class="item-label">VOLANTE</span><div class="opt-group"><label><input type="radio" name="volante" value="B"><span>B</span></label><label><input type="radio" name="volante" value="M"><span>M</span></label><label><input type="radio" name="volante" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">CORNETA (PITO)</span><div class="opt-group"><label><input type="radio" name="corneta" value="B"><span>B</span></label><label><input type="radio" name="corneta" value="M"><span>M</span></label><label><input type="radio" name="corneta" value="NT"><span>N/T</span></label></div></div>
@@ -247,8 +257,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
             <div class="inspection-item"><span class="item-label">TAPA BOMBA HIDRAULICA</span><div class="opt-group"><label><input type="radio" name="tapa_bomba_hidr" value="B"><span>B</span></label><label><input type="radio" name="tapa_bomba_hidr" value="M"><span>M</span></label><label><input type="radio" name="tapa_bomba_hidr" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">ESPOILDER DEL. (BABERO)</span><div class="opt-group"><label><input type="radio" name="espoilder_del" value="B"><span>B</span></label><label><input type="radio" name="espoilder_del" value="M"><span>M</span></label><label><input type="radio" name="espoilder_del" value="NT"><span>N/T</span></label></div></div>
           </div>
-
-          <!-- COLUMNA 4 -->
           <div class="inspection-col">
             <div class="inspection-item"><span class="item-label">RADIADOR DE A/A (EVAPORADOR)</span><div class="opt-group"><label><input type="radio" name="radiador_aa" value="B"><span>B</span></label><label><input type="radio" name="radiador_aa" value="M"><span>M</span></label><label><input type="radio" name="radiador_aa" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">ARRANQUE</span><div class="opt-group"><label><input type="radio" name="arranque" value="B"><span>B</span></label><label><input type="radio" name="arranque" value="M"><span>M</span></label><label><input type="radio" name="arranque" value="NT"><span>N/T</span></label></div></div>
@@ -270,6 +278,51 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
             <div class="inspection-item"><span class="item-label">CENICERO</span><div class="opt-group"><label><input type="radio" name="cenicero" value="B"><span>B</span></label><label><input type="radio" name="cenicero" value="M"><span>M</span></label><label><input type="radio" name="cenicero" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">CARDAN DEL.</span><div class="opt-group"><label><input type="radio" name="cardan_del" value="B"><span>B</span></label><label><input type="radio" name="cardan_del" value="M"><span>M</span></label><label><input type="radio" name="cardan_del" value="NT"><span>N/T</span></label></div></div>
             <div class="inspection-item"><span class="item-label">CARDAN TRAS.</span><div class="opt-group"><label><input type="radio" name="cardan_tras" value="B"><span>B</span></label><label><input type="radio" name="cardan_tras" value="M"><span>M</span></label><label><input type="radio" name="cardan_tras" value="NT"><span>N/T</span></label></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🛞 CAUCHOS Y RINES -->
+      <div class="form-section cauchos full-width">
+        <div class="form-section-header"><span class="form-section-icon">🛞</span><h2 class="form-section-title">Estado de Cauchos y Rines</h2></div>
+        <div class="tires-grid">
+          <div class="tire-item"><span class="item-label">Caucha Del. Izq.</span><div class="opt-group"><label><input type="radio" name="caucho_del_izq" value="B"><span>B</span></label><label><input type="radio" name="caucho_del_izq" value="M"><span>M</span></label></div></div>
+          <div class="tire-item"><span class="item-label">Caucha Del. Der.</span><div class="opt-group"><label><input type="radio" name="caucho_del_der" value="B"><span>B</span></label><label><input type="radio" name="caucho_del_der" value="M"><span>M</span></label></div></div>
+          <div class="tire-item"><span class="item-label">Caucha Tra. Izq.</span><div class="opt-group"><label><input type="radio" name="caucho_tra_izq" value="B"><span>B</span></label><label><input type="radio" name="caucho_tra_izq" value="M"><span>M</span></label></div></div>
+          <div class="tire-item"><span class="item-label">Caucha Tra. Der.</span><div class="opt-group"><label><input type="radio" name="caucho_tra_der" value="B"><span>B</span></label><label><input type="radio" name="caucho_tra_der" value="M"><span>M</span></label></div></div>
+          <div class="tire-item"><span class="item-label">Repuesto</span><div class="opt-group"><label><input type="radio" name="caucho_repuesto" value="B"><span>B</span></label><label><input type="radio" name="caucho_repuesto" value="M"><span>M</span></label></div></div>
+          <div class="tire-item"><span class="item-label">Tapa</span><div class="opt-group"><label><input type="radio" name="tapa_cauchos" value="SI"><span>SI</span></label><label><input type="radio" name="tapa_cauchos" value="NO"><span>NO</span></label></div></div>
+          <div class="tire-item"><span class="item-label">Nº de Rin</span><input type="text" id="rin_numero" name="rin_numero" class="form-input rin-input" maxlength="2" placeholder="00" pattern="[0-9]{2}" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- 📝 OBSERVACIONES -->
+      <div class="form-section observaciones full-width">
+        <div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Observaciones</h2></div>
+        <textarea id="observaciones" name="observaciones" class="form-textarea" placeholder="Describa hallazgos, novedades o detalles relevantes de la inspección..."></textarea>
+      </div>
+
+      <!-- 👥 RESPONSABLES -->
+      <div class="form-section responsables full-width">
+        <div class="form-section-header"><span class="form-section-icon">👥</span><h2 class="form-section-title">Firmas y Responsables</h2></div>
+        <div class="responsibles-grid">
+          <div class="responsable-col">
+            <h3 class="resp-header">POR LA COORDINACIÓN</h3>
+            <div class="form-fields-grid">
+              <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="coord_nombre" name="coord_nombre" class="form-input"></div>
+              <div class="form-group"><label>Rango</label><input type="text" id="coord_rango" name="coord_rango" class="form-input"></div>
+              <div class="form-group"><label>Nº de Cédula</label><input type="text" id="coord_cedula" name="coord_cedula" class="form-input"></div>
+              <div class="form-group"><label>Nº de Teléfono</label><input type="text" id="coord_telefono" name="coord_telefono" class="form-input"></div>
+            </div>
+          </div>
+          <div class="responsable-col">
+            <h3 class="resp-header">INSPECCIÓN REALIZADA POR:</h3>
+            <div class="form-fields-grid">
+              <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="insp_nombre" name="insp_nombre" class="form-input"></div>
+              <div class="form-group"><label>Rango</label><input type="text" id="insp_rango" name="insp_rango" class="form-input"></div>
+              <div class="form-group"><label>Nº de Cédula</label><input type="text" id="insp_cedula" name="insp_cedula" class="form-input"></div>
+              <div class="form-group"><label>Nº de Teléfono</label><input type="text" id="insp_telefono" name="insp_telefono" class="form-input"></div>
+            </div>
           </div>
         </div>
       </div>
