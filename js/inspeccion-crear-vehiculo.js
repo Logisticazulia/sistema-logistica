@@ -32,9 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const alertSuccess = document.getElementById('alertSuccess');
   const alertError = document.getElementById('alertError');
   const alertInfo = document.getElementById('alertInfo');
-  const previewWrapper = document.getElementById('previewWrapper');
-  const btnPreviewToggle = document.getElementById('btnPreviewToggle');
-  const btnHidePreview = document.getElementById('btnHidePreview');
 
   function mostrarAlerta(tipo, mensaje) {
     [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
@@ -98,17 +95,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function limpiarFormulario() {
     searchInput.value = ''; toggleFormState(false); inspectionForm.reset(); vehicleIdInput.value = '';
-    previewWrapper.classList.remove('active');
     mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
+    updatePreview();
   }
 
-  // 🆕 ACTUALIZAR VISTA PREVIA EN VIVO
+  // 🆕 ACTUALIZAR VISTA PREVIA EN VIVO (SIEMPRE ACTIVA)
   function updatePreview() {
     const v = id => document.getElementById(id)?.value || '-';
     const vr = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '-';
     const vs = id => { const el = document.getElementById(id); return el?.options[el.selectedIndex]?.text || '-'; }
 
-    // Mapeo directo a la vista previa
     document.getElementById('pv_n_inspeccion').textContent = v('n_inspeccion');
     document.getElementById('pv_fecha').textContent = v('fecha_inspeccion');
     document.getElementById('pv_hora').textContent = v('hora');
@@ -162,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       const div = document.createElement('div');
       div.className = 'pv-comp';
-      div.innerHTML = `<div style="font-size:7pt; margin-bottom:2px; color:#475569; font-weight:600;">${label}</div><div class="pv-comp-status ${cls}">${val}</div>`;
+      div.innerHTML = `<div class="pv-comp-label">${label}</div><div class="pv-comp-status ${cls}">${val}</div>`;
       compGrid.appendChild(div);
     });
   }
@@ -214,10 +210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     finally { btnSubmit.disabled = false; btnSubmit.querySelector('.btn-text').style.display = 'inline'; btnSubmit.querySelector('.btn-loader').style.display = 'none'; }
   });
 
-  // Toggle Preview
-  btnPreviewToggle?.addEventListener('click', () => { previewWrapper.classList.toggle('active'); updatePreview(); });
-  btnHidePreview?.addEventListener('click', () => { previewWrapper.classList.remove('active'); });
-
   // Live Update on any input change
   inspectionForm?.addEventListener('input', updatePreview);
   inspectionForm?.addEventListener('change', updatePreview);
@@ -229,5 +221,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   setDefaults();
+  updatePreview(); // Render inicial
   mostrarAlerta('info', '🔍 Busque un vehículo para habilitar el formulario');
 });
