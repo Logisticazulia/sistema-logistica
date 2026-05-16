@@ -358,6 +358,8 @@ function openFicha(id) {
         { label: 'N° Trámite', value: vehicle.n_tramite },
         { label: 'Ubicación Título', value: vehicle.ubicacion_titulo },
         { label: 'Observación Extra', value: vehicle.observacion_extra },
+         { label: 'Cuadrante', value: vehicle.cuadrante },
+  { label: 'Comuna', value: vehicle.comuna },
         { label: 'Creado', value: vehicle.created_at ? new Date(vehicle.created_at).toLocaleString() : '' }
     ];
     
