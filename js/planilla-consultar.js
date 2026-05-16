@@ -52,44 +52,33 @@ function populateFilters() {
   }
 }
 
-// 🔒 LÓGICA DE EXCLUSIVIDAD MUTUA (OPTIMIZADA & BLINDADA)
-let exclusivityInitialized = false;
-
+// 🔒 LÓGICA DE EXCLUSIVIDAD BLINDADA
 function setupFilterExclusivity() {
-  if (exclusivityInitialized) return; // Evita duplicar listeners si se recarga la tabla
   const unidad = filterUnidad;
   const epm = filterEPM;
   const epp = filterEPP;
   if (!unidad || !epm || !epp) return;
 
-  const toggleFilters = (source) => {
-    const uVal = unidad.value.trim();
-    const eVal = epm.value.trim();
-    const pVal = epp.value.trim();
-
-    // 1. Si selecciona Unidad → Bloquea EPM y EPP
-    if (source === 'unidad' && uVal !== '') {
+  unidad.addEventListener('change', () => {
+    if (unidad.value !== '') {
       epm.value = ''; epm.disabled = true;
       epp.value = ''; epp.disabled = true;
-    } 
-    // 2. Si selecciona EPM o EPP → Bloquea Unidad
-    else if ((source === 'epm' || source === 'epp') && (eVal !== '' || pVal !== '')) {
-      unidad.value = ''; unidad.disabled = true;
+    } else {
+      epm.disabled = false; epp.disabled = false;
     }
-
-    // 3. Rehabilitar automáticamente si se vuelven a poner en blanco
-    if (uVal === '') unidad.disabled = false;
-    if (eVal === '') epm.disabled = false;
-    if (pVal === '') epp.disabled = false;
-
     aplicarFiltros();
-  };
+  });
 
-  unidad.addEventListener('change', () => toggleFilters('unidad'));
-  epm.addEventListener('change', () => toggleFilters('epm'));
-  epp.addEventListener('change', () => toggleFilters('epp'));
-  
-  exclusivityInitialized = true;
+  function bloquearUnidad() {
+    if (epm.value !== '' || epp.value !== '') {
+      unidad.value = ''; unidad.disabled = true;
+    } else {
+      unidad.disabled = false;
+    }
+    aplicarFiltros();
+  }
+  epm.addEventListener('change', bloquearUnidad);
+  epp.addEventListener('change', bloquearUnidad);
 }
 
 function buscarPorPlacaFacsímil() {
