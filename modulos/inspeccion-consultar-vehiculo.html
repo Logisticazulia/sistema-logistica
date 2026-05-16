@@ -124,11 +124,61 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 <button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion-consultar.html'">← Volver</button>
 </header>
-<section class="module-title-section">
-<h1 class="module-title">🔍 Consultar Inspección de Patrullas</h1>
-<p class="module-subtitle">Busque un vehículo para ver su historial de inspecciones PVR</p>
+<!-- 📊 SECCIÓN DE RESULTADOS (VISIBLE POR DEFECTO) -->
+<section id="resultsSection" class="results-section active">
+  <div class="results-header">
+    <h2 class="results-title">📋 Historial de Inspecciones</h2>
+    <span class="results-count" id="resultsCount">Cargando...</span>
+  </div>
+  
+  <!-- 🔍 Filtro rápido por placa (opcional) -->
+  <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+    <input type="text" id="filterPlaca" class="search-input" placeholder="🔎 Filtrar por placa..." 
+           style="max-width: 250px; background: white; color: #333; border-color: #cbd5e1;">
+    <button class="btn-search" id="btnApplyFilter" style="padding: 12px 20px; height: fit-content;">
+      Aplicar Filtro
+    </button>
+    <button class="btn-secondary" id="btnClearFilter" style="padding: 12px 20px; height: fit-content; background: #6c757d;">
+      Limpiar
+    </button>
+  </div>
+  
+  <div style="overflow-x: auto;">
+    <table class="inspections-table">
+      <thead>
+        <tr>
+          <th>N° Inspección</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Placa</th>
+          <th>S/Carrocería</th>
+          <th>Motivo</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody">
+        <!-- Se llena dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- 📄 CONTROLES DE PAGINACIÓN -->
+  <div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px;">
+    <div style="font-size: 0.9rem; color: #64748b;">
+      Página <span id="currentPageNum">1</span> de <span id="totalPagesNum">1</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-secondary" id="btnPrev" style="padding: 8px 16px; font-size: 0.85rem;">← Anterior</button>
+      <button class="btn-secondary" id="btnNext" style="padding: 8px 16px; font-size: 0.85rem;">Siguiente →</button>
+    </div>
+  </div>
 </section>
-<div class="container">
+
+<!-- 📭 ESTADO VACÍO (SOLO SI NO HAY DATOS) -->
+<div id="emptyState" class="empty-state" style="display: none;">
+  <div class="icon">📭</div>
+  <p>No hay inspecciones registradas aún</p>
+</div>
 <!-- 🔍 BARRA DE BÚSQUEDA (IDÉNTICA A CREAR/MODIFICAR) -->
 <div class="search-container">
 <div class="search-group">
