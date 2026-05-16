@@ -61,43 +61,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     updatePreview();
   }
 
-  async function buscarVehiculo() {
-    const query = searchInput?.value.trim();
-    if (!query) { mostrarAlerta('info', 'Ingrese datos para búsqueda exacta'); return; }
+async function buscarVehiculo() {
+    const rawQuery = searchInput?.value.trim();
+    if (!rawQuery) { mostrarAlerta('info', 'Ingrese Placa, Facsímil o Serial para buscar'); return; }
+    
     if (btnSearch) { btnSearch.disabled = true; btnSearchText.style.display = 'none'; btnSearchLoader.style.display = 'inline'; }
     mostrarAlerta('info', '🔍 Buscando...');
 
     try {
-      const { data, error } = await supabase.from('vehiculos').select('*')
-        .or(`placa.eq.${query},facsimil.eq.${query},s_carroceria.eq.${query},s_motor.eq.${query}`).maybeSingle();
-      if (error) throw error;
-      if (!data) { mostrarAlerta('error', '❌ Vehículo no encontrado. Verifique los datos.'); toggleFormState(false); return; }
+        // 1️⃣ Normalizamos: quitamos espacios y pasamos a mayúsculas
+        const q = rawQuery.replace(/\s+/g, '').toUpperCase();
+        console.log('🔍 Query enviada a DB:', q);
 
-      document.getElementById('placa').value = data.placa || '';
-      document.getElementById('marca').value = data.marca?.toUpperCase() || '';
-      document.getElementById('modelo').value = data.modelo?.toUpperCase() || '';
-      document.getElementById('ano').value = data.ano || '';
-      document.getElementById('tipo').value = data.tipo || '';
-      document.getElementById('color').value = data.color || '';
-      document.getElementById('n_identificacion').value = data.n_identificacion || '';
-      document.getElementById('s_carroceria').value = data.s_carroceria || '';
-      vehicleIdInput.value = data.id;
+        // 2️⃣ Búsqueda insensible a mayúsculas y tolerante a espacios
+        const { data, error } = await supabase
+            .from('vehiculos')
+            .select('*')
+            .or(`placa.ilike.${q},facsimil.ilike.${q},s_carroceria.ilike.${q},s_motor.ilike.${q}`)
+            .limit(1) // Evita crash si hay duplicados
+            .maybeSingle();
 
-      setDefaults();
-      toggleFormState(true);
-      mostrarAlerta('success', '✅ Vehículo encontrado. Complete motivo, KMS, cauchos y responsables.');
+        if (error) throw error;
+        console.log('📦 Resultado DB:', data);
+
+        if (!data) { 
+            mostrarAlerta('error', '❌ Vehículo no encontrado. Verifique que los datos estén en la BD.'); 
+            toggleFormState(false); 
+            return; 
+        }
+
+        // 3️⃣ Mapeo seguro a los inputs
+        document.getElementById('placa').value = data.placa || '';
+        document.getElementById('marca').value = data.marca?.toUpperCase() || '';
+        document.getElementById('modelo').value = data.modelo?.toUpperCase() || '';
+        document.getElementById('ano').value = data.ano || '';
+        document.getElementById('tipo').value = data.tipo || '';
+        document.getElementById('color').value = data.color || '';
+        document.getElementById('n_identificacion').value = data.n_identificacion || '';
+        document.getElementById('s_carroceria').value = data.s_carroceria || '';
+        vehicleIdInput.value = data.id;
+        
+        setDefaults();
+        toggleFormState(true);
+        mostrarAlerta('success', '✅ Vehículo encontrado. Complete el resto de datos.');
     } catch (err) {
-      console.error('Error búsqueda:', err); mostrarAlerta('error', `Error: ${err.message}`);
+        console.error('❌ Error búsqueda:', err); 
+        mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
-      if (btnSearch) { btnSearch.disabled = false; btnSearchText.style.display = 'inline'; btnSearchLoader.style.display = 'none'; }
+        if (btnSearch) { btnSearch.disabled = false; btnSearchText.style.display = 'inline'; btnSearchLoader.style.display = 'none'; }
     }
-  }
-
-  function limpiarFormulario() {
-    searchInput.value = ''; toggleFormState(false); inspectionForm.reset(); vehicleIdInput.value = '';
-    mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
-    updatePreview();
-  }
+}
 
   // 🆕 ACTUALIZAR VISTA PREVIA EN VIVO (SIEMPRE ACTIVA)
   function updatePreview() {
