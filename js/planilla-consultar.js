@@ -162,19 +162,20 @@ function aplicarFiltros() {
     renderPagination();
 }
 
-// Limpiar filtros
 function limpiarFiltros() {
     if (filterTipo) filterTipo.value = '';
     if (filterClase) filterClase.value = '';
     if (filterSituacion) filterSituacion.value = '';
     if (filterEstatus) filterEstatus.value = '';
-    if (filterUnidad) filterUnidad.value = '';
-    if (filterEPM) filterEPM.value = '';
-    if (filterEPP) filterEPP.value = '';
+    
+    // ✅ NUEVO: Limpiar y habilitar explícitamente
+    if (filterUnidad) { filterUnidad.value = ''; filterUnidad.disabled = false; }
+    if (filterEPM)    { filterEPM.value = '';    filterEPM.disabled = false;    }
+    if (filterEPP)    { filterEPP.value = '';    filterEPP.disabled = false;    }
+    
     if (searchInput) searchInput.value = '';
     aplicarFiltros();
 }
-
 // Exportar a Excel con TODOS los datos completos
 function exportarExcel() {
     if (filteredVehicles.length === 0) {
@@ -443,7 +444,41 @@ function getEstatusBadge(estatus) {
     else if (estatusUpper.includes('REPARACION')) className = 'badge-reparacion';
     return `<span class="badge ${className}">${estatus}</span>`;
 }
+// 🔹 FUNCIÓN: Bloqueo mutuo entre Unidad, EPM y EPP
+function configurarExclusionFiltros() {
+    if (!filterUnidad || !filterEPM || !filterEPP) return;
 
+    function manejarCambio() {
+        const tieneUnidad = filterUnidad.value.trim() !== '';
+        const tieneEPM = filterEPM.value.trim() !== '';
+        const tieneEPP = filterEPP.value.trim() !== '';
+
+        // Si se elige Unidad → Bloquea EPM y EPP, y los limpia
+        if (tieneUnidad) {
+            filterEPM.disabled = true;
+            filterEPP.disabled = true;
+            filterEPM.value = '';
+            filterEPP.value = '';
+        } else {
+            filterEPM.disabled = false;
+            filterEPP.disabled = false;
+        }
+
+        // Si se elige EPM o EPP → Bloquea Unidad y la limpia
+        if (tieneEPM || tieneEPP) {
+            filterUnidad.disabled = true;
+            filterUnidad.value = '';
+        } else {
+            filterUnidad.disabled = false;
+        }
+
+        aplicarFiltros(); // Recalcula la tabla automáticamente
+    }
+
+    filterUnidad.addEventListener('change', manejarCambio);
+    filterEPM.addEventListener('change', manejarCambio);
+    filterEPP.addEventListener('change', manejarCambio);
+}
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Inicializando consulta de vehículos...');
@@ -461,9 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterClase) filterClase.addEventListener('change', aplicarFiltros);
     if (filterSituacion) filterSituacion.addEventListener('change', aplicarFiltros);
     if (filterEstatus) filterEstatus.addEventListener('change', aplicarFiltros);
-    if (filterUnidad) filterUnidad.addEventListener('change', aplicarFiltros);
-    if (filterEPM) filterEPM.addEventListener('change', aplicarFiltros);
-    if (filterEPP) filterEPP.addEventListener('change', aplicarFiltros);
+ configurarExclusionFiltros(); 
+    
 });
 // Mostrar usuario autenticado
 async function mostrarUsuarioAutenticado() {
