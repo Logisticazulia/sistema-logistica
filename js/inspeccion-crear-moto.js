@@ -145,32 +145,74 @@ function getComponentesMotoValues() {
   return componentes; // Retorna un objeto, no lo expande aún
 }
 
-// 🔹 EN EL EVENTO SUBMIT, modifica el payload así:
 inspectionForm?.addEventListener('submit', async e => {
   e.preventDefault();
   if(!usuarioActual) { mostrarAlerta('error','🔐 Inicie sesión'); return; }
   if(!motoIdInput.value) { mostrarAlerta('error','Busque una moto primero'); return; }
   btnSubmit.disabled = true;
+  
   try {
+    // 🔹 FUNCIÓN AUXILIAR: Convertir vacío a null para campos numéricos
+    const toIntOrNull = val => {
+      const num = parseInt(val, 10);
+      return isNaN(num) || val === '' ? null : num;
+    };
+    const toFloatOrNull = val => {
+      const num = parseFloat(val);
+      return isNaN(num) || val === '' ? null : num;
+    };
+
     const payload = {
-      vehiculo_id: motoIdInput.value, n_inspeccion: document.getElementById('n_inspeccion').value,
-      fecha_inspeccion: document.getElementById('fecha_inspeccion').value, hora: document.getElementById('hora').value,
-      motivo: document.getElementById('motivo_inspeccion').value, lugar: document.getElementById('lugar').value,
-      asignacion: document.getElementById('asignacion').value, supervision: document.getElementById('supervision').value,
-      placa: document.getElementById('placa').value, marca: document.getElementById('marca').value,
-      modelo: document.getElementById('modelo').value, ano: document.getElementById('ano').value,
-      color: document.getElementById('color').value, s_carroceria: document.getElementById('s_carroceria').value,
-      s_motor: document.getElementById('s_motor').value, n_identificacion: document.getElementById('n_identificacion').value,
-      observaciones: document.getElementById('observaciones').value,
-      coord_nombre: document.getElementById('coord_nombre').value, coord_rango: document.getElementById('coord_rango').value,
-      coord_cedula: document.getElementById('coord_cedula').value, coord_telefono: document.getElementById('coord_telefono').value,
-      insp_nombre: document.getElementById('insp_nombre').value, insp_rango: document.getElementById('insp_rango').value,
-      insp_cedula: document.getElementById('insp_cedula').value, insp_telefono: document.getElementById('insp_telefono').value,
-      inspector: usuarioActual.email || 'sistema', created_at: new Date().toISOString(),
+      vehiculo_id: toIntOrNull(motoIdInput.value), // ✅ ID como entero o null
+      n_inspeccion: document.getElementById('n_inspeccion')?.value || null,
+      fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value || null,
+      hora: document.getElementById('hora')?.value || null,
+      motivo: document.getElementById('motivo_inspeccion')?.value || null,
+      lugar: document.getElementById('lugar')?.value || null,
+      asignacion: document.getElementById('asignacion')?.value || null,
+      supervision: document.getElementById('supervision')?.value || null,
+      placa: document.getElementById('placa')?.value || null,
+      marca: document.getElementById('marca')?.value || null,
+      modelo: document.getElementById('modelo')?.value || null,
+      ano: toIntOrNull(document.getElementById('ano')?.value), // ✅ Entero o null
+      color: document.getElementById('color')?.value || null,
+      s_carroceria: document.getElementById('s_carroceria')?.value || null,
+      s_motor: document.getElementById('s_motor')?.value || null,
+      n_identificacion: document.getElementById('n_identificacion')?.value || null,
+      observaciones: document.getElementById('observaciones')?.value || null,
+      coord_nombre: document.getElementById('coord_nombre')?.value || null,
+      coord_rango: document.getElementById('coord_rango')?.value || null,
+      coord_cedula: document.getElementById('coord_cedula')?.value || null,
+      coord_telefono: document.getElementById('coord_telefono')?.value || null,
+      insp_nombre: document.getElementById('insp_nombre')?.value || null,
+      insp_rango: document.getElementById('insp_rango')?.value || null,
+      insp_cedula: document.getElementById('insp_cedula')?.value || null,
+      insp_telefono: document.getElementById('insp_telefono')?.value || null,
+      inspector: usuarioActual?.email || 'sistema',
+      created_at: new Date().toISOString(),
       
-      // ✅ COMPONENTES DE MOTO AGRUPADOS EN JSONB
+      // ✅ Componentes de moto agrupados en JSONB
       componentes_moto: getComponentesMotoValues()
     };
+
+    // 🔹 Eliminar campos null del payload (opcional, pero más limpio)
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === null || payload[key] === '') delete payload[key];
+    });
+    
+    const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
+    if(error) throw error;
+    
+    mostrarAlerta('success', '✅ Inspección de Moto registrada');
+    alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { limpiarFormulario(); }, 2000);
+    
+  } catch(err) { 
+    console.error('Error detalle:', err); 
+    mostrarAlerta('error', `Error: ${err.message}`); 
+  }
+  finally { btnSubmit.disabled = false; }
+});
     
     const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
     if(error) throw error;
