@@ -12,7 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-/* ================= ESTILOS BASE (Mismos que planilla-modificar) ================= */
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
 .form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
@@ -30,23 +29,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .form-section:hover { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
 .form-section.identificacion { border-color: #005b96; }
 .form-section.caracteristicas { border-color: #2a9d8f; }
-.form-section.observaciones { border-color: #f15bb5; }
+.form-section.accesorios { border-color: #e9c46a; }
+.form-section.estado { border-color: #f15bb5; }
 .form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
 .form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
 .form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
 .form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.2); }
-.form-section.observaciones .form-section-icon { background: rgba(241, 91, 181, 0.2); }
+.form-section.accesorios .form-section-icon { background: rgba(233, 196, 106, 0.2); }
+.form-section.estado .form-section-icon { background: rgba(241, 91, 181, 0.2); }
 .form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 0.8px; }
-.form-fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.form-section.full-width .form-fields-grid { grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.form-fields-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .form-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-.form-group label .required { color: #dc2626; margin-left: 3px; }
-.form-input, .form-select, .form-textarea { width: 100%; max-width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; transition: all 0.25s ease; background: white; color: #2d3748; }
-.form-input:hover, .form-select:hover, .form-textarea:hover { border-color: #cbd5e0; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12); background: #fff; }
-.form-input:disabled, .form-select:disabled, .form-textarea:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
-.form-textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+.form-input, .form-select { width: 100%; max-width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; transition: all 0.25s ease; background: white; color: #2d3748; }
+.form-input:hover, .form-select:hover { border-color: #cbd5e0; }
+.form-input:focus, .form-select:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12); background: #fff; }
+.form-input:disabled, .form-select:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+.form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px; }
 .form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
 .btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; border: none; white-space: nowrap; }
 .btn-secondary { background: #6c757d; color: white; }
@@ -59,7 +58,8 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-@media (max-width: 1200px) { .form-row { grid-template-columns: 1fr; } .form-section.full-width .form-fields-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1200px) { .form-fields-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 992px) { .form-fields-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
 </style>
 </head>
@@ -122,34 +122,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
           <h2 class="form-section-title">Datos de la Inspección</h2>
         </div>
         <div class="form-fields-grid">
-          <div class="form-group">
-            <label>N° DE INSPECCIÓN</label>
-            <input type="text" id="n_inspeccion" name="n_inspeccion" class="form-input" disabled placeholder="Generado automáticamente">
-          </div>
-          <div class="form-group">
-            <label>FECHA DE INSPECCIÓN</label>
-            <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>HORA</label>
-            <input type="time" id="hora" name="hora" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>MOTIVO DE LA INSPECCIÓN <span class="required">*</span></label>
-            <input type="text" id="motivo_inspeccion" name="motivo_inspeccion" class="form-input" placeholder="Ej: Revisión preventiva" required>
-          </div>
-          <div class="form-group">
-            <label>LUGAR</label>
-            <input type="text" id="lugar" name="lugar" class="form-input" placeholder="Ej: CCPE Zulia">
-          </div>
-          <div class="form-group">
-            <label>ASIGNACIÓN</label>
-            <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje Norte">
-          </div>
-          <div class="form-group">
-            <label>SUPERVISIÓN</label>
-            <input type="text" id="supervision" name="supervision" class="form-input" placeholder="Nombre del supervisor">
-          </div>
+          <div class="form-group"><label>N° DE INSPECCIÓN</label><input type="text" id="n_inspeccion" name="n_inspeccion" class="form-input" disabled placeholder="Generado automáticamente"></div>
+          <div class="form-group"><label>FECHA DE INSPECCIÓN</label><input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input"></div>
+          <div class="form-group"><label>HORA</label><input type="time" id="hora" name="hora" class="form-input"></div>
+          <div class="form-group"><label>MOTIVO DE LA INSPECCIÓN <span style="color:#dc2626">*</span></label><input type="text" id="motivo_inspeccion" name="motivo_inspeccion" class="form-input" placeholder="Ej: Revisión preventiva" required></div>
+          <div class="form-group"><label>LUGAR</label><input type="text" id="lugar" name="lugar" class="form-input" placeholder="Ej: CCPE Zulia"></div>
+          <div class="form-group"><label>ASIGNACIÓN</label><input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje Norte"></div>
+          <div class="form-group"><label>SUPERVISIÓN</label><input type="text" id="supervision" name="supervision" class="form-input" placeholder="Nombre del supervisor"></div>
         </div>
       </div>
 
@@ -161,27 +140,58 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
         </div>
         <div class="form-fields-grid">
           <div class="form-group"><label>PLACA</label><input type="text" id="placa" name="placa" class="form-input" disabled></div>
-          <div class="form-group"><label>MARCA:</label><input type="text" id="marca" name="marca" class="form-input" disabled></div>
-          <div class="form-group"><label>MODELO:</label><input type="text" id="modelo" name="modelo" class="form-input" disabled></div>
+          <div class="form-group"><label>MARCA</label><input type="text" id="marca" name="marca" class="form-input" disabled></div>
+          <div class="form-group"><label>MODELO</label><input type="text" id="modelo" name="modelo" class="form-input" disabled></div>
           <div class="form-group"><label>AÑO</label><input type="number" id="ano" name="ano" class="form-input" disabled></div>
-          <div class="form-group"><label>TIPO:</label><input type="text" id="tipo" name="tipo" class="form-input" disabled></div>
-          <div class="form-group"><label>COLOR:</label><input type="text" id="color" name="color" class="form-input" disabled></div>
-          <div class="form-group"><label>N° DE IDENTIFICACIÓN</label><input type="text" id="n_identificacion" name="n_identificacion" class="form-input" disabled></div>
-          <div class="form-group"><label>SERIAL DE CARROCERÍA:</label><input type="text" id="s_carroceria" name="s_carroceria" class="form-input" disabled></div>
+          <div class="form-group"><label>TIPO</label><input type="text" id="tipo" name="tipo" class="form-input" disabled></div>
+          <div class="form-group"><label>COLOR</label><input type="text" id="color" name="color" class="form-input" disabled></div>
+          <div class="form-group"><label>N° IDENTIFICACIÓN</label><input type="text" id="n_identificacion" name="n_identificacion" class="form-input" disabled></div>
+          <div class="form-group"><label>SERIAL CARROCERÍA</label><input type="text" id="s_carroceria" name="s_carroceria" class="form-input" disabled></div>
         </div>
       </div>
 
-      <!-- 🛣️ SECCIÓN 3: ESTADO ACTUAL -->
-      <div class="form-section observaciones">
+      <!-- 📦 SECCIÓN 3: ACCESORIOS Y EQUIPAMIENTO (SI / NO) -->
+      <div class="form-section accesorios full-width">
+        <div class="form-section-header">
+          <span class="form-section-icon">📦</span>
+          <h2 class="form-section-title">Accesorios y Equipamiento</h2>
+        </div>
+        <div class="form-fields-grid">
+          <div class="form-group"><label>BATERÍA</label>
+            <select id="bateria" name="bateria" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>ESTACIÓN BASE.</label>
+            <select id="estacion_base" name="estacion_base" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>COCTELERA</label>
+            <select id="coctelera" name="coctelera" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>TRIÁNGULO</label>
+            <select id="triangulo" name="triangulo" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>PLACAS</label>
+            <select id="placas" name="placas" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>HERRAMIENTAS</label>
+            <select id="herramientas" name="herramientas" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>GATO</label>
+            <select id="gato" name="gato" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+          <div class="form-group"><label>SESTACIÓN LUCES</label>
+            <select id="sestacion_luces" name="sestacion_luces" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🛣️ SECCIÓN 4: ESTADO ACTUAL -->
+      <div class="form-section estado full-width">
         <div class="form-section-header">
           <span class="form-section-icon">🛣️</span>
           <h2 class="form-section-title">Estado Actual</h2>
         </div>
         <div class="form-fields-grid">
-          <div class="form-group">
-            <label>KMS (Kilometraje) <span class="required">*</span></label>
-            <input type="number" id="kms" name="kms" class="form-input" placeholder="Ej: 45000" required>
-          </div>
+          <div class="form-group"><label>KMS (Kilometraje) <span style="color:#dc2626">*</span></label><input type="number" id="kms" name="kms" class="form-input" placeholder="Ej: 45000" required></div>
         </div>
       </div>
 
