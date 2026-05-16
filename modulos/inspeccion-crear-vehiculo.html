@@ -92,17 +92,16 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .preview-wrapper { margin-top: 0; padding: 0; }
 .print-page {
     width: 100%;
-    max-width: 216mm; /* Simula ancho carta en pantalla */
-    min-height: auto; /* ✅ Altura flexible para evitar cortes */
+    max-width: 216mm;
     background: white;
-    padding: 12mm;
-    margin: 0 auto;
+    padding: 15mm;
+    margin: 20px auto;
     box-shadow: 0 8px 30px rgba(0,0,0,0.1);
     border: 1px solid #e2e8f0;
     font-size: 9pt;
     box-sizing: border-box;
+    overflow: visible; /* ✅ CLAVE: Permite que el contenido fluya hacia abajo */
     position: relative;
-    overflow: visible; /* ✅ Permite que el contenido se extienda sin cortarse */
 }
 
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
@@ -136,24 +135,35 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 @media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .tires-grid, .responsibles-grid, .responsable-fields { grid-template-columns: 1fr; } .responsable-fields .full-width { grid-column: span 1; } .inspection-col { max-height: none; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-comps { grid-template-columns: repeat(3, 1fr); } .pv-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
 
-/* 🖨️ REGLAS PARA IMPRESIÓN / PDF */
 @media print {
     body, html { background: white; margin: 0; padding: 0; }
-    .navbar, .search-container, .alert, .form-actions, .form-section, .no-print, .preview-divider { display: none !important; }
-    .preview-wrapper > div:first-child { display: none !important; } /* Oculta título y botón de imprimir */
+    
+    /* 1️⃣ Oculta TODA la interfaz del sistema (breadcrumbs, títulos, botones) */
+    .navbar, .search-container, .alert, .form-actions, .form-section,
+    .no-print, .module-header, .module-title-section,
+    .preview-divider, .dashboard-main > header, .dashboard-main > section { 
+        display: none !important; 
+    }
+
+    /* 2️⃣ Prepara el contenedor para flujo multi-página */
     .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; }
     .preview-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
-    
+
     .print-page {
-        box-shadow: none !important;
-        border: none !important;
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: none !important;
-        min-height: auto !important;
-        padding: 10mm !important;
-        overflow: visible !important;
+        box-shadow: none !important; border: none !important; margin: 0 !important;
+        width: 100% !important; max-width: 100% !important; min-height: auto !important;
+        padding: 10mm !important; overflow: visible !important; position: static !important;
     }
+
+    /* 3️⃣ Evita que se corten secciones importantes entre páginas */
+    .pv-section-title { page-break-after: avoid; break-after: avoid; margin-top: 15px; }
+    .pv-grid, .pv-item, .pv-comps, .pv-signatures, #pv_observaciones,
+    .print-header, .official-use-box {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* 4️⃣ Garantiza colores de fondo y márgenes físicos de la hoja */
     .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     @page { size: letter portrait; margin: 10mm; }
 }
