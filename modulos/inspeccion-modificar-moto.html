@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modificar Inspección PVR - Motos | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
+.form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
+.search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+.search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+.search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
+.search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
+.btn-search { background: #f59e0b; color: white; padding: 12px 30px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; height: fit-content; }
+.btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+.btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+.search-hint { color: rgba(255,255,255,0.9); font-size: 0.8rem; margin-top: 8px; display: block; }
+.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #005b96; margin-bottom: 25px; }
+.form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
+.form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; background: rgba(0, 91, 150, 0.2); }
+.form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; }
+.form-fields-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; background: white; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.15); }
+.form-input:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+.form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px; }
+.form-textarea { resize: vertical; min-height: 100px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
+.btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; border: none; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-primary { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 51, 102, 0.3); }
+.btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+.alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 25px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
+.alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
+.alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+.inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
+.inspection-item { background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
+.item-label { font-size: 0.7rem; color: #475569; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; }
+.opt-group { display: flex; gap: 4px; }
+.opt-group label { flex: 1; text-align: center; padding: 6px 0; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; font-size: 0.72rem; font-weight: 800; transition: all 0.15s; background: #f8fafc; color: #64748b; }
+.opt-group input[type="radio"] { display: none; }
+.opt-group label:has(input:checked) { background: #005b96; color: white; border-color: #005b96; }
+.opt-group label:nth-child(1):has(input:checked) { background: #10b981; border-color: #10b981; }
+.opt-group label:nth-child(2):has(input:checked) { background: #ef4444; border-color: #ef4444; }
+.opt-group label:nth-child(3):has(input:checked) { background: #f59e0b; border-color: #f59e0b; }
+.responsibles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+.responsable-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.responsable-fields .full-width { grid-column: 1 / -1; }
+.resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #005b96; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+.preview-divider { height: 3px; background: linear-gradient(90deg, #003366, #005b96); margin: 40px 0 30px; border-radius: 2px; }
+.print-page { width: 100%; max-width: 216mm; min-height: auto; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; overflow: visible; }
+.print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
+.print-logo { width: 85px; height: 85px; object-fit: contain; }
+.print-header-text { flex: 1; padding: 0 15px; text-align: center; }
+.print-header-text h2, .print-header-text h3, .print-header-text h4, .print-header-text p { margin: 2px 0; line-height: 1.3; color: #003366; font-weight: 700; text-transform: uppercase; }
+.print-header-text h2 { font-size: 12pt; } .print-header-text h3 { font-size: 10pt; } .print-header-text h4 { font-size: 9pt; } .print-header-text p { font-size: 9pt; color: #4a5568; }
+.pv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+.pv-grid-2 { grid-template-columns: repeat(2, 1fr); } .pv-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.pv-item { background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
+.pv-label { font-size: 7pt; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
+.pv-value { font-size: 9pt; font-weight: 700; color: #0f172a; min-height: 14px; word-break: break-word; }
+.pv-section-title { font-size: 10pt; color: #005b96; font-weight: 800; text-transform: uppercase; margin: 15px 0 10px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
+.pv-comps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
+.pv-comp { text-align: center; font-size: 7pt; border: 1px solid #e2e8f0; padding: 4px; border-radius: 3px; background: #fff; }
+.pv-comp-label { display: block; margin-bottom: 3px; color: #475569; font-weight: 600; }
+.pv-comp-status { font-weight: 800; padding: 2px 4px; border-radius: 2px; display: inline-block; width: 100%; box-sizing: border-box; font-size: 7.5pt; }
+.status-B { background: #d1fae5; color: #059669; } .status-M { background: #fee2e2; color: #dc2626; } .status-NT { background: #fef3c7; color: #d97706; }
+.pv-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
+.pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
+.pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
+@media (max-width: 1024px) { .inspection-grid { grid-template-columns: repeat(2, 1fr); } .print-page { padding: 12mm; } .pv-comps { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .responsibles-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
+@media print { body, html { background: white; margin: 0; padding: 0; } .navbar, .search-container, .alert, .form-actions, .form-section, .no-print { display: none !important; } .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; } .preview-divider { display: none; } .print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 15mm !important; overflow: visible !important; } .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; } @page { size: letter portrait; margin: 0; } }
+</style>
+</head>
+<body class="dashboard-page">
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">Cargando...</span>
+<button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+</div>
+</div>
+</nav>
+<main class="dashboard-main" role="main">
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Modificar Inspección - Motos</span>
+</div>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion-modificar.html'">← Volver</button>
+</header>
+<section class="module-title-section">
+<h1 class="module-title">✏️ Modificar Inspección PVR - Motos</h1>
+<p class="module-subtitle">Busque por N° de Inspección o Placa para cargar y editar</p>
+</section>
+<div class="form-container">
+<div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Actualizado exitosamente</span></div>
+<div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al actualizar</span></div>
+<div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese N° Inspección o Placa para buscar</span></div>
+<div class="search-container">
+<div class="search-group">
+<label for="searchInspection">🔍 Buscar Inspección de Moto</label>
+<input type="text" id="searchInspection" class="search-input" placeholder="Ej: PVR-M-20260517-001 | AB123CD">
+<span class="search-hint">Búsqueda por: N° Inspección o Placa</span>
+</div>
+<button type="button" class="btn-search" id="btnSearch">
+<span class="btn-search-text">🔍 Cargar Inspección</span>
+<span class="btn-search-loader" style="display:none;">⏳</span>
+</button>
+</div>
+<form id="motoForm" style="opacity: 0.6; pointer-events: none;">
+<input type="hidden" id="recordId" name="recordId">
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Datos de la Inspección</h2></div>
+<div class="form-fields-grid">
+<div class="form-group"><label>Nº DE INSPECCIÓN</label><input type="text" id="n_inspeccion" class="form-input" disabled></div>
+<div class="form-group"><label>FECHA</label><input type="date" id="fecha_inspeccion" class="form-input"></div>
+<div class="form-group"><label>HORA</label><input type="time" id="hora" class="form-input"></div>
+<div class="form-group"><label>MOTIVO <span style="color:#dc2626">*</span></label><input type="text" id="motivo_inspeccion" class="form-input" required></div>
+<div class="form-group"><label>LUGAR</label><input type="text" id="lugar" class="form-input"></div>
+<div class="form-group"><label>ASIGNACIÓN</label><input type="text" id="asignacion" class="form-input"></div>
+<div class="form-group"><label>SUPERVISIÓN</label><input type="text" id="supervision" class="form-input"></div>
+</div>
+</div>
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">🏍️</span><h2 class="form-section-title">Datos de la Unidad (Solo Lectura)</h2></div>
+<div class="form-fields-grid">
+<div class="form-group"><label>PLACA</label><input type="text" id="placa" class="form-input" disabled></div>
+<div class="form-group"><label>MARCA</label><input type="text" id="marca" class="form-input" disabled></div>
+<div class="form-group"><label>MODELO</label><input type="text" id="modelo" class="form-input" disabled></div>
+<div class="form-group"><label>AÑO</label><input type="text" id="ano" class="form-input" disabled></div>
+<div class="form-group"><label>COLOR</label><input type="text" id="color" class="form-input" disabled></div>
+<div class="form-group"><label>SERIAL CARROCERÍA</label><input type="text" id="s_carroceria" class="form-input" disabled></div>
+<div class="form-group"><label>SERIAL MOTOR</label><input type="text" id="s_motor" class="form-input" disabled></div>
+<div class="form-group"><label>Nº DE IDENTIFICACIÓN</label><input type="text" id="n_identificacion" class="form-input" disabled></div>
+</div>
+</div>
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">🔧</span><h2 class="form-section-title">Inspección de Componentes (B=Bueno | M=Malo | N/T=No Tiene)</h2></div>
+<div class="inspection-grid">
+<!-- COLUMNA 1 -->
+<div class="inspection-col">
+<div class="inspection-item"><span class="item-label">VICERA</span><div class="opt-group"><label><input type="radio" name="vicera" value="B"><span>B</span></label><label><input type="radio" name="vicera" value="M"><span>M</span></label><label><input type="radio" name="vicera" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">VOLANTE</span><div class="opt-group"><label><input type="radio" name="volante" value="B"><span>B</span></label><label><input type="radio" name="volante" value="M"><span>M</span></label><label><input type="radio" name="volante" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TACOMETRO DE KILOMETRAJE</span><div class="opt-group"><label><input type="radio" name="tacometro_kilometraje" value="B"><span>B</span></label><label><input type="radio" name="tacometro_kilometraje" value="M"><span>M</span></label><label><input type="radio" name="tacometro_kilometraje" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">EJE TRASERO</span><div class="opt-group"><label><input type="radio" name="eje_trasero" value="B"><span>B</span></label><label><input type="radio" name="eje_trasero" value="M"><span>M</span></label><label><input type="radio" name="eje_trasero" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PATA DE CAMBIO</span><div class="opt-group"><label><input type="radio" name="pata_cambio" value="B"><span>B</span></label><label><input type="radio" name="pata_cambio" value="M"><span>M</span></label><label><input type="radio" name="pata_cambio" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PATA DE FRENO</span><div class="opt-group"><label><input type="radio" name="pata_freno" value="B"><span>B</span></label><label><input type="radio" name="pata_freno" value="M"><span>M</span></label><label><input type="radio" name="pata_freno" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MANILLA DE CLOUTCH</span><div class="opt-group"><label><input type="radio" name="manilla_cloutch" value="B"><span>B</span></label><label><input type="radio" name="manilla_cloutch" value="M"><span>M</span></label><label><input type="radio" name="manilla_cloutch" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MANILLA DE FRENO</span><div class="opt-group"><label><input type="radio" name="manilla_freno" value="B"><span>B</span></label><label><input type="radio" name="manilla_freno" value="M"><span>M</span></label><label><input type="radio" name="manilla_freno" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">ESPEJO RETROVISOR DER.</span><div class="opt-group"><label><input type="radio" name="espejo_retrovisor_der" value="B"><span>B</span></label><label><input type="radio" name="espejo_retrovisor_der" value="M"><span>M</span></label><label><input type="radio" name="espejo_retrovisor_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">ESPEJO RETROVISOR IZQ.</span><div class="opt-group"><label><input type="radio" name="espejo_retrovisor_izq" value="B"><span>B</span></label><label><input type="radio" name="espejo_retrovisor_izq" value="M"><span>M</span></label><label><input type="radio" name="espejo_retrovisor_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">SWITCHERA</span><div class="opt-group"><label><input type="radio" name="switchera" value="B"><span>B</span></label><label><input type="radio" name="switchera" value="M"><span>M</span></label><label><input type="radio" name="switchera" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BASTON IZQUIERDO</span><div class="opt-group"><label><input type="radio" name="baston_izq" value="B"><span>B</span></label><label><input type="radio" name="baston_izq" value="M"><span>M</span></label><label><input type="radio" name="baston_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BASTON DERECHO</span><div class="opt-group"><label><input type="radio" name="baston_der" value="B"><span>B</span></label><label><input type="radio" name="baston_der" value="M"><span>M</span></label><label><input type="radio" name="baston_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">FARO DELANTERO</span><div class="opt-group"><label><input type="radio" name="faro_delantero" value="B"><span>B</span></label><label><input type="radio" name="faro_delantero" value="M"><span>M</span></label><label><input type="radio" name="faro_delantero" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CRUCE DELANTERO DER.</span><div class="opt-group"><label><input type="radio" name="cruce_del_der" value="B"><span>B</span></label><label><input type="radio" name="cruce_del_der" value="M"><span>M</span></label><label><input type="radio" name="cruce_del_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CRUCE DELANTERO IZQ.</span><div class="opt-group"><label><input type="radio" name="cruce_del_izq" value="B"><span>B</span></label><label><input type="radio" name="cruce_del_izq" value="M"><span>M</span></label><label><input type="radio" name="cruce_del_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CRUCE TRASERO DER.</span><div class="opt-group"><label><input type="radio" name="cruce_tra_der" value="B"><span>B</span></label><label><input type="radio" name="cruce_tra_der" value="M"><span>M</span></label><label><input type="radio" name="cruce_tra_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CRUCE TRASERO IZQ.</span><div class="opt-group"><label><input type="radio" name="cruce_tra_izq" value="B"><span>B</span></label><label><input type="radio" name="cruce_tra_izq" value="M"><span>M</span></label><label><input type="radio" name="cruce_tra_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">FARO DE FRENO TRASERO (STOP)</span><div class="opt-group"><label><input type="radio" name="faro_freno_tra_stop" value="B"><span>B</span></label><label><input type="radio" name="faro_freno_tra_stop" value="M"><span>M</span></label><label><input type="radio" name="faro_freno_tra_stop" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">GUARDA FANGO DELANTERO</span><div class="opt-group"><label><input type="radio" name="guarda_fango_del" value="B"><span>B</span></label><label><input type="radio" name="guarda_fango_del" value="M"><span>M</span></label><label><input type="radio" name="guarda_fango_del" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">GUARDA FANGO TRASERO</span><div class="opt-group"><label><input type="radio" name="guarda_fango_tra" value="B"><span>B</span></label><label><input type="radio" name="guarda_fango_tra" value="M"><span>M</span></label><label><input type="radio" name="guarda_fango_tra" value="NT"><span>N/T</span></label></div></div>
+</div>
+<!-- COLUMNA 2 -->
+<div class="inspection-col">
+<div class="inspection-item"><span class="item-label">TANQUE DE LA GASOLINA</span><div class="opt-group"><label><input type="radio" name="tanque_gasolina" value="B"><span>B</span></label><label><input type="radio" name="tanque_gasolina" value="M"><span>M</span></label><label><input type="radio" name="tanque_gasolina" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA DEL TANQUE DE LA GASOLINA</span><div class="opt-group"><label><input type="radio" name="tapa_tanque_gasolina" value="B"><span>B</span></label><label><input type="radio" name="tapa_tanque_gasolina" value="M"><span>M</span></label><label><input type="radio" name="tapa_tanque_gasolina" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA CADENA</span><div class="opt-group"><label><input type="radio" name="tapa_cadena" value="B"><span>B</span></label><label><input type="radio" name="tapa_cadena" value="M"><span>M</span></label><label><input type="radio" name="tapa_cadena" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PULMÓN DERECHO</span><div class="opt-group"><label><input type="radio" name="pulmon_der" value="B"><span>B</span></label><label><input type="radio" name="pulmon_der" value="M"><span>M</span></label><label><input type="radio" name="pulmon_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PULMÓN IZQUIERDO</span><div class="opt-group"><label><input type="radio" name="pulmon_izq" value="B"><span>B</span></label><label><input type="radio" name="pulmon_izq" value="M"><span>M</span></label><label><input type="radio" name="pulmon_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">ASIENTO</span><div class="opt-group"><label><input type="radio" name="asiento" value="B"><span>B</span></label><label><input type="radio" name="asiento" value="M"><span>M</span></label><label><input type="radio" name="asiento" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">FORRO DEL ASIENTO</span><div class="opt-group"><label><input type="radio" name="forro_asiento" value="B"><span>B</span></label><label><input type="radio" name="forro_asiento" value="M"><span>M</span></label><label><input type="radio" name="forro_asiento" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CORNETA</span><div class="opt-group"><label><input type="radio" name="corneta" value="B"><span>B</span></label><label><input type="radio" name="corneta" value="M"><span>M</span></label><label><input type="radio" name="corneta" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA LATERAL DERECHA</span><div class="opt-group"><label><input type="radio" name="tapa_lateral_der" value="B"><span>B</span></label><label><input type="radio" name="tapa_lateral_der" value="M"><span>M</span></label><label><input type="radio" name="tapa_lateral_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA LATERAL IZQUIERDA</span><div class="opt-group"><label><input type="radio" name="tapa_lateral_izq" value="B"><span>B</span></label><label><input type="radio" name="tapa_lateral_izq" value="M"><span>M</span></label><label><input type="radio" name="tapa_lateral_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">FUSIBLE</span><div class="opt-group"><label><input type="radio" name="fusible" value="B"><span>B</span></label><label><input type="radio" name="fusible" value="M"><span>M</span></label><label><input type="radio" name="fusible" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA NEGRA DE LOS LADOS</span><div class="opt-group"><label><input type="radio" name="tapa_negra_lados" value="B"><span>B</span></label><label><input type="radio" name="tapa_negra_lados" value="M"><span>M</span></label><label><input type="radio" name="tapa_negra_lados" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">POSA PIE DER. (PARRILLERO)</span><div class="opt-group"><label><input type="radio" name="posa_pie_parillero_der" value="B"><span>B</span></label><label><input type="radio" name="posa_pie_parillero_der" value="M"><span>M</span></label><label><input type="radio" name="posa_pie_parillero_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">POSA PIE IZQ. (PARRILLERO)</span><div class="opt-group"><label><input type="radio" name="posa_pie_parillero_izq" value="B"><span>B</span></label><label><input type="radio" name="posa_pie_parillero_izq" value="M"><span>M</span></label><label><input type="radio" name="posa_pie_parillero_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">POSA PIE DER. (CONDUCTOR)</span><div class="opt-group"><label><input type="radio" name="posa_pie_conductor_der" value="B"><span>B</span></label><label><input type="radio" name="posa_pie_conductor_der" value="M"><span>M</span></label><label><input type="radio" name="posa_pie_conductor_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">POSA PIE IZQ. (CONDUCTOR)</span><div class="opt-group"><label><input type="radio" name="posa_pie_conductor_izq" value="B"><span>B</span></label><label><input type="radio" name="posa_pie_conductor_izq" value="M"><span>M</span></label><label><input type="radio" name="posa_pie_conductor_izq" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA DE PIÑON</span><div class="opt-group"><label><input type="radio" name="tapa_pinon" value="B"><span>B</span></label><label><input type="radio" name="tapa_pinon" value="M"><span>M</span></label><label><input type="radio" name="tapa_pinon" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PLACA POLICIAL</span><div class="opt-group"><label><input type="radio" name="placa_policial" value="B"><span>B</span></label><label><input type="radio" name="placa_policial" value="M"><span>M</span></label><label><input type="radio" name="placa_policial" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">ENCARENADO</span><div class="opt-group"><label><input type="radio" name="encarenado" value="B"><span>B</span></label><label><input type="radio" name="encarenado" value="M"><span>M</span></label><label><input type="radio" name="encarenado" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MANILLA DEL PARRILLERO DER.</span><div class="opt-group"><label><input type="radio" name="manilla_parrillero_der" value="B"><span>B</span></label><label><input type="radio" name="manilla_parrillero_der" value="M"><span>M</span></label><label><input type="radio" name="manilla_parrillero_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MANILLA DEL PARRILLERO IZQ.</span><div class="opt-group"><label><input type="radio" name="manilla_parrillero_izq" value="B"><span>B</span></label><label><input type="radio" name="manilla_parrillero_izq" value="M"><span>M</span></label><label><input type="radio" name="manilla_parrillero_izq" value="NT"><span>N/T</span></label></div></div>
+</div>
+<!-- COLUMNA 3 -->
+<div class="inspection-col">
+<div class="inspection-item"><span class="item-label">DEP. LIGA FRENO DELANTERO</span><div class="opt-group"><label><input type="radio" name="deposito_freno_del" value="B"><span>B</span></label><label><input type="radio" name="deposito_freno_del" value="M"><span>M</span></label><label><input type="radio" name="deposito_freno_del" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">DEP. LIGA FRENO TRASERO</span><div class="opt-group"><label><input type="radio" name="deposito_freno_tra" value="B"><span>B</span></label><label><input type="radio" name="deposito_freno_tra" value="M"><span>M</span></label><label><input type="radio" name="deposito_freno_tra" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">EMBOBINADO</span><div class="opt-group"><label><input type="radio" name="embobinado" value="B"><span>B</span></label><label><input type="radio" name="embobinado" value="M"><span>M</span></label><label><input type="radio" name="embobinado" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">ARRANQUE</span><div class="opt-group"><label><input type="radio" name="arranque_moto" value="B"><span>B</span></label><label><input type="radio" name="arranque_moto" value="M"><span>M</span></label><label><input type="radio" name="arranque_moto" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BATERÍA</span><div class="opt-group"><label><input type="radio" name="bateria_moto" value="B"><span>B</span></label><label><input type="radio" name="bateria_moto" value="M"><span>M</span></label><label><input type="radio" name="bateria_moto" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">AUTOMÁTICO</span><div class="opt-group"><label><input type="radio" name="automatico" value="B"><span>B</span></label><label><input type="radio" name="automatico" value="M"><span>M</span></label><label><input type="radio" name="automatico" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BOBINA</span><div class="opt-group"><label><input type="radio" name="bobina" value="B"><span>B</span></label><label><input type="radio" name="bobina" value="M"><span>M</span></label><label><input type="radio" name="bobina" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">REGULADOR DE CORRIENTE</span><div class="opt-group"><label><input type="radio" name="regulador_corriente" value="B"><span>B</span></label><label><input type="radio" name="regulador_corriente" value="M"><span>M</span></label><label><input type="radio" name="regulador_corriente" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">SISTEMA ELÉCTRICO</span><div class="opt-group"><label><input type="radio" name="sistema_electrico" value="B"><span>B</span></label><label><input type="radio" name="sistema_electrico" value="M"><span>M</span></label><label><input type="radio" name="sistema_electrico" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TOBERAS</span><div class="opt-group"><label><input type="radio" name="toberas" value="B"><span>B</span></label><label><input type="radio" name="toberas" value="M"><span>M</span></label><label><input type="radio" name="toberas" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">RING DELANTERO</span><div class="opt-group"><label><input type="radio" name="ring_del" value="B"><span>B</span></label><label><input type="radio" name="ring_del" value="M"><span>M</span></label><label><input type="radio" name="ring_del" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">RING TRASERO</span><div class="opt-group"><label><input type="radio" name="ring_tra" value="B"><span>B</span></label><label><input type="radio" name="ring_tra" value="M"><span>M</span></label><label><input type="radio" name="ring_tra" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CAUCHO DELANTERO</span><div class="opt-group"><label><input type="radio" name="caucho_del_comp" value="B"><span>B</span></label><label><input type="radio" name="caucho_del_comp" value="M"><span>M</span></label><label><input type="radio" name="caucho_del_comp" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CAUCHO TRASERO</span><div class="opt-group"><label><input type="radio" name="caucho_tra_comp" value="B"><span>B</span></label><label><input type="radio" name="caucho_tra_comp" value="M"><span>M</span></label><label><input type="radio" name="caucho_tra_comp" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CALIPER DE FRENO DEL.</span><div class="opt-group"><label><input type="radio" name="caliper_freno_del" value="B"><span>B</span></label><label><input type="radio" name="caliper_freno_del" value="M"><span>M</span></label><label><input type="radio" name="caliper_freno_del" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CALIPER DE FRENO TRA.</span><div class="opt-group"><label><input type="radio" name="caliper_freno_tra" value="B"><span>B</span></label><label><input type="radio" name="caliper_freno_tra" value="M"><span>M</span></label><label><input type="radio" name="caliper_freno_tra" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PASTILLAS FRENO DELANTERA</span><div class="opt-group"><label><input type="radio" name="pastillas_freno_del" value="B"><span>B</span></label><label><input type="radio" name="pastillas_freno_del" value="M"><span>M</span></label><label><input type="radio" name="pastillas_freno_del" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">PASTILLA FRENO TRASERA</span><div class="opt-group"><label><input type="radio" name="pastilla_freno_tra" value="B"><span>B</span></label><label><input type="radio" name="pastilla_freno_tra" value="M"><span>M</span></label><label><input type="radio" name="pastilla_freno_tra" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TUBO DE ESCAPE</span><div class="opt-group"><label><input type="radio" name="tubo_escape" value="B"><span>B</span></label><label><input type="radio" name="tubo_escape" value="M"><span>M</span></label><label><input type="radio" name="tubo_escape" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">SISTEMA DE RODAMIENTO</span><div class="opt-group"><label><input type="radio" name="sistema_rodamiento" value="B"><span>B</span></label><label><input type="radio" name="sistema_rodamiento" value="M"><span>M</span></label><label><input type="radio" name="sistema_rodamiento" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">C.D.I</span><div class="opt-group"><label><input type="radio" name="cdi" value="B"><span>B</span></label><label><input type="radio" name="cdi" value="M"><span>M</span></label><label><input type="radio" name="cdi" value="NT"><span>N/T</span></label></div></div>
+</div>
+<!-- COLUMNA 4 -->
+<div class="inspection-col">
+<div class="inspection-item"><span class="item-label">DISCO DE FRENO DELANTERO</span><div class="opt-group"><label><input type="radio" name="disco_freno_del" value="B"><span>B</span></label><label><input type="radio" name="disco_freno_del" value="M"><span>M</span></label><label><input type="radio" name="disco_freno_del" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">DISCO DE FRENO TRASERO</span><div class="opt-group"><label><input type="radio" name="disco_freno_tra" value="B"><span>B</span></label><label><input type="radio" name="disco_freno_tra" value="M"><span>M</span></label><label><input type="radio" name="disco_freno_tra" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA DE RADIADOR</span><div class="opt-group"><label><input type="radio" name="tapa_radiador" value="B"><span>B</span></label><label><input type="radio" name="tapa_radiador" value="M"><span>M</span></label><label><input type="radio" name="tapa_radiador" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">GUAYA DE CLOUTCH</span><div class="opt-group"><label><input type="radio" name="guaya_cloutch" value="B"><span>B</span></label><label><input type="radio" name="guaya_cloutch" value="M"><span>M</span></label><label><input type="radio" name="guaya_cloutch" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">GUAYA DE ACELERACIÓN</span><div class="opt-group"><label><input type="radio" name="guaya_aceleracion" value="B"><span>B</span></label><label><input type="radio" name="guaya_aceleracion" value="M"><span>M</span></label><label><input type="radio" name="guaya_aceleracion" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BOMBA DE FRENO TRASERO</span><div class="opt-group"><label><input type="radio" name="bomba_freno_tra" value="B"><span>B</span></label><label><input type="radio" name="bomba_freno_tra" value="M"><span>M</span></label><label><input type="radio" name="bomba_freno_tra" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BOMBA DE AGUA</span><div class="opt-group"><label><input type="radio" name="bomba_agua" value="B"><span>B</span></label><label><input type="radio" name="bomba_agua" value="M"><span>M</span></label><label><input type="radio" name="bomba_agua" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MANDO DE LUCES</span><div class="opt-group"><label><input type="radio" name="mando_luces" value="B"><span>B</span></label><label><input type="radio" name="mando_luces" value="M"><span>M</span></label><label><input type="radio" name="mando_luces" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MANDO DE ENCENDIDO</span><div class="opt-group"><label><input type="radio" name="mando_encendido" value="B"><span>B</span></label><label><input type="radio" name="mando_encendido" value="M"><span>M</span></label><label><input type="radio" name="mando_encendido" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BUJÍA</span><div class="opt-group"><label><input type="radio" name="bujia" value="B"><span>B</span></label><label><input type="radio" name="bujia" value="M"><span>M</span></label><label><input type="radio" name="bujia" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA DEL FILTRO DE ACEITE</span><div class="opt-group"><label><input type="radio" name="tapa_filtro_aceite" value="B"><span>B</span></label><label><input type="radio" name="tapa_filtro_aceite" value="M"><span>M</span></label><label><input type="radio" name="tapa_filtro_aceite" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">FILTRO DE AIRE</span><div class="opt-group"><label><input type="radio" name="filtro_aire" value="B"><span>B</span></label><label><input type="radio" name="filtro_aire" value="M"><span>M</span></label><label><input type="radio" name="filtro_aire" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">FILTRO DE ACEITE</span><div class="opt-group"><label><input type="radio" name="filtro_aceite" value="B"><span>B</span></label><label><input type="radio" name="filtro_aceite" value="M"><span>M</span></label><label><input type="radio" name="filtro_aceite" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CACHIMBO</span><div class="opt-group"><label><input type="radio" name="cachimbo" value="B"><span>B</span></label><label><input type="radio" name="cachimbo" value="M"><span>M</span></label><label><input type="radio" name="cachimbo" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">CADENA DE TIEMPO</span><div class="opt-group"><label><input type="radio" name="cadena_tiempo" value="B"><span>B</span></label><label><input type="radio" name="cadena_tiempo" value="M"><span>M</span></label><label><input type="radio" name="cadena_tiempo" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">DISCOS DE CLOUTCH</span><div class="opt-group"><label><input type="radio" name="discos_cloutch" value="B"><span>B</span></label><label><input type="radio" name="discos_cloutch" value="M"><span>M</span></label><label><input type="radio" name="discos_cloutch" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">RADIADOR DE AGUA</span><div class="opt-group"><label><input type="radio" name="radiador_agua" value="B"><span>B</span></label><label><input type="radio" name="radiador_agua" value="M"><span>M</span></label><label><input type="radio" name="radiador_agua" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">MOTOR</span><div class="opt-group"><label><input type="radio" name="motor_comp" value="B"><span>B</span></label><label><input type="radio" name="motor_comp" value="M"><span>M</span></label><label><input type="radio" name="motor_comp" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">TAPA DEL ACEITE</span><div class="opt-group"><label><input type="radio" name="tapa_aceite" value="B"><span>B</span></label><label><input type="radio" name="tapa_aceite" value="M"><span>M</span></label><label><input type="radio" name="tapa_aceite" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BASE MANILLA DE CLOUTCH</span><div class="opt-group"><label><input type="radio" name="base_manilla_cloutch" value="B"><span>B</span></label><label><input type="radio" name="base_manilla_cloutch" value="M"><span>M</span></label><label><input type="radio" name="base_manilla_cloutch" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">BASE MANILLA DE FRENO</span><div class="opt-group"><label><input type="radio" name="base_manilla_freno" value="B"><span>B</span></label><label><input type="radio" name="base_manilla_freno" value="M"><span>M</span></label><label><input type="radio" name="base_manilla_freno" value="NT"><span>N/T</span></label></div></div>
+</div>
+</div>
+</div>
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Observaciones</h2></div>
+<textarea id="observaciones" name="observaciones" class="form-textarea" placeholder="Describa hallazgos, novedades o detalles relevantes..."></textarea>
+</div>
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">👥</span><h2 class="form-section-title">Firmas y Responsables</h2></div>
+<div class="responsibles-grid">
+<div class="responsable-col">
+<h3 class="resp-header">POR LA COORDINACIÓN</h3>
+<div class="responsable-fields">
+<div class="form-group full-width"><label>Apellido y Nombre</label><input type="text" id="coord_nombre" class="form-input"></div>
+<div class="form-group full-width"><label>Rango</label><select id="coord_rango" class="form-select"><option value="">Seleccione...</option><option value="COMISARIO MAYOR">COMISARIO MAYOR</option><option value="COMISARIO GENERAL">COMISARIO GENERAL</option><option value="COMISARIO JEFE">COMISARIO JEFE</option><option value="PRIMER COMISARIO">PRIMER COMISARIO</option><option value="COMISARIO">COMISARIO</option><option value="INSPECTOR JEFE">INSPECTOR JEFE</option><option value="PRIMER INSPECTOR">PRIMER INSPECTOR</option><option value="INSPECTOR">INSPECTOR</option><option value="OFICIAL JEFE">OFICIAL JEFE</option><option value="PRIMER OFICIAL">PRIMER OFICIAL</option><option value="OFICIAL">OFICIAL</option></select></div>
+<div class="form-group"><label>Nº de Cédula</label><input type="text" id="coord_cedula" class="form-input"></div>
+<div class="form-group"><label>Nº de Teléfono</label><input type="text" id="coord_telefono" class="form-input"></div>
+</div>
+</div>
+<div class="responsable-col">
+<h3 class="resp-header">INSPECCIÓN REALIZADA POR:</h3>
+<div class="responsable-fields">
+<div class="form-group full-width"><label>Apellido y Nombre</label><input type="text" id="insp_nombre" class="form-input"></div>
+<div class="form-group full-width"><label>Rango</label><select id="insp_rango" class="form-select"><option value="">Seleccione...</option><option value="COMISARIO MAYOR">COMISARIO MAYOR</option><option value="COMISARIO GENERAL">COMISARIO GENERAL</option><option value="COMISARIO JEFE">COMISARIO JEFE</option><option value="PRIMER COMISARIO">PRIMER COMISARIO</option><option value="COMISARIO">COMISARIO</option><option value="INSPECTOR JEFE">INSPECTOR JEFE</option><option value="PRIMER INSPECTOR">PRIMER INSPECTOR</option><option value="INSPECTOR">INSPECTOR</option><option value="OFICIAL JEFE">OFICIAL JEFE</option><option value="PRIMER OFICIAL">PRIMER OFICIAL</option><option value="OFICIAL">OFICIAL</option></select></div>
+<div class="form-group"><label>Nº de Cédula</label><input type="text" id="insp_cedula" class="form-input"></div>
+<div class="form-group"><label>Nº de Teléfono</label><input type="text" id="insp_telefono" class="form-input"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="form-actions">
+<button type="button" class="btn btn-secondary" id="btnClear">🗑️ Limpiar / Buscar Otra</button>
+<button type="submit" class="btn btn-primary" id="btnSubmit" disabled><span class="btn-text">💾 Actualizar Inspección</span><span class="btn-loader" style="display:none;">⏳</span></button>
+</div>
+</form>
+<div class="preview-divider"></div>
+<div class="no-print" style="margin-bottom:15px;"><h2 style="margin:0; color:#005b96;">📄 Vista Previa Oficial</h2></div>
+<div class="print-page" id="printPage">
+<header class="print-header">
+<img src="../img/logo.png" alt="Logo" class="print-logo">
+<div class="print-header-text"><h2>REPUBLICA BOLIVARIANA DE VENEZUELA</h2><h3>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h3><p>CUERPO DE POLICIA NACIONAL BOLIVARIANA | REDIP OCCIDENTAL</p><p style="border-top: 2px solid #003366; padding-top: 5px; margin-top:5px;">DEPARTAMENTO DE TRANSPORTE</p></div>
+<img src="../img/logo_derecho.png" alt="Logo" class="print-logo">
+</header>
+<div class="pv-grid">
+<div class="pv-item"><span class="pv-label">N° Inspección</span><div class="pv-value" id="pv_n_inspeccion">-</div></div>
+<div class="pv-item"><span class="pv-label">Fecha</span><div class="pv-value" id="pv_fecha">-</div></div>
+<div class="pv-item"><span class="pv-label">Hora</span><div class="pv-value" id="pv_hora">-</div></div>
+</div>
+<div class="pv-grid pv-grid-2"><div class="pv-item"><span class="pv-label">Motivo</span><div class="pv-value" id="pv_motivo">-</div></div><div class="pv-item"><span class="pv-label">Lugar / Asignación</span><div class="pv-value" id="pv_lugar">-</div></div></div>
+<div class="pv-section-title">Datos de la Moto</div>
+<div class="pv-grid pv-grid-4">
+<div class="pv-item"><span class="pv-label">Placa</span><div class="pv-value" id="pv_placa">-</div></div>
+<div class="pv-item"><span class="pv-label">Marca / Modelo</span><div class="pv-value" id="pv_marca_modelo">-</div></div>
+<div class="pv-item"><span class="pv-label">Año / Tipo</span><div class="pv-value" id="pv_ano_tipo">-</div></div>
+<div class="pv-item"><span class="pv-label">Color</span><div class="pv-value" id="pv_color">-</div></div>
+<div class="pv-item"><span class="pv-label">S/Carrocería</span><div class="pv-value" id="pv_s_carroceria">-</div></div>
+<div class="pv-item"><span class="pv-label">S/Motor</span><div class="pv-value" id="pv_s_motor">-</div></div>
+<div class="pv-item"><span class="pv-label">N/Identificación</span><div class="pv-value" id="pv_n_id">-</div></div>
+</div>
+<div class="pv-section-title">Componentes Inspeccionados</div>
+<div class="pv-comps" id="pv_comps_grid"></div>
+<div class="pv-section-title">Observaciones</div>
+<div style="min-height: 60px; border: 1px dashed #cbd5e0; padding: 10px; margin-bottom: 20px; font-size: 9pt; word-break: break-word;" id="pv_observaciones">Sin observaciones.</div>
+<div class="pv-section-title">Firmas de Responsables</div>
+<div class="pv-signatures">
+<div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">POR LA COORDINACIÓN</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_coord_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_coord_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
+<div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">INSPECCIÓN REALIZADA POR:</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_insp_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_insp_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_insp_cedula">-</div></div></div>
+</div>
+<!-- 🟦 CUADRO DE USO OFICIAL -->
+<div style="background: #e5e7eb; border: 2px solid #9ca3af; border-radius: 6px; padding: 12px; text-align: center; margin-top: 25px; print-color-adjust: exact; -webkit-print-color-adjust: exact;">
+<p style="margin: 0; font-size: 9pt; font-weight: 800; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">USO OFICIAL DEL DEPARTAMENTO DE TRANSPORTE Y LOGISTICA</p>
+</div>
+</div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/inspeccion-modificar-moto.js" defer></script>
+</body>
+</html>
