@@ -1,6 +1,6 @@
 /**
 * CONSULTA DE VEHÍCULOS - PLANILLA
-* VERSIÓN ESTABLE + EXCLUSIVIDAD GARANTIZADA
+* VERSIÓN INAMOVIBLE + EXCLUSIVIDAD GARANTIZADA
 */
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 let allVehicles = [];
@@ -23,14 +23,17 @@ function getDOMElements() {
 
 async function cargarVehiculos() {
   try {
+    // Mantener altura fija mientras carga
+    document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 150px 10px;">⏳ Cargando vehículos...</td></tr>`;
     const { data, error } = await supabaseClient.from('vehiculos').select('*').order('marca', { ascending: true });
     if (error) throw error;
     allVehicles = data || [];
     filteredVehicles = [...allVehicles];
     populateFilters();
+    setupFilterExclusivity(); // 🔒 Activar restricciones
     aplicarFiltros();
   } catch (error) {
-    document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align: center; color: #dc2626; padding: 40px;">Error al cargar: ${error.message}</td></tr>`;
+    document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align: center; color: #dc2626; padding: 150px;">❌ Error: ${error.message}</td></tr>`;
   }
 }
 
@@ -54,10 +57,8 @@ function setupFilterExclusivity() {
   const unidad = filterUnidad;
   const epm = filterEPM;
   const epp = filterEPP;
-
   if (!unidad || !epm || !epp) return;
 
-  // Limpiar EPM/EPP si se selecciona Unidad
   unidad.addEventListener('change', () => {
     if (unidad.value !== '') {
       epm.value = ''; epm.disabled = true;
@@ -68,7 +69,6 @@ function setupFilterExclusivity() {
     aplicarFiltros();
   });
 
-  // Limpiar Unidad si se selecciona EPM o EPP
   function bloquearUnidad() {
     if (epm.value !== '' || epp.value !== '') {
       unidad.value = ''; unidad.disabled = true;
@@ -77,7 +77,6 @@ function setupFilterExclusivity() {
     }
     aplicarFiltros();
   }
-
   epm.addEventListener('change', bloquearUnidad);
   epp.addEventListener('change', bloquearUnidad);
 }
@@ -130,7 +129,6 @@ function limpiarFiltros() {
   if (filterEPM) filterEPM.value = '';
   if (filterEPP) filterEPP.value = '';
   if (searchInput) searchInput.value = '';
-  // Restaurar disponibilidad
   filterUnidad.disabled = false; filterEPM.disabled = false; filterEPP.disabled = false;
   aplicarFiltros();
 }
@@ -146,10 +144,10 @@ function exportarExcel() {
     asignacion: v.asignacion||'', estatus: v.estatus||'', observacion: v.observacion||'',
     certificado_origen: v.certificado_origen||'', fecha_inspeccion: v.fecha_inspeccion||'',
     n_tramite: v.n_tramite||'', ubicacion_titulo: v.ubicacion_titulo||'', observacion_extra: v.observacion_extra||'',
-    created_at: v.created_at||''
+    cuadrante: v.cuadrante||'', comuna: v.comuna||'', created_at: v.created_at||''
   }));
   const ws = XLSX.utils.json_to_sheet(datosCompletos);
-  ws['!cols'] = [{wch:10},{wch:20},{wch:20},{wch:15},{wch:15},{wch:10},{wch:15},{wch:25},{wch:25},{wch:15},{wch:15},{wch:15},{wch:20},{wch:40},{wch:15},{wch:15},{wch:20},{wch:30},{wch:30},{wch:15},{wch:15},{wch:50},{wch:20},{wch:20},{wch:20},{wch:30},{wch:50},{wch:25},{wch:25}];
+  ws['!cols'] = [{wch:10},{wch:20},{wch:20},{wch:15},{wch:15},{wch:10},{wch:15},{wch:25},{wch:25},{wch:15},{wch:15},{wch:15},{wch:20},{wch:40},{wch:15},{wch:15},{wch:20},{wch:30},{wch:30},{wch:15},{wch:15},{wch:50},{wch:20},{wch:20},{wch:20},{wch:30},{wch:50},{wch:25},{wch:15},{wch:15},{wch:25}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Vehículos');
   XLSX.writeFile(wb, `Vehiculos_${new Date().toISOString().slice(0,10)}_${filteredVehicles.length}registros.xlsx`);
@@ -161,7 +159,8 @@ function renderTable() {
   const tbody = document.getElementById('vehiclesTableBody');
   
   if (pageVehicles.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #666; padding: 40px;">No se encontraron vehículos</td></tr>`;
+    // 🔒 Mantiene altura fija con padding grande
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #666; padding: 150px 10px;">📭 No se encontraron vehículos con los filtros seleccionados</td></tr>`;
     document.getElementById('resultsCount').textContent = '0 vehículos encontrados';
     return;
   }
@@ -251,7 +250,7 @@ function getEstatusBadge(estatus) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  getDOMElements(); cargarVehiculos(); setupSearchEnter(); setupFilterExclusivity();
+  getDOMElements(); cargarVehiculos(); setupSearchEnter();
   const logoutBtn = document.getElementById('logoutBtn');
   if(logoutBtn) logoutBtn.addEventListener('click', cerrarSesion);
   [filterTipo,filterClase,filterSituacion,filterEstatus].forEach(el=>{
