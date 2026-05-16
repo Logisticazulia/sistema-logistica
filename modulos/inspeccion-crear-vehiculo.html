@@ -91,19 +91,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .preview-divider { height: 3px; background: linear-gradient(90deg, #003366, #005b96); margin: 40px 0 30px; border-radius: 2px; }
 .preview-wrapper { margin-top: 0; padding: 0; }
 .print-page {
-    width: 216mm;
-    min-height: 279mm;
-    max-height: 279mm;
+    width: 100%;
+    max-width: 216mm; /* Simula ancho carta en pantalla */
+    min-height: auto; /* ✅ Altura flexible para evitar cortes */
     background: white;
-    padding: 15mm;
+    padding: 12mm;
     margin: 0 auto;
     box-shadow: 0 8px 30px rgba(0,0,0,0.1);
     border: 1px solid #e2e8f0;
     font-size: 9pt;
     box-sizing: border-box;
-    overflow: hidden;
     position: relative;
+    overflow: visible; /* ✅ Permite que el contenido se extienda sin cortarse */
 }
+
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 70px; height: 70px; object-fit: contain; }
 .print-header-text { flex: 1; padding: 0 15px; }
@@ -137,23 +138,24 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 
 /* 🖨️ REGLAS PARA IMPRESIÓN / PDF */
 @media print {
-  body, html { background: white; margin: 0; padding: 0; }
-  .navbar, .search-container, .alert, .form-actions, .form-section, .no-print { display: none !important; }
-  .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; }
-  .preview-divider { display: none; }
-  .preview-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
-  .print-page {
+    body, html { background: white; margin: 0; padding: 0; }
+    .navbar, .search-container, .alert, .form-actions, .form-section, .no-print, .preview-divider { display: none !important; }
+    .preview-wrapper > div:first-child { display: none !important; } /* Oculta título y botón de imprimir */
+    .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; }
+    .preview-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
+    
+    .print-page {
         box-shadow: none !important;
         border: none !important;
         margin: 0 !important;
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: none !important;
         min-height: auto !important;
-        max-height: none !important;
-        padding: 15mm !important;
+        padding: 10mm !important;
+        overflow: visible !important;
     }
-  .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  @page { size: letter; margin: 0; }
+    .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    @page { size: letter portrait; margin: 10mm; }
 }
 </style>
 </head>
