@@ -8,116 +8,57 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-/* ================= ESTILOS BASE (IDÉNTICOS A VEHÍCULOS) ================= */
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
-.form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
+.form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1200px; }
 .search-container { background: linear-gradient(135deg, #e9c46a 0%, #d4a84a 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
 .search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
 .search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-.search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
+.search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; }
 .search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
-.btn-search { background: #f59e0b; color: white; padding: 12px 30px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Roboto', sans-serif; white-space: nowrap; height: fit-content; margin-bottom: 0; }
+.btn-search { background: #f59e0b; color: white; padding: 12px 30px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; height: fit-content; }
 .btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
 .btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
 .search-hint { color: rgba(255,255,255,0.9); font-size: 0.8rem; margin-top: 8px; display: block; }
-.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid; min-width: 0; transition: box-shadow 0.3s ease, transform 0.3s ease; height: 100%; margin-bottom: 25px; }
-.form-section:hover { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
-.form-section.identificacion { border-color: #e9c46a; }
-.form-section.caracteristicas { border-color: #2a9d8f; }
-.form-section.accesorios { border-color: #005b96; }
-.form-section.componentes { border-color: #e76f51; }
-.form-section.cauchos { border-color: #6b7280; }
-.form-section.observaciones { border-color: #9b5de5; }
-.form-section.responsables { border-color: #f59e0b; }
+.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #e9c46a; margin-bottom: 25px; }
 .form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
-.form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
-.form-section.identificacion .form-section-icon { background: rgba(233, 196, 106, 0.2); }
-.form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.2); }
-.form-section.accesorios .form-section-icon { background: rgba(0, 91, 150, 0.2); }
-.form-section.componentes .form-section-icon { background: rgba(231, 111, 81, 0.2); }
-.form-section.cauchos .form-section-icon { background: rgba(107, 114, 128, 0.2); }
-.form-section.observaciones .form-section-icon { background: rgba(155, 93, 229, 0.2); }
-.form-section.responsables .form-section-icon { background: rgba(245, 158, 11, 0.2); }
-.form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 0.8px; }
-.form-fields-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-.form-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-.form-input, .form-select, .form-textarea { width: 100%; max-width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; transition: all 0.25s ease; background: white; color: #2d3748; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #e9c46a; box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.25); background: #fff; }
-.form-input:disabled, .form-select:disabled, .form-textarea:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
-.form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px; }
-.form-textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
-.form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
-.btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; border: none; white-space: nowrap; }
+.form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; }
+.form-fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; background: white; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #e9c46a; box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.25); }
+.form-input:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 20px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
+.btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; border: none; }
 .btn-secondary { background: #6c757d; color: white; }
-.btn-secondary:hover { background: #5a6268; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3); }
-.btn-primary { background: linear-gradient(135deg, #e9c46a 0%, #d4a84a 100%); color: #000; box-shadow: 0 4px 15px rgba(233, 196, 106, 0.35); }
-.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(233, 196, 106, 0.45); }
-.btn-primary:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary { background: linear-gradient(135deg, #e9c46a 0%, #d4a84a 100%); color: #000; }
+.btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
 .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 25px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-/* 🆕 ESTILOS COMPONENTES B/M/NT */
-.inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
-.inspection-item { background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
-.inspection-item:hover { border-color: #e9c46a; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-.item-label { font-size: 0.7rem; color: #475569; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; line-height: 1.2; letter-spacing: 0.3px; }
-.opt-group { display: flex; gap: 4px; }
-.opt-group label { flex: 1; text-align: center; padding: 6px 0; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; font-size: 0.72rem; font-weight: 800; transition: all 0.15s; background: #f8fafc; color: #64748b; }
-.opt-group input[type="radio"] { display: none; }
-.opt-group label:has(input:checked) { background: #e9c46a; color: #000; border-color: #e9c46a; box-shadow: 0 2px 4px rgba(233,196,106,0.3); }
-.opt-group label:hover:not(:has(input:checked)) { background: #e2e8f0; }
-.opt-group label:nth-child(1):has(input:checked) { background: #10b981; border-color: #10b981; color: white; }
-.opt-group label:nth-child(2):has(input:checked) { background: #ef4444; border-color: #ef4444; color: white; }
-.opt-group label:nth-child(3):has(input:checked) { background: #f59e0b; border-color: #f59e0b; color: white; }
-.tires-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-.tire-item { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center; }
-.tire-item .item-label { margin-bottom: 10px; }
-.tires-grid .opt-group { justify-content: center; }
-.responsibles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
-.responsable-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.responsable-fields .full-width { grid-column: 1 / -1; }
-.resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #e9c46a; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; letter-spacing: 0.5px; }
-/* 🖨️ VISTA PREVIA */
+.moto-placeholder { text-align: center; padding: 30px; background: #fff8f0; border: 2px dashed #d4a84a; border-radius: 8px; color: #6b7280; margin-bottom: 25px; }
 .preview-divider { height: 3px; background: linear-gradient(90deg, #e9c46a, #d4a84a); margin: 40px 0 30px; border-radius: 2px; }
-.preview-wrapper { margin-top: 0; padding: 0; }
-.print-page { width: 100%; max-width: 216mm; min-height: auto; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; overflow: visible; position: relative; }
+.print-page { width: 100%; max-width: 216mm; min-height: auto; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; overflow: visible; }
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 85px; height: 85px; object-fit: contain; }
-.print-header-text { flex: 1; padding: 0 15px; }
-.print-header-text h2, .print-header-text h3, .print-header-text h4, .print-header-text p { margin: 2px 0; line-height: 1.3; color: #003366; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.print-header-text h2 { font-size: 12pt; } .print-header-text h3 { font-size: 10pt; } .print-header-text h4 { font-size: 9pt; } .print-header-text p { font-size: 9pt; color: #4a5568; font-weight: 500; }
+.print-header-text { flex: 1; padding: 0 15px; text-align: center; }
+.print-header-text h2, .print-header-text h3, .print-header-text p { margin: 2px 0; line-height: 1.3; color: #003366; font-weight: 700; text-transform: uppercase; }
+.print-header-text h2 { font-size: 12pt; } .print-header-text h3 { font-size: 10pt; } .print-header-text p { font-size: 9pt; color: #4a5568; }
 .pv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-.pv-grid-2 { grid-template-columns: repeat(2, 1fr); } .pv-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.pv-grid-2 { grid-template-columns: repeat(2, 1fr); } .pv-grid-3 { grid-template-columns: repeat(3, 1fr); }
 .pv-item { background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
 .pv-label { font-size: 7pt; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
-.pv-value { font-size: 9pt; font-weight: 700; color: #0f172a; min-height: 14px; word-break: break-word; }
+.pv-value { font-size: 9pt; font-weight: 700; color: #0f172a; min-height: 14px; }
 .pv-section-title { font-size: 10pt; color: #e9c46a; font-weight: 800; text-transform: uppercase; margin: 15px 0 10px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
-.pv-comps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
-.pv-comp { text-align: center; font-size: 7pt; border: 1px solid #e2e8f0; padding: 4px; border-radius: 3px; background: #fff; }
-.pv-comp-label { display: block; margin-bottom: 3px; color: #475569; font-weight: 600; line-height: 1.1; }
-.pv-comp-status { font-weight: 800; padding: 2px 4px; border-radius: 2px; display: inline-block; width: 100%; box-sizing: border-box; font-size: 7.5pt; }
-.status-B { background: #d1fae5; color: #059669; } .status-M { background: #fee2e2; color: #dc2626; } .status-NT { background: #fef3c7; color: #d97706; }
 .pv-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
 .pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
 .pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
-@media (max-width: 1024px) { .inspection-grid { grid-template-columns: repeat(2, 1fr); } .print-page { padding: 12mm; } .pv-comps { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .tires-grid, .responsibles-grid, .responsable-fields { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-comps { grid-template-columns: repeat(3, 1fr); } .pv-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
-@media print {
-body, html { background: white; margin: 0; padding: 0; }
-.navbar, .search-container, .alert, .form-actions, .form-section, .no-print { display: none !important; }
-.form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; }
-.preview-divider { display: none; }
-.preview-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
-.print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; min-height: auto !important; padding: 15mm !important; overflow: visible !important; }
-.print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-@page { size: letter portrait; margin: 0; }
-}
+@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid, .pv-grid, .pv-grid-2, .pv-grid-3 { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
+@media print { body, html { background: white; margin: 0; padding: 0; } .navbar, .search-container, .alert, .form-actions, .form-section, .no-print { display: none !important; } .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; } .preview-divider { display: none; } .print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 15mm !important; } .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; } @page { size: letter; margin: 0; } }
 </style>
 </head>
 <body class="dashboard-page">
@@ -147,178 +88,109 @@ body, html { background: white; margin: 0; padding: 0; }
 </header>
 <section class="module-title-section">
 <h1 class="module-title">🏍️ Crear Inspección PVR para Motos</h1>
-<p class="module-subtitle">Busque la moto y complete los datos de la inspección física</p>
+<p class="module-subtitle">Busque la moto y complete los datos requeridos</p>
 </section>
 <div class="form-container">
 <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Guardado exitosamente</span></div>
 <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al guardar</span></div>
-<div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa, Facsímil o Serial para buscar una Moto</span></div>
+<div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa o Serial para buscar una Moto</span></div>
 <div class="search-container">
 <div class="search-group">
 <label for="searchMoto">🔍 Búsqueda Exclusiva de Motos</label>
 <input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
-<span class="search-hint">El sistema buscará únicamente registros con Tipo o Clase = MOTO</span>
+<span class="search-hint">Solo buscará registros con Tipo/Clase = MOTO</span>
 </div>
 <button type="button" class="btn-search" id="btnSearch">
 <span class="btn-search-text">🔍 Buscar Moto</span>
 <span class="btn-search-loader" style="display:none;">⏳</span>
 </button>
 </div>
-<form id="motoForm" class="form-disabled" style="opacity: 0.6; pointer-events: none;">
+<form id="motoForm" style="opacity: 0.6; pointer-events: none;">
 <input type="hidden" id="motoId" name="motoId">
-<div class="form-section identificacion full-width">
+<div class="form-section">
 <div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Datos de la Inspección</h2></div>
 <div class="form-fields-grid">
-<div class="form-group"><label>N° DE INSPECCIÓN</label><input type="text" id="n_inspeccion" name="n_inspeccion" class="form-input" disabled placeholder="Generado automáticamente"></div>
+<div class="form-group"><label>Nº DE INSPECCIÓN</label><input type="text" id="n_inspeccion" name="n_inspeccion" class="form-input" disabled placeholder="Automático"></div>
 <div class="form-group"><label>FECHA</label><input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input"></div>
 <div class="form-group"><label>HORA</label><input type="time" id="hora" name="hora" class="form-input"></div>
-<div class="form-group"><label>MOTIVO <span style="color:#dc2626">*</span></label><input type="text" id="motivo_inspeccion" name="motivo_inspeccion" class="form-input" placeholder="Ej: Revisión preventiva" required></div>
-<div class="form-group"><label>LUGAR</label><input type="text" id="lugar" name="lugar" class="form-input" placeholder="Ej: CCPE Zulia"></div>
-<div class="form-group"><label>ASIGNACIÓN</label><input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje Norte"></div>
-<div class="form-group"><label>SUPERVISIÓN</label><input type="text" id="supervision" name="supervision" class="form-input" placeholder="Nombre del supervisor"></div>
+<div class="form-group"><label>MOTIVO DE LA INSPECCIÓN <span style="color:#dc2626">*</span></label><input type="text" id="motivo_inspeccion" name="motivo_inspeccion" class="form-input" placeholder="Ej: Revisión preventiva" required></div>
 </div>
 </div>
-<div class="form-section caracteristicas full-width">
-<div class="form-section-header"><span class="form-section-icon">🏍️</span><h2 class="form-section-title">Datos de la Moto (Automático)</h2></div>
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">🏍️</span><h2 class="form-section-title">Datos de la Unidad (Automático)</h2></div>
 <div class="form-fields-grid">
 <div class="form-group"><label>PLACA</label><input type="text" id="placa" name="placa" class="form-input" disabled></div>
 <div class="form-group"><label>MARCA</label><input type="text" id="marca" name="marca" class="form-input" disabled></div>
 <div class="form-group"><label>MODELO</label><input type="text" id="modelo" name="modelo" class="form-input" disabled></div>
-<div class="form-group"><label>AÑO</label><input type="number" id="ano" name="ano" class="form-input" disabled></div>
-<div class="form-group"><label>TIPO / CLASE</label><input type="text" id="tipo" name="tipo" class="form-input" disabled></div>
 <div class="form-group"><label>COLOR</label><input type="text" id="color" name="color" class="form-input" disabled></div>
-<div class="form-group"><label>N° IDENTIFICACIÓN</label><input type="text" id="n_identificacion" name="n_identificacion" class="form-input" disabled></div>
+<div class="form-group"><label>SERIAL CARROCERÍA</label><input type="text" id="s_carroceria" name="s_carroceria" class="form-input" disabled></div>
 <div class="form-group"><label>SERIAL MOTOR</label><input type="text" id="s_motor" name="s_motor" class="form-input" disabled></div>
+<div class="form-group"><label>Nº DE IDENTIFICACIÓN</label><input type="text" id="n_identificacion" name="n_identificacion" class="form-input" disabled></div>
 </div>
 </div>
-<div class="form-section accesorios full-width">
-<div class="form-section-header"><span class="form-section-icon">📦</span><h2 class="form-section-title">Accesorios y Equipamiento</h2></div>
+<div class="moto-placeholder">
+<h3 style="margin:0 0 10px 0; color:#d4a84a;">🔧 Componentes Específicos de Motos</h3>
+<p>Los ítems de inspección para motocicletas se agregarán aquí próximamente según tu lista.</p>
+</div>
+<div class="form-section">
+<div class="form-section-header"><span class="form-section-icon">🛞</span><h2 class="form-section-title">Estado de Cauchos</h2></div>
 <div class="form-fields-grid">
-<div class="form-group"><label>BATERÍA</label><select id="bateria" name="bateria" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>ESTACIÓN BASE</label><select id="estacion_base" name="estacion_base" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>COCTELERA</label><select id="coctelera" name="coctelera" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>TRIÁNGULO</label><select id="triangulo" name="triangulo" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>PLACAS</label><select id="placas" name="placas" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>HERRAMIENTAS</label><select id="herramientas" name="herramientas" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>GATO</label><select id="gato" name="gato" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
-<div class="form-group"><label>ESTACIÓN LUCES</label><select id="sestacion_luces" name="sestacion_luces" class="form-select"><option value="NO">NO</option><option value="SI">SI</option></select></div>
+<div class="form-group"><label>DELANTERO</label><select id="caucho_del" name="caucho_del" class="form-select"><option value="B">B (Bueno)</option><option value="M">M (Malo)</option></select></div>
+<div class="form-group"><label>TRASERO</label><select id="caucho_tra" name="caucho_tra" class="form-select"><option value="B">B (Bueno)</option><option value="M">M (Malo)</option></select></div>
 </div>
 </div>
-<div class="form-section componentes full-width">
-<div class="form-section-header"><span class="form-section-icon">🔧</span><h2 class="form-section-title">Inspección de Componentes (B=Bueno | M=Malo | N/T=No Tiene)</h2></div>
-<div class="inspection-grid" id="motoComponentsGrid">
-<!-- 🏍️ AQUÍ SE CARGARÁN LOS ITEMS ESPECÍFICOS PARA MOTOS QUE ME PASES LUEGO -->
-<div class="inspection-item" style="grid-column: 1/-1; text-align:center; padding:20px; border:2px dashed #cbd5e1;">
-<span style="color:#64748b; font-size:0.9rem;">⏳ Esperando lista de ítems específicos para motos...</span>
-</div>
-</div>
-</div>
-<div class="form-section cauchos full-width">
-<div class="form-section-header"><span class="form-section-icon">🛞</span><h2 class="form-section-title">Estado de Cauchos (Delantero / Trasero)</h2></div>
-<div class="tires-grid">
-<div class="tire-item"><span class="item-label">Caucha Del.</span><div class="opt-group"><label><input type="radio" name="caucho_del" value="B"><span>B</span></label><label><input type="radio" name="caucho_del" value="M"><span>M</span></label></div></div>
-<div class="tire-item"><span class="item-label">Caucha Tras.</span><div class="opt-group"><label><input type="radio" name="caucho_tra" value="B"><span>B</span></label><label><input type="radio" name="caucho_tra" value="M"><span>M</span></label></div></div>
-<div class="tire-item"><span class="item-label">Repuesto</span><div class="opt-group"><label><input type="radio" name="caucho_repuesto" value="B"><span>B</span></label><label><input type="radio" name="caucho_repuesto" value="M"><span>M</span></label></div></div>
-<div class="tire-item"><span class="item-label">Tapa / Protector</span><div class="opt-group"><label><input type="radio" name="tapa_cauchos" value="SI"><span>SI</span></label><label><input type="radio" name="tapa_cauchos" value="NO"><span>NO</span></label></div></div>
-</div>
-</div>
-<div class="form-section observaciones full-width">
+<div class="form-section">
 <div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Observaciones</h2></div>
-<textarea id="observaciones" name="observaciones" class="form-textarea" placeholder="Describa hallazgos, novedades o detalles relevantes de la inspección..."></textarea>
+<textarea id="observaciones" name="observaciones" class="form-textarea" placeholder="Describa hallazgos o novedades..."></textarea>
 </div>
-<div class="form-section responsables full-width">
+<div class="form-section">
 <div class="form-section-header"><span class="form-section-icon">👥</span><h2 class="form-section-title">Firmas y Responsables</h2></div>
-<div class="responsibles-grid">
-<div class="responsable-col">
-<h3 class="resp-header">POR LA COORDINACIÓN</h3>
-<div class="responsable-fields">
-<div class="form-group full-width"><label>Apellido y Nombre</label><input type="text" id="coord_nombre" name="coord_nombre" class="form-input"></div>
-<div class="form-group full-width"><label>Rango</label><select id="coord_rango" name="coord_rango" class="form-select"><option value="">Seleccione...</option><option value="COMISARIO MAYOR">COMISARIO MAYOR</option><option value="COMISARIO GENERAL">COMISARIO GENERAL</option><option value="COMISARIO JEFE">COMISARIO JEFE</option><option value="PRIMER COMISARIO">PRIMER COMISARIO</option><option value="COMISARIO">COMISARIO</option><option value="INSPECTOR JEFE">INSPECTOR JEFE</option><option value="PRIMER INSPECTOR">PRIMER INSPECTOR</option><option value="INSPECTOR">INSPECTOR</option><option value="OFICIAL JEFE">OFICIAL JEFE</option><option value="PRIMER OFICIAL">PRIMER OFICIAL</option><option value="OFICIAL">OFICIAL</option></select></div>
-<div class="form-group"><label>Nº de Cédula</label><input type="text" id="coord_cedula" name="coord_cedula" class="form-input"></div>
-<div class="form-group"><label>Nº de Teléfono</label><input type="text" id="coord_telefono" name="coord_telefono" class="form-input"></div>
-</div>
-</div>
-<div class="responsable-col">
-<h3 class="resp-header">INSPECCIÓN REALIZADA POR:</h3>
-<div class="responsable-fields">
-<div class="form-group full-width"><label>Apellido y Nombre</label><input type="text" id="insp_nombre" name="insp_nombre" class="form-input"></div>
-<div class="form-group full-width"><label>Rango</label><select id="insp_rango" name="insp_rango" class="form-select"><option value="">Seleccione...</option><option value="COMISARIO MAYOR">COMISARIO MAYOR</option><option value="COMISARIO GENERAL">COMISARIO GENERAL</option><option value="COMISARIO JEFE">COMISARIO JEFE</option><option value="PRIMER COMISARIO">PRIMER COMISARIO</option><option value="COMISARIO">COMISARIO</option><option value="INSPECTOR JEFE">INSPECTOR JEFE</option><option value="PRIMER INSPECTOR">PRIMER INSPECTOR</option><option value="INSPECTOR">INSPECTOR</option><option value="OFICIAL JEFE">OFICIAL JEFE</option><option value="PRIMER OFICIAL">PRIMER OFICIAL</option><option value="OFICIAL">OFICIAL</option></select></div>
-<div class="form-group"><label>Nº de Cédula</label><input type="text" id="insp_cedula" name="insp_cedula" class="form-input"></div>
-<div class="form-group"><label>Nº de Teléfono</label><input type="text" id="insp_telefono" name="insp_telefono" class="form-input"></div>
-</div>
-</div>
+<div class="form-fields-grid">
+<div class="form-group full-width"><label>COORDINACIÓN (Nombre y Rango)</label><input type="text" id="coord_nombre" name="coord_nombre" class="form-input"></div>
+<div class="form-group"><label>C.I. Coordinación</label><input type="text" id="coord_cedula" name="coord_cedula" class="form-input"></div>
+<div class="form-group full-width"><label>INSPECTOR (Nombre y Rango)</label><input type="text" id="insp_nombre" name="insp_nombre" class="form-input"></div>
+<div class="form-group"><label>C.I. Inspector</label><input type="text" id="insp_cedula" name="insp_cedula" class="form-input"></div>
 </div>
 </div>
 <div class="form-actions">
-<button type="button" class="btn btn-secondary" id="btnClear">🗑️ Limpiar / Buscar Otra</button>
-<button type="submit" class="btn btn-primary" id="btnSubmit" disabled>
-<span class="btn-text">💾 Guardar Inspección</span>
-<span class="btn-loader" style="display:none;">⏳ Guardando...</span>
-</button>
+<button type="button" class="btn btn-secondary" id="btnClear">🗑️ Limpiar</button>
+<button type="submit" class="btn btn-primary" id="btnSubmit" disabled><span class="btn-text">💾 Guardar Inspección</span><span class="btn-loader" style="display:none;">⏳</span></button>
 </div>
 </form>
 <div class="preview-divider"></div>
-<div id="previewWrapper" class="preview-wrapper">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;" class="no-print">
-<h2 style="margin:0; color:#e9c46a; font-size:1.1rem;">📄 Vista Previa Oficial</h2>
-<button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir / Guardar PDF</button>
-</div>
+<div class="no-print" style="margin-bottom:15px;"><h2 style="margin:0; color:#e9c46a;">📄 Vista Previa Oficial</h2></div>
 <div class="print-page" id="printPage">
 <header class="print-header">
-<img src="../img/logo.png" alt="Logo Izq" class="print-logo">
-<div class="print-header-text">
-<h2>REPUBLICA BOLIVARIANA DE VENEZUELA</h2>
-<h3>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h3>
-<h4>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h4>
-<p>REDIP OCCIDENTAL | CENTRO DE COORDINACION POLICIAL ESTADAL ZULIA</p>
-<p style="border-top: 2px solid #003366; padding-top: 5px; margin-top:5px;">DEPARTAMENTO DE TRANSPORTE</p>
-</div>
-<img src="../img/logo_derecho.png" alt="Logo Der" class="print-logo">
+<img src="../img/logo.png" alt="Logo" class="print-logo">
+<div class="print-header-text"><h2>REPUBLICA BOLIVARIANA DE VENEZUELA</h2><h3>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h3><p>CUERPO DE POLICIA NACIONAL BOLIVARIANA | REDIP OCCIDENTAL</p></div>
+<img src="../img/logo_derecho.png" alt="Logo" class="print-logo">
 </header>
 <div class="pv-grid">
 <div class="pv-item"><span class="pv-label">N° Inspección</span><div class="pv-value" id="pv_n_inspeccion">-</div></div>
 <div class="pv-item"><span class="pv-label">Fecha</span><div class="pv-value" id="pv_fecha">-</div></div>
 <div class="pv-item"><span class="pv-label">Hora</span><div class="pv-value" id="pv_hora">-</div></div>
 </div>
-<div class="pv-grid pv-grid-2">
-<div class="pv-item"><span class="pv-label">Motivo</span><div class="pv-value" id="pv_motivo">-</div></div>
-<div class="pv-item"><span class="pv-label">Lugar / Asignación</span><div class="pv-value" id="pv_lugar">-</div></div>
-</div>
+<div class="pv-grid pv-grid-2"><div class="pv-item full-width"><span class="pv-label">Motivo</span><div class="pv-value" id="pv_motivo">-</div></div></div>
 <div class="pv-section-title">Datos de la Moto</div>
-<div class="pv-grid pv-grid-4">
+<div class="pv-grid pv-grid-3">
 <div class="pv-item"><span class="pv-label">Placa</span><div class="pv-value" id="pv_placa">-</div></div>
 <div class="pv-item"><span class="pv-label">Marca / Modelo</span><div class="pv-value" id="pv_marca_modelo">-</div></div>
-<div class="pv-item"><span class="pv-label">Año / Tipo</span><div class="pv-value" id="pv_ano_tipo">-</div></div>
 <div class="pv-item"><span class="pv-label">Color</span><div class="pv-value" id="pv_color">-</div></div>
+<div class="pv-item"><span class="pv-label">S/Carrocería</span><div class="pv-value" id="pv_s_carroceria">-</div></div>
 <div class="pv-item"><span class="pv-label">S/Motor</span><div class="pv-value" id="pv_s_motor">-</div></div>
-<div class="pv-item"><span class="pv-label">N° Identificación</span><div class="pv-value" id="pv_n_id">-</div></div>
+<div class="pv-item"><span class="pv-label">N/Identificación</span><div class="pv-value" id="pv_n_id">-</div></div>
 </div>
-<div class="pv-section-title">Accesorios</div>
-<div class="pv-grid pv-grid-4">
-<div class="pv-item"><span class="pv-label">Batería</span><div class="pv-value" id="pv_bateria">-</div></div>
-<div class="pv-item"><span class="pv-label">Est. Base</span><div class="pv-value" id="pv_est_base">-</div></div>
-<div class="pv-item"><span class="pv-label">Coctelera</span><div class="pv-value" id="pv_coctelera">-</div></div>
-<div class="pv-item"><span class="pv-label">Triángulo</span><div class="pv-value" id="pv_triangulo">-</div></div>
-<div class="pv-item"><span class="pv-label">Placas</span><div class="pv-value" id="pv_placas">-</div></div>
-<div class="pv-item"><span class="pv-label">Herramientas</span><div class="pv-value" id="pv_herramientas">-</div></div>
-<div class="pv-item"><span class="pv-label">Gato</span><div class="pv-value" id="pv_gato">-</div></div>
-<div class="pv-item"><span class="pv-label">Est. Luces</span><div class="pv-value" id="pv_luces">-</div></div>
-</div>
-<div class="pv-section-title">Estado de Cauchos</div>
-<div class="pv-grid pv-grid-4">
+<div class="pv-section-title">Cauchos</div>
+<div class="pv-grid pv-grid-2">
 <div class="pv-item"><span class="pv-label">Delantero</span><div class="pv-value" id="pv_ca_del">-</div></div>
 <div class="pv-item"><span class="pv-label">Trasero</span><div class="pv-value" id="pv_ca_tra">-</div></div>
-<div class="pv-item"><span class="pv-label">Repuesto</span><div class="pv-value" id="pv_ca_rep">-</div></div>
-<div class="pv-item"><span class="pv-label">Protector</span><div class="pv-value" id="pv_tapa">-</div></div>
 </div>
-<div class="pv-section-title">Componentes Inspeccionados</div>
-<div class="pv-comps" id="pv_comps_grid"></div>
 <div class="pv-section-title">Observaciones</div>
-<div style="min-height: 60px; border: 1px dashed #cbd5e0; padding: 10px; margin-bottom: 20px; font-size: 9pt; word-break: break-word;" id="pv_observaciones">Sin observaciones.</div>
-<div class="pv-section-title">Firmas de Responsables</div>
+<div style="min-height: 60px; border: 1px dashed #cbd5e0; padding: 10px; margin-bottom: 20px;" id="pv_observaciones">Sin observaciones.</div>
+<div class="pv-section-title">Firmas</div>
 <div class="pv-signatures">
-<div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">POR LA COORDINACIÓN</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_coord_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_coord_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
-<div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">INSPECCIÓN REALIZADA POR:</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_insp_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_insp_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_insp_cedula">-</div></div></div>
+<div><div style="text-align:center;"><div style="font-weight:700; margin-bottom:15px;">COORDINACIÓN</div><div style="border-top:1px solid #000; width:80%; margin:0 auto;"></div><div style="margin-top:10px;" id="pv_coord_nombre">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
+<div><div style="text-align:center;"><div style="font-weight:700; margin-bottom:15px;">INSPECTOR</div><div style="border-top:1px solid #000; width:80%; margin:0 auto;"></div><div style="margin-top:10px;" id="pv_insp_nombre">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_insp_cedula">-</div></div></div>
 </div>
 </div>
 </div>
