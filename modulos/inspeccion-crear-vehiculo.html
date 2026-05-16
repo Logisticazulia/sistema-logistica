@@ -7,19 +7,123 @@
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
-    
-    <!-- Librería para generar PDF/Imprimir -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    
     <style>
-        /* Estilos específicos para la inspección */
-        .inspection-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 columnas como en el diseño de 4 columnas de inputs */
-            gap: 20px;
+        /* ================= BUSCADOR ================= */
+        .search-container { 
+            background: linear-gradient(135deg, #003366 0%, #005b96 100%); 
+            padding: 25px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            gap: 15px; 
+            align-items: center; 
+            flex-wrap: wrap; 
         }
-        
-        /* Tabla de checklist */
+        .search-group { 
+            flex: 1; 
+            min-width: 200px; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .search-group label { 
+            display: block; 
+            color: white; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+        .search-input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-radius: 7px; 
+            font-size: 0.95rem; 
+            background: rgba(255,255,255,0.95); 
+            transition: all 0.3s; 
+            font-family: 'Roboto', sans-serif; 
+            box-sizing: border-box; 
+        }
+        .search-input:focus { 
+            outline: none; 
+            border-color: #fff; 
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.2); 
+        }
+        .btn-search { 
+            background: #f59e0b; 
+            color: white; 
+            padding: 12px 30px; 
+            border: none; 
+            border-radius: 7px; 
+            font-weight: 600; 
+            font-size: 0.92rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s; 
+            font-family: 'Roboto', sans-serif; 
+            white-space: nowrap; 
+            height: fit-content; 
+            margin-bottom: 0; 
+        }
+        .btn-search:hover { 
+            background: #d97706; 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); 
+        }
+        .search-hint { 
+            color: rgba(255,255,255,0.8); 
+            font-size: 0.8rem; 
+            margin-top: 8px; 
+            display: block; 
+        }
+
+        /* ================= DATOS DEL VEHÍCULO (SOLO LECTURA) ================= */
+        .vehicle-info {
+            background: #e3f2fd;
+            border-left: 5px solid #005b96;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        .vehicle-info.show {
+            display: block;
+        }
+        .vehicle-info h3 {
+            margin: 0 0 15px 0;
+            color: #003366;
+            font-size: 1.1rem;
+        }
+        .vehicle-data-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        .vehicle-field {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .vehicle-field label {
+            display: block;
+            font-size: 0.7rem;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .vehicle-field span {
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* ================= CHECKLIST TABLE ================= */
         .checklist-container {
             margin-top: 20px;
             border: 1px solid #e2e8f0;
@@ -47,17 +151,14 @@
         }
         .checklist-table tr:nth-child(even) { background: #f9f9f9; }
         .checklist-table tr:hover { background: #e3f2fd; }
-        
-        /* Columnas de opciones B/M/NIT */
         .col-check { width: 80px; text-align: center; }
         .radio-option {
             margin: 0 5px;
             cursor: pointer;
             transform: scale(1.2);
         }
-        .label-check { font-size: 0.7rem; color: #666; font-weight: bold; }
 
-        /* Gauchos */
+        /* ================= GAUCHOS ================= */
         .gauchos-section {
             background: #f8f9fa;
             padding: 15px;
@@ -79,9 +180,28 @@
             border-radius: 6px;
             border: 1px solid #ddd;
         }
-        .gaucho-item label { font-size: 0.7rem; font-weight: bold; color: #333; }
+        .gaucho-item label { 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            color: #333; 
+        }
         
-        /* Modal de Vista Previa */
+        /* ================= ALERTAS ================= */
+        .alert { 
+            padding: 16px 22px; 
+            border-radius: 8px; 
+            margin-bottom: 25px; 
+            display: none; 
+            align-items: center; 
+            gap: 12px; 
+            font-size: 0.92rem; 
+            font-weight: 500; 
+        }
+        .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
+        .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
+        .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+
+        /* ================= VISTA PREVIA MODAL ================= */
         .modal-preview {
             display: none;
             position: fixed;
@@ -97,7 +217,7 @@
             background-color: white;
             margin: 2% auto;
             padding: 40px;
-            width: 210mm; /* Ancho A4 */
+            width: 210mm;
             min-height: 297mm;
             box-shadow: 0 0 25px rgba(0,0,0,0.5);
             font-family: 'Times New Roman', serif;
@@ -148,11 +268,21 @@
             .preview-content { position: absolute; left: 0; top: 0; margin: 0; padding: 20px; width: 100%; box-shadow: none; }
             .preview-actions { display: none; }
         }
+
+        @media (max-width: 1200px) {
+            .vehicle-data-grid { grid-template-columns: repeat(2, 1fr); }
+            .gauchos-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .search-container { flex-direction: column; align-items: stretch; }
+            .vehicle-data-grid { grid-template-columns: 1fr; }
+            .gauchos-grid { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body class="dashboard-page">
     
-    <!-- Navbar -->
+    <!-- NAVBAR -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
@@ -188,29 +318,85 @@
 
         <div class="form-container" style="max-width: 1200px;">
             
-            <!-- Encabezado del Documento -->
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #003366; padding-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <img src="../img/logo.png" alt="Logo Izq" style="height: 60px;">
-                    <div style="text-align: center; flex: 1;">
-                        <div style="font-weight: bold; font-size: 0.9rem;">REPÚBLICA BOLIVARIANA DE VENEZUELA</div>
-                        <div style="font-size: 0.8rem;">MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</div>
-                        <div style="font-size: 0.8rem;">CUERPO DE POLICÍA NACIONAL BOLIVARIANA</div>
-                        <div style="font-size: 0.8rem;">DEPARTAMENTO DE TRANSPORTE</div>
-                    </div>
-                    <img src="../img/logo_derecho.png" alt="Logo Der" style="height: 60px;">
-                </div>
-                <h2 class="inspection-title" style="font-size: 1.5rem; color: #003366; text-transform: uppercase;">Ficha de Inspección Técnica</h2>
+            <!-- ALERTAS -->
+            <div id="alertSuccess" class="alert alert-success">
+                <span>✅</span>
+                <span id="successMessage">Inspección guardada exitosamente</span>
+            </div>
+            <div id="alertError" class="alert alert-error">
+                <span>❌</span>
+                <span id="errorMessage">Error al guardar la inspección</span>
+            </div>
+            <div id="alertInfo" class="alert alert-info">
+                <span>ℹ️</span>
+                <span id="infoMessage">Ingrese Placa, Facsímil o Serial para buscar el vehículo</span>
             </div>
 
+            <!-- ================= BUSCADOR DE VEHÍCULOS ================= -->
+            <div class="search-container">
+                <div class="search-group">
+                    <label for="searchVehicle">🔍 Buscar Vehículo</label>
+                    <input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
+                    <span class="search-hint">Busca por: Placa, Facsímil, S/Carrocería o S/Motor</span>
+                </div>
+                <button type="button" class="btn-search" id="btnSearch" onclick="buscarVehiculo()">
+                    <span>🔍 Buscar</span>
+                </button>
+            </div>
+
+            <!-- ================= DATOS DEL VEHÍCULO (AUTO-COMPLETADOS) ================= -->
+            <div id="vehicleInfo" class="vehicle-info">
+                <h3>🚗 Datos del Vehículo Seleccionado</h3>
+                <div class="vehicle-data-grid">
+                    <div class="vehicle-field">
+                        <label>Placa</label>
+                        <span id="infoPlaca">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>Marca</label>
+                        <span id="infoMarca">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>Modelo</label>
+                        <span id="infoModelo">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>Año</label>
+                        <span id="infoAno">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>Tipo</label>
+                        <span id="infoTipo">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>Color</label>
+                        <span id="infoColor">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>S/Carrocería</label>
+                        <span id="infoSerialCarroceria">-</span>
+                    </div>
+                    <div class="vehicle-field">
+                        <label>Asignado a</label>
+                        <span id="infoAsignacion">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= FORMULARIO DE INSPECCIÓN ================= -->
             <form id="inspectionForm">
-                <!-- 1. Datos de la Inspección -->
-                <div class="section-box">
-                    <div class="section-title">📝 Datos de la Inspección</div>
-                    <div class="inspection-grid">
-                        <div class="form-group">
-                            <label>N° Inspección</label>
-                            <input type="text" id="n_inspeccion" class="form-input" placeholder="Auto-generado o manual">
+                <input type="hidden" id="vehicleId" name="vehicleId">
+                
+                <!-- 1. DATOS DE LA INSPECCIÓN -->
+                <div class="form-section full-width" style="background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #005b96; margin-bottom: 25px;">
+                    <div class="form-section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5;">
+                        <span class="form-section-icon" style="font-size: 1.5rem; background: rgba(0, 91, 150, 0.2); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px;">📝</span>
+                        <h2 class="form-section-title" style="font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 0.8px;">Datos de la Inspección</h2>
+                    </div>
+                    <div class="form-fields-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase;">N° Inspección</label>
+                            <input type="text" id="n_inspeccion" class="form-input" placeholder="Auto-generado">
                         </div>
                         <div class="form-group">
                             <label>Fecha</label>
@@ -242,63 +428,46 @@
                     </div>
                 </div>
 
-                <!-- 2. Datos del Vehículo -->
-                <div class="section-box">
-                    <div class="section-title">🚗 Identificación del Vehículo</div>
-                    <div class="inspection-grid">
+                <!-- 2. CHECKLIST DE COMPONENTES -->
+                <div class="form-section full-width" style="background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #e9c46a; margin-bottom: 25px;">
+                    <div class="form-section-header">
+                        <span class="form-section-icon" style="font-size: 1.5rem; background: rgba(233, 196, 106, 0.2); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px;">✅</span>
+                        <h2 class="form-section-title">Estado de Componentes (B=Bueno, M=Malo, NIT=Necesita Intervención)</h2>
+                    </div>
+                    
+                    <!-- Items rápidos -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px;">
                         <div class="form-group">
-                            <label>Placa</label>
-                            <input type="text" id="placa_vehiculo" class="form-input" placeholder="AB123CD">
-                        </div>
-                        <div class="form-group">
-                            <label>Marca</label>
-                            <input type="text" id="marca_vehiculo" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Modelo</label>
-                            <input type="text" id="modelo_vehiculo" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Año</label>
-                            <input type="number" id="ano_vehiculo" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>N° Identificación</label>
-                            <input type="text" id="n_id_vehiculo" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>S/Carrocería</label>
-                            <input type="text" id="serial_carroceria" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Asignado a</label>
-                            <input type="text" id="asignacion_vehiculo" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Kilometraje (Kms)</label>
-                            <input type="number" id="kms_vehiculo" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo</label>
-                            <select id="tipo_vehiculo" class="form-select">
-                                <option value="">Seleccione...</option>
-                                <option value="AUTOMOVIL">Automóvil</option>
-                                <option value="CAMIONETA">Camioneta</option>
-                                <option value="MOTO">Motocicleta</option>
-                                <option value="BUS">Bus</option>
-                                <option value="MACHITO">Machito</option>
+                            <label>Batería</label>
+                            <select id="check_bateria" class="form-select">
+                                <option value="SI">SI</option>
+                                <option value="NO">NO</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Color</label>
-                            <input type="text" id="color_vehiculo" class="form-input">
+                            <label>Estación Base/Luces</label>
+                            <select id="check_estacion" class="form-select">
+                                <option value="SI">SI</option>
+                                <option value="NO">NO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Coctelera</label>
+                            <select id="check_coctelera" class="form-select">
+                                <option value="SI">SI</option>
+                                <option value="NO">NO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Triángulo</label>
+                            <select id="check_triangulo" class="form-select">
+                                <option value="SI">SI</option>
+                                <option value="NO">NO</option>
+                            </select>
                         </div>
                     </div>
-                </div>
 
-                <!-- 3. Estado Componentes (Checklist) -->
-                <div class="section-box">
-                    <div class="section-title">✅ Estado de Componentes (B=Bueno, M=Malo, NIT=Necesita Intervención)</div>
+                    <!-- Tabla detallada -->
                     <div class="checklist-container">
                         <table class="checklist-table">
                             <thead>
@@ -324,89 +493,123 @@
                     </div>
                 </div>
 
-                <!-- 4. Cauchos y Repuestos -->
-                <div class="section-box">
-                    <div class="section-title">🛞 Estado de Cauchos y Repuestos</div>
+                <!-- 3. CAUCHOS Y REPUESTOS -->
+                <div class="form-section full-width" style="background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #2a9d8f; margin-bottom: 25px;">
+                    <div class="form-section-header">
+                        <span class="form-section-icon" style="font-size: 1.5rem; background: rgba(42, 157, 143, 0.2); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px;">🛞</span>
+                        <h2 class="form-section-title">Estado de Cauchos y Repuestos</h2>
+                    </div>
                     <div class="gauchos-grid">
                         <div class="gaucho-item">
                             <label>Caucho 1 (Del IZQ)</label>
-                            <select id="caucho_1" class="form-select"><option value="BUENO">Bueno</option><option value="MALO">Malo</option></select>
+                            <select id="caucho_1" class="form-select">
+                                <option value="BUENO">Bueno</option>
+                                <option value="MALO">Malo</option>
+                            </select>
                         </div>
                         <div class="gaucho-item">
                             <label>Caucho 2 (Del DER)</label>
-                            <select id="caucho_2" class="form-select"><option value="BUENO">Bueno</option><option value="MALO">Malo</option></select>
+                            <select id="caucho_2" class="form-select">
+                                <option value="BUENO">Bueno</option>
+                                <option value="MALO">Malo</option>
+                            </select>
                         </div>
                         <div class="gaucho-item">
                             <label>Caucho 3 (Tra IZQ)</label>
-                            <select id="caucho_3" class="form-select"><option value="BUENO">Bueno</option><option value="MALO">Malo</option></select>
+                            <select id="caucho_3" class="form-select">
+                                <option value="BUENO">Bueno</option>
+                                <option value="MALO">Malo</option>
+                            </select>
                         </div>
                         <div class="gaucho-item">
                             <label>Caucho 4 (Tra DER)</label>
-                            <select id="caucho_4" class="form-select"><option value="BUENO">Bueno</option><option value="MALO">Malo</option></select>
+                            <select id="caucho_4" class="form-select">
+                                <option value="BUENO">Bueno</option>
+                                <option value="MALO">Malo</option>
+                            </select>
                         </div>
                         <div class="gaucho-item">
                             <label>Caucho 5 (Repuesto)</label>
-                            <select id="caucho_5" class="form-select"><option value="BUENO">Bueno</option><option value="MALO">Malo</option><option value="NO_TIENE">No Tiene</option></select>
+                            <select id="caucho_5" class="form-select">
+                                <option value="BUENO">Bueno</option>
+                                <option value="MALO">Malo</option>
+                                <option value="NO_TIENE">No Tiene</option>
+                            </select>
                         </div>
                         <div class="gaucho-item">
                             <label>Tapas Válvulas</label>
-                            <select id="tapas_valvulas" class="form-select"><option value="SI">SI</option><option value="NO">NO</option><option value="SIN_NUMERO">Sin Número</option></select>
+                            <select id="tapas_valvulas" class="form-select">
+                                <option value="SI">SI</option>
+                                <option value="NO">NO</option>
+                                <option value="SIN_NUMERO">Sin Número</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. Observaciones -->
-                <div class="section-box">
-                    <div class="section-title">📝 Observaciones</div>
-                    <textarea id="observaciones_inspeccion" class="form-textarea" rows="4" placeholder="Detalles adicionales sobre daños, faltantes o condiciones especiales..."></textarea>
+                <!-- 4. OBSERVACIONES -->
+                <div class="form-section full-width" style="background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #f15bb5; margin-bottom: 25px;">
+                    <div class="form-section-header">
+                        <span class="form-section-icon" style="font-size: 1.5rem; background: rgba(241, 91, 181, 0.2); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px;">📝</span>
+                        <h2 class="form-section-title">Observaciones</h2>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="observaciones_inspeccion" class="form-textarea" rows="4" placeholder="Detalles adicionales sobre daños, faltantes o condiciones especiales..." style="width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; resize: vertical;"></textarea>
+                    </div>
                 </div>
 
-                <!-- 6. Firmas -->
-                <div class="section-box">
-                    <div class="section-title">✍️ Firmas de Conformidad</div>
+                <!-- 5. FIRMAS -->
+                <div class="form-section full-width" style="background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #9b5de5; margin-bottom: 25px;">
+                    <div class="form-section-header">
+                        <span class="form-section-icon" style="font-size: 1.5rem; background: rgba(155, 93, 229, 0.2); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px;">✍️</span>
+                        <h2 class="form-section-title">Firmas de Conformidad</h2>
+                    </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
                         <div>
                             <label style="font-weight: bold; display: block; margin-bottom: 10px;">POR LA COORDINACIÓN</label>
-                            <div class="inspection-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="firma_coord_nombre" class="form-input"></div>
                                 <div class="form-group"><label>Rango</label><input type="text" id="firma_coord_rango" class="form-input"></div>
                                 <div class="form-group"><label>N° de Cédula</label><input type="text" id="firma_coord_cedula" class="form-input"></div>
                                 <div class="form-group"><label>N° de Teléfono</label><input type="text" id="firma_coord_telf" class="form-input"></div>
                             </div>
-                            <div class="form-group" style="margin-top: 10px;"><label>Firma</label><input type="text" class="form-input" style="border-bottom: 2px solid #333; border-top: none; border-left: none; border-right: none; border-radius: 0;"></div>
                         </div>
                         <div>
                             <label style="font-weight: bold; display: block; margin-bottom: 10px;">INSPECCIÓN REALIZADA POR</label>
-                            <div class="inspection-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="firma_insp_nombre" class="form-input"></div>
                                 <div class="form-group"><label>Rango</label><input type="text" id="firma_insp_rango" class="form-input"></div>
                                 <div class="form-group"><label>N° de Cédula</label><input type="text" id="firma_insp_cedula" class="form-input"></div>
                                 <div class="form-group"><label>N° de Teléfono</label><input type="text" id="firma_insp_telf" class="form-input"></div>
                             </div>
-                            <div class="form-group" style="margin-top: 10px;"><label>Firma</label><input type="text" class="form-input" style="border-bottom: 2px solid #333; border-top: none; border-left: none; border-right: none; border-radius: 0;"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Botones de Acción -->
-                <div class="form-actions" style="justify-content: center; gap: 20px; margin-top: 30px;">
-                    <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">🧹 Limpiar Formulario</button>
-                    <button type="button" class="btn btn-primary" onclick="generarVistaPrevia()">️ Vista Previa / Imprimir</button>
-                    <button type="button" class="btn btn-success" style="background: #28a745; color: white;" onclick="guardarInspeccion()">💾 Guardar en BD</button>
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="form-actions" style="display: flex; justify-content: center; gap: 20px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()" style="padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; background: #6c757d; color: white; border: none;">
+                        🧹 Limpiar Formulario
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="generarVistaPrevia()" style="padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; border: none;">
+                        👁️ Vista Previa / Imprimir
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="guardarInspeccion()" style="padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; background: #28a745; color: white; border: none;">
+                        💾 Guardar Inspección
+                    </button>
                 </div>
-
             </form>
         </div>
     </main>
 
-    <!-- Modal de Vista Previa -->
+    <!-- MODAL DE VISTA PREVIA -->
     <div id="modalPreview" class="modal-preview">
         <div class="preview-actions">
             <button class="btn-preview btn-print" onclick="imprimirDocumento()">🖨️ Imprimir / PDF</button>
             <button class="btn-preview btn-close" onclick="cerrarVistaPrevia()">❌ Cerrar</button>
         </div>
         <div class="preview-content" id="printableArea">
-            <!-- El contenido se inyecta dinámicamente aquí -->
+            <!-- El contenido se inyecta dinámicamente -->
         </div>
     </div>
 
