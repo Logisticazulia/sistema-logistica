@@ -1,6 +1,6 @@
 /**
 * CONSULTA DE VEHÍCULOS - PLANILLA
-* VERSIÓN ESTABLE + EXCLUSIVIDAD DE FILTROS
+* VERSIÓN ESTABLE + EXCLUSIVIDAD GARANTIZADA
 */
 const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 let allVehicles = [];
@@ -31,7 +31,6 @@ async function cargarVehiculos() {
     aplicarFiltros();
   } catch (error) {
     document.getElementById('vehiclesTableBody').innerHTML = `<tr><td colspan="11" style="text-align: center; color: #dc2626; padding: 40px;">Error al cargar: ${error.message}</td></tr>`;
-    document.getElementById('pagination').innerHTML = '<span style="padding: 15px; color: #666;">Sin datos</span>';
   }
 }
 
@@ -50,34 +49,37 @@ function populateFilters() {
   }
 }
 
-// 🔒 LÓGICA DE EXCLUSIVIDAD
+// 🔒 LÓGICA DE EXCLUSIVIDAD BLINDADA
 function setupFilterExclusivity() {
   const unidad = filterUnidad;
   const epm = filterEPM;
   const epp = filterEPP;
 
-  function handleUnidadChange() {
-    if (unidad.value) {
-      epm.disabled = true; epm.value = '';
-      epp.disabled = true; epp.value = '';
+  if (!unidad || !epm || !epp) return;
+
+  // Limpiar EPM/EPP si se selecciona Unidad
+  unidad.addEventListener('change', () => {
+    if (unidad.value !== '') {
+      epm.value = ''; epm.disabled = true;
+      epp.value = ''; epp.disabled = true;
     } else {
       epm.disabled = false; epp.disabled = false;
     }
     aplicarFiltros();
-  }
+  });
 
-  function handleLocationChange() {
-    if (epm.value || epp.value) {
-      unidad.disabled = true; unidad.value = '';
+  // Limpiar Unidad si se selecciona EPM o EPP
+  function bloquearUnidad() {
+    if (epm.value !== '' || epp.value !== '') {
+      unidad.value = ''; unidad.disabled = true;
     } else {
       unidad.disabled = false;
     }
     aplicarFiltros();
   }
 
-  unidad.addEventListener('change', handleUnidadChange);
-  epm.addEventListener('change', handleLocationChange);
-  epp.addEventListener('change', handleLocationChange);
+  epm.addEventListener('change', bloquearUnidad);
+  epp.addEventListener('change', bloquearUnidad);
 }
 
 function buscarPorPlacaFacsímil() {
@@ -128,7 +130,7 @@ function limpiarFiltros() {
   if (filterEPM) filterEPM.value = '';
   if (filterEPP) filterEPP.value = '';
   if (searchInput) searchInput.value = '';
-  // Rehabilitar todo
+  // Restaurar disponibilidad
   filterUnidad.disabled = false; filterEPM.disabled = false; filterEPP.disabled = false;
   aplicarFiltros();
 }
@@ -144,23 +146,22 @@ function exportarExcel() {
     asignacion: v.asignacion||'', estatus: v.estatus||'', observacion: v.observacion||'',
     certificado_origen: v.certificado_origen||'', fecha_inspeccion: v.fecha_inspeccion||'',
     n_tramite: v.n_tramite||'', ubicacion_titulo: v.ubicacion_titulo||'', observacion_extra: v.observacion_extra||'',
-    cuadrante: v.cuadrante||'', comuna: v.comuna||'', created_at: v.created_at||''
+    created_at: v.created_at||''
   }));
   const ws = XLSX.utils.json_to_sheet(datosCompletos);
-  ws['!cols'] = [{wch:10},{wch:20},{wch:20},{wch:15},{wch:15},{wch:10},{wch:15},{wch:25},{wch:25},{wch:15},{wch:15},{wch:15},{wch:20},{wch:40},{wch:15},{wch:15},{wch:20},{wch:30},{wch:30},{wch:15},{wch:15},{wch:50},{wch:20},{wch:20},{wch:20},{wch:30},{wch:50},{wch:25},{wch:15},{wch:15},{wch:25}];
+  ws['!cols'] = [{wch:10},{wch:20},{wch:20},{wch:15},{wch:15},{wch:10},{wch:15},{wch:25},{wch:25},{wch:15},{wch:15},{wch:15},{wch:20},{wch:40},{wch:15},{wch:15},{wch:20},{wch:30},{wch:30},{wch:15},{wch:15},{wch:50},{wch:20},{wch:20},{wch:20},{wch:30},{wch:50},{wch:25},{wch:25}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Vehículos');
   XLSX.writeFile(wb, `Vehiculos_${new Date().toISOString().slice(0,10)}_${filteredVehicles.length}registros.xlsx`);
 }
 
-// 🔒 RENDERIZADO ESTABLE
 function renderTable() {
   const start = (currentPage - 1) * itemsPerPage;
   const pageVehicles = filteredVehicles.slice(start, start + itemsPerPage);
   const tbody = document.getElementById('vehiclesTableBody');
   
   if (pageVehicles.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #666; padding: 40px 10px;">No se encontraron vehículos con los filtros seleccionados</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #666; padding: 40px;">No se encontraron vehículos</td></tr>`;
     document.getElementById('resultsCount').textContent = '0 vehículos encontrados';
     return;
   }
@@ -177,9 +178,8 @@ function renderTable() {
 function renderPagination() {
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
   const pagination = document.getElementById('pagination');
-  
   if (totalPages <= 1) {
-    pagination.innerHTML = '<span style="color:#6c757d; font-size:0.85rem; padding: 5px;">Página 1 de 1</span>';
+    pagination.innerHTML = '<span style="color:#6c757d; font-size:0.85rem;">Página 1 de 1</span>';
     return;
   }
   let html = `<button onclick="changePage(1)" ${currentPage===1?'disabled':''}>«</button>
