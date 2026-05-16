@@ -12,14 +12,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-/* ================= RESET Y BASE ================= */
+/* ================= ESTILOS BASE (Mismos que planilla-modificar) ================= */
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
-
-/* ================= CONTENEDOR PRINCIPAL ================= */
 .form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
-
-/* ================= BUSCADOR ================= */
 .search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
 .search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
 .search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -29,34 +25,28 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
 .btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
 .search-hint { color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-top: 8px; display: block; }
-
-/* ================= DATOS DEL VEHÍCULO ENCONTRADO ================= */
-.vehicle-display { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; display: none; animation: slideDown 0.4s ease; }
-.vehicle-display-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e8eef5; }
-.vehicle-display-title { font-size: 1rem; color: #003366; font-weight: 700; text-transform: uppercase; margin: 0; }
-.vehicle-data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-.vehicle-data-item { background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #005b96; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-.vehicle-data-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
-.vehicle-data-value { font-size: 0.95rem; color: #0f172a; font-weight: 700; word-break: break-word; }
-
-/* ================= SECCIONES DEL FORMULARIO ================= */
 .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; width: 100%; margin-bottom: 25px; }
-.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #005b96; min-width: 0; transition: box-shadow 0.3s ease, transform 0.3s ease; height: 100%; }
+.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid; min-width: 0; transition: box-shadow 0.3s ease, transform 0.3s ease; height: 100%; }
+.form-section:hover { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
+.form-section.identificacion { border-color: #005b96; }
+.form-section.caracteristicas { border-color: #2a9d8f; }
+.form-section.observaciones { border-color: #f15bb5; }
 .form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
-.form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: rgba(0, 91, 150, 0.15); flex-shrink: 0; }
+.form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
+.form-section.identificacion .form-section-icon { background: rgba(0, 91, 150, 0.2); }
+.form-section.caracteristicas .form-section-icon { background: rgba(42, 157, 143, 0.2); }
+.form-section.observaciones .form-section-icon { background: rgba(241, 91, 181, 0.2); }
 .form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: 0.8px; }
 .form-fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.form-section.full-width .form-fields-grid { grid-template-columns: repeat(4, 1fr); gap: 22px; }
 .form-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 .form-group label .required { color: #dc2626; margin-left: 3px; }
-
-/* ================= INPUTS ================= */
 .form-input, .form-select, .form-textarea { width: 100%; max-width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; transition: all 0.25s ease; background: white; color: #2d3748; }
+.form-input:hover, .form-select:hover, .form-textarea:hover { border-color: #cbd5e0; }
 .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.12); background: #fff; }
 .form-input:disabled, .form-select:disabled, .form-textarea:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
 .form-textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
-
-/* ================= BOTONES DE ACCIÓN ================= */
 .form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
 .btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; border: none; white-space: nowrap; }
 .btn-secondary { background: #6c757d; color: white; }
@@ -64,26 +54,21 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .btn-primary { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; box-shadow: 0 4px 15px rgba(0, 51, 102, 0.35); }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45); }
 .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
-
-/* ================= ALERTAS ================= */
 .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 25px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 1200px) { .form-row { grid-template-columns: 1fr; } }
-@media (max-width: 768px) { .search-container { flex-direction: column; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
+@media (max-width: 1200px) { .form-row { grid-template-columns: 1fr; } .form-section.full-width .form-fields-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
 </style>
 </head>
 <body class="dashboard-page">
-<!-- ================= NAVBAR ================= -->
 <nav class="navbar" role="navigation">
   <div class="nav-container">
     <div class="nav-brand">
       <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-      <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
+      <img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
       <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
     </div>
     <div class="nav-user">
@@ -93,7 +78,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   </div>
 </nav>
 
-<!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main" role="main">
   <header class="module-header">
     <div class="breadcrumb">
@@ -107,22 +91,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   </header>
 
   <section class="module-title-section">
-    <h1 class="module-title">➕ Crear Inspección PVR de Vehículo</h1>
-    <p class="module-subtitle">Busque el vehículo y complete los ítems de inspección física</p>
+    <h1 class="module-title">➕ Crear Inspección PVR</h1>
+    <p class="module-subtitle">Busque el vehículo y complete los datos de la inspección física</p>
   </section>
 
   <div class="form-container">
-    <!-- Alertas -->
-    <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Inspección creada exitosamente</span></div>
-    <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al procesar la solicitud</span></div>
-    <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa, Facsímil, S/Carrocería o S/Motor para comenzar</span></div>
+    <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Guardado exitosamente</span></div>
+    <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al guardar</span></div>
+    <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa, Facsímil, S/Carrocería o S/Motor para iniciar</span></div>
 
-    <!-- ================= BUSCADOR ================= -->
     <div class="search-container">
       <div class="search-group">
-        <label for="searchVehicle">🔍 Búsqueda de Vehículo</label>
-        <input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | 123456 | 1HGCM82633A...">
-        <span class="search-hint">Busca por: Placa, Facsímil, S/Carrocería o S/Motor</span>
+        <label for="searchVehicle">🔍 Búsqueda Exacta de Vehículo</label>
+        <input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
+        <span class="search-hint">Búsqueda exacta por: Placa, Facsímil, Serial Carrocería o Serial Motor</span>
       </div>
       <button type="button" class="btn-search" id="btnSearch">
         <span class="btn-search-text">🔍 Buscar Vehículo</span>
@@ -130,44 +112,81 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
       </button>
     </div>
 
-    <!-- ================= DATOS DEL VEHÍCULO ENCONTRADO ================= -->
-    <div id="vehicleDisplay" class="vehicle-display">
-      <div class="vehicle-display-header">
-        <h2 class="vehicle-display-title">📦 Vehículo Seleccionado</h2>
-        <button type="button" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" id="btnClearVehicle">🗑️ Limpiar</button>
-      </div>
-      <div class="vehicle-data-grid">
-        <div class="vehicle-data-item"><div class="vehicle-data-label">PLACA</div><div class="vehicle-data-value" id="dispPlaca">-</div></div>
-        <div class="vehicle-data-item"><div class="vehicle-data-label">MARCA</div><div class="vehicle-data-value" id="dispMarca">-</div></div>
-        <div class="vehicle-data-item"><div class="vehicle-data-label">MODELO</div><div class="vehicle-data-value" id="dispModelo">-</div></div>
-        <div class="vehicle-data-item"><div class="vehicle-data-label">AÑO</div><div class="vehicle-data-value" id="dispAno">-</div></div>
-        <div class="vehicle-data-item"><div class="vehicle-data-label">TIPO</div><div class="vehicle-data-value" id="dispTipo">-</div></div>
-        <div class="vehicle-data-item"><div class="vehicle-data-label">COLOR</div><div class="vehicle-data-value" id="dispColor">-</div></div>
-        <div class="vehicle-data-item"><div class="vehicle-data-label">N° IDENTIFICACIÓN</div><div class="vehicle-data-value" id="dispNId">-</div></div>
-        <div class="vehicle-data-item" style="grid-column: 1 / -1;"><div class="vehicle-data-label">ADSCRITA A</div><div class="vehicle-data-value" id="dispAdscrita">-</div></div>
-      </div>
-    </div>
-
-    <!-- ================= FORMULARIO DE INSPECCIÓN ================= -->
     <form id="inspectionForm" class="form-disabled" style="opacity: 0.6; pointer-events: none;">
       <input type="hidden" id="vehicleId" name="vehicleId">
-      
-      <!-- ⚠️ AQUÍ IRÁN LOS ÍTEMS DE INSPECCIÓN QUE ME INDICARÁS -->
-      <div class="form-section">
+
+      <!-- 📋 SECCIÓN 1: DATOS DE LA INSPECCIÓN -->
+      <div class="form-section identificacion full-width">
         <div class="form-section-header">
-          <span class="form-section-icon">📋</span>
-          <h2 class="form-section-title">Ítems de Inspección PVR</h2>
+          <span class="form-section-icon">📝</span>
+          <h2 class="form-section-title">Datos de la Inspección</h2>
         </div>
-        <div class="form-fields-grid" id="inspectionItemsContainer">
-          <p style="grid-column: 1/-1; color: #64748b; text-align: center; padding: 20px;">
-            👆 Complete la búsqueda de un vehículo para habilitar este formulario. Los ítems de inspección se generarán aquí según su indicación.
-          </p>
+        <div class="form-fields-grid">
+          <div class="form-group">
+            <label>N° DE INSPECCIÓN</label>
+            <input type="text" id="n_inspeccion" name="n_inspeccion" class="form-input" disabled placeholder="Generado automáticamente">
+          </div>
+          <div class="form-group">
+            <label>FECHA DE INSPECCIÓN</label>
+            <input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>HORA</label>
+            <input type="time" id="hora" name="hora" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>MOTIVO DE LA INSPECCIÓN <span class="required">*</span></label>
+            <input type="text" id="motivo_inspeccion" name="motivo_inspeccion" class="form-input" placeholder="Ej: Revisión preventiva" required>
+          </div>
+          <div class="form-group">
+            <label>LUGAR</label>
+            <input type="text" id="lugar" name="lugar" class="form-input" placeholder="Ej: CCPE Zulia">
+          </div>
+          <div class="form-group">
+            <label>ASIGNACIÓN</label>
+            <input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje Norte">
+          </div>
+          <div class="form-group">
+            <label>SUPERVISIÓN</label>
+            <input type="text" id="supervision" name="supervision" class="form-input" placeholder="Nombre del supervisor">
+          </div>
         </div>
       </div>
 
-      <!-- ================= BOTONES DE ACCIÓN ================= -->
+      <!-- 🚗 SECCIÓN 2: DATOS DEL VEHÍCULO (Auto-llenado) -->
+      <div class="form-section caracteristicas full-width">
+        <div class="form-section-header">
+          <span class="form-section-icon">🚘</span>
+          <h2 class="form-section-title">Datos del Vehículo (Automático)</h2>
+        </div>
+        <div class="form-fields-grid">
+          <div class="form-group"><label>PLACA</label><input type="text" id="placa" name="placa" class="form-input" disabled></div>
+          <div class="form-group"><label>MARCA:</label><input type="text" id="marca" name="marca" class="form-input" disabled></div>
+          <div class="form-group"><label>MODELO:</label><input type="text" id="modelo" name="modelo" class="form-input" disabled></div>
+          <div class="form-group"><label>AÑO</label><input type="number" id="ano" name="ano" class="form-input" disabled></div>
+          <div class="form-group"><label>TIPO:</label><input type="text" id="tipo" name="tipo" class="form-input" disabled></div>
+          <div class="form-group"><label>COLOR:</label><input type="text" id="color" name="color" class="form-input" disabled></div>
+          <div class="form-group"><label>N° DE IDENTIFICACIÓN</label><input type="text" id="n_identificacion" name="n_identificacion" class="form-input" disabled></div>
+          <div class="form-group"><label>SERIAL DE CARROCERÍA:</label><input type="text" id="s_carroceria" name="s_carroceria" class="form-input" disabled></div>
+        </div>
+      </div>
+
+      <!-- 🛣️ SECCIÓN 3: ESTADO ACTUAL -->
+      <div class="form-section observaciones">
+        <div class="form-section-header">
+          <span class="form-section-icon">🛣️</span>
+          <h2 class="form-section-title">Estado Actual</h2>
+        </div>
+        <div class="form-fields-grid">
+          <div class="form-group">
+            <label>KMS (Kilometraje) <span class="required">*</span></label>
+            <input type="number" id="kms" name="kms" class="form-input" placeholder="Ej: 45000" required>
+          </div>
+        </div>
+      </div>
+
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" id="btnCancel">❌ Cancelar</button>
+        <button type="button" class="btn btn-secondary" id="btnClear">🗑️ Limpiar / Buscar Otro</button>
         <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>
           <span class="btn-text">💾 Guardar Inspección</span>
           <span class="btn-loader" style="display:none;">⏳ Guardando...</span>
@@ -177,7 +196,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   </div>
 </main>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
 <script src="../js/inspeccion-crear-vehiculo.js" defer></script>
