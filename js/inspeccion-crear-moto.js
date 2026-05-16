@@ -135,15 +135,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  function getComponentesValues() {
-    const componentes = {};
-    document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => { 
-      if (!componentes[r.name]) componentes[r.name] = 'NT'; 
-      if (r.checked) componentes[r.name] = r.value; 
-    });
-    return componentes;
-  }
+// 🔹 FUNCIÓN ACTUALIZADA: Agrupa componentes en un objeto JSON
+function getComponentesMotoValues() {
+  const componentes = {};
+  document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => { 
+    if (!componentes[r.name]) componentes[r.name] = 'NT'; 
+    if (r.checked) componentes[r.name] = r.value; 
+  });
+  return componentes; // Retorna un objeto, no lo expande aún
+}
 
+// 🔹 EN EL EVENTO SUBMIT, modifica el payload así:
+inspectionForm?.addEventListener('submit', async e => {
+  e.preventDefault();
+  if(!usuarioActual) { mostrarAlerta('error','🔐 Inicie sesión'); return; }
+  if(!motoIdInput.value) { mostrarAlerta('error','Busque una moto primero'); return; }
+  btnSubmit.disabled = true;
+  try {
+    const payload = {
+      vehiculo_id: motoIdInput.value, n_inspeccion: document.getElementById('n_inspeccion').value,
+      fecha_inspeccion: document.getElementById('fecha_inspeccion').value, hora: document.getElementById('hora').value,
+      motivo: document.getElementById('motivo_inspeccion').value, lugar: document.getElementById('lugar').value,
+      asignacion: document.getElementById('asignacion').value, supervision: document.getElementById('supervision').value,
+      placa: document.getElementById('placa').value, marca: document.getElementById('marca').value,
+      modelo: document.getElementById('modelo').value, ano: document.getElementById('ano').value,
+      color: document.getElementById('color').value, s_carroceria: document.getElementById('s_carroceria').value,
+      s_motor: document.getElementById('s_motor').value, n_identificacion: document.getElementById('n_identificacion').value,
+      observaciones: document.getElementById('observaciones').value,
+      coord_nombre: document.getElementById('coord_nombre').value, coord_rango: document.getElementById('coord_rango').value,
+      coord_cedula: document.getElementById('coord_cedula').value, coord_telefono: document.getElementById('coord_telefono').value,
+      insp_nombre: document.getElementById('insp_nombre').value, insp_rango: document.getElementById('insp_rango').value,
+      insp_cedula: document.getElementById('insp_cedula').value, insp_telefono: document.getElementById('insp_telefono').value,
+      inspector: usuarioActual.email || 'sistema', created_at: new Date().toISOString(),
+      
+      // ✅ COMPONENTES DE MOTO AGRUPADOS EN JSONB
+      componentes_moto: getComponentesMotoValues()
+    };
+    
+    const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
+    if(error) throw error;
+    mostrarAlerta('success', '✅ Inspección de Moto registrada');
+    alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { limpiarFormulario(); }, 2000);
+  } catch(err) { 
+    console.error('Error detalle:', err); 
+    mostrarAlerta('error', `Error: ${err.message}`); 
+  }
+  finally { btnSubmit.disabled = false; }
+});
   btnSearch?.addEventListener('click', buscarMoto);
   searchInput?.addEventListener('keypress', e => { if(e.key==='Enter') buscarMoto(); });
   btnClear?.addEventListener('click', limpiarFormulario);
