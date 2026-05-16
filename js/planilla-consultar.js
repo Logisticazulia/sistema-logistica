@@ -159,19 +159,17 @@ function renderTable() {
   const pageVehicles = filteredVehicles.slice(start, end);
   const tbody = document.getElementById('vehiclesTableBody');
   
-  if (pageVehicles.length === 0) {
-    // 🔒 MANTENER ALTURA CON PADDING GRANDE CUANDO NO HAY RESULTADOS
+ if (pageVehicles.length === 0) {
     tbody.innerHTML = `
-      <tr>
-        <td colspan="11" style="text-align: center; color: #666; padding: 200px 10px;">
-          📭 No se encontraron vehículos con los filtros seleccionados
+    <tr>
+        <td colspan="11" style="text-align: center; color: #666; padding: 40px 10px; vertical-align: middle;">
+            📭 No se encontraron vehículos con los filtros seleccionados
         </td>
-      </tr>
-    `;
+    </tr>`;
     document.getElementById('resultsCount').textContent = '0 vehículos encontrados';
     document.getElementById('pageInfo').textContent = 'Página 1 de 1';
     return;
-  }
+}
   
   tbody.innerHTML = pageVehicles.map(v => `
     <tr onclick="openFicha('${v.id || ''}')">
