@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       setDefaults();
       toggleFormState(true);
-      mostrarAlerta('success', '✅ Vehículo encontrado. Complete motivo, lugar, KMS y componentes.');
+      mostrarAlerta('success', '✅ Vehículo encontrado. Complete motivo, KMS, cauchos y responsables.');
     } catch (err) {
       console.error('Error búsqueda:', err); mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
@@ -97,11 +97,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
   }
 
-  // 🆕 Recolección optimizada de los 80 componentes
   function getComponentesValues() {
     const componentes = {};
     document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => {
-      if (!componentes[r.name]) componentes[r.name] = 'NT'; // Default a N/T si no se selecciona
+      if (!componentes[r.name]) componentes[r.name] = 'NT';
       if (r.checked) componentes[r.name] = r.value;
     });
     return componentes;
@@ -111,6 +110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     if (!usuarioActual) { mostrarAlerta('error', '🔐 Inicie sesión para guardar'); return; }
     if (!vehicleIdInput.value) { mostrarAlerta('error', 'Busque un vehículo primero'); return; }
+
+    // Validar Rin (2 dígitos exactos)
+    const rinVal = document.getElementById('rin_numero')?.value;
+    if (rinVal && !/^\d{2}$/.test(rinVal)) {
+      mostrarAlerta('error', 'El Nº de Rin debe contener exactamente 2 dígitos numéricos.');
+      document.getElementById('rin_numero').focus();
+      return;
+    }
 
     btnSubmit.disabled = true;
     btnSubmit.querySelector('.btn-text').style.display = 'none';
@@ -145,8 +152,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         herramientas: document.getElementById('herramientas')?.value || 'NO',
         gato: document.getElementById('gato')?.value || 'NO',
         sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
-        // 🆕 Inyectar los 80 componentes automáticamente
-        ...getComponentesValues()
+        ...getComponentesValues(),
+        // 🛞 Cauchos y Rines
+        caucho_del_izq: document.querySelector('input[name="caucho_del_izq"]:checked')?.value || 'M',
+        caucho_del_der: document.querySelector('input[name="caucho_del_der"]:checked')?.value || 'M',
+        caucho_tra_izq: document.querySelector('input[name="caucho_tra_izq"]:checked')?.value || 'M',
+        caucho_tra_der: document.querySelector('input[name="caucho_tra_der"]:checked')?.value || 'M',
+        caucho_repuesto: document.querySelector('input[name="caucho_repuesto"]:checked')?.value || 'M',
+        tapa_cauchos: document.querySelector('input[name="tapa_cauchos"]:checked')?.value || 'NO',
+        rin_numero: rinVal || '',
+        observaciones: document.getElementById('observaciones')?.value || '',
+        // 👥 Responsables
+        coord_nombre: document.getElementById('coord_nombre')?.value || '',
+        coord_rango: document.getElementById('coord_rango')?.value || '',
+        coord_cedula: document.getElementById('coord_cedula')?.value || '',
+        coord_telefono: document.getElementById('coord_telefono')?.value || '',
+        insp_nombre: document.getElementById('insp_nombre')?.value || '',
+        insp_rango: document.getElementById('insp_rango')?.value || '',
+        insp_cedula: document.getElementById('insp_cedula')?.value || '',
+        insp_telefono: document.getElementById('insp_telefono')?.value || ''
       };
 
       const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
