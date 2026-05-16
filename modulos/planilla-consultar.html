@@ -13,23 +13,24 @@
 .consultar-header {
 background: white; padding: 20px; border-radius: 10px;
 box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1); margin-bottom: 20px;
+min-height: 280px; /* 🔒 Evita colapso vertical del panel */
 }
 .filters-row {
 display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 gap: 15px; margin-bottom: 15px;
+min-height: 140px; /* 🔒 Reserva espacio para los selects */
 }
 .filter-group { display: flex; flex-direction: column; gap: 5px; }
 .filter-group label { font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase; }
-.filter-select { padding: 10px 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.85rem; background: white; cursor: pointer; }
+.filter-select { padding: 10px 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.85rem; background: white; cursor: pointer; transition: all 0.2s; }
 .filter-select:focus { outline: none; border-color: #005b96; }
+.filter-select:disabled { background: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
+
 .search-container {
 display: flex; gap: 10px; align-items: flex-end; grid-column: 1 / -1;
 margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;
 }
-.search-input {
-flex: 1; padding: 10px 15px; border: 2px solid #ddd;
-border-radius: 6px; font-size: 0.9rem; width: 100%;
-}
+.search-input { flex: 1; padding: 10px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.9rem; width: 100%; }
 .search-input:focus { outline: none; border-color: #005b96; }
 .btn-buscar { background: #005b96; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 5px; }
 .btn-buscar:hover { background: #003366; }
@@ -39,20 +40,13 @@ border-radius: 6px; font-size: 0.9rem; width: 100%;
 .btn-exportar:hover { background: #218838; }
 .action-buttons { display: flex; gap: 10px; align-items: flex-end; }
 
-/* ✅ ESTABILIDAD DE LAYOUT */
+/* 🔒 CONTENEDORES FIJOS */
 .table-container {
-background: white; border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
-overflow-x: auto; width: 100%;
-min-height: 420px; /* Reserva espacio fijo para evitar saltos */
+background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+overflow-x: auto; width: 100%; min-height: 420px; /* Altura fija garantizada */
 }
-.data-table {
-width: 100%; border-collapse: collapse; table-layout: auto;
-}
-.data-table thead {
-background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-color: white; position: sticky; top: 0; z-index: 10;
-}
+.data-table { width: 100%; border-collapse: collapse; table-layout: auto; }
+.data-table thead { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; position: sticky; top: 0; z-index: 10; }
 .data-table th { padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.8rem; white-space: nowrap; }
 .data-table td { padding: 10px; border-bottom: 1px solid #e8eef5; font-size: 0.85rem; }
 .data-table tbody tr { cursor: pointer; transition: background 0.3s; }
@@ -69,13 +63,12 @@ color: white; position: sticky; top: 0; z-index: 10;
 .results-info {
 display: flex; justify-content: space-between; align-items: center;
 padding: 10px 15px; background: #f8f9fa; border-radius: 6px; font-size: 0.85rem;
-min-height: 36px; /* Evita saltos al cambiar texto */
+min-height: 38px;
 }
-/* ✅ PAGINACIÓN SIEMPRE OCUPA ESPACIO */
 .pagination {
-min-height: 54px; /* Mantiene altura aunque no haya botones */
-display: flex; justify-content: center; align-items: center;
-gap: 5px; padding: 15px; background: #f8f9fa; border-top: 1px solid #e8eef5;
+min-height: 58px; /* Altura fija para paginación */
+display: flex; justify-content: center; align-items: center; gap: 5px;
+padding: 15px; background: #f8f9fa; border-top: 1px solid #e8eef5;
 }
 .pagination button { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
 .pagination button:hover { background: #005b96; color: white; border-color: #005b96; }
@@ -106,12 +99,7 @@ gap: 5px; padding: 15px; background: #f8f9fa; border-top: 1px solid #e8eef5;
 .btn-cerrar { background: #6c757d; color: white; } .btn-cerrar:hover { background: #5a6268; }
 
 @media print { .modal-footer, .modal-close { display: none !important; } .modal-ficha-content { box-shadow: none; margin: 0; width: 100%; max-width: 100%; } }
-@media (max-width: 768px) {
-.filters-row { grid-template-columns: 1fr; }
-.search-container { flex-direction: column; align-items: stretch; }
-.search-input { max-width: 100%; }
-.action-buttons { flex-wrap: wrap; }
-}
+@media (max-width: 768px) { .filters-row { grid-template-columns: 1fr; } .search-container { flex-direction: column; align-items: stretch; } .search-input { max-width: 100%; } .action-buttons { flex-wrap: wrap; } }
 .nav-brand { display: flex; align-items: center; gap: 10px; }
 .nav-logo { object-fit: contain; }
 </style>
@@ -162,9 +150,9 @@ gap: 5px; padding: 15px; background: #f8f9fa; border-top: 1px solid #e8eef5;
 <div class="filter-group"><label for="filterClase">Clase</label><select id="filterClase" class="filter-select"><option value="">Todas</option><option value="AUTOBUS">AUTOBUS</option><option value="AUTOMOVIL">AUTOMOVIL</option><option value="BLINDADO">BLINDADO</option><option value="CAMION">CAMION</option><option value="CAMIONETA">CAMIONETA</option><option value="ESPECIAL">ESPECIAL</option><option value="MOTO">MOTO</option><option value="TRACCION DE SANGRE">TRACCION DE SANGRE</option></select></div>
 <div class="filter-group"><label for="filterSituacion">Situación</label><select id="filterSituacion" class="filter-select"><option value="">Todas</option><option value="COMODATO">COMODATO</option><option value="DENUNCIADA">DENUNCIADA</option><option value="DESINCORPORADA">DESINCORPORADA</option><option value="DONACION">DONACION</option><option value="INOPERATIVA">INOPERATIVA</option><option value="OPERATIVA">OPERATIVA</option><option value="REPARACION">REPARACION</option><option value="TALLER">TALLER</option></select></div>
 <div class="filter-group"><label for="filterEstatus">Estatus</label><select id="filterEstatus" class="filter-select"><option value="">Todos</option><option value="DESINCORPORADA">DESINCORPORADA</option><option value="INOPERATIVA">INOPERATIVA</option><option value="OPERATIVA">OPERATIVA</option></select></div>
-<div class="filter-group"><label for="filterUnidad">Unidad Administrativa</label><select id="filterUnidad" class="filter-select"><option value="">Todas</option></select></div>
-<div class="filter-group"><label for="filterEPM">EPM</label><select id="filterEPM" class="filter-select"><option value="">Todos</option><option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option><option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option><option value="LACAÑADA DE URDANETA">LACAÑADA DE URDANETA</option><option value="MARACAIBO">MARACAIBO</option><option value="NO">NO</option><option value="SAN FRANCISCO">SAN FRANCISCO</option></select></div>
-<div class="filter-group"><label for="filterEPP">EPP</label><select id="filterEPP" class="filter-select"><option value="">Todos</option><option value="NO">NO</option><option value="ESTACION POLICIAL">ESTACION POLICIAL</option><option value="E.P.">E.P.</option><option value="ANDRES BELLO">ANDRES BELLO</option><option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option><option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option><option value="CHIQUINQUIRA">CHIQUINQUIRA</option><option value="COQUIVACOA">COQUIVACOA</option><option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option><option value="DOMITILA FLORES">DOMITILA FLORES</option><option value="EL BAJO">EL BAJO</option><option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option><option value="FRANCISCO OCHOA">FRANCISCO OCHOA</option><option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option><option value="JUANA DE AVILA">JUANA DE AVILA</option><option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option><option value="LA CONCEPCION">LA CONCEPCION</option><option value="LOS CORTIJO">LOS CORTIJO</option><option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option><option value="MANUEL DAGNINO">MANUEL DAGNINO</option><option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option><option value="RAUL LEONI">RAUL LEONI</option><option value="SAN FRANCISCO">SAN FRANCISCO</option><option value="SAN JOSE DE POTRERITO">SAN JOSE DE POTRERITO</option><option value="VENANCIO PULGAR">VENANCIO PULGAR</option></select></div>
+<div class="filter-group"><label for="filterUnidad">📍 Unidad Administrativa</label><select id="filterUnidad" class="filter-select"><option value="">Todas</option></select></div>
+<div class="filter-group"><label for="filterEPM">🏢 EPM</label><select id="filterEPM" class="filter-select"><option value="">Todos</option><option value="JESUS ENRIQUE LOSADA">JESUS ENRIQUE LOSADA</option><option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option><option value="LACAÑADA DE URDANETA">LACAÑADA DE URDANETA</option><option value="MARACAIBO">MARACAIBO</option><option value="NO">NO</option><option value="SAN FRANCISCO">SAN FRANCISCO</option></select></div>
+<div class="filter-group"><label for="filterEPP">📍 EPP</label><select id="filterEPP" class="filter-select"><option value="">Todos</option><option value="NO">NO</option><option value="ESTACION POLICIAL">ESTACION POLICIAL</option><option value="E.P.">E.P.</option><option value="ANDRES BELLO">ANDRES BELLO</option><option value="ANTONIO BORJAS ROMERO">ANTONIO BORJAS ROMERO</option><option value="CARACCIOLO PARRA">CARACCIOLO PARRA</option><option value="CHIQUINQUIRA">CHIQUINQUIRA</option><option value="COQUIVACOA">COQUIVACOA</option><option value="CRISTO DE ARANZA">CRISTO DE ARANZA</option><option value="DOMITILA FLORES">DOMITILA FLORES</option><option value="EL BAJO">EL BAJO</option><option value="FRANCISCO E BUSTAMANTE">FRANCISCO E BUSTAMANTE</option><option value="FRANCISCO OCHOA">FRANCISCO OCHOA</option><option value="IDELFONSO VASQUEZ">IDELFONSO VASQUEZ</option><option value="JUANA DE AVILA">JUANA DE AVILA</option><option value="LA CAÑADA DE URDANETA">LA CAÑADA DE URDANETA</option><option value="LA CONCEPCION">LA CONCEPCION</option><option value="LOS CORTIJO">LOS CORTIJO</option><option value="LUIS HURTADO HIGUERA">LUIS HURTADO HIGUERA</option><option value="MANUEL DAGNINO">MANUEL DAGNINO</option><option value="OLEGARIO VILLALOBOS">OLEGARIO VILLALOBOS</option><option value="RAUL LEONI">RAUL LEONI</option><option value="SAN FRANCISCO">SAN FRANCISCO</option><option value="SAN JOSE DE POTRERITO">SAN JOSE DE POTRERITO</option><option value="VENANCIO PULGAR">VENANCIO PULGAR</option></select></div>
 </div>
 <div class="results-info">
 <span id="resultsCount">Cargando...</span>
