@@ -1,47 +1,38 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // 🔍 Verificar que Supabase esté disponible
-  if (typeof supabase === 'undefined') {
-    console.error('❌ Supabase no está disponible. Verifica que config.js se cargue antes.');
-    mostrarAlerta('error', 'Error de configuración. Recarga la página.');
+  if (typeof window.supabase === 'undefined') {
+    console.error('❌ Supabase no está disponible. Verifica el orden de carga de scripts.');
+    mostrarAlerta('error', 'Error de configuración. Recarga la página (Ctrl+F5).');
     return;
   }
+  
+  const supabase = window.supabase; // Usar referencia global
 
-  // 🔐 Configuración de rutas (AJUSTA ESTO SEGÚN TU ESTRUCTURA REAL)
+  // 🔐 Configuración de rutas (AJUSTA SEGÚN TU ESTRUCTURA REAL EN GITHUB PAGES)
   const RUTAS = {
-    login: '../../login.html', // ← Cambia esto si tu login está en otra ubicación
-    dashboard: '../dashboard.html',
-    transporte: 'transporte.html',
-    inspeccion: 'inspeccion.html'
+    login: '/sistema-logistica/login.html',  // ← Ruta absoluta desde root de GitHub Pages
+    dashboard: '/sistema-logistica/dashboard.html',
+    transporte: '/sistema-logistica/transporte.html',
+    inspeccion: '/sistema-logistica/inspeccion/inspeccion.html'
   };
 
-  // 🔒 Verificar autenticación de forma segura
+  // 🔒 Verificar autenticación de forma NO bloqueante
+  let usuarioActual = null;
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
-      console.warn('⚠️ Error verificando sesión:', error.message);
-      // No redirigir inmediatamente, permitir que el usuario intente buscar
-      mostrarAlerta('info', '⚠️ Sesión no verificada. Algunas funciones pueden estar limitadas.');
-    } else if (!user) {
-      console.warn('⚠️ Usuario no autenticado');
-      mostrarAlerta('info', '🔐 Inicia sesión para guardar inspecciones.');
-      // Opcional: deshabilitar botón de guardar
-      const btnSubmit = document.getElementById('btnSubmit');
-      if (btnSubmit) {
-        btnSubmit.disabled = true;
-        btnSubmit.title = 'Requiere autenticación';
-      }
-    }
-    // Si hay usuario, actualizar navbar
-    else if (user?.email) {
+      console.warn('⚠️ Warning auth:', error.message);
+    } else if (user) {
+      usuarioActual = user;
+      // Actualizar email en navbar
       const userEmailEl = document.getElementById('userEmail');
-      if (userEmailEl) userEmailEl.textContent = user.email;
+      if (userEmailEl) userEmailEl.textContent = user.email || 'Usuario';
     }
   } catch (err) {
-    console.error('❌ Error crítico en auth:', err);
-    mostrarAlerta('error', 'No se pudo verificar la sesión.');
+    console.error('❌ Error en auth:', err);
   }
 
-  // 🎯 Referencias DOM
+  // 🎯 Referencias DOM (con verificación)
   const searchInput = document.getElementById('searchVehicle');
   const btnSearch = document.getElementById('btnSearch');
   const btnSearchText = btnSearch?.querySelector('.btn-search-text');
@@ -52,12 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnCancel = document.getElementById('btnCancel');
   const btnClearVehicle = document.getElementById('btnClearVehicle');
   
-  // Alertas
   const alertSuccess = document.getElementById('alertSuccess');
   const alertError = document.getElementById('alertError');
   const alertInfo = document.getElementById('alertInfo');
 
-  // 📊 Visualización de vehículo
   const disp = {
     placa: document.getElementById('dispPlaca'),
     marca: document.getElementById('dispMarca'),
@@ -70,11 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   const vehicleIdInput = document.getElementById('vehicleId');
 
-  // 🔍 Mostrar alerta (reutilizable)
+  // 🔍 Mostrar alerta
   function mostrarAlerta(tipo, mensaje) {
-    [alertSuccess, alertError, alertInfo].forEach(el => {
-      if (el) el.style.display = 'none';
-    });
+    [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
     if (tipo === 'success' && alertSuccess) {
       alertSuccess.querySelector('span:last-child').textContent = mensaje;
       alertSuccess.style.display = 'flex';
@@ -92,19 +79,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!inspectionForm) return;
     inspectionForm.style.opacity = activo ? '1' : '0.6';
     inspectionForm.style.pointerEvents = activo ? 'auto' : 'none';
-    if (btnSubmit) btnSubmit.disabled = !activo;
+    if (btnSubmit) btnSubmit.disabled = !activo || !usuarioActual;
+    if (!usuarioActual && btnSubmit) {
+      btnSubmit.title = '🔐 Requiere iniciar sesión para guardar';
+    }
     if (vehicleDisplay) vehicleDisplay.style.display = activo ? 'block' : 'none';
   }
 
-  // 🚗 Buscar vehículo en Supabase
+  // 🚗 Buscar vehículo
   async function buscarVehiculo() {
     const query = searchInput?.value.trim();
-    if (!query) {
-      mostrarAlerta('info', 'Ingrese Placa, Facsímil, S/Carrocería o S/Motor');
-      return;
-    }
+    if (!query) { mostrarAlerta('info', 'Ingrese Placa, Facsímil, S/Carrocería o S/Motor'); return; }
 
-    // UI loading
     if (btnSearch) {
       btnSearch.disabled = true;
       if (btnSearchText) btnSearchText.style.display = 'none';
@@ -113,7 +99,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     mostrarAlerta('info', '🔍 Buscando...');
 
     try {
-      // ⚠️ Asegúrate que 'vehiculos' es el nombre exacto de tu tabla
       const { data, error } = await supabase
         .from('vehiculos')
         .select('*')
@@ -121,14 +106,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         .maybeSingle();
 
       if (error) throw error;
-      
       if (!data) {
         mostrarAlerta('error', '❌ No se encontró vehículo con esos datos.');
         toggleFormState(false);
         return;
       }
 
-      // Rellenar datos encontrados
+      // Rellenar datos
       disp.placa.textContent = data.placa || 'N/A';
       disp.marca.textContent = data.marca?.toUpperCase() || 'N/A';
       disp.modelo.textContent = data.modelo?.toUpperCase() || 'N/A';
@@ -136,21 +120,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       disp.tipo.textContent = data.tipo || 'N/A';
       disp.color.textContent = data.color || 'N/A';
       disp.nId.textContent = data.n_identificacion || 'N/A';
-      
-      // Lógica para ADSCRITA A (prioridad: unidad_administrativa > epp > epm)
       const adscrita = data.unidad_administrativa || data.epp || data.epm || 'No asignada';
       disp.adscrita.textContent = adscrita;
 
       if (vehicleIdInput) vehicleIdInput.value = data.id;
-      
       toggleFormState(true);
-      mostrarAlerta('success', '✅ Vehículo encontrado. Complete la inspección.');
+      mostrarAlerta('success', '✅ Vehículo encontrado');
 
     } catch (err) {
       console.error('Error búsqueda:', err);
       mostrarAlerta('error', `Error: ${err.message || 'Consulta fallida'}`);
     } finally {
-      // Restaurar UI
       if (btnSearch) {
         btnSearch.disabled = false;
         if (btnSearchText) btnSearchText.style.display = 'inline';
@@ -159,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 🗑️ Limpiar búsqueda
+  // 🗑️ Limpiar
   function limpiarBusqueda() {
     if (searchInput) searchInput.value = '';
     toggleFormState(false);
@@ -168,16 +148,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
   }
 
-  // 💾 Guardar inspección (placeholder - espera tus ítems)
+  // 💾 Guardar inspección
   async function guardarInspeccion(e) {
     e?.preventDefault();
     
+    if (!usuarioActual) {
+      mostrarAlerta('error', '🔐 Debes iniciar sesión para guardar inspecciones');
+      return;
+    }
     if (!vehicleIdInput?.value) {
       mostrarAlerta('error', 'Primero busca y selecciona un vehículo');
       return;
     }
 
-    // UI loading
     if (btnSubmit) {
       btnSubmit.disabled = true;
       const btnText = btnSubmit.querySelector('.btn-text');
@@ -187,23 +170,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-      // Obtener usuario actual (para registrar quién hizo la inspección)
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // 📦 Payload base - AQUÍ AGREGARÉS LOS ÍTEMS QUE ME INDIQUES
       const payload = {
         vehiculo_id: vehicleIdInput.value,
-        inspector: user?.email || 'sistema',
-        fecha_creacion: new Date().toISOString(),
-        // Ejemplo: estado_llantas: document.getElementById('estado_llantas')?.value,
-        // Ejemplo: nivel_combustible: document.getElementById('nivel_combustible')?.value,
+        inspector: usuarioActual.email || 'sistema',
+        fecha_creacion: new Date().toISOString()
+        // 👇 Aquí agregarás los ítems que me indiques
       };
 
-      // ⚠️ Cambia 'inspecciones_pvr' por el nombre real de tu tabla destino
-      const { error } = await supabase
-        .from('inspecciones_pvr')
-        .insert([payload]);
-      
+      const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
       if (error) throw error;
 
       mostrarAlerta('success', '✅ Inspección PVR registrada correctamente');
@@ -213,7 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error al guardar:', err);
       mostrarAlerta('error', `No se pudo guardar: ${err.message || 'Error desconocido'}`);
     } finally {
-      // Restaurar botón
       if (btnSubmit) {
         btnSubmit.disabled = false;
         const btnText = btnSubmit.querySelector('.btn-text');
@@ -224,15 +197,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 🎧 Event Listeners (con verificación de existencia)
+  // 🎧 Event Listeners
   if (btnSearch) btnSearch.addEventListener('click', buscarVehiculo);
-  if (searchInput) searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') buscarVehiculo();
-  });
+  if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarVehiculo(); });
   if (btnClearVehicle) btnClearVehicle.addEventListener('click', limpiarBusqueda);
   if (btnCancel) btnCancel.addEventListener('click', limpiarBusqueda);
   if (inspectionForm) inspectionForm.addEventListener('submit', guardarInspeccion);
 
-  // Inicialización: mostrar mensaje de bienvenida
+  // Init
   mostrarAlerta('info', '🔍 Busque un vehículo por Placa, Facsímil, S/Carrocería o S/Motor');
 });
