@@ -1,7 +1,23 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // 🔒 Verificar autenticación
-  const currentUser = supabase.auth.getUser();
-  if (!currentUser) {
+document.addEventListener('DOMContentLoaded', async () => {
+  // 🔍 Verificar que Supabase esté disponible en el ámbito global
+  if (typeof supabase === 'undefined') {
+    console.error('❌ Error crítico: Supabase no se cargó. Verifica config.js o tu conexión a internet.');
+    alert('Error de configuración. Por favor, recargue la página.');
+    return;
+  }
+
+  // 🔒 Verificar autenticación correctamente (async/await)
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) {
+      window.location.href = '../login.html';
+      return;
+    }
+    // Actualizar email en navbar si existe el elemento
+    const userEmailEl = document.getElementById('userEmail');
+    if (userEmailEl) userEmailEl.textContent = user.email || 'Usuario';
+  } catch (err) {
+    console.error('Error al verificar sesión:', err);
     window.location.href = '../login.html';
     return;
   }
@@ -59,14 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Estado de carga
     btnSearch.disabled = true;
     btnSearchText.style.display = 'none';
     btnSearchLoader.style.display = 'inline';
     showAlert('info', 'Buscando vehículo...');
 
     try {
-      // ⚠️ Asegúrate de que 'vehiculos' sea el nombre exacto de tu tabla en Supabase
       const { data, error } = await supabase
         .from('vehiculos')
         .select('*')
@@ -81,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Rellenar datos
+      // Rellenar datos encontrados
       dispPlaca.textContent = data.placa || 'N/A';
       dispMarca.textContent = data.marca?.toUpperCase() || 'N/A';
       dispModelo.textContent = data.modelo?.toUpperCase() || 'N/A';
@@ -90,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
       dispColor.textContent = data.color || 'N/A';
       dispNId.textContent = data.n_identificacion || 'N/A';
       
-      // Lógica para ADSCRITA A
       const adscrita = data.unidad_administrativa || data.epp || data.epm || 'No asignada';
       dispAdscrita.textContent = adscrita;
 
@@ -118,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showAlert('info', 'Ingrese Placa, Facsímil, S/Carrocería o S/Motor para comenzar');
   }
 
-  // 💾 Guardar inspección (Placeholder listo para tus ítems)
+  // 💾 Guardar inspección
   async function handleSubmit(e) {
     e.preventDefault();
     btnSubmit.disabled = true;
@@ -126,17 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit.querySelector('.btn-loader').style.display = 'inline';
 
     try {
-      // 📦 Recolectar datos del formulario
       const formData = new FormData(inspectionForm);
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const payload = {
         vehiculo_id: vehicleIdInput.value,
-        inspector: (await supabase.auth.getUser()).user?.email || 'sistema',
-        // Aquí se agregarán automáticamente los ítems que me indiques
-        // ejemplo: estado_llantas: formData.get('estado_llantas'),
+        inspector: user?.email || 'sistema',
+        // ⚠️ Aquí se agregarán automáticamente los ítems que me indiques
         created_at: new Date().toISOString()
       };
 
-      // ⚠️ Cambia 'inspecciones_pvr' por el nombre real de tu tabla de inspecciones
+      // ⚠️ Cambia 'inspecciones_pvr' por el nombre real de tu tabla
       const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
       if (error) throw error;
 
