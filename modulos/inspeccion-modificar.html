@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Modificar Inspección PVR - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Modificar Inspección | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* Ajustes específicos para la pantalla de selección */
+.selection-container { text-align: center; margin: 40px auto 20px; max-width: 800px; }
+.selection-title { font-size: 1.25rem; font-weight: 800; color: #003366; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.selection-subtitle { color: #4a5568; margin-bottom: 35px; font-size: 0.95rem; }
+.selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; max-width: 700px; margin: 0 auto; }
+@media (max-width: 768px) { .selection-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="dashboard-page">
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">usuario@institucion.com</span>
+<button class="btn-logout" id="logoutBtn">
+<span class="logout-icon">🚪</span>
+<span class="logout-text">Cerrar Sesión</span>
+</button>
+</div>
+</div>
+</nav>
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Modificar Inspección</span>
+</div>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='transporte.html'">← Volver a Transporte</button>
+</header>
+
+<section class="module-title-section">
+<h1 class="module-title">✏️ Modificar Inspección PVR</h1>
+<p class="module-subtitle">Búsqueda y actualización de registros de inspección física vehicular</p>
+</section>
+
+<!-- 🚓 SECCIÓN DE SELECCIÓN SOLICITADA -->
+<div class="selection-container">
+<div class="selection-title">🚓 Seleccionar Tipo de Unidad Policial</div>
+<p class="selection-subtitle">Elige la categoría de la unidad que deseas inspeccionar para continuar con el proceso</p>
+
+<div class="selection-grid">
+<!-- Opción 1: Unidad Policial Operativa -->
+<a href="inspeccion-modificar-vehiculo.html" class="module-card" style="border-left-color: #e76f51;">
+<div class="module-icon" style="color: #e76f51;">🚓</div>
+<h2 class="module-title">Unidad Operativa</h2>
+<p class="module-description">Patrulleros, motos, camiones y unidades tácticas</p>
+<div class="module-arrow">→</div>
+</a>
+
+<!-- Opción 2: Unidad Administrativa / Logística -->
+<a href="inspeccion-modificar-admin.html" class="module-card" style="border-left-color: #2a9d8f;">
+<div class="module-icon" style="color: #2a9d8f;">🚙</div>
+<h2 class="module-title">Unidad Administrativa</h2>
+<p class="module-description">Vehículos de logística, transporte y apoyo institucional</p>
+<div class="module-arrow">→</div>
+</a>
+</div>
+</div>
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
+<script src="../js/inspeccion.js" defer></script>
+</body>
+</html>
