@@ -60,7 +60,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
 
-/* 🆕 ESTILOS NUEVOS: COMPONENTES B/M/NT */
 .inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
 .inspection-item { background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
@@ -75,20 +74,21 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .opt-group label:nth-child(2):has(input:checked) { background: #ef4444; border-color: #ef4444; }
 .opt-group label:nth-child(3):has(input:checked) { background: #f59e0b; border-color: #f59e0b; }
 
-/* 🆕 ESTILOS CAUCHOS Y RINES */
 .tires-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
 .tire-item { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center; }
 .tire-item .item-label { margin-bottom: 10px; }
 .tires-grid .opt-group { justify-content: center; }
 .rin-input { width: 100%; text-align: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; }
 
-/* 🆕 ESTILOS RESPONSABLES */
+/* 🆕 LAYOUT RESPONSABLES ACTUALIZADO */
 .responsibles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+.responsable-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.responsable-fields .full-width { grid-column: 1 / -1; }
 .resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #005b96; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; letter-spacing: 0.5px; }
 
 @media (max-width: 1200px) { .tires-grid { grid-template-columns: repeat(3, 1fr); } .inspection-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 992px) { .tires-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .tires-grid, .responsibles-grid { grid-template-columns: 1fr; } .inspection-col { max-height: none; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
+@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .tires-grid, .responsibles-grid, .responsable-fields { grid-template-columns: 1fr; } .responsable-fields .full-width { grid-column: span 1; } .inspection-col { max-height: none; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
 </style>
 </head>
 <body class="dashboard-page">
@@ -302,24 +302,56 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
         <textarea id="observaciones" name="observaciones" class="form-textarea" placeholder="Describa hallazgos, novedades o detalles relevantes de la inspección..."></textarea>
       </div>
 
-      <!-- 👥 RESPONSABLES -->
+      <!-- 👥 RESPONSABLES (ACTUALIZADO) -->
       <div class="form-section responsables full-width">
         <div class="form-section-header"><span class="form-section-icon">👥</span><h2 class="form-section-title">Firmas y Responsables</h2></div>
         <div class="responsibles-grid">
           <div class="responsable-col">
             <h3 class="resp-header">POR LA COORDINACIÓN</h3>
-            <div class="form-fields-grid">
-              <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="coord_nombre" name="coord_nombre" class="form-input"></div>
-              <div class="form-group"><label>Rango</label><input type="text" id="coord_rango" name="coord_rango" class="form-input"></div>
+            <div class="responsable-fields">
+              <div class="form-group full-width"><label>Apellido y Nombre</label><input type="text" id="coord_nombre" name="coord_nombre" class="form-input"></div>
+              <div class="form-group full-width">
+                <label>Rango</label>
+                <select id="coord_rango" name="coord_rango" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option value="COMISARIO MAYOR">COMISARIO MAYOR</option>
+                  <option value="COMISARIO GENERAL">COMISARIO GENERAL</option>
+                  <option value="COMISARIO JEFE">COMISARIO JEFE</option>
+                  <option value="PRIMER COMISARIO">PRIMER COMISARIO</option>
+                  <option value="COMISARIO">COMISARIO</option>
+                  <option value="INSPECTOR JEFE">INSPECTOR JEFE</option>
+                  <option value="PRIMER INSPECTOR">PRIMER INSPECTOR</option>
+                  <option value="INSPECTOR">INSPECTOR</option>
+                  <option value="OFICIAL JEFE">OFICIAL JEFE</option>
+                  <option value="PRIMER OFICIAL">PRIMER OFICIAL</option>
+                  <option value="OFICIAL">OFICIAL</option>
+                </select>
+              </div>
               <div class="form-group"><label>Nº de Cédula</label><input type="text" id="coord_cedula" name="coord_cedula" class="form-input"></div>
               <div class="form-group"><label>Nº de Teléfono</label><input type="text" id="coord_telefono" name="coord_telefono" class="form-input"></div>
             </div>
           </div>
           <div class="responsable-col">
             <h3 class="resp-header">INSPECCIÓN REALIZADA POR:</h3>
-            <div class="form-fields-grid">
-              <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="insp_nombre" name="insp_nombre" class="form-input"></div>
-              <div class="form-group"><label>Rango</label><input type="text" id="insp_rango" name="insp_rango" class="form-input"></div>
+            <div class="responsable-fields">
+              <div class="form-group full-width"><label>Apellido y Nombre</label><input type="text" id="insp_nombre" name="insp_nombre" class="form-input"></div>
+              <div class="form-group full-width">
+                <label>Rango</label>
+                <select id="insp_rango" name="insp_rango" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option value="COMISARIO MAYOR">COMISARIO MAYOR</option>
+                  <option value="COMISARIO GENERAL">COMISARIO GENERAL</option>
+                  <option value="COMISARIO JEFE">COMISARIO JEFE</option>
+                  <option value="PRIMER COMISARIO">PRIMER COMISARIO</option>
+                  <option value="COMISARIO">COMISARIO</option>
+                  <option value="INSPECTOR JEFE">INSPECTOR JEFE</option>
+                  <option value="PRIMER INSPECTOR">PRIMER INSPECTOR</option>
+                  <option value="INSPECTOR">INSPECTOR</option>
+                  <option value="OFICIAL JEFE">OFICIAL JEFE</option>
+                  <option value="PRIMER OFICIAL">PRIMER OFICIAL</option>
+                  <option value="OFICIAL">OFICIAL</option>
+                </select>
+              </div>
               <div class="form-group"><label>Nº de Cédula</label><input type="text" id="insp_cedula" name="insp_cedula" class="form-input"></div>
               <div class="form-group"><label>Nº de Teléfono</label><input type="text" id="insp_telefono" name="insp_telefono" class="form-input"></div>
             </div>
