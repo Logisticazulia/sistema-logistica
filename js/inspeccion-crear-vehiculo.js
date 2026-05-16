@@ -1,67 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // ==========================================
+  // 1️⃣ REFERENCIAS DOM (Se declaran primero para evitar TDZ)
+  // ==========================================
+  const alertSuccess = document.getElementById('alertSuccess');
+  const alertError = document.getElementById('alertError');
+  const alertInfo = document.getElementById('alertInfo');
   
-  // 🔧 INICIALIZAR SUPABASE SI NO EXISTE (usando tus credenciales de config.js)
-  async function initSupabase() {
-    if (typeof window.supabase !== 'undefined' && window.supabase?.auth) {
-      return window.supabase;
-    }
-    
-    // Esperar a que createClient esté disponible desde el CDN
-    let attempts = 0;
-    while (typeof createClient === 'undefined' && attempts < 50) {
-      await new Promise(res => setTimeout(res, 100));
-      attempts++;
-    }
-    
-    if (typeof createClient === 'undefined') {
-      console.error('❌ No se pudo cargar createClient desde el CDN de Supabase');
-      mostrarAlerta('error', 'Error de carga. Recarga con Ctrl+F5');
-      return null;
-    }
-    
-    // Crear cliente con tus credenciales de config.js
-    if (window.SUPABASE_URL && window.SUPABASE_KEY) {
-      try {
-        window.supabase = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-        console.log('✅ Cliente Supabase inicializado desde config.js');
-        return window.supabase;
-      } catch (err) {
-        console.error('❌ Error al crear cliente Supabase:', err);
-        return null;
-      }
-    }
-    
-    console.error('❌ Faltan credenciales en config.js (SUPABASE_URL o SUPABASE_KEY)');
-    return null;
-  }
-
-  const supabase = await initSupabase();
-  if (!supabase) return;
-
-  // 🔐 Rutas (ajusta según tu estructura real en GitHub Pages)
-  const RUTAS = {
-    login: '/sistema-logistica/login.html',
-    dashboard: '/sistema-logistica/dashboard.html',
-    transporte: '/sistema-logistica/transporte.html',
-    inspeccion: '/sistema-logistica/inspeccion/inspeccion.html'
-  };
-
-  // 🔒 Verificar autenticación (NO bloqueante - sin redirección agresiva)
-  let usuarioActual = null;
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) {
-      console.warn('⚠️ Auth warning:', error.message);
-    } else if (user) {
-      usuarioActual = user;
-      const userEmailEl = document.getElementById('userEmail');
-      if (userEmailEl) userEmailEl.textContent = user.email || 'Usuario';
-    }
-  } catch (err) {
-    console.error('❌ Error en auth:', err);
-  }
-
-  // 🎯 Referencias DOM
   const searchInput = document.getElementById('searchVehicle');
   const btnSearch = document.getElementById('btnSearch');
   const btnSearchText = btnSearch?.querySelector('.btn-search-text');
@@ -72,10 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnCancel = document.getElementById('btnCancel');
   const btnClearVehicle = document.getElementById('btnClearVehicle');
   
-  const alertSuccess = document.getElementById('alertSuccess');
-  const alertError = document.getElementById('alertError');
-  const alertInfo = document.getElementById('alertInfo');
-
   const disp = {
     placa: document.getElementById('dispPlaca'),
     marca: document.getElementById('dispMarca'),
@@ -88,7 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   const vehicleIdInput = document.getElementById('vehicleId');
 
-  // 🔍 Mostrar alerta
+  // ==========================================
+  // 2️⃣ UTILIDADES DE UI
+  // ==========================================
   function mostrarAlerta(tipo, mensaje) {
     [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
     if (tipo === 'success' && alertSuccess) {
@@ -103,21 +45,80 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 🔄 Habilitar/deshabilitar formulario
   function toggleFormState(activo) {
     if (!inspectionForm) return;
     inspectionForm.style.opacity = activo ? '1' : '0.6';
     inspectionForm.style.pointerEvents = activo ? 'auto' : 'none';
-    if (btnSubmit) {
-      btnSubmit.disabled = !activo || !usuarioActual;
-      if (!usuarioActual && btnSubmit) {
-        btnSubmit.title = '🔐 Requiere iniciar sesión para guardar';
-      }
-    }
+    if (btnSubmit) btnSubmit.disabled = !activo;
     if (vehicleDisplay) vehicleDisplay.style.display = activo ? 'block' : 'none';
   }
 
-  // 🚗 Buscar vehículo
+  // ==========================================
+  // 3️⃣ INICIALIZACIÓN DE SUPABASE (Robusta)
+  // ==========================================
+  async function initSupabase() {
+    // Esperar a que el CDN cargue (máx 5 seg)
+    let attempts = 0;
+    while (!window.supabase && attempts < 50) {
+      await new Promise(res => setTimeout(res, 100));
+      attempts++;
+    }
+
+    if (!window.supabase) {
+      mostrarAlerta('error', '❌ No se cargó la librería de Supabase. Recargue la página.');
+      return null;
+    }
+
+    // Si ya está inicializado, lo retornamos
+    if (window.supabase.auth) {
+      return window.supabase;
+    }
+
+    // Inicializar con credenciales de config.js
+    const createFn = window.supabase.createClient || window.createClient;
+    if (createFn && window.SUPABASE_URL && window.SUPABASE_KEY) {
+      try {
+        window.supabase = createFn(window.SUPABASE_URL, window.SUPABASE_KEY);
+        console.log('✅ Cliente Supabase inicializado desde config.js');
+        return window.supabase;
+      } catch (err) {
+        console.error('❌ Error init Supabase:', err);
+        mostrarAlerta('error', '❌ Error al crear el cliente Supabase');
+        return null;
+      }
+    }
+
+    mostrarAlerta('error', '⚠️ Faltan credenciales o función de creación');
+    return null;
+  }
+
+  const supabase = await initSupabase();
+  if (!supabase) return; // Detener ejecución si falla init
+
+  // ==========================================
+  // 4️⃣ AUTENTICACIÓN (No bloqueante)
+  // ==========================================
+  let usuarioActual = null;
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (!error && user) {
+      usuarioActual = user;
+      const userEmailEl = document.getElementById('userEmail');
+      if (userEmailEl) userEmailEl.textContent = user.email || 'Usuario';
+    }
+  } catch (err) {
+    console.warn('⚠️ Sesión no verificada, pero se permite buscar vehículos');
+  }
+
+  // Deshabilitar guardar si no hay sesión
+  if (!usuarioActual && btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.title = '🔐 Requiere iniciar sesión';
+  }
+
+  // ==========================================
+  // 5️⃣ LÓGICA DE NEGOCIO
+  // ==========================================
   async function buscarVehiculo() {
     const query = searchInput?.value.trim();
     if (!query) { mostrarAlerta('info', 'Ingrese Placa, Facsímil, S/Carrocería o S/Motor'); return; }
@@ -143,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Rellenar datos encontrados
+      // Rellenar UI
       disp.placa.textContent = data.placa || 'N/A';
       disp.marca.textContent = data.marca?.toUpperCase() || 'N/A';
       disp.modelo.textContent = data.modelo?.toUpperCase() || 'N/A';
@@ -151,12 +152,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       disp.tipo.textContent = data.tipo || 'N/A';
       disp.color.textContent = data.color || 'N/A';
       disp.nId.textContent = data.n_identificacion || 'N/A';
-      const adscrita = data.unidad_administrativa || data.epp || data.epm || 'No asignada';
-      disp.adscrita.textContent = adscrita;
+      disp.adscrita.textContent = data.unidad_administrativa || data.epp || data.epm || 'No asignada';
 
       if (vehicleIdInput) vehicleIdInput.value = data.id;
       toggleFormState(true);
-      mostrarAlerta('success', '✅ Vehículo encontrado');
+      mostrarAlerta('success', '✅ Vehículo encontrado. Complete la inspección.');
 
     } catch (err) {
       console.error('Error búsqueda:', err);
@@ -170,7 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 🗑️ Limpiar búsqueda
   function limpiarBusqueda() {
     if (searchInput) searchInput.value = '';
     toggleFormState(false);
@@ -179,16 +178,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
   }
 
-  // 💾 Guardar inspección
   async function guardarInspeccion(e) {
     e?.preventDefault();
     
     if (!usuarioActual) {
-      mostrarAlerta('error', '🔐 Debes iniciar sesión para guardar inspecciones');
+      mostrarAlerta('error', '🔐 Debe iniciar sesión para guardar');
       return;
     }
     if (!vehicleIdInput?.value) {
-      mostrarAlerta('error', 'Primero busca y selecciona un vehículo');
+      mostrarAlerta('error', 'Primero seleccione un vehículo');
       return;
     }
 
@@ -205,19 +203,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         vehiculo_id: vehicleIdInput.value,
         inspector: usuarioActual.email || 'sistema',
         fecha_creacion: new Date().toISOString()
-        // 👇 Aquí agregarás los ítems de inspección que me indiques
+        // ⬇️ Aquí se agregarán los ítems que me indiques
       };
 
-      // ⚠️ Cambia 'inspecciones_pvr' por el nombre real de tu tabla
       const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
       if (error) throw error;
 
-      mostrarAlerta('success', '✅ Inspección PVR registrada correctamente');
+      mostrarAlerta('success', '✅ Inspección registrada correctamente');
       limpiarBusqueda();
 
     } catch (err) {
       console.error('Error al guardar:', err);
-      mostrarAlerta('error', `No se pudo guardar: ${err.message || 'Error desconocido'}`);
+      mostrarAlerta('error', `No se pudo guardar: ${err.message || 'Error'}`);
     } finally {
       if (btnSubmit) {
         btnSubmit.disabled = false;
@@ -229,7 +226,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 🎧 Event Listeners
+  // ==========================================
+  // 6️⃣ EVENT LISTENERS
+  // ==========================================
   if (btnSearch) btnSearch.addEventListener('click', buscarVehiculo);
   if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarVehiculo(); });
   if (btnClearVehicle) btnClearVehicle.addEventListener('click', limpiarBusqueda);
