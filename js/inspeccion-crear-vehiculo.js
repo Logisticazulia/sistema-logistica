@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       setDefaults();
       toggleFormState(true);
-      mostrarAlerta('success', '✅ Vehículo encontrado. Complete motivo, lugar, KMS y accesorios.');
+      mostrarAlerta('success', '✅ Vehículo encontrado. Complete motivo, lugar, KMS y componentes.');
     } catch (err) {
       console.error('Error búsqueda:', err); mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
@@ -95,6 +95,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   function limpiarFormulario() {
     searchInput.value = ''; toggleFormState(false); inspectionForm.reset(); vehicleIdInput.value = '';
     mostrarAlerta('info', 'Ingrese datos para buscar un vehículo');
+  }
+
+  // 🆕 Recolección optimizada de los 80 componentes
+  function getComponentesValues() {
+    const componentes = {};
+    document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => {
+      if (!componentes[r.name]) componentes[r.name] = 'NT'; // Default a N/T si no se selecciona
+      if (r.checked) componentes[r.name] = r.value;
+    });
+    return componentes;
   }
 
   async function guardarInspeccion(e) {
@@ -127,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         kms: parseFloat(document.getElementById('kms')?.value) || 0,
         inspector: usuarioActual.email || 'sistema',
         created_at: new Date().toISOString(),
-        // 📦 Accesorios y Equipamiento (SI / NO)
         bateria: document.getElementById('bateria')?.value || 'NO',
         estacion_base: document.getElementById('estacion_base')?.value || 'NO',
         coctelera: document.getElementById('coctelera')?.value || 'NO',
@@ -135,7 +144,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         placas: document.getElementById('placas')?.value || 'NO',
         herramientas: document.getElementById('herramientas')?.value || 'NO',
         gato: document.getElementById('gato')?.value || 'NO',
-        sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO'
+        sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
+        // 🆕 Inyectar los 80 componentes automáticamente
+        ...getComponentesValues()
       };
 
       const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
