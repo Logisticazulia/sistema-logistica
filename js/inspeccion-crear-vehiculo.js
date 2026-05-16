@@ -193,61 +193,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnClear?.addEventListener('click', limpiarFormulario); // ✅ Ahora sí está definida
     
     inspectionForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!usuarioActual) { mostrarAlerta('error', '🔐 Inicie sesión para guardar'); return; }
-        if (!vehicleIdInput.value) { mostrarAlerta('error', 'Busque un vehículo primero'); return; }
-        
-        const rinVal = document.getElementById('rin_numero')?.value;
-        if (rinVal && !/^\d{2}$/.test(rinVal)) { mostrarAlerta('error', 'El Nº de Rin debe contener exactamente 2 dígitos.'); return; }
-        
-        btnSubmit.disabled = true; btnSubmit.querySelector('.btn-text').style.display = 'none'; btnSubmit.querySelector('.btn-loader').style.display = 'inline';
-        try {
-       try {
-    const payload = {
-        vehiculo_id: vehicleIdInput.value, n_inspeccion: document.getElementById('n_inspeccion')?.value,
-        fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value, hora: document.getElementById('hora')?.value,
-        motivo: document.getElementById('motivo_inspeccion')?.value, lugar: document.getElementById('lugar')?.value,
-        asignacion: document.getElementById('asignacion')?.value, supervision: document.getElementById('supervision')?.value,
-        placa: document.getElementById('placa')?.value, marca: document.getElementById('marca')?.value,
-        modelo: document.getElementById('modelo')?.value, ano: document.getElementById('ano')?.value, tipo: document.getElementById('tipo')?.value,
-        color: document.getElementById('color')?.value, n_identificacion: document.getElementById('n_identificacion')?.value,
-        s_carroceria: document.getElementById('s_carroceria')?.value, kms: parseFloat(document.getElementById('kms')?.value) || 0,
-        inspector: usuarioActual.email || 'sistema', created_at: new Date().toISOString(),
-        bateria: document.getElementById('bateria')?.value || 'NO', estacion_base: document.getElementById('estacion_base')?.value || 'NO',
-        coctelera: document.getElementById('coctelera')?.value || 'NO', triangulo: document.getElementById('triangulo')?.value || 'NO',
-        placas: document.getElementById('placas')?.value || 'NO', herramientas: document.getElementById('herramientas')?.value || 'NO',
-        gato: document.getElementById('gato')?.value || 'NO', sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
-        caucho_del_izq: document.querySelector('input[name="caucho_del_izq"]:checked')?.value || 'M',
-        caucho_del_der: document.querySelector('input[name="caucho_del_der"]:checked')?.value || 'M',
-        caucho_tra_izq: document.querySelector('input[name="caucho_tra_izq"]:checked')?.value || 'M',
-        caucho_tra_der: document.querySelector('input[name="caucho_tra_der"]:checked')?.value || 'M',
-        caucho_repuesto: document.querySelector('input[name="caucho_repuesto"]:checked')?.value || 'M',
-        tapa_cauchos: document.querySelector('input[name="tapa_cauchos"]:checked')?.value || 'NO',
-        rin_numero: document.getElementById('rin_numero')?.value || '', observaciones: document.getElementById('observaciones')?.value || '',
-        coord_nombre: document.getElementById('coord_nombre')?.value || '', coord_rango: document.getElementById('coord_rango')?.value || '',
-        coord_cedula: document.getElementById('coord_cedula')?.value || '', coord_telefono: document.getElementById('coord_telefono')?.value || '',
-        insp_nombre: document.getElementById('insp_nombre')?.value || '', insp_rango: document.getElementById('insp_rango')?.value || '',
-        insp_cedula: document.getElementById('insp_cedula')?.value || '', insp_telefono: document.getElementById('insp_telefono')?.value || '',
-        ...getComponentesValues()
-    };
-
-    const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
-    if (error) throw error; 
-
-    // ✅ Muestra mensaje y sube suavemente a la parte superior
-    mostrarAlerta('success', '✅ Inspección PVR registrada correctamente');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    e.preventDefault();
+    if (!usuarioActual) { mostrarAlerta('error', '🔐 Inicie sesión para guardar'); return; }
+    if (!vehicleIdInput.value) { mostrarAlerta('error', 'Busque un vehículo primero'); return; }
     
-    limpiarFormulario();
-} catch (err) { 
-    console.error('Error al guardar:', err); 
-    mostrarAlerta('error', `No se pudo guardar: ${err.message}`); 
-} finally { 
-    btnSubmit.disabled = false; 
-    btnSubmit.querySelector('.btn-text').style.display = 'inline'; 
-    btnSubmit.querySelector('.btn-loader').style.display = 'none'; 
-}
+    const rinVal = document.getElementById('rin_numero')?.value;
+    if (rinVal && !/^\d{2}$/.test(rinVal)) { mostrarAlerta('error', 'El Nº de Rin debe contener exactamente 2 dígitos.'); return; }
+    
+    btnSubmit.disabled = true; 
+    btnSubmit.querySelector('.btn-text').style.display = 'none'; 
+    btnSubmit.querySelector('.btn-loader').style.display = 'inline';
+    
+    try {
+        const payload = {
+            vehiculo_id: vehicleIdInput.value, n_inspeccion: document.getElementById('n_inspeccion')?.value,
+            fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value, hora: document.getElementById('hora')?.value,
+            motivo: document.getElementById('motivo_inspeccion')?.value, lugar: document.getElementById('lugar')?.value,
+            asignacion: document.getElementById('asignacion')?.value, supervision: document.getElementById('supervision')?.value,
+            placa: document.getElementById('placa')?.value, marca: document.getElementById('marca')?.value,
+            modelo: document.getElementById('modelo')?.value, ano: document.getElementById('ano')?.value, tipo: document.getElementById('tipo')?.value,
+            color: document.getElementById('color')?.value, n_identificacion: document.getElementById('n_identificacion')?.value,
+            s_carroceria: document.getElementById('s_carroceria')?.value, kms: parseFloat(document.getElementById('kms')?.value) || 0,
+            inspector: usuarioActual.email || 'sistema', created_at: new Date().toISOString(),
+            bateria: document.getElementById('bateria')?.value || 'NO', estacion_base: document.getElementById('estacion_base')?.value || 'NO',
+            coctelera: document.getElementById('coctelera')?.value || 'NO', triangulo: document.getElementById('triangulo')?.value || 'NO',
+            placas: document.getElementById('placas')?.value || 'NO', herramientas: document.getElementById('herramientas')?.value || 'NO',
+            gato: document.getElementById('gato')?.value || 'NO', sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
+            caucho_del_izq: document.querySelector('input[name="caucho_del_izq"]:checked')?.value || 'M',
+            caucho_del_der: document.querySelector('input[name="caucho_del_der"]:checked')?.value || 'M',
+            caucho_tra_izq: document.querySelector('input[name="caucho_tra_izq"]:checked')?.value || 'M',
+            caucho_tra_der: document.querySelector('input[name="caucho_tra_der"]:checked')?.value || 'M',
+            caucho_repuesto: document.querySelector('input[name="caucho_repuesto"]:checked')?.value || 'M',
+            tapa_cauchos: document.querySelector('input[name="tapa_cauchos"]:checked')?.value || 'NO',
+            rin_numero: rinVal || '', observaciones: document.getElementById('observaciones')?.value || '',
+            coord_nombre: document.getElementById('coord_nombre')?.value || '', coord_rango: document.getElementById('coord_rango')?.value || '',
+            coord_cedula: document.getElementById('coord_cedula')?.value || '', coord_telefono: document.getElementById('coord_telefono')?.value || '',
+            insp_nombre: document.getElementById('insp_nombre')?.value || '', insp_rango: document.getElementById('insp_rango')?.value || '',
+            insp_cedula: document.getElementById('insp_cedula')?.value || '', insp_telefono: document.getElementById('insp_telefono')?.value || '',
+            ...getComponentesValues()
+        };
 
+        const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
+        if (error) throw error; 
+        
+        // ✅ 1. Mostrar mensaje de éxito
+        mostrarAlerta('success', '✅ Inspección PVR registrada correctamente');
+        // ✅ 2. Hacer scroll suave EXACTO hacia la alerta visible
+        alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // ⏳ 3. Esperar 3 segundos para que se lea, luego limpiar
+        setTimeout(() => {
+            limpiarFormulario();
+        }, 3000);
+        
+    } catch (err) { 
+        console.error('Error al guardar:', err); 
+        mostrarAlerta('error', `No se pudo guardar: ${err.message}`); 
+    } finally { 
+        btnSubmit.disabled = false; 
+        btnSubmit.querySelector('.btn-text').style.display = 'inline'; 
+        btnSubmit.querySelector('.btn-loader').style.display = 'none'; 
+    }
+});
     inspectionForm?.addEventListener('input', updatePreview);
     inspectionForm?.addEventListener('change', updatePreview);
 
