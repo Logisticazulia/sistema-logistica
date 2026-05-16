@@ -155,46 +155,73 @@ function exportarExcel() {
 
 function renderTable() {
   const start = (currentPage - 1) * itemsPerPage;
-  const pageVehicles = filteredVehicles.slice(start, start + itemsPerPage);
+  const end = start + itemsPerPage;
+  const pageVehicles = filteredVehicles.slice(start, end);
   const tbody = document.getElementById('vehiclesTableBody');
   
   if (pageVehicles.length === 0) {
-    // 🔒 Mantiene altura fija con padding grande
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #666; padding: 150px 10px;">📭 No se encontraron vehículos con los filtros seleccionados</td></tr>`;
+    // 🔒 MANTENER ALTURA CON PADDING GRANDE CUANDO NO HAY RESULTADOS
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="11" style="text-align: center; color: #666; padding: 200px 10px;">
+          📭 No se encontraron vehículos con los filtros seleccionados
+        </td>
+      </tr>
+    `;
     document.getElementById('resultsCount').textContent = '0 vehículos encontrados';
+    document.getElementById('pageInfo').textContent = 'Página 1 de 1';
     return;
   }
+  
   tbody.innerHTML = pageVehicles.map(v => `
     <tr onclick="openFicha('${v.id || ''}')">
-      <td>${v.placa||'N/A'}</td><td>${v.facsimil||'N/A'}</td><td>${v.marca||'N/A'}</td><td>${v.modelo||'N/A'}</td>
-      <td>${v.tipo||'N/A'}</td><td>${v.clase||'N/A'}</td><td>${v.ano||'N/A'}</td><td>${v.color||'N/A'}</td>
-      <td>${v.s_carroceria||'N/A'}</td><td>${v.s_motor||'N/A'}</td><td>${getEstatusBadge(v.estatus)}</td>
-    </tr>`).join('');
+      <td>${v.placa || 'N/A'}</td>
+      <td>${v.facsimil || 'N/A'}</td>
+      <td>${v.marca || 'N/A'}</td>
+      <td>${v.modelo || 'N/A'}</td>
+      <td>${v.tipo || 'N/A'}</td>
+      <td>${v.clase || 'N/A'}</td>
+      <td>${v.ano || 'N/A'}</td>
+      <td>${v.color || 'N/A'}</td>
+      <td>${v.s_carroceria || 'N/A'}</td>
+      <td>${v.s_motor || 'N/A'}</td>
+      <td>${getEstatusBadge(v.estatus)}</td>
+    </tr>
+  `).join('');
+  
   document.getElementById('resultsCount').textContent = `${filteredVehicles.length} vehículos encontrados`;
   document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${Math.ceil(filteredVehicles.length / itemsPerPage)}`;
 }
 
 function renderPagination() {
-  const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage) || 1;
   const pagination = document.getElementById('pagination');
+  
   if (totalPages <= 1) {
     pagination.innerHTML = '<span style="color:#6c757d; font-size:0.85rem;">Página 1 de 1</span>';
     return;
   }
-  let html = `<button onclick="changePage(1)" ${currentPage===1?'disabled':''}>«</button>
-              <button onclick="changePage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  
+  let html = `
+    <button onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>«</button>
+    <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+  `;
+  
   for (let i = 1; i <= totalPages; i++) {
-    if (i===1 || i===totalPages || (i>=currentPage-2 && i<=currentPage+2)) {
-      html += `<button onclick="changePage(${i})" class="${i===currentPage?'active':''}">${i}</button>`;
-    } else if (i===currentPage-3 || i===currentPage+3) {
-      html += `<span style="padding:0 5px; color:#6c757d;">...</span>`;
+    if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+      html += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+    } else if (i === currentPage - 3 || i === currentPage + 3) {
+      html += `<span style="padding: 0 5px; color:#6c757d;">...</span>`;
     }
   }
-  html += `<button onclick="changePage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>
-           <button onclick="changePage(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>`;
+  
+  html += `
+    <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>
+    <button onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>»</button>
+  `;
+  
   pagination.innerHTML = html;
 }
-
 function changePage(page) {
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
   if (page<1 || page>totalPages) return;
