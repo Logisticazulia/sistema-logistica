@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updatePreview();
   }
 
-  // 🆕 ACTUALIZAR VISTA PREVIA EN VIVO (SIEMPRE ACTIVA)
+  // 🆕 ACTUALIZAR VISTA PREVIA EN VIVO (4 COLUMNAS + ✅)
   function updatePreview() {
     const v = id => document.getElementById(id)?.value || '-';
     const vr = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '-';
@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('pv_hora').textContent = v('hora');
     document.getElementById('pv_motivo').textContent = v('motivo_inspeccion');
     document.getElementById('pv_lugar').textContent = `${v('lugar')} / ${v('asignacion')}`;
+    document.getElementById('pv_supervision').textContent = v('supervision');
 
     document.getElementById('pv_placa').textContent = v('placa');
     document.getElementById('pv_marca_modelo').textContent = `${v('marca')} ${v('modelo')}`;
@@ -146,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('pv_insp_rango').textContent = vs('insp_rango');
     document.getElementById('pv_insp_cedula').textContent = v('insp_cedula');
 
-    // Componentes Grid
+    // Componentes Grid (4 columnas + ✅)
     const compGrid = document.getElementById('pv_comps_grid');
     compGrid.innerHTML = '';
     const compItems = document.querySelectorAll('.inspection-item');
@@ -158,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       const div = document.createElement('div');
       div.className = 'pv-comp';
-      div.innerHTML = `<div class="pv-comp-label">${label}</div><div class="pv-comp-status ${cls}">${val}</div>`;
+      div.innerHTML = `<div class="pv-comp-label">${label}</div><div class="pv-comp-status ${cls}"><span class="pv-check">✅</span>${val}</div>`;
       compGrid.appendChild(div);
     });
   }
@@ -210,7 +211,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     finally { btnSubmit.disabled = false; btnSubmit.querySelector('.btn-text').style.display = 'inline'; btnSubmit.querySelector('.btn-loader').style.display = 'none'; }
   });
 
-  // Live Update on any input change
   inspectionForm?.addEventListener('input', updatePreview);
   inspectionForm?.addEventListener('change', updatePreview);
 
@@ -221,6 +221,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   setDefaults();
-  updatePreview(); // Render inicial
+  updatePreview();
   mostrarAlerta('info', '🔍 Busque un vehículo para habilitar el formulario');
 });
