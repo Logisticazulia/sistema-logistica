@@ -11,7 +11,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
 .form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
-.search-container { background: linear-gradient(135deg, #e9c46a 0%, #d4a84a 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+
+/* 🔵 BARRA DE BÚSQUEDA AZUL */
+.search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
 .search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
 .search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 .search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
@@ -20,48 +22,55 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
 .btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
 .search-hint { color: rgba(255,255,255,0.9); font-size: 0.8rem; margin-top: 8px; display: block; }
-.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #e9c46a; margin-bottom: 25px; }
+
+/* 🔵 SECCIONES Y SUBTÍTULOS AZULES */
+.form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #005b96; margin-bottom: 25px; }
 .form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
+.form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; background: rgba(0, 91, 150, 0.2); }
 .form-section-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 700; text-transform: uppercase; margin: 0; }
 .form-fields-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group label { font-size: 0.78rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 .form-input, .form-select, .form-textarea { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 7px; font-size: 0.92rem; font-family: 'Roboto', sans-serif; background: white; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #e9c46a; box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.25); }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #005b96; box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.15); }
 .form-input:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
 .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px; }
 .form-textarea { resize: vertical; min-height: 100px; }
+
 .form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
 .btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; border: none; }
 .btn-secondary { background: #6c757d; color: white; }
-.btn-primary { background: linear-gradient(135deg, #e9c46a 0%, #d4a84a 100%); color: #000; }
+.btn-primary { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; box-shadow: 0 4px 15px rgba(0, 51, 102, 0.35); }
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45); }
 .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+
 .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 25px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+
+/* 🔵 COMPONENTES 4 COLUMNAS */
 .inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
 .inspection-item { background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
-.inspection-item:hover { border-color: #e9c46a; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.inspection-item:hover { border-color: #005b96; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 .item-label { font-size: 0.7rem; color: #475569; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; line-height: 1.2; letter-spacing: 0.3px; }
 .opt-group { display: flex; gap: 4px; }
 .opt-group label { flex: 1; text-align: center; padding: 6px 0; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; font-size: 0.72rem; font-weight: 800; transition: all 0.15s; background: #f8fafc; color: #64748b; }
 .opt-group input[type="radio"] { display: none; }
-.opt-group label:has(input:checked) { background: #e9c46a; color: #000; border-color: #e9c46a; box-shadow: 0 2px 4px rgba(233,196,106,0.3); }
+.opt-group label:has(input:checked) { background: #005b96; color: white; border-color: #005b96; box-shadow: 0 2px 4px rgba(0,91,150,0.3); }
 .opt-group label:hover:not(:has(input:checked)) { background: #e2e8f0; }
 .opt-group label:nth-child(1):has(input:checked) { background: #10b981; border-color: #10b981; color: white; }
 .opt-group label:nth-child(2):has(input:checked) { background: #ef4444; border-color: #ef4444; color: white; }
 .opt-group label:nth-child(3):has(input:checked) { background: #f59e0b; border-color: #f59e0b; color: white; }
-.tires-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 15px; }
-.tire-item { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center; }
-.tires-grid .opt-group { justify-content: center; }
+
 .responsibles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
 .responsable-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
 .responsable-fields .full-width { grid-column: 1 / -1; }
-.resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #e9c46a; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-.preview-divider { height: 3px; background: linear-gradient(90deg, #e9c46a, #d4a84a); margin: 40px 0 30px; border-radius: 2px; }
+.resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #005b96; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+
+.preview-divider { height: 3px; background: linear-gradient(90deg, #003366, #005b96); margin: 40px 0 30px; border-radius: 2px; }
 .print-page { width: 100%; max-width: 216mm; min-height: auto; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; overflow: visible; position: relative; }
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 85px; height: 85px; object-fit: contain; }
@@ -73,7 +82,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .pv-item { background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
 .pv-label { font-size: 7pt; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
 .pv-value { font-size: 9pt; font-weight: 700; color: #0f172a; min-height: 14px; word-break: break-word; }
-.pv-section-title { font-size: 10pt; color: #e9c46a; font-weight: 800; text-transform: uppercase; margin: 15px 0 10px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
+.pv-section-title { font-size: 10pt; color: #005b96; font-weight: 800; text-transform: uppercase; margin: 15px 0 10px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
 .pv-comps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
 .pv-comp { text-align: center; font-size: 7pt; border: 1px solid #e2e8f0; padding: 4px; border-radius: 3px; background: #fff; }
 .pv-comp-label { display: block; margin-bottom: 3px; color: #475569; font-weight: 600; line-height: 1.1; }
@@ -82,8 +91,9 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .pv-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
 .pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
 .pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
+
 @media (max-width: 1024px) { .inspection-grid { grid-template-columns: repeat(2, 1fr); } .print-page { padding: 12mm; } .pv-comps { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .tires-grid, .responsibles-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-grid, .pv-grid-2, .pv-grid-3, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .responsibles-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-grid, .pv-grid-2, .pv-grid-3, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
 @media print { body, html { background: white; margin: 0; padding: 0; } .navbar, .search-container, .alert, .form-actions, .form-section, .no-print { display: none !important; } .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; } .preview-divider { display: none; } .print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 15mm !important; overflow: visible !important; } .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; } @page { size: letter portrait; margin: 0; } }
 </style>
 </head>
@@ -260,15 +270,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 </div>
 <div class="form-section">
-<div class="form-section-header"><span class="form-section-icon">🛞</span><h2 class="form-section-title">Estado de Cauchos (Del/Tras)</h2></div>
-<div class="form-fields-grid">
-<div class="form-group"><label>CAUCHO DELANTERO</label><select id="caucho_del" name="caucho_del" class="form-select"><option value="B">B (Bueno)</option><option value="M">M (Malo)</option></select></div>
-<div class="form-group"><label>CAUCHO TRASERO</label><select id="caucho_tra" name="caucho_tra" class="form-select"><option value="B">B (Bueno)</option><option value="M">M (Malo)</option></select></div>
-<div class="form-group"><label>CAUCHO REPUESTO</label><select id="caucho_repuesto" name="caucho_repuesto" class="form-select"><option value="B">B (Bueno)</option><option value="M">M (Malo)</option></select></div>
-<div class="form-group"><label>TAPA / PROTECTOR</label><select id="tapa_cauchos" name="tapa_cauchos" class="form-select"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-</div>
-</div>
-<div class="form-section">
 <div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Observaciones</h2></div>
 <textarea id="observaciones" name="observaciones" class="form-textarea" placeholder="Describa hallazgos, novedades o detalles relevantes..."></textarea>
 </div>
@@ -301,7 +302,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 </form>
 <div class="preview-divider"></div>
-<div class="no-print" style="margin-bottom:15px;"><h2 style="margin:0; color:#e9c46a;">📄 Vista Previa Oficial</h2></div>
+<div class="no-print" style="margin-bottom:15px;"><h2 style="margin:0; color:#005b96;">📄 Vista Previa Oficial</h2></div>
 <div class="print-page" id="printPage">
 <header class="print-header">
 <img src="../img/logo.png" alt="Logo" class="print-logo">
@@ -323,13 +324,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div class="pv-item"><span class="pv-label">S/Carrocería</span><div class="pv-value" id="pv_s_carroceria">-</div></div>
 <div class="pv-item"><span class="pv-label">S/Motor</span><div class="pv-value" id="pv_s_motor">-</div></div>
 <div class="pv-item"><span class="pv-label">N/Identificación</span><div class="pv-value" id="pv_n_id">-</div></div>
-</div>
-<div class="pv-section-title">Estado de Cauchos</div>
-<div class="pv-grid pv-grid-4">
-<div class="pv-item"><span class="pv-label">Delantero</span><div class="pv-value" id="pv_ca_del">-</div></div>
-<div class="pv-item"><span class="pv-label">Trasero</span><div class="pv-value" id="pv_ca_tra">-</div></div>
-<div class="pv-item"><span class="pv-label">Repuesto</span><div class="pv-value" id="pv_ca_rep">-</div></div>
-<div class="pv-item"><span class="pv-label">Protector</span><div class="pv-value" id="pv_tapa">-</div></div>
 </div>
 <div class="pv-section-title">Componentes Inspeccionados</div>
 <div class="pv-comps" id="pv_comps_grid"></div>
