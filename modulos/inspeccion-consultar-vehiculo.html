@@ -26,7 +26,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-
 /* ================= TABLA DE RESULTADOS ================= */
 .results-section { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,51,102,0.12); padding: 25px; margin-bottom: 30px; }
 .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e8eef5; }
@@ -47,7 +46,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
 .empty-state .icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
 .empty-state p { margin: 0; font-size: 1rem; }
-
 /* ================= MODAL VISTA PREVIA ================= */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
 .modal-overlay.active { display: flex; }
@@ -60,8 +58,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .modal-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 20px; border-top: 2px solid #e8eef5; position: sticky; bottom: 0; background: white; }
 .btn-print { background: linear-gradient(135deg, #003366, #005b96); color: white; padding: 10px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
 .btn-print:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,51,102,0.3); }
-
-/* 🖨️ ESTILOS DE VISTA PREVIA (IDÉNTICOS A CREAR) */
+/* 🖨️ ESTILOS DE VISTA PREVIA */
 .print-page { width: 100%; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; }
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 85px; height: 85px; object-fit: contain; }
@@ -83,23 +80,46 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
 .pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
 
-@media (max-width: 768px) {
-  .search-container { flex-direction: column; }
-  .inspections-table { font-size: 0.85rem; }
-  .inspections-table th, .inspections-table td { padding: 10px 8px; }
-  .inspections-table .motivo { max-width: 150px; }
-  .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .pv-comps { grid-template-columns: repeat(3, 1fr); }
-}
+/* 🖨️ MEDIA PRINT OPTIMIZADO (HOJA CARTA, SIN CORTES) */
 @media print {
-  body * { visibility: hidden; }
-  .modal-overlay.active, .modal-overlay.active * { visibility: visible; }
-  .modal-overlay.active { position: absolute; left: 0; top: 0; background: white; width: 100%; height: auto; overflow: visible; padding: 0; }
-  .modal-header, .modal-actions, .modal-close { display: none !important; }
-  .modal-content { box-shadow: none; max-height: none; overflow: visible; width: 100%; max-width: none; }
-  .print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 15mm !important; }
-  .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  @page { size: letter portrait; margin: 0; }
+    body { background: white !important; margin: 0 !important; padding: 0 !important; }
+    .navbar, .search-container, .alert, .results-section, .module-header, .module-title-section, .modal-header, .modal-actions, .modal-close, .btn-search, .no-print, .paginationControls {
+        display: none !important;
+    }
+    .modal-overlay.active {
+        position: relative !important;
+        background: white !important;
+        display: block !important;
+        padding: 0 !important; margin: 0 !important; overflow: visible !important; height: auto !important; width: 100% !important;
+    }
+    .modal-content {
+        box-shadow: none !important; max-height: none !important; overflow: visible !important;
+        width: 100% !important; max-width: 100% !important; border: none !important; margin: 0 !important; padding: 0 !important;
+    }
+    .print-page {
+        width: 215mm !important; margin: 0 auto !important; padding: 15mm !important;
+        box-shadow: none !important; border: none !important; background: white !important; overflow: visible !important;
+        page-break-inside: auto; page-break-after: auto;
+    }
+    .print-page * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
+    
+    .pv-section-title { page-break-after: avoid; break-after: avoid; margin-top: 15px; }
+    .pv-grid, .pv-item, .pv-comps, .pv-signatures {
+        page-break-inside: avoid !important; break-inside: avoid !important;
+    }
+    @page {
+        size: letter portrait;
+        margin: 10mm;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-container { flex-direction: column; }
+    .inspections-table { font-size: 0.85rem; }
+    .inspections-table th, .inspections-table td { padding: 10px 8px; }
+    .inspections-table .motivo { max-width: 150px; }
+    .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .pv-comps { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
@@ -117,7 +137,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 </div>
 </nav>
-
 <main class="dashboard-main" role="main">
 <header class="module-header">
 <div class="breadcrumb">
@@ -131,12 +150,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 <button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion-consultar.html'">← Volver</button>
 </header>
-
 <section class="module-title-section">
 <h1 class="module-title">🔍 Consultar Inspección de Patrullas</h1>
 <p class="module-subtitle">Busque un vehículo o revise el historial completo de inspecciones PVR</p>
 </section>
-
 <div class="container">
 <!-- 🔍 BARRA DE BÚSQUEDA -->
 <div class="search-container">
@@ -150,35 +167,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <span class="btn-search-loader" style="display:none;">⏳</span>
 </button>
 </div>
-
 <!-- 📋 ALERTAS -->
 <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Operación exitosa</span></div>
 <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error</span></div>
 <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Cargando historial...</span></div>
-
-<!-- 📊 SECCIÓN DE RESULTADOS (DEBAJO DE LA BÚSQUEDA) -->
+<!-- 📊 SECCIÓN DE RESULTADOS -->
 <section id="resultsSection" class="results-section active">
 <div class="results-header">
-<h2 class="results-title">📋 Historial de Inspecciones</h2>
+<h2 class="results-title">📋 Historial de Inspecciones (Patrullas)</h2>
 <span class="results-count" id="resultsCount">Cargando...</span>
 </div>
 <div style="overflow-x: auto;">
 <table class="inspections-table">
-<thead>
-<tr>
-<th>N° Inspección</th>
-<th>Fecha</th>
-<th>Hora</th>
-<th>Placa</th>
-<th>S/Carrocería</th>
-<th>Motivo</th>
-<th>Acción</th>
-</tr>
-</thead>
+<thead><tr><th>N° Inspección</th><th>Fecha</th><th>Hora</th><th>Placa</th><th>S/Carrocería</th><th>Motivo</th><th>Acción</th></tr></thead>
 <tbody id="resultsBody"></tbody>
 </table>
 </div>
-<div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px;">
+<div id="paginationControls" class="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px;">
 <div style="font-size: 0.9rem; color: #64748b;">Página <span id="currentPageNum">1</span> de <span id="totalPagesNum">1</span></div>
 <div style="display: flex; gap: 8px;">
 <button class="btn btn-secondary" id="btnPrev" style="padding: 8px 16px; font-size: 0.85rem;">← Anterior</button>
@@ -186,13 +191,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 </div>
 </section>
-
 <div id="emptyState" class="empty-state" style="display: none;">
-<div class="icon">📭</div>
-<p>No hay inspecciones registradas aún</p>
+<div class="icon">📭</div><p>No hay inspecciones registradas aún</p>
 </div>
 </div>
-
 <!-- 🗂️ MODAL VISTA PREVIA OFICIAL -->
 <div id="detailModal" class="modal-overlay">
 <div class="modal-content">
@@ -213,7 +215,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 <img src="../img/logo_derecho.png" alt="Logo Der" class="print-logo">
 </header>
-
 <div class="pv-grid">
 <div class="pv-item"><span class="pv-label">N° Inspección</span><div class="pv-value" id="pv_n_inspeccion">-</div></div>
 <div class="pv-item"><span class="pv-label">Fecha</span><div class="pv-value" id="pv_fecha">-</div></div>
@@ -234,7 +235,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div class="pv-item"><span class="pv-label">Kilometraje</span><div class="pv-value" id="pv_kms">-</div></div>
 <div class="pv-item"><span class="pv-label">Rin Nº</span><div class="pv-value" id="pv_rin">-</div></div>
 </div>
-
 <div class="pv-section-title">Accesorios</div>
 <div class="pv-grid pv-grid-4">
 <div class="pv-item"><span class="pv-label">Batería</span><div class="pv-value" id="pv_bateria">-</div></div>
@@ -246,7 +246,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div class="pv-item"><span class="pv-label">Gato</span><div class="pv-value" id="pv_gato">-</div></div>
 <div class="pv-item"><span class="pv-label">Est. Luces</span><div class="pv-value" id="pv_luces">-</div></div>
 </div>
-
 <div class="pv-section-title">Estado de Cauchos</div>
 <div class="pv-grid pv-grid-4">
 <div class="pv-item"><span class="pv-label">Del. Izq.</span><div class="pv-value" id="pv_ca_d_izq">-</div></div>
@@ -256,13 +255,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div class="pv-item"><span class="pv-label">Repuesto</span><div class="pv-value" id="pv_ca_rep">-</div></div>
 <div class="pv-item"><span class="pv-label">Tapa</span><div class="pv-value" id="pv_tapa">-</div></div>
 </div>
-
 <div class="pv-section-title">Componentes Inspeccionados</div>
 <div class="pv-comps" id="pv_comps_grid"></div>
-
 <div class="pv-section-title">Observaciones</div>
 <div style="min-height: 60px; border: 1px dashed #cbd5e0; padding: 10px; margin-bottom: 20px; font-size: 9pt; word-break: break-word;" id="pv_observaciones">Sin observaciones.</div>
-
 <div class="pv-section-title">Firmas de Responsables</div>
 <div class="pv-signatures">
 <div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">POR LA COORDINACIÓN</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_coord_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_coord_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
@@ -276,7 +272,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 </div>
 </div>
 </main>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/config.js"></script>
 <script src="../js/inspeccion-consultar-vehiculo.js"></script>
