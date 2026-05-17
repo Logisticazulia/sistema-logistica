@@ -4,7 +4,7 @@ let currentPage = 1;
 let allInspections = [];
 let filteredInspections = [];
 
-// 🔹 CLASES PERMITIDAS (SOLO PATRULLAS)
+// ✅ FILTRO ESTRICTO: SOLO ESTAS CLASES
 const CLASES_PATRULLA = ['AUTOBUS', 'AUTOMOVIL', 'CAMION', 'CAMIONETA'];
 
 async function initSupabase() {
@@ -21,7 +21,6 @@ return null;
 }
 const supabase = await initSupabase();
 if (!supabase) return;
-
 try {
 const { data: { user } } = await supabase.auth.getUser();
 if (user) { const el = document.getElementById('userEmail'); if (el) el.textContent = user.email || 'Usuario'; }
@@ -57,22 +56,25 @@ const [y, m, d] = dateStr.split('-');
 return `${d}/${m}/${y}`;
 }
 
-// 📊 CARGAR HISTORIAL (FILTRADO SOLO POR CLASES DE PATRULLA)
+// 📊 CARGAR HISTORIAL CON FILTRO DE CLASE
 async function cargarTodasInspecciones(page = 1) {
 try {
 resultsCount.textContent = '🔄 Cargando...';
-// ✅ JOIN con vehiculos para filtrar por clase antes de paginar
-const { count, error: countError } = await supabase.from('inspecciones_pvr')
-.select('id, vehiculos!inner(clase)', { count: 'exact', head: true })
+
+// ✅ Consulta con JOIN para filtrar por clase en la tabla vehiculos
+// Nota: 'vehiculos!vehiculo_id(clase)' asegura que use la FK correcta
+const countQuery = supabase.from('inspecciones_pvr')
+.select('id', { count: 'exact', head: true })
 .in('vehiculos.clase', CLASES_PATRULLA);
 
+const { count, error: countError } = await countQuery;
 if (countError) throw countError;
 
 const from = (page - 1) * ITEMS_PER_PAGE;
 const to = from + ITEMS_PER_PAGE - 1;
 
 const { data, error } = await supabase.from('inspecciones_pvr')
-.select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo, vehiculo_id, vehiculos!inner(clase)')
+.select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo, vehiculos!vehiculo_id(clase)')
 .in('vehiculos.clase', CLASES_PATRULLA)
 .order('fecha_inspeccion', { ascending: false }).range(from, to);
 
@@ -135,27 +137,28 @@ btnNext.disabled = currentPage >= totalPages;
 resultsCount.textContent = `${filteredInspections.length} registro${filteredInspections.length !== 1 ? 's' : ''}`;
 }
 
-// 🔍 BÚSQUEDA INDIVIDUAL (FILTRADA SOLO POR CLASES DE PATRULLA)
+// 🔍 BÚSQUEDA INDIVIDUAL (FILTRADA POR CLASE)
 async function buscarVehiculo() {
 const rawQuery = searchInput?.value.trim();
 if (!rawQuery) { mostrarAlerta('info', 'Ingrese Placa, Facsímil o Serial para buscar'); return; }
 
 if (btnSearch) { btnSearch.disabled = true; btnSearchText.style.display = 'none'; btnSearchLoader.style.display = 'inline'; }
-mostrarAlerta('info', '🔍 Buscando vehículo...');
+mostrarAlerta('info', '🔍 Buscando patrulla...');
 
 try {
-// ✅ Mantenemos espacios y agregamos % para búsqueda parcial
+// ✅ Mantiene espacios y agrega % para búsqueda parcial robusta
 const q = rawQuery.toUpperCase();
 
-const { data: vehiculo, error } = await supabase.from('vehiculos').select('id')
+// ✅ Búsqueda directa filtrada por clases permitidas
+const { data: vehiculo, error } = await supabase.from('vehiculos').select('id, clase')
 .or(`placa.ilike.%${q}%,facsimil.ilike.%${q}%,s_carroceria.ilike.%${q}%,s_motor.ilike.%${q}%`)
-.in('clase', CLASES_PATRULLA) // 🔒 FILTRO ERICTO: SOLO PATRULLAS
+.in('clase', CLASES_PATRULLA)
 .limit(1).maybeSingle();
 
 if (error) throw error;
 
 if (!vehiculo) { 
-mostrarAlerta('error', '❌ Vehículo de patrulla no encontrado. Verifique los datos o el tipo de vehículo.'); 
+mostrarAlerta('error', '❌ Vehículo de patrulla no encontrado. Verifique los datos o el tipo.'); 
 return; 
 }
 
