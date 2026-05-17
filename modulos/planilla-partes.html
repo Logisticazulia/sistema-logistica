@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Estadísticas y Partes - Sistema de Logística">
+<meta name="description" content="Partes Generales - Estadísticas y Reportes">
 <meta name="theme-color" content="#003366">
 <title>Partes Generales | Transporte</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
@@ -12,82 +12,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 
-<!-- Chart.js para gráficos -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- jsPDF para exportar a PDF -->
+<!-- jsPDF & html2canvas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
-/* ================= ESTILOS ESPECÍFICOS DEL REPORTE ================= */
-/* Copiando estilo de transporte.html para las stats en línea */
+/* Estadísticas en línea */
 .stats-inline {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
-  padding: 25px 40px;
-  background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-  border-radius: 12px;
-  margin: 30px 0 40px 0;
-  box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
+  display: flex; justify-content: center; align-items: center; gap: 30px;
+  padding: 25px 40px; background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+  border-radius: 12px; margin: 30px 0 40px 0; box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
   flex-wrap: wrap;
 }
-.stat-item {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.stat-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-.stat-label {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 400;
-}
-.stat-separator {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 1.5rem;
-  font-weight: 300;
-}
+.stat-item { text-align: center; display: flex; flex-direction: column; gap: 5px; }
+.stat-value { font-size: 2.5rem; font-weight: 700; color: white; line-height: 1; }
+.stat-label { font-size: 0.9rem; color: rgba(255, 255, 255, 0.9); font-weight: 400; }
+.stat-separator { color: rgba(255, 255, 255, 0.4); font-size: 1.5rem; font-weight: 300; }
 
-/* Contenedor del reporte */
+/* Contenedor Reporte */
 .report-container {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12);
-  margin-bottom: 40px;
-  max-width: 1440px;
-  margin: 0 auto;
+  background: white; padding: 30px; border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin-bottom: 40px; max-width: 1440px; margin: 0 auto;
 }
-.report-actions {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 30px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-/* Botones */
+.report-actions { display: flex; gap: 15px; margin-bottom: 30px; justify-content: flex-end; flex-wrap: wrap; }
 .btn-action {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s;
-  border: none;
-  font-family: 'Roboto', sans-serif;
-  color: white;
+  padding: 10px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;
+  border: none; font-family: 'Roboto', sans-serif; color: white;
 }
 .btn-refresh { background: #059669; }
 .btn-print { background: #005b96; }
@@ -95,53 +48,32 @@
 .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
 
 /* Gráficos */
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 25px;
-  margin-bottom: 30px;
-}
-.chart-container {
-  background: #f8fafc;
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-}
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
+.chart-container { background: #f8fafc; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; }
 .chart-wrapper { position: relative; height: 300px; }
 
 /* Tabla */
-.table-container {
-  background: white;
-  border-radius: 10px;
-  overflow-x: auto;
-  margin-top: 20px;
-  border: 1px solid #e2e8f0;
-}
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th, .data-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-.data-table th {
-  background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-  color: white;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-}
+.table-container { background: white; border-radius: 10px; overflow-x: auto; margin-top: 20px; border: 1px solid #e2e8f0; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+.data-table th, .data-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+.data-table th { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
 .data-table tr:hover { background: #f1f5f9; }
 
 /* Badges */
-.badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 .badge-alta { background: #d1fae5; color: #059669; }
 .badge-media { background: #fef3c7; color: #d97706; }
 .badge-baja { background: #fee2e2; color: #dc2626; }
+
+/* Paginación */
+.pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 15px; padding: 10px 0; }
+.pagination button {
+  padding: 8px 16px; border: 1px solid #cbd5e1; background: white; border-radius: 6px;
+  cursor: pointer; font-weight: 500; transition: all 0.2s;
+}
+.pagination button:hover:not(:disabled) { background: #005b96; color: white; border-color: #005b96; }
+.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+.pagination span { font-size: 0.9rem; color: #64748b; }
 
 @media (max-width: 768px) {
   .stats-inline { flex-direction: column; gap: 15px; padding: 20px; }
@@ -157,7 +89,6 @@
 </style>
 </head>
 <body class="dashboard-page">
-<!-- ================= BARRA DE NAVEGACIÓN ================= -->
 <nav class="navbar" role="navigation">
   <div class="nav-container">
     <div class="nav-brand">
@@ -165,131 +96,88 @@
       <span class="nav-title">Sistema de Logística</span>
     </div>
     <div class="nav-user">
-      <span class="user-email" id="userEmail">⏳ Cargando usuario...</span>
-      <button class="btn-logout" id="logoutBtn">
-        <span class="logout-icon">🚪</span>
-        <span class="logout-text">Cerrar Sesión</span>
-      </button>
+      <span class="user-email" id="userEmail">⏳ Cargando...</span>
+      <button class="btn-logout" id="logoutBtn"><span class="logout-icon">🚪</span><span class="logout-text">Cerrar Sesión</span></button>
     </div>
   </div>
 </nav>
 
-<!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main" role="main">
-  <!-- Header con Navegación de Migas -->
   <header class="module-header">
     <div class="breadcrumb">
-      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="transporte.html" class="breadcrumb-link">Transporte</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="planilla.html" class="breadcrumb-link">Planilla</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a> <span class="breadcrumb-separator">/</span>
+      <a href="transporte.html" class="breadcrumb-link">Transporte</a> <span class="breadcrumb-separator">/</span>
+      <a href="planilla.html" class="breadcrumb-link">Planilla</a> <span class="breadcrumb-separator">/</span>
       <span class="breadcrumb-current">Partes Generales</span>
     </div>
-    <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">← Volver a Planilla</button>
+    <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">← Volver</button>
   </header>
 
-  <!-- Título del Módulo -->
   <section class="module-title-section">
     <h1 class="module-title">📊 Estadísticas de Partes Generales</h1>
     <p class="module-subtitle">Análisis del parque automotor por unidad y estatus</p>
   </section>
 
-  <!-- ✅ ESTADÍSTICAS EN LÍNEA (Estilo transporte.html) -->
+  <!-- ✅ ESTADÍSTICAS EN LÍNEA (5 Indicadores) -->
   <section class="stats-inline">
-    <div class="stat-item">
-      <span class="stat-value" id="totalVehiculos">⏳</span>
-      <span class="stat-label">Total Vehículos</span>
-    </div>
+    <div class="stat-item"><span class="stat-value" id="totalVehiculos">⏳</span><span class="stat-label">Total</span></div>
     <span class="stat-separator">|</span>
-    <div class="stat-item">
-      <span class="stat-value" id="totalTerrestres">⏳</span>
-      <span class="stat-label">Vehículos Terrestres</span>
-    </div>
+    <div class="stat-item"><span class="stat-value" id="totalPatrulleras">⏳</span><span class="stat-label">Patrulleras</span></div>
     <span class="stat-separator">|</span>
-    <div class="stat-item">
-      <span class="stat-value" id="totalMotos">⏳</span>
-      <span class="stat-label">Motocicletas</span>
-    </div>
+    <div class="stat-item"><span class="stat-value" id="totalMotos">⏳</span><span class="stat-label">Motos</span></div>
     <span class="stat-separator">|</span>
-    <div class="stat-item">
-      <span class="stat-value" id="totalOperativos">⏳</span>
-      <span class="stat-label">Operativos</span>
-    </div>
+    <div class="stat-item"><span class="stat-value" id="totalInoperativos">⏳</span><span class="stat-label">Inoperativos</span></div>
     <span class="stat-separator">|</span>
-    <div class="stat-item">
-      <span class="stat-value" id="totalInoperativos">⏳</span>
-      <span class="stat-label">Inoperativos</span>
-    </div>
+    <div class="stat-item"><span class="stat-value" id="totalDesincorporados">⏳</span><span class="stat-label">Desincorporados</span></div>
   </section>
 
-  <!-- Contenedor del Reporte -->
   <div class="report-container" id="reportContent">
-    <!-- Botones de Acción -->
     <div class="report-actions">
       <button class="btn-action btn-refresh" onclick="location.reload()">🔄 Actualizar</button>
       <button class="btn-action btn-print" onclick="imprimirReporte()">🖨️ Imprimir</button>
       <button class="btn-action btn-pdf" onclick="exportarPDF()">📄 Exportar PDF</button>
     </div>
 
-    <!-- Sección de Gráficos -->
     <div class="charts-section">
       <h2 class="section-title">📈 Distribución Gráfica</h2>
       <div class="charts-grid">
-        <div class="chart-container">
-          <h3 style="margin-bottom: 10px;">Por Estatus (Operatividad)</h3>
-          <div class="chart-wrapper"><canvas id="chartEstatus"></canvas></div>
-        </div>
-        <div class="chart-container">
-          <h3 style="margin-bottom: 10px;">Por Tipo de Vehículo</h3>
-          <div class="chart-wrapper"><canvas id="chartTipos"></canvas></div>
-        </div>
-        <div class="chart-container">
-          <h3 style="margin-bottom: 10px;">Top 10 Unidades Administrativas</h3>
-          <div class="chart-wrapper"><canvas id="chartUnidades"></canvas></div>
-        </div>
-        <div class="chart-container">
-          <h3 style="margin-bottom: 10px;">Antigüedad (Año)</h3>
-          <div class="chart-wrapper"><canvas id="chartAnos"></canvas></div>
-        </div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Por Tipo (Patrulleras, Motos, Tracción)</h3><div class="chart-wrapper"><canvas id="chartTipos"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Por Estatus</h3><div class="chart-wrapper"><canvas id="chartEstatus"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Top Unidades (10)</h3><div class="chart-wrapper"><canvas id="chartUnidades"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Antigüedad (Año)</h3><div class="chart-wrapper"><canvas id="chartAnos"></canvas></div></div>
       </div>
     </div>
 
-    <!-- Tabla de Resumen -->
     <div class="table-container">
       <h2 class="section-title">📋 Resumen por Unidad Administrativa</h2>
       <table class="data-table">
         <thead>
           <tr>
             <th>Unidad Administrativa</th>
-            <th>Vehículos Terrestres</th>
-            <th>Motocicletas</th>
-            <th>Otros</th>
-            <th>Operativos</th>
+            <th>Patrulleras</th>
+            <th>Motos</th>
+            <th>Tracción de Sangre</th>
+            <th>Inoperativos</th>
+            <th>Desincorporados</th>
             <th>% Operatividad</th>
           </tr>
         </thead>
         <tbody id="tablaResumenBody">
-          <!-- Se llena dinámicamente con planilla-partes.js -->
-          <tr><td colspan="6" style="text-align:center; padding: 20px;">⏳ Cargando datos de la base de datos...</td></tr>
+          <tr><td colspan="7" style="text-align:center; padding:20px;">⏳ Cargando unidades...</td></tr>
         </tbody>
       </table>
+      <div class="pagination" id="paginationControls"></div>
     </div>
 
     <div style="text-align:center;color:#64748b;margin-top:20px;font-size:0.9rem;">
-      Reporte generado: <strong id="fechaReporte">--/--/----</strong>
+      Reporte generado: <strong id="fechaReporte"></strong>
     </div>
   </div>
 </main>
 
-<!-- ================= SCRIPTS - ORDEN OBLIGATORIO ================= -->
-<!-- 1. Configuración Global -->
+<!-- ================= SCRIPTS ================= -->
 <script src="../js/config.js"></script>
-<!-- 2. Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- 3. Tu lógica específica (con guion) -->
 <script src="../js/planilla-partes.js"></script>
-
 </body>
 </html>
