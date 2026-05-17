@@ -1,313 +1,272 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Inspección PVR | Transporte</title>
-    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        /* ================= ESTILOS BASE ================= */
-        *, *::before, *::after { box-sizing: border-box; }
-        body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; color: #333; line-height: 1.5; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        .search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
-        .search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
-        .search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
-        .btn-search { background: #f59e0b; color: white; padding: 12px 30px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Roboto', sans-serif; white-space: nowrap; height: fit-content; }
-        .btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
-        .btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
-        .search-hint { color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-top: 8px; display: block; }
-        .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
-        .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
-        .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-        /* ================= TABLA DE RESULTADOS ================= */
-        .results-section { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,51,102,0.12); padding: 25px; margin-bottom: 30px; }
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e8eef5; }
-        .results-title { font-size: 1.1rem; color: #003366; font-weight: 700; margin: 0; }
-        .results-count { font-size: 0.9rem; color: #64748b; }
-        .inspections-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .inspections-table thead { background: linear-gradient(135deg, #003366, #005b96); color: white; }
-        .inspections-table th { padding: 14px 12px; text-align: left; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-        .inspections-table td { padding: 14px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
-        .inspections-table tbody tr:hover { background: #f8fafc; }
-        .inspections-table .n-inspeccion { font-weight: 700; color: #005b96; }
-        .inspections-table .fecha { white-space: nowrap; }
-        .inspections-table .placa { font-weight: 600; letter-spacing: 1px; }
-        .inspections-table .s-carroceria { font-family: monospace; font-size: 0.85rem; color: #475569; }
-        .inspections-table .motivo { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .btn-ver { background: linear-gradient(135deg, #2a9d8f, #218838); color: white; padding: 8px 18px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-ver:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(42,157,143,0.3); }
-        .empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
-        .empty-state .icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
-        .empty-state p { margin: 0; font-size: 1rem; }
-        /* ================= MODAL VISTA PREVIA ================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: white; border-radius: 12px; max-width: 220mm; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 2px solid #e8eef5; position: sticky; top: 0; background: white; z-index: 1; }
-        .modal-title { font-size: 1.1rem; color: #003366; font-weight: 700; margin: 0; }
-        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; transition: color 0.2s; padding: 5px; }
-        .modal-close:hover { color: #dc2626; }
-        .modal-body { padding: 20px; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 20px; border-top: 2px solid #e8eef5; position: sticky; bottom: 0; background: white; }
-        .btn-print { background: linear-gradient(135deg, #003366, #005b96); color: white; padding: 10px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .btn-print:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,51,102,0.3); }
-        /* 🖨️ ESTILOS DE VISTA PREVIA */
-        .print-page { width: 100%; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; }
-        .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
-        .print-logo { width: 85px; height: 85px; object-fit: contain; }
-        .print-header-text { flex: 1; padding: 0 15px; }
-        .print-header-text h2, .print-header-text h3, .print-header-text h4, .print-header-text p { margin: 2px 0; line-height: 1.3; color: #003366; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .print-header-text h2 { font-size: 12pt; } .print-header-text h3 { font-size: 10pt; } .print-header-text h4 { font-size: 9pt; } .print-header-text p { font-size: 9pt; color: #4a5568; font-weight: 500; }
-        .pv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .pv-grid-2 { grid-template-columns: repeat(2, 1fr); } .pv-grid-4 { grid-template-columns: repeat(4, 1fr); }
-        .pv-item { background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
-        .pv-label { font-size: 7pt; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .pv-value { font-size: 9pt; font-weight: 700; color: #0f172a; min-height: 14px; word-break: break-word; }
-        .pv-section-title { font-size: 10pt; color: #005b96; font-weight: 800; text-transform: uppercase; margin: 15px 0 10px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
-        .pv-comps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
-        .pv-comp { text-align: center; font-size: 7pt; border: 1px solid #e2e8f0; padding: 4px; border-radius: 3px; background: #fff; }
-        .pv-comp-label { display: block; margin-bottom: 3px; color: #475569; font-weight: 600; line-height: 1.1; }
-        .pv-comp-status { font-weight: 800; padding: 2px 4px; border-radius: 2px; display: inline-block; width: 100%; box-sizing: border-box; font-size: 7.5pt; }
-        .status-B { background: #d1fae5; color: #059669; } .status-M { background: #fee2e2; color: #dc2626; } .status-NT { background: #fef3c7; color: #d97706; }
-        .pv-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
-        .pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
-        .pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
-        
-        @media (max-width: 768px) {
-            .search-container { flex-direction: column; }
-            .inspections-table { font-size: 0.85rem; }
-            .inspections-table th, .inspections-table td { padding: 10px 8px; }
-            .inspections-table .motivo { max-width: 150px; }
-            .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: repeat(2, 1fr); }
-            .pv-comps { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* 🖨️ CORRECCIÓN DE IMPRESIÓN: HOJA CARTA COMPLETA */
-        @media print {
-            @page {
-                size: letter portrait; /* Hoja Carta */
-                margin: 10mm; /* Margen físico de la hoja */
-            }
-            body, html {
-                width: 100%;
-                height: auto !important;
-                overflow: visible !important;
-                background: white !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            /* Ocultar todo lo que no es el contenido */
-            .navbar, .search-container, .alert, .results-section, .module-header, .module-title-section, .modal-header, .modal-actions, .no-print {
-                display: none !important;
-            }
-            /* Mostrar el modal como contenedor principal */
-            .modal-overlay.active {
-                position: static !important;
-                background: none !important;
-                display: block !important;
-                width: 100% !important;
-                height: auto !important;
-                overflow: visible !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .modal-content {
-                box-shadow: none !important;
-                max-width: 100% !important;
-                width: 100% !important;
-                max-height: none !important;
-                overflow: visible !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                border: none !important;
-            }
-            .modal-body {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            /* Ajustar la hoja de impresión */
-            .print-page {
-                box-shadow: none !important;
-                border: none !important;
-                margin: 0 auto !important;
-                width: 100% !important;
-                max-width: 210mm !important; /* Ancho carta estándar menos márgenes */
-                padding: 0 !important;
-                overflow: visible !important;
-                page-break-inside: auto;
-            }
-            /* Evitar cortes feos dentro de elementos importantes */
-            .pv-grid, .pv-section-title, .pv-comps, .pv-signatures {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultar Inspección PVR | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ================= ESTILOS BASE ================= */
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; color: #333; line-height: 1.5; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+.search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+.search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
+.search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
+.btn-search { background: #f59e0b; color: white; padding: 12px 30px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Roboto', sans-serif; white-space: nowrap; height: fit-content; }
+.btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+.btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+.search-hint { color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-top: 8px; display: block; }
+.alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
+.alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
+.alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+/* ================= TABLA DE RESULTADOS ================= */
+.results-section { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,51,102,0.12); padding: 25px; margin-bottom: 30px; }
+.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e8eef5; }
+.results-title { font-size: 1.1rem; color: #003366; font-weight: 700; margin: 0; }
+.results-count { font-size: 0.9rem; color: #64748b; }
+.inspections-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.inspections-table thead { background: linear-gradient(135deg, #003366, #005b96); color: white; }
+.inspections-table th { padding: 14px 12px; text-align: left; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+.inspections-table td { padding: 14px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+.inspections-table tbody tr:hover { background: #f8fafc; }
+.inspections-table .n-inspeccion { font-weight: 700; color: #005b96; }
+.inspections-table .fecha { white-space: nowrap; }
+.inspections-table .placa { font-weight: 600; letter-spacing: 1px; }
+.inspections-table .s-carroceria { font-family: monospace; font-size: 0.85rem; color: #475569; }
+.inspections-table .motivo { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.btn-ver { background: linear-gradient(135deg, #2a9d8f, #218838); color: white; padding: 8px 18px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-ver:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(42,157,143,0.3); }
+.empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
+.empty-state .icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+.empty-state p { margin: 0; font-size: 1rem; }
+/* ================= MODAL VISTA PREVIA ================= */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: white; border-radius: 12px; max-width: 220mm; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 2px solid #e8eef5; position: sticky; top: 0; background: white; z-index: 1; }
+.modal-title { font-size: 1.1rem; color: #003366; font-weight: 700; margin: 0; }
+.modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; transition: color 0.2s; padding: 5px; }
+.modal-close:hover { color: #dc2626; }
+.modal-body { padding: 20px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 20px; border-top: 2px solid #e8eef5; position: sticky; bottom: 0; background: white; }
+.btn-print { background: linear-gradient(135deg, #003366, #005b96); color: white; padding: 10px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.btn-print:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,51,102,0.3); }
+/* 🖨️ ESTILOS DE VISTA PREVIA */
+.print-page { width: 100%; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; }
+.print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
+.print-logo { width: 85px; height: 85px; object-fit: contain; }
+.print-header-text { flex: 1; padding: 0 15px; }
+.print-header-text h2, .print-header-text h3, .print-header-text h4, .print-header-text p { margin: 2px 0; line-height: 1.3; color: #003366; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.print-header-text h2 { font-size: 12pt; } .print-header-text h3 { font-size: 10pt; } .print-header-text h4 { font-size: 9pt; } .print-header-text p { font-size: 9pt; color: #4a5568; font-weight: 500; }
+.pv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+.pv-grid-2 { grid-template-columns: repeat(2, 1fr); } .pv-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.pv-item { background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
+.pv-label { font-size: 7pt; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
+.pv-value { font-size: 9pt; font-weight: 700; color: #0f172a; min-height: 14px; word-break: break-word; }
+.pv-section-title { font-size: 10pt; color: #005b96; font-weight: 800; text-transform: uppercase; margin: 15px 0 10px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
+.pv-comps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
+.pv-comp { text-align: center; font-size: 7pt; border: 1px solid #e2e8f0; padding: 4px; border-radius: 3px; background: #fff; }
+.pv-comp-label { display: block; margin-bottom: 3px; color: #475569; font-weight: 600; line-height: 1.1; }
+.pv-comp-status { font-weight: 800; padding: 2px 4px; border-radius: 2px; display: inline-block; width: 100%; box-sizing: border-box; font-size: 7.5pt; }
+.status-B { background: #d1fae5; color: #059669; } .status-M { background: #fee2e2; color: #dc2626; } .status-NT { background: #fef3c7; color: #d97706; }
+.pv-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
+.pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
+.pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
+@media (max-width: 768px) {
+.search-container { flex-direction: column; }
+.inspections-table { font-size: 0.85rem; }
+.inspections-table th, .inspections-table td { padding: 10px 8px; }
+.inspections-table .motivo { max-width: 150px; }
+.pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: repeat(2, 1fr); }
+.pv-comps { grid-template-columns: repeat(3, 1fr); }
+}
+@media print {
+body * { visibility: hidden; }
+.modal-overlay.active, .modal-overlay.active * { visibility: visible; }
+.modal-overlay.active { position: absolute; left: 0; top: 0; background: white; width: 100%; height: auto; overflow: visible; padding: 0; }
+.modal-header, .modal-actions, .modal-close { display: none !important; }
+.modal-content { box-shadow: none; max-height: none; overflow: visible; width: 100%; max-width: none; }
+.print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 15mm !important; }
+.print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+@page { size: letter portrait; margin: 0; }
+}
+</style>
 </head>
 <body class="dashboard-page">
-    <!-- [Resto del HTML igual, sin cambios en la estructura visible] -->
-    <nav class="navbar" role="navigation">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-                <img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
-                <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
-            </div>
-            <div class="nav-user">
-                <span class="user-email" id="userEmail">Cargando...</span>
-                <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
-            </div>
-        </div>
-    </nav>
-    <main class="dashboard-main" role="main">
-        <header class="module-header">
-            <div class="breadcrumb">
-                <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="transporte.html" class="breadcrumb-link">Transporte</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="inspeccion.html" class="breadcrumb-link">Inspección PVR</a>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-current">Consultar Patrullas</span>
-            </div>
-            <button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion-consultar.html'">← Volver</button>
-        </header>
-        <section class="module-title-section">
-            <h1 class="module-title">🔍 Consultar Inspección de Patrullas</h1>
-            <p class="module-subtitle">Busque un vehículo o revise el historial completo de inspecciones PVR</p>
-        </section>
-        <div class="container">
-            <div class="search-container">
-                <div class="search-group">
-                    <label for="searchVehicle">🔍 Búsqueda de Vehículo</label>
-                    <input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
-                    <span class="search-hint">Búsqueda exacta por: Placa, Facsímil, Serial Carrocería o Serial Motor</span>
-                </div>
-                <button type="button" class="btn-search" id="btnSearch">
-                    <span class="btn-search-text">🔍 Buscar Vehículo</span>
-                    <span class="btn-search-loader" style="display:none;">⏳</span>
-                </button>
-            </div>
-            
-            <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Operación exitosa</span></div>
-            <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error</span></div>
-            <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Cargando historial...</span></div>
-
-            <section id="resultsSection" class="results-section active">
-                <div class="results-header">
-                    <h2 class="results-title">📋 Historial de Inspecciones (Patrullas)</h2>
-                    <span class="results-count" id="resultsCount">Cargando...</span>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="inspections-table">
-                        <thead>
-                            <tr>
-                                <th>N° Inspección</th><th>Fecha</th><th>Hora</th><th>Placa</th><th>S/Carrocería</th><th>Motivo</th><th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsBody"></tbody>
-                    </table>
-                </div>
-                <div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px;">
-                    <div style="font-size: 0.9rem; color: #64748b;">Página <span id="currentPageNum">1</span> de <span id="totalPagesNum">1</span></div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-secondary" id="btnPrev" style="padding: 8px 16px; font-size: 0.85rem;">← Anterior</button>
-                        <button class="btn btn-secondary" id="btnNext" style="padding: 8px 16px; font-size: 0.85rem;">Siguiente →</button>
-                    </div>
-                </div>
-            </section>
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <div class="icon">📭</div>
-                <p>No hay inspecciones registradas aún</p>
-            </div>
-        </div>
-
-        <!-- 🗂️ MODAL VISTA PREVIA OFICIAL -->
-        <div id="detailModal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">📄 Vista Previa Oficial</h3>
-                    <button class="modal-close" id="modalClose">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="print-page" id="printPreview">
-                        <header class="print-header">
-                            <img src="../img/logo.png" alt="Logo Izq" class="print-logo">
-                            <div class="print-header-text">
-                                <h2>REPUBLICA BOLIVARIANA DE VENEZUELA</h2>
-                                <h3>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h3>
-                                <h4>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h4>
-                                <p>REDIP OCCIDENTAL | CENTRO DE COORDINACION POLICIAL ESTADAL ZULIA</p>
-                                <p style="border-top: 2px solid #003366; padding-top: 5px; margin-top:5px;">DEPARTAMENTO DE TRANSPORTE</p>
-                            </div>
-                            <img src="../img/logo_derecho.png" alt="Logo Der" class="print-logo">
-                        </header>
-                        <div class="pv-grid">
-                            <div class="pv-item"><span class="pv-label">N° Inspección</span><div class="pv-value" id="pv_n_inspeccion">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Fecha</span><div class="pv-value" id="pv_fecha">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Hora</span><div class="pv-value" id="pv_hora">-</div></div>
-                        </div>
-                        <div class="pv-grid pv-grid-2">
-                            <div class="pv-item"><span class="pv-label">Motivo</span><div class="pv-value" id="pv_motivo">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Lugar / Asignación</span><div class="pv-value" id="pv_lugar">-</div></div>
-                        </div>
-                        <div class="pv-section-title">Datos del Vehículo</div>
-                        <div class="pv-grid pv-grid-4">
-                            <div class="pv-item"><span class="pv-label">Placa</span><div class="pv-value" id="pv_placa">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Marca / Modelo</span><div class="pv-value" id="pv_marca_modelo">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Año / Tipo</span><div class="pv-value" id="pv_ano_tipo">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Color</span><div class="pv-value" id="pv_color">-</div></div>
-                            <div class="pv-item"><span class="pv-label">S/Carrocería</span><div class="pv-value" id="pv_s_carroceria">-</div></div>
-                            <div class="pv-item"><span class="pv-label">N° Identificación</span><div class="pv-value" id="pv_n_id">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Kilometraje</span><div class="pv-value" id="pv_kms">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Rin Nº</span><div class="pv-value" id="pv_rin">-</div></div>
-                        </div>
-                        <div class="pv-section-title">Accesorios</div>
-                        <div class="pv-grid pv-grid-4">
-                            <div class="pv-item"><span class="pv-label">Batería</span><div class="pv-value" id="pv_bateria">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Est. Base</span><div class="pv-value" id="pv_est_base">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Coctelera</span><div class="pv-value" id="pv_coctelera">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Triángulo</span><div class="pv-value" id="pv_triangulo">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Placas</span><div class="pv-value" id="pv_placas">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Herramientas</span><div class="pv-value" id="pv_herramientas">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Gato</span><div class="pv-value" id="pv_gato">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Est. Luces</span><div class="pv-value" id="pv_luces">-</div></div>
-                        </div>
-                        <div class="pv-section-title">Estado de Cauchos</div>
-                        <div class="pv-grid pv-grid-4">
-                            <div class="pv-item"><span class="pv-label">Del. Izq.</span><div class="pv-value" id="pv_ca_d_izq">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Del. Der.</span><div class="pv-value" id="pv_ca_d_der">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Tra. Izq.</span><div class="pv-value" id="pv_ca_t_izq">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Tra. Der.</span><div class="pv-value" id="pv_ca_t_der">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Repuesto</span><div class="pv-value" id="pv_ca_rep">-</div></div>
-                            <div class="pv-item"><span class="pv-label">Tapa</span><div class="pv-value" id="pv_tapa">-</div></div>
-                        </div>
-                        <div class="pv-section-title">Componentes Inspeccionados</div>
-                        <div class="pv-comps" id="pv_comps_grid"></div>
-                        <div class="pv-section-title">Observaciones</div>
-                        <div style="min-height: 60px; border: 1px dashed #cbd5e0; padding: 10px; margin-bottom: 20px; font-size: 9pt; word-break: break-word;" id="pv_observaciones">Sin observaciones.</div>
-                        <div class="pv-section-title">Firmas de Responsables</div>
-                        <div class="pv-signatures">
-                            <div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">POR LA COORDINACIÓN</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_coord_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_coord_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
-                            <div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">INSPECCIÓN REALIZADA POR:</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_insp_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_insp_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_insp_cedula">-</div></div></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-                </div>
-            </div>
-        </div>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js"></script>
-    <script src="../js/inspeccion-consultar-vehiculo.js"></script>
+<nav class="navbar" role="navigation">
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
+</div>
+<div class="nav-user">
+<span class="user-email" id="userEmail">Cargando...</span>
+<button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
+</div>
+</div>
+</nav>
+<main class="dashboard-main" role="main">
+<header class="module-header">
+<div class="breadcrumb">
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+<span class="breadcrumb-separator">/</span>
+<a href="transporte.html" class="breadcrumb-link">Transporte</a>
+<span class="breadcrumb-separator">/</span>
+<a href="inspeccion.html" class="breadcrumb-link">Inspección PVR</a>
+<span class="breadcrumb-separator">/</span>
+<span class="breadcrumb-current">Consultar Patrullas</span>
+</div>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion-consultar.html'">← Volver</button>
+</header>
+<section class="module-title-section">
+<h1 class="module-title">🔍 Consultar Inspección de Patrullas</h1>
+<p class="module-subtitle">Busque un vehículo o revise el historial completo de inspecciones PVR</p>
+</section>
+<div class="container">
+<!-- 🔍 BARRA DE BÚSQUEDA -->
+<div class="search-container">
+<div class="search-group">
+<label for="searchVehicle">🔍 Búsqueda de Vehículo</label>
+<input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
+<span class="search-hint">Búsqueda exacta por: Placa, Facsímil, Serial Carrocería o Serial Motor</span>
+</div>
+<button type="button" class="btn-search" id="btnSearch">
+<span class="btn-search-text">🔍 Buscar Vehículo</span>
+<span class="btn-search-loader" style="display:none;">⏳</span>
+</button>
+</div>
+<!-- 📋 ALERTAS -->
+<div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Operación exitosa</span></div>
+<div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error</span></div>
+<div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Cargando historial...</span></div>
+<!-- 📊 SECCIÓN DE RESULTADOS (DEBAJO DE LA BÚSQUEDA) -->
+<section id="resultsSection" class="results-section active">
+<div class="results-header">
+<h2 class="results-title">📋 Historial de Inspecciones</h2>
+<span class="results-count" id="resultsCount">Cargando...</span>
+</div>
+<div style="overflow-x: auto;">
+<table class="inspections-table">
+<thead>
+<tr>
+<th>N° Inspección</th>
+<th>Fecha</th>
+<th>Hora</th>
+<th>Placa</th>
+<th>S/Carrocería</th>
+<th>Motivo</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="resultsBody"></tbody>
+</table>
+</div>
+<div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px;">
+<div style="font-size: 0.9rem; color: #64748b;">Página <span id="currentPageNum">1</span> de <span id="totalPagesNum">1</span></div>
+<div style="display: flex; gap: 8px;">
+<button class="btn btn-secondary" id="btnPrev" style="padding: 8px 16px; font-size: 0.85rem;">← Anterior</button>
+<button class="btn btn-secondary" id="btnNext" style="padding: 8px 16px; font-size: 0.85rem;">Siguiente →</button>
+</div>
+</div>
+</section>
+<div id="emptyState" class="empty-state" style="display: none;">
+<div class="icon">📭</div>
+<p>No hay inspecciones registradas aún</p>
+</div>
+</div>
+<!-- 🗂️ MODAL VISTA PREVIA OFICIAL -->
+<div id="detailModal" class="modal-overlay">
+<div class="modal-content">
+<div class="modal-header">
+<h3 class="modal-title">📄 Vista Previa Oficial</h3>
+<button class="modal-close" id="modalClose">&times;</button>
+</div>
+<div class="modal-body">
+<div class="print-page" id="printPreview">
+<header class="print-header">
+<img src="../img/logo.png" alt="Logo Izq" class="print-logo">
+<div class="print-header-text">
+<h2>REPUBLICA BOLIVARIANA DE VENEZUELA</h2>
+<h3>MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ</h3>
+<h4>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h4>
+<p>REDIP OCCIDENTAL | CENTRO DE COORDINACION POLICIAL ESTADAL ZULIA</p>
+<p style="border-top: 2px solid #003366; padding-top: 5px; margin-top:5px;">DEPARTAMENTO DE TRANSPORTE</p>
+</div>
+<img src="../img/logo_derecho.png" alt="Logo Der" class="print-logo">
+</header>
+<div class="pv-grid">
+<div class="pv-item"><span class="pv-label">N° Inspección</span><div class="pv-value" id="pv_n_inspeccion">-</div></div>
+<div class="pv-item"><span class="pv-label">Fecha</span><div class="pv-value" id="pv_fecha">-</div></div>
+<div class="pv-item"><span class="pv-label">Hora</span><div class="pv-value" id="pv_hora">-</div></div>
+</div>
+<div class="pv-grid pv-grid-2">
+<div class="pv-item"><span class="pv-label">Motivo</span><div class="pv-value" id="pv_motivo">-</div></div>
+<div class="pv-item"><span class="pv-label">Lugar / Asignación</span><div class="pv-value" id="pv_lugar">-</div></div>
+</div>
+<div class="pv-section-title">Datos del Vehículo</div>
+<div class="pv-grid pv-grid-4">
+<div class="pv-item"><span class="pv-label">Placa</span><div class="pv-value" id="pv_placa">-</div></div>
+<div class="pv-item"><span class="pv-label">Marca / Modelo</span><div class="pv-value" id="pv_marca_modelo">-</div></div>
+<div class="pv-item"><span class="pv-label">Año / Tipo</span><div class="pv-value" id="pv_ano_tipo">-</div></div>
+<div class="pv-item"><span class="pv-label">Color</span><div class="pv-value" id="pv_color">-</div></div>
+<div class="pv-item"><span class="pv-label">S/Carrocería</span><div class="pv-value" id="pv_s_carroceria">-</div></div>
+<div class="pv-item"><span class="pv-label">N° Identificación</span><div class="pv-value" id="pv_n_id">-</div></div>
+<div class="pv-item"><span class="pv-label">Kilometraje</span><div class="pv-value" id="pv_kms">-</div></div>
+<div class="pv-item"><span class="pv-label">Rin Nº</span><div class="pv-value" id="pv_rin">-</div></div>
+</div>
+<div class="pv-section-title">Accesorios</div>
+<div class="pv-grid pv-grid-4">
+<div class="pv-item"><span class="pv-label">Batería</span><div class="pv-value" id="pv_bateria">-</div></div>
+<div class="pv-item"><span class="pv-label">Est. Base</span><div class="pv-value" id="pv_est_base">-</div></div>
+<div class="pv-item"><span class="pv-label">Coctelera</span><div class="pv-value" id="pv_coctelera">-</div></div>
+<div class="pv-item"><span class="pv-label">Triángulo</span><div class="pv-value" id="pv_triangulo">-</div></div>
+<div class="pv-item"><span class="pv-label">Placas</span><div class="pv-value" id="pv_placas">-</div></div>
+<div class="pv-item"><span class="pv-label">Herramientas</span><div class="pv-value" id="pv_herramientas">-</div></div>
+<div class="pv-item"><span class="pv-label">Gato</span><div class="pv-value" id="pv_gato">-</div></div>
+<div class="pv-item"><span class="pv-label">Est. Luces</span><div class="pv-value" id="pv_luces">-</div></div>
+</div>
+<div class="pv-section-title">Estado de Cauchos</div>
+<div class="pv-grid pv-grid-4">
+<div class="pv-item"><span class="pv-label">Del. Izq.</span><div class="pv-value" id="pv_ca_d_izq">-</div></div>
+<div class="pv-item"><span class="pv-label">Del. Der.</span><div class="pv-value" id="pv_ca_d_der">-</div></div>
+<div class="pv-item"><span class="pv-label">Tra. Izq.</span><div class="pv-value" id="pv_ca_t_izq">-</div></div>
+<div class="pv-item"><span class="pv-label">Tra. Der.</span><div class="pv-value" id="pv_ca_t_der">-</div></div>
+<div class="pv-item"><span class="pv-label">Repuesto</span><div class="pv-value" id="pv_ca_rep">-</div></div>
+<div class="pv-item"><span class="pv-label">Tapa</span><div class="pv-value" id="pv_tapa">-</div></div>
+</div>
+<div class="pv-section-title">Componentes Inspeccionados</div>
+<div class="pv-comps" id="pv_comps_grid"></div>
+<div class="pv-section-title">Observaciones</div>
+<div style="min-height: 60px; border: 1px dashed #cbd5e0; padding: 10px; margin-bottom: 20px; font-size: 9pt; word-break: break-word;" id="pv_observaciones">Sin observaciones.</div>
+<div class="pv-section-title">Firmas de Responsables</div>
+<div class="pv-signatures">
+<div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">POR LA COORDINACIÓN</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_coord_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_coord_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
+<div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">INSPECCIÓN REALIZADA POR:</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_insp_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_insp_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_insp_cedula">-</div></div></div>
+</div>
+<!-- 🆕 CUADRO GRIS OFICIAL AGREGADO -->
+<div style="background: #e5e7eb; border: 2px solid #9ca3af; border-radius: 6px; padding: 12px; text-align: center; margin-top: 25px;">
+    <p style="margin: 0; font-size: 9pt; font-weight: 800; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">
+        USO EXCLUSIVO DEL DEPARTAMENTO DE TRANSPORTE Y LOGÍSTICA
+    </p>
+</div>
+</div>
+</div>
+<div class="modal-actions">
+<button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</div>
+</div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/inspeccion-consultar-vehiculo.js"></script>
 </body>
 </html>
