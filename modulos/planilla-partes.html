@@ -1,475 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 Dashboard Vehículos - Estadísticas</title>
-  <!-- Chart.js para gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --primary: #2563eb; --success: #22c55e; --warning: #f59e0b; 
-      --danger: #ef4444; --dark: #1e293b; --light: #f8fafc;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
-    
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
-    .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
-    .header p { opacity: 0.9; }
-    
-    /* Cards de estadísticas */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid var(--primary); transition: transform 0.2s; }
-    .stat-card:hover { transform: translateY(-2px); }
-    .stat-card.success { border-left-color: var(--success); }
-    .stat-card.warning { border-left-color: var(--warning); }
-    .stat-card.danger { border-left-color: var(--danger); }
-    .stat-card .label { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-    .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--dark); margin: 8px 0; }
-    .stat-card .subtext { font-size: 0.8rem; color: #94a3b8; }
-    
-    /* Secciones de gráficos */
-    .charts-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px; }
-    .chart-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .chart-card h3 { margin-bottom: 16px; color: var(--dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-    .chart-container { position: relative; height: 300px; }
-    
-    /* Tabla de detalles */
-    .table-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto; }
-    .table-section h3 { margin-bottom: 16px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th { background: #f1f5f9; padding: 12px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
-    td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-    tr:hover { background: #f8fafc; }
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
-    .badge-operativa { background: #dcfce7; color: #166534; }
-    .badge-inoperativa { background: #fef3c7; color: #92400e; }
-    .badge-desincorporada { background: #fee2e2; color: #991b1b; }
-    .badge-reparacion { background: #dbeafe; color: #1e40af; }
-    
-    /* Loading y estados */
-    .loading { text-align: center; padding: 40px; color: #64748b; }
-    .loading-spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error { background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid var(--danger); }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .charts-section { grid-template-columns: 1fr; }
-      .stat-card .value { font-size: 1.5rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gestión de Partes Generales - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Partes Generales | Transporte</title>
+<link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1>📊 Dashboard de Vehículos</h1>
-      <p>Estadísticas en tiempo real del parque vehicular - Región Occidental</p>
+<body class="dashboard-page">
+<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+<nav class="navbar" role="navigation">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+      <span class="nav-title">Sistema de Logística</span>
     </div>
-
-    <!-- Loading -->
-    <div id="loading" class="loading">
-      <div class="loading-spinner"></div>
-      <p>Cargando datos de vehículos...</p>
-    </div>
-
-    <!-- Error -->
-    <div id="error" class="error" style="display:none;"></div>
-
-    <!-- Stats Cards -->
-    <div id="statsContainer" style="display:none;">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="label">🚗 Vehículos Terrestres</div>
-          <div class="value" id="totalTerrestres">0</div>
-          <div class="subtext">Automóvil + Autobús + Camioneta</div>
-        </div>
-        <div class="stat-card success">
-          <div class="label">🏍️ Motocicletas</div>
-          <div class="value" id="totalMotos">0</div>
-          <div class="subtext">Moto + Especial</div>
-        </div>
-        <div class="stat-card warning">
-          <div class="label">🐎 Tracción de Sangre</div>
-          <div class="value" id="totalTraccion">0</div>
-          <div class="subtext">Unidades ecuestres</div>
-        </div>
-        <div class="stat-card danger">
-          <div class="label">🗑️ Desincorporados</div>
-          <div class="value" id="totalDesincorporados">0</div>
-          <div class="subtext">Bajas del inventario</div>
-        </div>
-        <div class="stat-card success">
-          <div class="label">✅ Operativos</div>
-          <div class="value" id="totalOperativos">0</div>
-          <div class="subtext">Listos para servicio</div>
-        </div>
-        <div class="stat-card warning">
-          <div class="label">❌ Inoperativos</div>
-          <div class="value" id="totalInoperativos">0</div>
-          <div class="subtext">En reparación/mantenimiento</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">📦 Total Registrado</div>
-          <div class="value" id="totalGeneral">0</div>
-          <div class="subtext">Unidades en sistema</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">🔄 Tasa Operativa</div>
-          <div class="value" id="tasaOperativa">0%</div>
-          <div class="subtext">Disponibilidad de flota</div>
-        </div>
-      </div>
-
-      <!-- Gráficos -->
-      <div class="charts-section">
-        <div class="chart-card">
-          <h3>📊 Distribución por Tipo de Vehículo</h3>
-          <div class="chart-container">
-            <canvas id="chartTipos"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>📈 Estado Operativo</h3>
-          <div class="chart-container">
-            <canvas id="chartEstado"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>🏍️ Detalle Motocicletas</h3>
-          <div class="chart-container">
-            <canvas id="chartMotos"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>📅 Vehículos por Año</h3>
-          <div class="chart-container">
-            <canvas id="chartAnos"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabla de Resumen -->
-      <div class="table-section">
-        <h3>📋 Resumen por Categoría</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Categoría</th>
-              <th>Subcategoría</th>
-              <th>Operativos</th>
-              <th>Inoperativos</th>
-              <th>Desincorporados</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="tablaResumen"></tbody>
-        </table>
-      </div>
+    <div class="nav-user">
+      <span class="user-email" id="userEmail">usuario@institucion.com</span>
+      <button class="btn-logout" id="logoutBtn">
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">Cerrar Sesión</span>
+      </button>
     </div>
   </div>
+</nav>
 
-  <script>
-    // ============================================
-    // CONFIGURACIÓN SUPABASE
-    // ============================================
-    const SUPABASE_URL = 'TU_SUPABASE_URL';
-    const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY';
-    
-    let supabase;
-    
-    async function initSupabase() {
-      if (window.supabase) return window.supabase;
-      
-      // Cargar librería si no está
-      if (!window.createClient) {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-      
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      return supabase;
-    }
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<main class="dashboard-main" role="main">
+  <!-- Header con Navegación de Migas -->
+  <header class="module-header">
+    <div class="breadcrumb">
+      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="transporte.html" class="breadcrumb-link">Transporte</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="planilla.html" class="breadcrumb-link">Planilla de Vehículos</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">Partes Generales</span>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
+      ← Volver a Planilla
+    </button>
+  </header>
 
-    // ============================================
-    // LÓGICA DE PROCESAMIENTO DE DATOS
-    // ============================================
-    
-    function categorizarVehiculo(clase, tipo) {
-      const c = (clase || '').toUpperCase().trim();
-      const t = (tipo || '').toUpperCase().trim();
-      
-      // Vehículos terrestres (grupo principal)
-      if (['AUTOMOVIL', 'CAMIONETA', 'AUTOBUS', 'CAMION'].includes(c)) {
-        return 'terrestres';
-      }
-      
-      // Motocicletas
-      if (c === 'MOTO' || t === 'MOTO' || c === 'ESPECIAL' || t === 'ESPECIAL') {
-        return 'motos';
-      }
-      
-      // Tracción de sangre (separado)
-      if (c.includes('TRACCION') || c.includes('SANGRE') || t.includes('TRACCION')) {
-        return 'traccion';
-      }
-      
-      return 'otros';
-    }
-    
-    function clasificarEstado(estatus) {
-      const e = (estatus || '').toUpperCase().trim();
-      if (e.includes('DESINCORP') || e === 'BAJA') return 'desincorporado';
-      if (e.includes('OPERATIVA') && !e.includes('INOPERATIVA')) return 'operativo';
-      if (e.includes('INOPERATIVA') || e.includes('REPARACION') || e.includes('TALLER')) return 'inoperativo';
-      return 'inoperativo'; // Por defecto
-    }
-    
-    function procesarDatos(vehiculos) {
-      const stats = {
-        terrestres: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
-        motos: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
-        traccion: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
-        otros: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
-        porAno: {},
-        porMarca: {},
-        total: 0
-      };
-      
-      vehiculos.forEach(v => {
-        const categoria = categorizarVehiculo(v.clase, v.tipo);
-        const estado = clasificarEstado(v.estatus);
-        const ano = v.ano || 'Sin dato';
-        const marca = (v.marca || 'Sin marca').toUpperCase();
-        
-        // Actualizar categoría
-        if (stats[categoria]) {
-          stats[categoria][estado]++;
-          stats[categoria].total++;
-        }
-        
-        // Por año
-        stats.porAno[ano] = (stats.porAno[ano] || 0) + 1;
-        
-        // Por marca (top 10)
-        stats.porMarca[marca] = (stats.porMarca[marca] || 0) + 1;
-        
-        stats.total++;
-      });
-      
-      // Calcular totales generales
-      stats.totalOperativos = stats.terrestres.operativo + stats.motos.operativo + stats.traccion.operativo + stats.otros.operativo;
-      stats.totalInoperativos = stats.terrestres.inoperativo + stats.motos.inoperativo + stats.traccion.inoperativo + stats.otros.inoperativo;
-      stats.totalDesincorporados = stats.terrestres.desincorporado + stats.motos.desincorporado + stats.traccion.desincorporado + stats.otros.desincorporado;
-      
-      return stats;
-    }
+  <!-- Título del Módulo -->
+  <section class="module-title-section">
+    <h1 class="module-title">📄 Partes Generales de Vehículos</h1>
+    <p class="module-subtitle">Registro y gestión de novedades, incidencias y partes diarios</p>
+  </section>
 
-    // ============================================
-    // RENDERIZADO DE GRÁFICOS (Chart.js)
-    // ============================================
-    
-    function crearGraficoTipos(stats) {
-      const ctx = document.getElementById('chartTipos').getContext('2d');
-      return new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Vehículos Terrestres', 'Motocicletas', 'Tracción de Sangre', 'Otros'],
-          datasets: [{
-            data: [stats.terrestres.total, stats.motos.total, stats.traccion.total, stats.otros.total],
-            backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#64748b'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true } }
-          },
-          cutout: '60%'
-        }
-      });
-    }
-    
-    function crearGraficoEstado(stats) {
-      const ctx = document.getElementById('chartEstado').getContext('2d');
-      return new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Operativos', 'Inoperativos', 'Desincorporados'],
-          datasets: [{
-            label: 'Cantidad de Vehículos',
-            data: [stats.totalOperativos, stats.totalInoperativos, stats.totalDesincorporados],
-            backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-            x: { grid: { display: false } }
-          }
-        }
-      });
-    }
-    
-    function crearGraficoMotos(stats) {
-      const ctx = document.getElementById('chartMotos').getContext('2d');
-      return new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Motos + Especial', 'Tracción de Sangre'],
-          datasets: [{
-            data: [stats.motos.total, stats.traccion.total],
-            backgroundColor: ['#22c55e', '#f59e0b'],
-            borderWidth: 3,
-            borderColor: 'white'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom' }
-          }
-        }
-      });
-    }
-    
-    function crearGraficoAnos(stats) {
-      const ctx = document.getElementById('chartAnos').getContext('2d');
-      // Ordenar años y tomar últimos 10
-      const anosOrdenados = Object.keys(stats.porAno).sort().slice(-10);
-      const datosAnos = anosOrdenados.map(a => stats.porAno[a]);
-      
-      return new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: anosOrdenados,
-          datasets: [{
-            label: 'Vehículos incorporados',
-            data: datosAnos,
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#3b82f6',
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-            x: { grid: { display: false } }
-          }
-        }
-      });
-    }
+  <!-- Formulario de Registro de Parte -->
+  <section class="form-section">
+    <h2 class="section-title">Registrar Nuevo Parte</h2>
+    <form id="parteForm" class="data-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="parteFecha">📅 Fecha</label>
+          <input type="date" id="parteFecha" name="fecha" required>
+        </div>
+        <div class="form-group">
+          <label for="parteVehiculo">🚗 Vehículo (Placa)</label>
+          <input type="text" id="parteVehiculo" name="vehiculo" placeholder="Ej: ABC-123" required>
+        </div>
+        <div class="form-group">
+          <label for="parteTipo">📋 Tipo de Novedad</label>
+          <select id="parteTipo" name="tipo" required>
+            <option value="">Seleccione...</option>
+            <option value="mantenimiento">Mantenimiento</option>
+            <option value="accidente">Accidente / Colisión</option>
+            <option value="fallo_mecanico">Fallo Mecánico</option>
+            <option value="combustible">Control de Combustible</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="parteConductor">👤 Conductor / Responsable</label>
+          <input type="text" id="parteConductor" name="conductor" placeholder="Nombre completo" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="parteDescripcion">📝 Descripción / Observaciones</label>
+          <textarea id="parteDescripcion" name="descripcion" rows="3" placeholder="Detalle la novedad ocurrida..." required></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">💾 Guardar Parte</button>
+        <button type="button" id="btnLimpiar" class="btn btn-secondary">🧹 Limpiar</button>
+      </div>
+    </form>
+  </section>
 
-    // ============================================
-    // RENDERIZADO DE TABLA Y ESTADÍSTICAS
-    // ============================================
-    
-    function renderizarEstadisticas(stats) {
-      // Cards principales
-      document.getElementById('totalTerrestres').textContent = stats.terrestres.total.toLocaleString();
-      document.getElementById('totalMotos').textContent = stats.motos.total.toLocaleString();
-      document.getElementById('totalTraccion').textContent = stats.traccion.total.toLocaleString();
-      document.getElementById('totalDesincorporados').textContent = stats.totalDesincorporados.toLocaleString();
-      document.getElementById('totalOperativos').textContent = stats.totalOperativos.toLocaleString();
-      document.getElementById('totalInoperativos').textContent = stats.totalInoperativos.toLocaleString();
-      document.getElementById('totalGeneral').textContent = stats.total.toLocaleString();
-      
-      // Tasa operativa
-      const activos = stats.totalOperativos + stats.totalInoperativos;
-      const tasa = activos > 0 ? Math.round((stats.totalOperativos / activos) * 100) : 0;
-      document.getElementById('tasaOperativa').textContent = `${tasa}%`;
-      
-      // Tabla de resumen
-      const tbody = document.getElementById('tablaResumen');
-      const filas = [
-        { cat: '🚗 Terrestres', sub: 'Automóvil/Camioneta/Autobús', stats: stats.terrestres },
-        { cat: '🏍️ Motocicletas', sub: 'Moto + Especial', stats: stats.motos },
-        { cat: '🐎 Tracción', sub: 'Tracción de Sangre', stats: stats.traccion }
-      ];
-      
-      tbody.innerHTML = filas.map(f => `
-        <tr>
-          <td><strong>${f.cat}</strong></td>
-          <td>${f.sub}</td>
-          <td><span class="badge badge-operativa">${f.stats.operativo}</span></td>
-          <td><span class="badge badge-inoperativa">${f.stats.inoperativo}</span></td>
-          <td><span class="badge badge-desincorporada">${f.stats.desincorporado}</span></td>
-          <td><strong>${f.stats.total}</strong></td>
-        </tr>
-      `).join('');
-    }
+  <!-- Tabla de Partes Registrados -->
+  <section class="table-section">
+    <div class="table-header">
+      <h2 class="section-title">📜 Historial de Partes</h2>
+      <div class="table-controls">
+        <input type="text" id="searchPartes" placeholder="🔍 Buscar por placa, conductor o tipo..." class="search-input">
+      </div>
+    </div>
+    <div class="table-container">
+      <table id="tablaPartes" class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Conductor</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPartesBody">
+          <tr><td colspan="6" class="empty-state">Cargando registros...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
 
-    // ============================================
-    // FUNCIÓN PRINCIPAL DE CARGA
-    // ============================================
-    
-    async function cargarDashboard() {
-      try {
-        // 1. Inicializar Supabase
-        const supabase = await initSupabase();
-        
-        // 2. Consultar vehículos
-        const { data: vehiculos, error } = await supabase
-          .from('vehiculos')
-          .select('id, marca, modelo, tipo, clase, ano, estatus, situacion')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        if (!vehiculos || vehiculos.length === 0) {
-          throw new Error('No se encontraron vehículos en la base de datos');
-        }
-        
-        // 3. Procesar datos
-        const stats = procesarDatos(vehiculos);
-        
-        // 4. Ocultar loading, mostrar contenido
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('statsContainer').style.display = 'block';
-        
-        // 5. Renderizar estadísticas
-        renderizarEstadisticas(stats);
-        
-        // 6. Crear gráficos
-        crearGraficoTipos(stats);
-        crearGraficoEstado(stats);
-        crearGraficoMotos(stats);
-        crearGraficoAnos(stats);
-        
-        console.log('✅ Dashboard cargado:', stats.total, 'vehículos procesados');
-        
-      } catch (err) {
-        console.error('❌ Error:', err);
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('error').textContent = `Error: ${err.message}`;
-      }
-    }
-
-    // ============================================
-    // INICIALIZACIÓN
-    // ============================================
-    document.addEventListener('DOMContentLoaded', cargarDashboard);
-  </script>
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/planilla.partes.js" defer></script>
 </body>
 </html>
