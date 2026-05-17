@@ -17,8 +17,8 @@
 display: flex;
 justify-content: center;
 align-items: center;
-gap: 30px;
-padding: 25px 40px;
+gap: 15px;
+padding: 15px 20px;
 background: linear-gradient(135deg, #003366 0%, #005b96 100%);
 border-radius: 12px;
 margin: 30px 0 40px 0;
@@ -29,21 +29,24 @@ flex-wrap: wrap;
 text-align: center;
 display: flex;
 flex-direction: column;
-gap: 5px;
+gap: 4px;
+min-width: 90px;
 }
 .stat-value {
-font-size: 2.5rem;
+font-size: 2rem;
 font-weight: 700;
 color: white;
 line-height: 1;
 }
 .stat-label {
-font-size: 0.9rem;
+font-size: 0.75rem;
 color: rgba(255, 255, 255, 0.9);
 font-weight: 400;
+text-transform: uppercase;
+letter-spacing: 0.5px;
 }
 .stat-separator {
-color: rgba(255, 255, 255, 0.4);
+color: rgba(255, 255, 255, 0.3);
 font-size: 1.5rem;
 font-weight: 300;
 }
@@ -109,7 +112,7 @@ transform: translateY(-2px);
 }
 /* Loader para estadísticas */
 .stat-loading {
-font-size: 1.5rem;
+font-size: 1.2rem;
 animation: pulse 1s infinite;
 }
 @keyframes pulse {
@@ -117,20 +120,18 @@ animation: pulse 1s infinite;
 50% { opacity: 0.5; }
 }
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
 .stats-inline {
 flex-direction: column;
-gap: 15px;
+gap: 10px;
 padding: 20px;
 }
-.stat-separator {
-display: none;
-}
+.stat-separator { display: none; }
 .stat-item {
 width: 100%;
 flex-direction: row;
 justify-content: space-between;
-padding: 10px 0;
+padding: 10px 15px;
 border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 .transporte-buttons-grid {
@@ -159,71 +160,53 @@ grid-template-columns: 1fr;
 </nav>
 <!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main" role="main">
-<!-- Header con Navegación de Migas -->
 <header class="module-header">
 <div class="breadcrumb">
 <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
 <span class="breadcrumb-separator">/</span>
 <span class="breadcrumb-current">Transporte</span>
 </div>
-<!-- ✅ BOTÓN VOLVER AGREGADO -->
-<button class="btn-volver" onclick="window.location.href='../dashboard.html'">
-← Volver
-</button>
+<button class="btn-volver" onclick="window.location.href='../dashboard.html'">← Volver</button>
 </header>
-<!-- Título del Módulo -->
+
 <section class="module-title-section">
 <h1 class="module-title">🚓 Módulo de Transporte</h1>
 <p class="module-subtitle">Gestión integral del parque automotor institucional</p>
 </section>
-<!-- ✅ ESTADÍSTICAS ACTUALIZADAS CON 5 INDICADORES -->
+
+<!-- ✅ ESTADÍSTICAS ACTUALIZADAS CON 7 INDICADORES -->
 <section class="stats-inline">
-<div class="stat-item">
-<span class="stat-value" id="totalVehicles"><span class="stat-loading">⏳</span></span>
-<span class="stat-label">Total Vehículos</span>
-</div>
+<div class="stat-item"><span class="stat-value" id="totalVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Total Vehículos</span></div>
 <span class="stat-separator">|</span>
-<div class="stat-item">
-<span class="stat-value" id="automovilVehicles"><span class="stat-loading">⏳</span></span>
-<span class="stat-label">Automóviles</span>
-</div>
+<div class="stat-item"><span class="stat-value" id="terrestresVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Auto/Bus/Camión</span></div>
 <span class="stat-separator">|</span>
-<div class="stat-item">
-<span class="stat-value" id="motosVehicles"><span class="stat-loading">⏳</span></span>
-<span class="stat-label">Motos</span>
-</div>
+<div class="stat-item"><span class="stat-value" id="motosVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Motos</span></div>
 <span class="stat-separator">|</span>
-<div class="stat-item">
-<span class="stat-value" id="operativosVehicles"><span class="stat-loading">⏳</span></span>
-<span class="stat-label">Operativos</span>
-</div>
+<div class="stat-item"><span class="stat-value" id="traccionSangreVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Tracción de Sangre</span></div>
 <span class="stat-separator">|</span>
-<div class="stat-item">
-<span class="stat-value" id="inoperativosVehicles"><span class="stat-loading">⏳</span></span>
-<span class="stat-label">Inoperativos</span>
-</div>
+<div class="stat-item"><span class="stat-value" id="operativosVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Operativos</span></div>
+<span class="stat-separator">|</span>
+<div class="stat-item"><span class="stat-value" id="inoperativosVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Inoperativos</span></div>
+<span class="stat-separator">|</span>
+<div class="stat-item"><span class="stat-value" id="desincorporadosVehicles"><span class="stat-loading">⏳</span></span><span class="stat-label">Desincorporados</span></div>
 </section>
-<!-- 4 Botones Principales -->
+
 <section class="transporte-buttons-grid">
-<!-- Botón 1: Planilla de Datos -->
 <a href="planilla.html" class="transporte-btn">
 <div class="btn-icon">📋</div>
 <h3 class="btn-title">Planilla de Datos de Vehículos</h3>
 <p class="btn-description">Registro y consulta de información general del parque automotor</p>
 </a>
-<!-- Botón 2: Ficha Técnica -->
 <a href="ficha.html" class="transporte-btn">
 <div class="btn-icon">🔧</div>
 <h3 class="btn-title">Ficha Técnica</h3>
 <p class="btn-description">Especificaciones técnicas y características mecánicas</p>
 </a>
-<!-- Botón 3: Acta de Asignación -->
 <a href="acta.html" class="transporte-btn">
 <div class="btn-icon">📝</div>
 <h3 class="btn-title">Acta de Asignación</h3>
 <p class="btn-description">Documentos de asignación de vehículos a personal</p>
 </a>
-<!-- Botón 4: Inspección PVR -->
 <a href="inspeccion.html" class="transporte-btn">
 <div class="btn-icon">🔍</div>
 <h3 class="btn-title">Inspección de PVR Individual</h3>
@@ -231,14 +214,10 @@ grid-template-columns: 1fr;
 </a>
 </section>
 </main>
+
 <!-- ================= SCRIPTS ================= -->
-<!-- 1️⃣ Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
-<!-- 2️⃣ ✅ CONFIGURACIÓN GLOBAL (AGREGAR ESTO) -->
 <script src="../js/config.js" defer></script>
-
-<!-- 3️⃣ Script del módulo (DESPUÉS de config.js) -->
 <script src="../js/transporte.js" defer></script>
 </body>
 </html>
