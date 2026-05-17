@@ -3,14 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Gestión de Partes Generales - Sistema de Logística">
+<meta name="description" content="Estadísticas de Partes Generales - Sistema de Logística">
 <meta name="theme-color" content="#003366">
-<title>Partes Generales | Transporte</title>
+<title>Partes Generales | Estadísticas</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- jsPDF para exportar a PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ================= ESTILOS DEL REPORTE ================= */
+.report-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12);
+  margin: 25px auto;
+  max-width: 1440px;
+}
+.report-actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.btn-action {
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  border: none;
+  font-family: 'Roboto', sans-serif;
+}
+.btn-print { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; }
+.btn-pdf { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; }
+.btn-refresh { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; }
+.btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+
+/* Tarjetas de estadísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.stat-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 10px;
+  padding: 20px;
+  border-left: 5px solid #005b96;
+  text-align: center;
+}
+.stat-card.operativos { border-left-color: #2a9d8f; }
+.stat-card.inoperativos { border-left-color: #e76f51; }
+.stat-card.mantenimiento { border-left-color: #e9c46a; }
+.stat-card.total { border-left-color: #264653; }
+.stat-value { font-size: 2rem; font-weight: 700; color: #1e293b; margin: 10px 0; }
+.stat-label { color: #64748b; font-size: 0.9rem; }
+
+/* Gráficos */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+.chart-container {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+.chart-wrapper { position: relative; height: 300px; }
+
+/* Tabla resumen */
+.table-container {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+.data-table th {
+  background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+  color: white;
+  font-weight: 600;
+}
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-operativo { background: #d1fae5; color: #059669; }
+.badge-inoperativo { background: #fee2e2; color: #dc2626; }
+.badge-mantenimiento { background: #fef3c7; color: #d97706; }
+
+/* Responsive e impresión */
+@media (max-width: 768px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .report-actions { justify-content: center; }
+  .btn-action { width: 100%; justify-content: center; }
+}
+@media print {
+  .navbar, .report-actions, .module-header { display: none !important; }
+  .report-container { box-shadow: none; margin: 0; padding: 0; }
+}
+</style>
 </head>
 <body class="dashboard-page">
 <!-- ================= BARRA DE NAVEGACIÓN ================= -->
@@ -32,98 +144,106 @@
 
 <!-- ================= CONTENIDO PRINCIPAL ================= -->
 <main class="dashboard-main" role="main">
-  <!-- Header con Navegación de Migas -->
   <header class="module-header">
     <div class="breadcrumb">
       <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
       <span class="breadcrumb-separator">/</span>
       <a href="transporte.html" class="breadcrumb-link">Transporte</a>
       <span class="breadcrumb-separator">/</span>
-      <a href="planilla.html" class="breadcrumb-link">Planilla de Vehículos</a>
+      <a href="planilla.html" class="breadcrumb-link">Planilla</a>
       <span class="breadcrumb-separator">/</span>
       <span class="breadcrumb-current">Partes Generales</span>
     </div>
     <button class="btn btn-secondary btn-sm" onclick="window.location.href='planilla.html'">
-      ← Volver a Planilla
+      ← Volver
     </button>
   </header>
 
-  <!-- Título del Módulo -->
   <section class="module-title-section">
-    <h1 class="module-title">📄 Partes Generales de Vehículos</h1>
-    <p class="module-subtitle">Registro y gestión de novedades, incidencias y partes diarios</p>
+    <h1 class="module-title">📊 Partes Generales - Estadísticas</h1>
+    <p class="module-subtitle">Análisis del parque automotor por tipo, estatus y unidad administrativa</p>
   </section>
 
-  <!-- Formulario de Registro de Parte -->
-  <section class="form-section">
-    <h2 class="section-title">Registrar Nuevo Parte</h2>
-    <form id="parteForm" class="data-form">
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="parteFecha">📅 Fecha</label>
-          <input type="date" id="parteFecha" name="fecha" required>
-        </div>
-        <div class="form-group">
-          <label for="parteVehiculo">🚗 Vehículo (Placa)</label>
-          <input type="text" id="parteVehiculo" name="vehiculo" placeholder="Ej: ABC-123" required>
-        </div>
-        <div class="form-group">
-          <label for="parteTipo">📋 Tipo de Novedad</label>
-          <select id="parteTipo" name="tipo" required>
-            <option value="">Seleccione...</option>
-            <option value="mantenimiento">Mantenimiento</option>
-            <option value="accidente">Accidente / Colisión</option>
-            <option value="fallo_mecanico">Fallo Mecánico</option>
-            <option value="combustible">Control de Combustible</option>
-            <option value="otro">Otro</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="parteConductor">👤 Conductor / Responsable</label>
-          <input type="text" id="parteConductor" name="conductor" placeholder="Nombre completo" required>
-        </div>
-        <div class="form-group full-width">
-          <label for="parteDescripcion">📝 Descripción / Observaciones</label>
-          <textarea id="parteDescripcion" name="descripcion" rows="3" placeholder="Detalle la novedad ocurrida..." required></textarea>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">💾 Guardar Parte</button>
-        <button type="button" id="btnLimpiar" class="btn btn-secondary">🧹 Limpiar</button>
-      </div>
-    </form>
-  </section>
+  <div class="report-container" id="reportContent">
+    <!-- Botones de acción -->
+    <div class="report-actions">
+      <button class="btn-action btn-refresh" onclick="location.reload()">🔄 Actualizar</button>
+      <button class="btn-action btn-print" onclick="imprimirReporte()">🖨️ Imprimir</button>
+      <button class="btn-action btn-pdf" onclick="exportarPDF()">📄 Exportar PDF</button>
+    </div>
 
-  <!-- Tabla de Partes Registrados -->
-  <section class="table-section">
-    <div class="table-header">
-      <h2 class="section-title">📜 Historial de Partes</h2>
-      <div class="table-controls">
-        <input type="text" id="searchPartes" placeholder="🔍 Buscar por placa, conductor o tipo..." class="search-input">
+    <!-- Tarjetas de estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-label">🚗 Total Vehículos</div>
+        <div class="stat-value" id="totalVehiculos">0</div>
+      </div>
+      <div class="stat-card operativos">
+        <div class="stat-label">✅ Operativos</div>
+        <div class="stat-value" id="totalOperativos">0</div>
+      </div>
+      <div class="stat-card inoperativos">
+        <div class="stat-label">❌ Inoperativos</div>
+        <div class="stat-value" id="totalInoperativos">0</div>
+      </div>
+      <div class="stat-card mantenimiento">
+        <div class="stat-label">🔧 En Mantenimiento</div>
+        <div class="stat-value" id="totalMantenimiento">0</div>
       </div>
     </div>
+
+    <!-- Gráficos -->
+    <div class="charts-grid">
+      <!-- Por Tipo de Vehículo (agrupado) -->
+      <div class="chart-container">
+        <h3 style="margin-bottom:15px;">📊 Por Tipo de Vehículo</h3>
+        <div class="chart-wrapper"><canvas id="chartTipos"></canvas></div>
+      </div>
+      <!-- Por Estatus -->
+      <div class="chart-container">
+        <h3 style="margin-bottom:15px;">📈 Por Estatus</h3>
+        <div class="chart-wrapper"><canvas id="chartEstatus"></canvas></div>
+      </div>
+      <!-- Por Año -->
+      <div class="chart-container">
+        <h3 style="margin-bottom:15px;">📅 Por Año de Fabricación</h3>
+        <div class="chart-wrapper"><canvas id="chartAnos"></canvas></div>
+      </div>
+      <!-- Top Unidades Administrativas -->
+      <div class="chart-container">
+        <h3 style="margin-bottom:15px;">🏢 Top 10 Unidades Administrativas</h3>
+        <div class="chart-wrapper"><canvas id="chartUnidades"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tabla resumen por unidad -->
     <div class="table-container">
-      <table id="tablaPartes" class="data-table">
+      <h3 style="margin-bottom:15px;">📋 Resumen por Unidad Administrativa</h3>
+      <table class="data-table">
         <thead>
           <tr>
-            <th>Fecha</th>
-            <th>Placa</th>
-            <th>Tipo</th>
-            <th>Conductor</th>
-            <th>Descripción</th>
-            <th>Acciones</th>
+            <th>Unidad Administrativa</th>
+            <th>Vehículos Terrestres</th>
+            <th>Motocicletas</th>
+            <th>Otros</th>
+            <th>Operativos</th>
+            <th>% Operatividad</th>
           </tr>
         </thead>
-        <tbody id="tablaPartesBody">
-          <tr><td colspan="6" class="empty-state">Cargando registros...</td></tr>
+        <tbody id="tablaResumenBody">
+          <tr><td colspan="6" style="text-align:center;">Cargando datos...</td></tr>
         </tbody>
       </table>
     </div>
-  </section>
+
+    <div style="text-align:center; color:#64748b; margin-top:20px; padding-top:15px; border-top:1px solid #e2e8f0;">
+      Reporte generado: <strong id="fechaReporte"></strong>
+    </div>
+  </div>
 </main>
 
-<!-- ================= SCRIPTS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="../js/config.js" defer></script>
 <script src="../js/planilla.partes.js" defer></script>
 </body>
 </html>
