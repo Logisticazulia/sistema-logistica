@@ -11,6 +11,9 @@ const supabaseClient = window.supabase.createClient(
 let vehiculoSeleccionado = null;
 let isEditing = false;
 
+// ✅ TODOS LOS CAMPOS SON EDITABLES (lista vacía)
+const camposNoEditables = [];
+
 // ============================================
 // FUNCIONES DE BÚSQUEDA
 // ============================================
@@ -41,7 +44,7 @@ async function buscarVehiculo() {
     }
 
     try {
-        // ✅ BÚSQUEDA EXACTA POR 5 CAMPOS
+        // ✅ BÚSQUEDA EXACTA POR 5 CAMPOS: placa, facsimil, s_carroceria, s_motor, n_identificacion
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .select('*')
@@ -76,6 +79,7 @@ async function buscarVehiculo() {
         console.error('❌ Error en buscarVehiculo:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
     } finally {
+        const btnSearch = document.getElementById('btnSearch');
         if (btnSearch) {
             btnSearch.disabled = false;
             btnSearch.classList.remove('searching');
@@ -111,22 +115,27 @@ function llenarFormulario(vehiculo) {
                 const dbValue = String(vehiculo[dbField]).toUpperCase().trim();
                 let matchingOption = options.find(function(opt) {
                     const optValue = opt.value.toUpperCase().trim();
-                    return optValue === dbValue || optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '');
+                    if (optValue === dbValue) return true;
+                    if (optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '')) return true;
+                    return false;
                 });
                 if (matchingOption) {
                     element.value = matchingOption.value;
+                    console.log('✅ Select asignado:', formField, '=', matchingOption.value);
                 } else {
                     const newOption = document.createElement('option');
                     newOption.value = dbValue;
                     newOption.textContent = dbValue;
                     newOption.selected = true;
                     element.appendChild(newOption);
+                    console.log('⚠️ Opción agregada dinámicamente:', formField, '=', dbValue);
                 }
             } else {
                 element.value = vehiculo[dbField];
             }
         }
     });
+    
     const idField = document.getElementById('vehicleId');
     if (idField) idField.value = vehiculo.id;
     console.log('✅ Formulario llenado correctamente');
@@ -140,24 +149,15 @@ function resetearFormulario() {
     toggleFormFields(false);
 }
 
-// ============================================
-// FUNCIONES DE LIMPIEZA Y EDICIÓN
-// ============================================
 function limpiarBusqueda() {
-    console.log('🧹 Limpiando formulario y búsqueda...');
     const searchInput = document.getElementById('searchUniversal');
     if (searchInput) searchInput.value = '';
     
     const alertInfo = document.getElementById('alertInfo');
-    const alertError = document.getElementById('alertError');
-    const alertSuccess = document.getElementById('alertSuccess');
-    if (alertInfo) {
-        alertInfo.style.display = 'flex';
-        document.getElementById('infoMessage').textContent = 'Ingrese Placa, ID, Facsímil, Serial o N° Identificación para buscar';
-    }
-    if (alertError) alertError.style.display = 'none';
-    if (alertSuccess) alertSuccess.style.display = 'none';
-
+    if (alertInfo) alertInfo.style.display = 'flex';
+    document.getElementById('alertError').style.display = 'none';
+    document.getElementById('alertSuccess').style.display = 'none';
+    
     resetearFormulario();
     vehiculoSeleccionado = null;
     
@@ -165,10 +165,12 @@ function limpiarBusqueda() {
     const btnCancel = document.getElementById('btnCancel');
     if (btnEdit) btnEdit.style.display = 'none';
     if (btnCancel) btnCancel.disabled = true;
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ============================================
+// FUNCIONES DE EDICIÓN
+// ============================================
+// ✅ TODOS LOS CAMPOS SON EDITABLES
 function toggleFormFields(enable) {
     const fields = document.querySelectorAll('#vehicleForm input, #vehicleForm select, #vehicleForm textarea');
     fields.forEach(function(field) {
@@ -177,9 +179,7 @@ function toggleFormFields(enable) {
         }
     });
     const form = document.getElementById('vehicleForm');
-    if (form) {
-        form.classList.toggle('form-disabled', !enable);
-    }
+    if (form) form.classList.toggle('form-disabled', !enable);
     isEditing = enable;
 }
 
@@ -189,14 +189,9 @@ function editarVehiculo() {
         return;
     }
     toggleFormFields(true);
-    const btnEdit = document.getElementById('btnEdit');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const btnCancel = document.getElementById('btnCancel');
-    
-    if (btnEdit) btnEdit.style.display = 'none';
-    if (btnSubmit) btnSubmit.style.display = 'inline-flex';
-    if (btnCancel) btnCancel.disabled = false;
-    
+    document.getElementById('btnEdit').style.display = 'none';
+    document.getElementById('btnSubmit').style.display = 'inline-flex';
+    document.getElementById('btnCancel').disabled = false;
     mostrarAlerta('ℹ️ Editando vehículo. TODOS los campos son modificables.', 'info');
 }
 
@@ -205,19 +200,14 @@ function cancelarEdicion() {
         llenarFormulario(vehiculoSeleccionado);
     }
     toggleFormFields(false);
-    const btnEdit = document.getElementById('btnEdit');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const btnCancel = document.getElementById('btnCancel');
-    
-    if (btnEdit) btnEdit.style.display = 'inline-flex';
-    if (btnSubmit) btnSubmit.style.display = 'none';
-    if (btnCancel) btnCancel.disabled = true;
-    
+    document.getElementById('btnEdit').style.display = 'inline-flex';
+    document.getElementById('btnSubmit').style.display = 'none';
+    document.getElementById('btnCancel').disabled = false;
     mostrarAlerta('ℹ️ Edición cancelada. Los cambios no fueron guardados.', 'info');
 }
 
 // ============================================
-// FUNCIONES DE GUARDADO (SEGURA)
+// FUNCIONES DE GUARDADO
 // ============================================
 async function guardarVehiculo(event) {
     event.preventDefault();
@@ -240,46 +230,37 @@ async function guardarVehiculo(event) {
     }
 
     try {
-        // ✅ FUNCIÓN SEGURA PARA OBTENER VALORES
-        const getVal = (id, trim = true, upper = false) => {
-            const el = document.getElementById(id);
-            if (!el) return null;
-            let val = el.value;
-            if (trim) val = val.trim();
-            if (upper) val = val.toUpperCase();
-            return val === '' ? null : val;
-        };
-
+        // ✅ ACTUALIZAR TODOS LOS CAMPOS EDITABLES
         const vehiculoActualizado = {
-            marca: getVal('marca', true, true),
-            modelo: getVal('modelo', true, true),
-            tipo: getVal('tipo', true, true),
-            clase: getVal('clase', true, true),
-            ano: getVal('ano', true, false),
-            color: getVal('color', true, true),
-            s_carroceria: getVal('s_carroceria', true, false),
-            s_motor: getVal('s_motor', true, false),
-            placa: getVal('placa', true, true),
-            facsimil: getVal('facsimil', true, false),
-            n_identificacion: getVal('n_identificacion', true, false),
-            situacion: getVal('situacion', true, true),
-            estatus: getVal('estatus', true, true),
-            unidad_administrativa: getVal('unidad_administrativa', true, false),
-            redip: getVal('redip', true, false),
-            ccpe: getVal('ccpe', true, false),
-            epm: getVal('epm', true, false),
-            epp: getVal('epp', true, false),
-            ubicacion_fisica: getVal('ubicacion_fisica', true, false),
-            asignacion: getVal('asignacion', true, false),
-            observacion: getVal('observacion', true, false),
-            observacion_extra: getVal('observacion_extra', true, false),
-            certificado_origen: getVal('certificado_origen', true, false),
-            fecha_inspeccion: getVal('fecha_inspeccion', false, false),
-            n_tramite: getVal('n_tramite', true, false),
-            ubicacion_titulo: getVal('ubicacion_titulo', true, false),
+            marca: document.getElementById('marca')?.value.trim().toUpperCase(),
+            modelo: document.getElementById('modelo')?.value.trim().toUpperCase(),
+            tipo: document.getElementById('tipo')?.value.trim().toUpperCase(),
+            clase: document.getElementById('clase')?.value.trim().toUpperCase(),
+            ano: document.getElementById('ano')?.value.trim() || null,
+            color: document.getElementById('color')?.value.trim().toUpperCase(),
+            s_carroceria: document.getElementById('s_carroceria')?.value.trim(),
+            s_motor: document.getElementById('s_motor')?.value.trim() || null,
+            placa: document.getElementById('placa')?.value.trim().toUpperCase(),
+            facsimil: document.getElementById('facsimil')?.value.trim() || null,
+            n_identificacion: document.getElementById('n_identificacion')?.value.trim() || null,
+            situacion: document.getElementById('situacion')?.value.trim().toUpperCase(),
+            estatus: document.getElementById('estatus')?.value.trim().toUpperCase(),
+            unidad_administrativa: document.getElementById('unidad_administrativa')?.value.trim(),
+            redip: document.getElementById('redip')?.value.trim() || null,
+            ccpe: document.getElementById('ccpe')?.value.trim() || null,
+            epm: document.getElementById('epm')?.value.trim() || null,
+            epp: document.getElementById('epp')?.value.trim() || null,
+            ubicacion_fisica: document.getElementById('ubicacion_fisica')?.value.trim() || null,
+            asignacion: document.getElementById('asignacion')?.value.trim() || null,
+            observacion: document.getElementById('observacion')?.value.trim() || null,
+            observacion_extra: document.getElementById('observacion_extra')?.value.trim() || null,
+            certificado_origen: document.getElementById('certificado_origen')?.value.trim() || null,
+            fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value || null,
+            n_tramite: document.getElementById('n_tramite')?.value.trim() || null,
+            ubicacion_titulo: document.getElementById('ubicacion_titulo')?.value.trim() || null,
         };
 
-        console.log('📝 Actualizando vehículo ID:', vehiculoSeleccionado.id, vehiculoActualizado);
+        console.log('📝 Actualizando vehículo ID:', vehiculoSeleccionado.id);
         const { data, error } = await supabaseClient
             .from('vehiculos')
             .update(vehiculoActualizado)
@@ -294,16 +275,19 @@ async function guardarVehiculo(event) {
 
         console.log('✅ Vehículo actualizado:', data);
         mostrarAlerta('✅ Vehículo actualizado exitosamente', 'success');
-        vehiculoSeleccionado = Object.assign({}, vehiculoSeleccionado, data[0]);
         
+        // 🔄 SCROLL AUTOMÁTICO HACIA ARRIBA PARA VER EL MENSAJE
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        vehiculoSeleccionado = Object.assign({}, vehiculoSeleccionado, data[0]);
         setTimeout(function() {
             limpiarTodoParaNuevaBusqueda();
         }, 2000);
-
     } catch (error) {
         console.error('❌ Error en guardarVehiculo:', error);
         mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
     } finally {
+        const btnSubmit = document.getElementById('btnSubmit');
         if (btnSubmit) {
             btnSubmit.disabled = false;
             btnSubmit.classList.remove('loading');
@@ -311,10 +295,32 @@ async function guardarVehiculo(event) {
     }
 }
 
+// NUEVA FUNCIÓN: LIMPIAR TODO PARA NUEVA BÚSQUEDA
 function limpiarTodoParaNuevaBusqueda() {
     console.log('🧹 Limpiando formulario para nueva búsqueda...');
-    limpiarBusqueda();
+    const searchInput = document.getElementById('searchUniversal');
+    if (searchInput) searchInput.value = '';
+    
+    const form = document.getElementById('vehicleForm');
+    if (form) form.reset();
+    
+    const idField = document.getElementById('vehicleId');
+    if (idField) idField.value = '';
+    
+    toggleFormFields(false);
+    
+    const btnEdit = document.getElementById('btnEdit');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnCancel = document.getElementById('btnCancel');
+    
+    if (btnEdit) btnEdit.style.display = 'inline-flex';
+    if (btnSubmit) btnSubmit.style.display = 'none';
+    if (btnCancel) btnCancel.disabled = true;
+    
+    vehiculoSeleccionado = null;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    mostrarAlerta('ℹ️ Ingrese placa, facsímil, serial o N° identificación para buscar un vehículo', 'info');
+    console.log('✅ Formulario limpiado, listo para nueva búsqueda');
 }
 
 // ============================================
@@ -325,24 +331,27 @@ function mostrarAlerta(mensaje, tipo) {
     const alertError = document.getElementById('alertError');
     const alertSuccess = document.getElementById('alertSuccess');
     
+    // Ocultar todas primero
     if (alertInfo) alertInfo.style.display = 'none';
     if (alertError) alertError.style.display = 'none';
     if (alertSuccess) alertSuccess.style.display = 'none';
 
+    // Mostrar la correspondiente
     if (tipo === 'success') {
-        const msg = document.getElementById('successMessage');
-        if (msg) msg.textContent = mensaje;
+        const msgEl = document.getElementById('successMessage');
+        if (msgEl) msgEl.textContent = mensaje;
         if (alertSuccess) alertSuccess.style.display = 'flex';
     } else if (tipo === 'error') {
-        const msg = document.getElementById('errorMessage');
-        if (msg) msg.textContent = mensaje;
+        const msgEl = document.getElementById('errorMessage');
+        if (msgEl) msgEl.textContent = mensaje;
         if (alertError) alertError.style.display = 'flex';
     } else {
-        const msg = document.getElementById('infoMessage');
-        if (msg) msg.textContent = mensaje;
+        const msgEl = document.getElementById('infoMessage');
+        if (msgEl) msgEl.textContent = mensaje;
         if (alertInfo) alertInfo.style.display = 'flex';
     }
 
+    // Auto-ocultar después de 5 segundos (excepto info inicial)
     if (tipo !== 'info') {
         setTimeout(function() {
             if (alertSuccess) alertSuccess.style.display = 'none';
@@ -362,18 +371,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCancel = document.getElementById('btnCancel');
     const btnSearch = document.getElementById('btnSearch');
     const searchInput = document.getElementById('searchUniversal');
-    const btnClearSearch = document.getElementById('btnClearSearch'); // ✅ Botón de limpiar
     const logoutBtn = document.getElementById('logoutBtn');
 
     if (btnEdit) btnEdit.addEventListener('click', editarVehiculo);
     if (btnSubmit) btnSubmit.addEventListener('click', guardarVehiculo);
     if (btnCancel) btnCancel.addEventListener('click', cancelarEdicion);
     if (btnSearch) btnSearch.addEventListener('click', buscarVehiculo);
-    if (searchInput) searchInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') buscarVehiculo(); });
     
-    // ✅ Asignar evento al botón de limpiar
-    if (btnClearSearch) btnClearSearch.addEventListener('click', limpiarBusqueda);
-    
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') buscarVehiculo();
+        });
+    }
+
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async function() {
             if (confirm('¿Está seguro de cerrar sesión?')) {
