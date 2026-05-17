@@ -21,14 +21,14 @@
 <style>
 /* Estadísticas en línea */
 .stats-inline {
-  display: flex; justify-content: center; align-items: center; gap: 30px;
-  padding: 25px 40px; background: linear-gradient(135deg, #003366 0%, #005b96 100%);
+  display: flex; justify-content: center; align-items: center; gap: 20px;
+  padding: 20px 30px; background: linear-gradient(135deg, #003366 0%, #005b96 100%);
   border-radius: 12px; margin: 30px 0 40px 0; box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
   flex-wrap: wrap;
 }
 .stat-item { text-align: center; display: flex; flex-direction: column; gap: 5px; }
-.stat-value { font-size: 2.5rem; font-weight: 700; color: white; line-height: 1; }
-.stat-label { font-size: 0.9rem; color: rgba(255, 255, 255, 0.9); font-weight: 400; }
+.stat-value { font-size: 2.2rem; font-weight: 700; color: white; line-height: 1; }
+.stat-label { font-size: 0.85rem; color: rgba(255, 255, 255, 0.9); font-weight: 400; }
 .stat-separator { color: rgba(255, 255, 255, 0.4); font-size: 1.5rem; font-weight: 300; }
 
 /* Contenedor Reporte */
@@ -42,13 +42,11 @@
   cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;
   border: none; font-family: 'Roboto', sans-serif; color: white;
 }
-.btn-refresh { background: #059669; }
-.btn-print { background: #005b96; }
-.btn-pdf { background: #dc2626; }
+.btn-refresh { background: #059669; } .btn-print { background: #005b96; } .btn-pdf { background: #dc2626; }
 .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
 
 /* Gráficos */
-.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 30px; }
 .chart-container { background: #f8fafc; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; }
 .chart-wrapper { position: relative; height: 300px; }
 
@@ -76,29 +74,22 @@
 .pagination span { font-size: 0.9rem; color: #64748b; }
 
 @media (max-width: 768px) {
-  .stats-inline { flex-direction: column; gap: 15px; padding: 20px; }
+  .stats-inline { flex-direction: column; gap: 10px; padding: 15px; }
   .stat-separator { display: none; }
-  .stat-item { width: 100%; flex-direction: row; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
+  .stat-item { width: 100%; flex-direction: row; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
   .charts-grid { grid-template-columns: 1fr; }
 }
 @media print {
   .navbar, .report-actions, .module-header { display: none !important; }
-  .report-container { box-shadow: none; padding: 0; }
-  body { background: white; }
+  .report-container { box-shadow: none; padding: 0; } body { background: white; }
 }
 </style>
 </head>
 <body class="dashboard-page">
 <nav class="navbar" role="navigation">
   <div class="nav-container">
-    <div class="nav-brand">
-      <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-      <span class="nav-title">Sistema de Logística</span>
-    </div>
-    <div class="nav-user">
-      <span class="user-email" id="userEmail">⏳ Cargando...</span>
-      <button class="btn-logout" id="logoutBtn"><span class="logout-icon">🚪</span><span class="logout-text">Cerrar Sesión</span></button>
-    </div>
+    <div class="nav-brand"><img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35"><span class="nav-title">Sistema de Logística</span></div>
+    <div class="nav-user"><span class="user-email" id="userEmail">⏳ Cargando...</span><button class="btn-logout" id="logoutBtn"><span class="logout-icon">🚪</span><span class="logout-text">Cerrar Sesión</span></button></div>
   </div>
 </nav>
 
@@ -118,13 +109,15 @@
     <p class="module-subtitle">Análisis del parque automotor por unidad y estatus</p>
   </section>
 
-  <!-- ✅ ESTADÍSTICAS EN LÍNEA (5 Indicadores) -->
+  <!-- ✅ ESTADÍSTICAS EN LÍNEA (6 Indicadores) -->
   <section class="stats-inline">
     <div class="stat-item"><span class="stat-value" id="totalVehiculos">⏳</span><span class="stat-label">Total</span></div>
     <span class="stat-separator">|</span>
     <div class="stat-item"><span class="stat-value" id="totalPatrulleras">⏳</span><span class="stat-label">Patrulleras</span></div>
     <span class="stat-separator">|</span>
     <div class="stat-item"><span class="stat-value" id="totalMotos">⏳</span><span class="stat-label">Motos</span></div>
+    <span class="stat-separator">|</span>
+    <div class="stat-item"><span class="stat-value" id="totalOperativos">⏳</span><span class="stat-label">Operativos</span></div>
     <span class="stat-separator">|</span>
     <div class="stat-item"><span class="stat-value" id="totalInoperativos">⏳</span><span class="stat-label">Inoperativos</span></div>
     <span class="stat-separator">|</span>
@@ -141,10 +134,12 @@
     <div class="charts-section">
       <h2 class="section-title">📈 Distribución Gráfica</h2>
       <div class="charts-grid">
-        <div class="chart-container"><h3 style="margin-bottom:10px;">Por Tipo (Patrulleras, Motos, Tracción)</h3><div class="chart-wrapper"><canvas id="chartTipos"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Por Tipo Agrupado</h3><div class="chart-wrapper"><canvas id="chartTipos"></canvas></div></div>
         <div class="chart-container"><h3 style="margin-bottom:10px;">Por Estatus</h3><div class="chart-wrapper"><canvas id="chartEstatus"></canvas></div></div>
-        <div class="chart-container"><h3 style="margin-bottom:10px;">Top Unidades (10)</h3><div class="chart-wrapper"><canvas id="chartUnidades"></canvas></div></div>
-        <div class="chart-container"><h3 style="margin-bottom:10px;">Antigüedad (Año)</h3><div class="chart-wrapper"><canvas id="chartAnos"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Por Situación</h3><div class="chart-wrapper"><canvas id="chartSituacion"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Top Marcas</h3><div class="chart-wrapper"><canvas id="chartMarcas"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Top Modelos</h3><div class="chart-wrapper"><canvas id="chartModelos"></canvas></div></div>
+        <div class="chart-container"><h3 style="margin-bottom:10px;">Por Año</h3><div class="chart-wrapper"><canvas id="chartAnos"></canvas></div></div>
       </div>
     </div>
 
