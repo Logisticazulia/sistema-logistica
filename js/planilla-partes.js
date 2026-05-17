@@ -1,6 +1,5 @@
-// planilla-partes.js - Dashboard de estadísticas (sin sección Mantenimiento)
+// planilla-partes.js - Dashboard estadístico con paginación
 document.addEventListener('DOMContentLoaded', () => {
-  // 🔧 CONFIGURACIÓN
   const supabaseUrl = window.SUPABASE_URL;
   const supabaseKey = window.SUPABASE_KEY;
   let supabase = null;
@@ -9,315 +8,247 @@ document.addEventListener('DOMContentLoaded', () => {
     supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
   }
 
-  // 📦 REFERENCIAS DOM
   const userEmail = document.getElementById('userEmail');
   const fechaReporte = document.getElementById('fechaReporte');
-  const tbodyResumen = document.getElementById('tablaResumenBody');
+  const tbody = document.getElementById('tablaResumenBody');
+  const pagContainer = document.getElementById('paginationControls');
+
+  let unidadesData = [];
+  const itemsPerPage = 20;
+  let currentPage = 1;
 
   // 🚀 INICIALIZACIÓN
   if (supabase) {
-    mostrarUsuarioAutenticado();
+    cargarUsuario();
     cargarYProcesarDatos();
   } else {
-    userEmail.textContent = 'Sin conexión';
+    if(userEmail) userEmail.textContent = '⚠️ Sin conexión a BD';
     generarDatosEjemplo();
   }
 
-  // 👤 MOSTRAR USUARIO (igual que transporte.js)
-  async function mostrarUsuarioAutenticado() {
+  // 👤 SESIÓN
+  async function cargarUsuario() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.email) {
-        userEmail.textContent = session.user.email;
-      } else {
-        userEmail.textContent = 'Usuario no autenticado';
-      }
-    } catch (err) {
-      console.warn('⚠️ No se pudo obtener sesión:', err.message);
-      userEmail.textContent = 'usuario@institucion.com';
-    }
+      if(userEmail) userEmail.textContent = session?.user?.email || 'Invitado';
+    } catch { if(userEmail) userEmail.textContent = 'Usuario'; }
   }
 
-  // 📥 CARGAR DATOS
+  // 📥 OBTENER DATOS
   async function cargarYProcesarDatos() {
     try {
-      const { data: vehiculos, error } = await supabase
+      const { data, error } = await supabase
         .from('vehiculos')
-        .select('estatus, clase, tipo, ano, unidad_administrativa')
-        .order('created_at', { ascending: false });
+        .select('clase, estatus, situacion, unidad_administrativa, ano');
       
       if (error) throw error;
-      if (!vehiculos?.length) {
-        console.warn('⚠️ Sin registros');
-        generarDatosEjemplo();
-        return;
-      }
-      procesarDatos(vehiculos);
+      procesarDatos(data || []);
     } catch (err) {
-      console.error('❌ Error cargando datos:', err.message);
+      console.error('❌ Error BD:', err);
       generarDatosEjemplo();
     }
   }
 
-  // 🔄 PROCESAR DATOS
+  // 🔄 PROCESAR Y AGRUPAR
   function procesarDatos(vehiculos) {
-    // 🎯 Agrupación EXACTA como pediste
-    const tiposAgrupados = {
-      'Vehículos': ['automovil', 'camioneta', 'autobus', 'camion', 'pick-up', 'pickup', 'bus', 'machito', 'sport wagon', 'minibus'],
-      'Motocicletas': ['moto', 'enduro', 'trimovil', 'traccion de sangre', 'paseo'],
-      'Especiales': ['especial', 'embarcacion', 'barco']
+    const stats = { 
+      total: 0, patrulleras: 0, motos: 0, traccion: 0, 
+      inoperativos: 0, desincorporados: 0, 
+      porEstatus: { 'Operativos': 0, 'Inoperativos': 0, 'Desincorporados': 0 },
+      porUnidad: {}, porAno: {}
     };
 
-    const stats = {
-      total: vehiculos.length,
-      operativos: 0,
-      inoperativos: 0,
-      vehiculosTerrestres: 0,
-      motos: 0,
-      porTipo: {},
-      porEstatus: {},
-      porAno: {},
-      porUnidad: {}
-    };
+    // Definiciones estrictas según tu CSV
+    const clasesPatrulleras = ['automovil', 'camioneta', 'autobus', 'camion'];
+    const clasesMotos = ['moto', 'enduro', 'trimovil', 'paseo', 'especial'];
+    const clasesTraccion = ['traccion de sangre', 'traccion'];
 
     vehiculos.forEach(v => {
-      // 📊 Estatus (solo Operativo / Inoperativo)
-      const estatusRaw = (v.estatus || '').toString().toLowerCase().trim();
-      const esOperativo = estatusRaw.includes('operativa') && 
-                         !estatusRaw.includes('inoperativa') && 
-                         !estatusRaw.includes('reparacion') && 
-                         !estatusRaw.includes('taller') &&
-                         !estatusRaw.includes('desincorporada');
+      stats.total++;
+      const clase = (v.clase || '').toLowerCase().trim();
+      const estatus = ((v.estatus || v.situacion) || '').toLowerCase().trim();
+
+      // 1. TIPO
+      if (clasesPatrulleras.some(c => clase.includes(c))) { stats.patrulleras++; }
+      else if (clasesMotos.some(c => clase.includes(c))) { stats.motos++; }
+      else if (clasesTraccion.some(c => clase.includes(c))) { stats.traccion++; }
+
+      // 2. ESTATUS
+      const esDesincorporado = estatus.includes('desincorporad');
+      const esInoperativo = !esDesincorporado && (estatus.includes('inoperativa') || estatus.includes('reparacion') || estatus.includes('taller') || estatus.includes('denunciada'));
       
-      if (esOperativo) {
-        stats.operativos++;
-        stats.porEstatus['Operativo'] = (stats.porEstatus['Operativo'] || 0) + 1;
+      if (esDesincorporado) {
+        stats.desincorporados++; stats.porEstatus['Desincorporados']++;
+      } else if (esInoperativo) {
+        stats.inoperativos++; stats.porEstatus['Inoperativos']++;
       } else {
-        stats.inoperativos++;
-        stats.porEstatus['Inoperativo'] = (stats.porEstatus['Inoperativo'] || 0) + 1;
+        stats.porEstatus['Operativos']++;
       }
 
-      // 🚗 Tipo agrupado
-      const claseRaw = (v.clase || v.tipo || '').toString().toLowerCase().trim();
-      let tipoAgrupado = 'Otros';
-      for (const [grupo, valores] of Object.entries(tiposAgrupados)) {
-        if (valores.some(val => claseRaw.includes(val))) {
-          tipoAgrupado = grupo;
-          break;
-        }
-      }
-      stats.porTipo[tipoAgrupado] = (stats.porTipo[tipoAgrupado] || 0) + 1;
-      if (tipoAgrupado === 'Vehículos') stats.vehiculosTerrestres++;
-      if (tipoAgrupado === 'Motocicletas') stats.motos++;
-
-      // 📅 Año
-      const ano = v.ano && !isNaN(v.ano) ? v.ano : 'N/D';
-      stats.porAno[ano] = (stats.porAno[ano] || 0) + 1;
-
-      // 🏢 Unidad administrativa
-      const unidad = (v.unidad_administrativa || 'Sin asignar').toString().trim() || 'Sin asignar';
+      // 3. UNIDAD
+      const unidad = (v.unidad_administrativa || 'Sin Asignar').trim();
       if (!stats.porUnidad[unidad]) {
-        stats.porUnidad[unidad] = { total: 0, terrestres: 0, motos: 0, otros: 0, operativos: 0 };
+        stats.porUnidad[unidad] = { total: 0, patrulleras: 0, motos: 0, traccion: 0, inoperativos: 0, desincorporados: 0 };
       }
       stats.porUnidad[unidad].total++;
-      if (tipoAgrupado === 'Vehículos') stats.porUnidad[unidad].terrestres++;
-      else if (tipoAgrupado === 'Motocicletas') stats.porUnidad[unidad].motos++;
-      else stats.porUnidad[unidad].otros++;
-      if (esOperativo) stats.porUnidad[unidad].operativos++;
+      if (clasesPatrulleras.some(c => clase.includes(c))) stats.porUnidad[unidad].patrulleras++;
+      if (clasesMotos.some(c => clase.includes(c))) stats.porUnidad[unidad].motos++;
+      if (clasesTraccion.some(c => clase.includes(c))) stats.porUnidad[unidad].traccion++;
+      if (esInoperativo) stats.porUnidad[unidad].inoperativos++;
+      if (esDesincorporado) stats.porUnidad[unidad].desincorporados++;
+
+      // 4. AÑO
+      const ano = v.ano && !isNaN(v.ano) ? v.ano : null;
+      if (ano) stats.porAno[ano] = (stats.porAno[ano] || 0) + 1;
     });
 
-    // 📊 ACTUALIZAR UI
-    actualizarEstadisticas(stats);
-    generarGraficos(stats);
-    generarTablaResumen(stats.porUnidad);
+    // Preparar datos para tabla
+    unidadesData = Object.entries(stats.porUnidad)
+      .map(([nombre, d]) => ({ nombre, ...d }))
+      .sort((a, b) => b.total - a.total);
+
+    currentPage = 1;
+    renderStats(stats);
+    renderCharts(stats);
+    renderTable();
+    renderPagination();
     
-    if (fechaReporte) {
-      fechaReporte.textContent = new Date().toLocaleString('es-ES');
-    }
+    if(fechaReporte) fechaReporte.textContent = new Date().toLocaleString('es-ES');
   }
 
-  // 📈 ACTUALIZAR TARJETAS (estilo transporte.html)
-  function actualizarEstadisticas(stats) {
-    const ids = [
-      { id: 'totalVehiculos', val: stats.total },
-      { id: 'totalOperativos', val: stats.operativos },
-      { id: 'totalInoperativos', val: stats.inoperativos },
-      { id: 'totalVehiculosTerrestres', val: stats.vehiculosTerrestres },
-      { id: 'totalMotos', val: stats.motos }
-    ];
-    ids.forEach(({id, val}) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = val;
-    });
+  // 📈 ACTUALIZAR TARJETAS
+  function renderStats(s) {
+    document.getElementById('totalVehiculos').textContent = s.total;
+    document.getElementById('totalPatrulleras').textContent = s.patrulleras;
+    document.getElementById('totalMotos').textContent = s.motos;
+    document.getElementById('totalInoperativos').textContent = s.inoperativos;
+    document.getElementById('totalDesincorporados').textContent = s.desincorporados;
   }
 
   // 📊 GRÁFICOS
-  function generarGraficos(stats) {
-    if (typeof Chart === 'undefined') return;
+  function renderCharts(s) {
+    if(typeof Chart === 'undefined') return;
     Chart.defaults.font.family = 'Roboto, sans-serif';
 
-    // Doughnut: Tipos
-    const ctxTipos = document.getElementById('chartTipos');
-    if (ctxTipos) {
-      new Chart(ctxTipos, {
-        type: 'doughnut',
-        data: {
-          labels: Object.keys(stats.porTipo),
-          datasets: [{
-            data: Object.values(stats.porTipo),
-            backgroundColor: ['#264653', '#2a9d8f', '#e9c46a'],
-            borderWidth: 2,
-            borderColor: '#fff'
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-      });
-    }
+    // 1. Tipos (Solo 3)
+    new Chart(document.getElementById('chartTipos'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Unidades Patrulleras', 'Motocicletas', 'Tracción de Sangre'],
+        datasets: [{ data: [s.patrulleras, s.motos, s.traccion], backgroundColor: ['#003366', '#e76f51', '#2a9d8f'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
 
-    // Bar: Estatus (solo 2 categorías)
-    const ctxEstatus = document.getElementById('chartEstatus');
-    if (ctxEstatus) {
-      new Chart(ctxEstatus, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(stats.porEstatus),
-          datasets: [{
-            data: Object.values(stats.porEstatus),
-            backgroundColor: ['#2a9d8f', '#e76f51'],
-            borderRadius: 6
-          }]
-        },
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } }
-        }
-      });
-    }
+    // 2. Estatus
+    new Chart(document.getElementById('chartEstatus'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(s.porEstatus),
+        datasets: [{ data: Object.values(s.porEstatus), backgroundColor: ['#22c55e', '#ef4444', '#64748b'], borderRadius: 6 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
 
-    // Line: Años
-    const ctxAnos = document.getElementById('chartAnos');
-    if (ctxAnos) {
-      const anos = Object.keys(stats.porAno).filter(a => a !== 'N/D').map(Number).sort((a,b)=>a-b);
-      new Chart(ctxAnos, {
-        type: 'line',
-        data: {
-          labels: anos,
-          datasets: [{
-            label: 'Vehículos',
-            data: anos.map(a => stats.porAno[a]),
-            borderColor: '#005b96',
-            backgroundColor: 'rgba(0,91,150,0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
-    }
+    // 3. Top Unidades
+    const top = s.porUnidad ? Object.entries(s.porUnidad).sort((a,b)=>b[1].total-a[1].total).slice(0,10) : [];
+    new Chart(document.getElementById('chartUnidades'), {
+      type: 'bar',
+      data: {
+        labels: top.map(u => u[0].length>30 ? u[0].substring(0,27)+'...' : u[0]),
+        datasets: [{ data: top.map(u=>u[1].total), backgroundColor: '#005b96', borderRadius: 4 }]
+      },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
 
-    // Horizontal Bar: Top Unidades
-    const ctxUnidades = document.getElementById('chartUnidades');
-    if (ctxUnidades) {
-      const top = Object.entries(stats.porUnidad).sort((a,b)=>b[1].total-a[1].total).slice(0,10);
-      new Chart(ctxUnidades, {
-        type: 'bar',
-        data: {
-          labels: top.map(u => u[0].length>25 ? u[0].substring(0,22)+'...' : u[0]),
-          datasets: [{
-            data: top.map(u => u[1].total),
-            backgroundColor: '#005b96',
-            borderRadius: 4
-          }]
-        },
-        options: { 
-          indexAxis: 'y',
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { beginAtZero: true } }
-        }
-      });
-    }
+    // 4. Años
+    const anos = Object.keys(s.porAno).filter(a=>!isNaN(a)).map(Number).sort((a,b)=>a-b);
+    new Chart(document.getElementById('chartAnos'), {
+      type: 'line',
+      data: {
+        labels: anos,
+        datasets: [{ data: anos.map(a=>s.porAno[a]), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
   }
 
-  // 📋 TABLA RESUMEN - ✅ ID CORREGIDO: tablaResumenBody
-  function generarTablaResumen(porUnidad) {
-    if (!tbodyResumen) {
-      console.error('❌ No se encontró #tablaResumenBody');
+  // 📋 RENDER TABLA CON PAGINACIÓN
+  function renderTable() {
+    if(!tbody) return;
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = unidadesData.slice(start, end);
+
+    if(pageData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#64748b;">Sin datos para mostrar</td></tr>';
       return;
     }
-    
-    const filas = Object.entries(porUnidad)
-      .sort((a, b) => b[1].total - a[1].total)
-      .slice(0, 15)
-      .map(([unidad, d]) => {
-        const pct = d.total > 0 ? Math.round((d.operativos / d.total) * 100) : 0;
-        const cls = pct >= 80 ? 'badge-operativa' : pct >= 50 ? 'badge-mantenimiento' : 'badge-inoperativa';
-        return `<tr>
-          <td><strong>${unidad}</strong></td>
-          <td>${d.terrestres}</td>
-          <td>${d.motos}</td>
-          <td>${d.otros}</td>
-          <td>${d.operativos}</td>
-          <td><span class="badge ${cls}">${pct}%</span></td>
-        </tr>`;
-      }).join('');
-    
-    tbodyResumen.innerHTML = filas || '<tr><td colspan="6" style="text-align:center;color:#64748b;">Sin datos</td></tr>';
+
+    tbody.innerHTML = pageData.map(d => {
+      const activos = d.total - d.inoperativos - d.desincorporados;
+      const pct = d.total > 0 ? Math.round((activos / d.total) * 100) : 0;
+      const cls = pct >= 80 ? 'badge-alta' : pct >= 50 ? 'badge-media' : 'badge-baja';
+      return `<tr>
+        <td style="font-weight:500;">${d.nombre}</td>
+        <td style="text-align:center;">${d.patrulleras}</td>
+        <td style="text-align:center;">${d.motos}</td>
+        <td style="text-align:center;">${d.traccion}</td>
+        <td style="text-align:center;color:#dc2626;">${d.inoperativos}</td>
+        <td style="text-align:center;color:#64748b;">${d.desincorporados}</td>
+        <td style="text-align:center;"><span class="badge ${cls}">${pct}%</span></td>
+      </tr>`;
+    }).join('');
   }
 
-  // 🧪 DATOS DE EJEMPLO
+  // 🔘 PAGINACIÓN
+  function renderPagination() {
+    pagContainer.innerHTML = '';
+    const totalPages = Math.ceil(unidadesData.length / itemsPerPage);
+    if (totalPages <= 1) return;
+
+    const prev = document.createElement('button'); prev.textContent = '← Anterior';
+    prev.disabled = currentPage === 1;
+    prev.onclick = () => { currentPage--; renderTable(); renderPagination(); };
+
+    const next = document.createElement('button'); next.textContent = 'Siguiente →';
+    next.disabled = currentPage === totalPages;
+    next.onclick = () => { currentPage++; renderTable(); renderPagination(); };
+
+    const info = document.createElement('span');
+    info.textContent = `Página ${currentPage} de ${totalPages} (${unidadesData.length} registros)`;
+    
+    pagContainer.append(prev, info, next);
+  }
+
+  // 🧪 FALLBACK DATOS
   function generarDatosEjemplo() {
-    const vehiculos = Array.from({length: 120}, () => ({
-      estatus: ['OPERATIVA','INOPERATIVA','OPERATIVA','OPERATIVA'][Math.floor(Math.random()*4)],
-      clase: ['CAMIONETA','MOTO','AUTOMOVIL','CAMION','ENDURO'][Math.floor(Math.random()*5)],
-      ano: [2015,2018,2022,2024][Math.floor(Math.random()*4)],
-      unidad_administrativa: ['ESTACION A','ESTACION B','BRIGADA MOTORIZADA','DIP'][Math.floor(Math.random()*4)]
+    const data = Array.from({length: 85}, (_, i) => ({
+      clase: ['CAMIONETA','MOTO','TRACCION DE SANGRE','AUTOMOVIL'][Math.floor(Math.random()*4)],
+      estatus: ['OPERATIVA','INOPERATIVA','DESINCORPORADA','REPARACION'][Math.floor(Math.random()*4)],
+      unidad_administrativa: ['ESTACIÓN A','EPP B','CCPEM','EPM C','BRIM'][Math.floor(Math.random()*5)],
+      ano: 2015 + Math.floor(Math.random()*9)
     }));
-    procesarDatos(vehiculos);
-    
-    // Aviso visual
-    const report = document.getElementById('reportContent');
-    if (report && !report.querySelector('.demo-warning')) {
-      const w = document.createElement('div');
-      w.className = 'demo-warning';
-      w.style.cssText = 'background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-bottom:20px;text-align:center;color:#92400e';
-      w.innerHTML = '⚠️ <strong>Modo demostración:</strong> Datos de ejemplo. Conecta Supabase para datos reales.';
-      report.insertBefore(w, report.firstChild);
-    }
+    procesarDatos(data);
+    if(tbody) tbody.insertAdjacentHTML('beforebegin', '<div style="background:#fef3c7;padding:10px;margin-bottom:10px;border-radius:8px;text-align:center;color:#92400e;">⚠️ Modo Demo: Datos simulados. Conecta Supabase para datos reales.</div>');
   }
 
-  // 🖨️ EXPORTAR
+  // 📄 EXPORTAR
   window.imprimirReporte = () => window.print();
-  
   window.exportarPDF = async () => {
-    if (!window.jspdf || !window.html2canvas) {
-      alert('⚠️ Librerías PDF no cargadas');
-      return;
-    }
+    if(!window.jspdf || !window.html2canvas) return alert('⚠️ Librerías no cargadas');
     const { jsPDF } = window.jspdf;
     const el = document.getElementById('reportContent');
-    if (!el) return;
-    
+    if(!el) return;
     try {
       const btn = document.querySelector('.btn-pdf');
-      if (btn) { btn.disabled = true; btn.innerHTML = '⏳...'; }
-      
+      btn.innerHTML = '⏳ Generando...'; btn.disabled = true;
       const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#fff' });
-      const img = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const w = 210;
-      const h = (canvas.height * w) / canvas.width;
-      pdf.addImage(img, 'PNG', 0, 0, w, h);
-      pdf.save(`partes-${new Date().toISOString().slice(0,10)}.pdf`);
-    } catch (e) {
-      console.error('❌ PDF error:', e);
-      alert('⚠️ Error al exportar');
-    } finally {
-      const btn = document.querySelector('.btn-pdf');
-      if (btn) { btn.disabled = false; btn.innerHTML = '📄 Exportar PDF'; }
-    }
+      const w = 210, h = (canvas.height * w) / canvas.width;
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
+      pdf.save(`Partes_Generales_${new Date().toISOString().slice(0,10)}.pdf`);
+    } catch(e) { console.error(e); alert('❌ Error al exportar'); }
+    finally { const b = document.querySelector('.btn-pdf'); b.innerHTML = '📄 Exportar PDF'; b.disabled = false; }
   };
 });
