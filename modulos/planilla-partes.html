@@ -1,541 +1,475 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Partes Generales - Sistema de Logística">
-    <meta name="theme-color" content="#003366">
-    <title>Partes Generales | Transporte</title>
-    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1" defer></script>
-    <style>
-        /* Estadísticas en línea */
-        .stats-inline {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #003366 0%, #005b96 100%);
-            border-radius: 12px;
-            margin: 20px 0 30px 0;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
-            flex-wrap: wrap;
-        }
-        .stat-item {
-            text-align: center;
-            min-width: 90px;
-        }
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: white;
-            line-height: 1;
-        }
-        .stat-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-        .stat-separator {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 1.2rem;
-        }
-        
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .summary-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 3px 10px rgba(0, 51, 102, 0.08);
-            border-left: 4px solid #005b96;
-        }
-        .summary-card.motos { border-left-color: #2a9d8f; }
-        .summary-card.desinc { border-left-color: #e76f51; }
-        .summary-card.ubic { border-left-color: #e9c46a; }
-        .summary-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #003366;
-        }
-        .summary-label {
-            font-size: 0.8rem;
-            color: #666;
-        }
-        
-        /* Grid de gráficos - 3 por fila */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .chart-card {
-            background: white;
-            border-radius: 12px;
-            padding: 18px;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.08);
-            border: 2px solid #e8eef5;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .chart-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 51, 102, 0.12);
-            border-color: #005b96;
-        }
-        .chart-card h4 {
-            margin: 0 0 12px 0;
-            font-size: 0.95rem;
-            color: #003366;
-            font-weight: 600;
-            text-align: center;
-        }
-        .chart-container {
-            position: relative;
-            height: 240px;
-            width: 100%;
-        }
-        
-        /* ✅ BOTÓN DE IMPRIMIR */
-        .print-section {
-            display: flex;
-            justify-content: flex-end;
-            margin: 15px 0 25px 0;
-            gap: 10px;
-        }
-        .btn-print {
-            background: #003366;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        .btn-print:hover {
-            background: #005b96;
-            transform: translateY(-2px);
-        }
-        .btn-print:active {
-            transform: translateY(0);
-        }
-        
-        .btn-volver {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-volver:hover {
-            background: #5a6268;
-        }
-        
-        .loading {
-            font-size: 1.2rem;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        /* === RESPONSIVE === */
-        @media (max-width: 1024px) {
-            .charts-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 768px) {
-            .stats-inline {
-                flex-direction: column;
-                gap: 10px;
-                padding: 12px 15px;
-            }
-            .stat-separator { display: none; }
-            .stat-item {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                padding: 5px 0;
-                border-bottom: 1px solid rgba(255,255,255,0.2);
-            }
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            .chart-container {
-                height: 220px;
-            }
-            .summary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .print-section {
-                flex-direction: column;
-            }
-            .btn-print {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-        
-     /* === ESTILOS DE IMPRESIÓN - TAMAÑO CARTA === */
-@media print {
-    /* Configuración de página - TAMAÑO CARTA */
-    @page {
-        size: letter portrait; /* 8.5" x 11" */
-        margin: 1.2cm;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 Dashboard Vehículos - Estadísticas</title>
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #2563eb; --success: #22c55e; --warning: #f59e0b; 
+      --danger: #ef4444; --dark: #1e293b; --light: #f8fafc;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
     
-    /* Forzar colores de fondo en impresión */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color-adjust: exact !important;
-    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+    .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
+    .header p { opacity: 0.9; }
     
-    /* Ocultar elementos no necesarios */
-    .navbar,
-    .btn-volver,
-    .btn-print,
-    .btn-logout,
-    .breadcrumb,
-    .module-subtitle {
-        display: none !important;
-    }
+    /* Cards de estadísticas */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid var(--primary); transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card.success { border-left-color: var(--success); }
+    .stat-card.warning { border-left-color: var(--warning); }
+    .stat-card.danger { border-left-color: var(--danger); }
+    .stat-card .label { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--dark); margin: 8px 0; }
+    .stat-card .subtext { font-size: 0.8rem; color: #94a3b8; }
     
-    /* Ajustar contenedor principal */
-    body, html {
-        width: 21.59cm !important; /* Ancho carta */
-        margin: 0 !important;
-        padding: 0 !important;
-        font-size: 11pt !important;
-    }
+    /* Secciones de gráficos */
+    .charts-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px; }
+    .chart-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .chart-card h3 { margin-bottom: 16px; color: var(--dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .chart-container { position: relative; height: 300px; }
     
-    .dashboard-main {
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100% !important;
-    }
+    /* Tabla de detalles */
+    .table-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto; }
+    .table-section h3 { margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: #f1f5f9; padding: 12px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    tr:hover { background: #f8fafc; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+    .badge-operativa { background: #dcfce7; color: #166534; }
+    .badge-inoperativa { background: #fef3c7; color: #92400e; }
+    .badge-desincorporada { background: #fee2e2; color: #991b1b; }
+    .badge-reparacion { background: #dbeafe; color: #1e40af; }
     
-    /* Título del módulo */
-    .module-title-section {
-        margin: 0 0 15px 0 !important;
-        padding: 0 !important;
-        page-break-after: avoid;
-    }
-    .module-title {
-        font-size: 14pt !important;
-        font-weight: 700 !important;
-        color: #003366 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+    /* Loading y estados */
+    .loading { text-align: center; padding: 40px; color: #64748b; }
+    .loading-spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error { background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid var(--danger); }
     
-    /* ✅ BARRA DE ESTADÍSTICAS - AJUSTADA PARA IMPRESIÓN */
-    .stats-inline {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 8px !important;
-        padding: 10px 5px !important;
-        margin: 10px 0 15px 0 !important;
-        background: #f8f9fa !important;
-        border: 1px solid #dee2e6 !important;
-        border-radius: 6px !important;
-        box-shadow: none !important;
-        page-break-after: avoid;
-        width: 100% !important;
+    /* Responsive */
+    @media (max-width: 768px) {
+      .charts-section { grid-template-columns: 1fr; }
+      .stat-card .value { font-size: 1.5rem; }
     }
-    
-    .stat-item {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: baseline !important;
-        gap: 4px !important;
-        min-width: auto !important;
-        padding: 3px 8px !important;
-        border: none !important;
-        border-right: 1px solid #ccc !important;
-    }
-    
-    .stat-item:last-child {
-        border-right: none !important;
-    }
-    
-    .stat-value {
-        font-size: 11pt !important;
-        font-weight: 700 !important;
-        color: #003366 !important;
-        line-height: 1 !important;
-    }
-    
-    .stat-label {
-        font-size: 9pt !important;
-        color: #444 !important;
-        font-weight: 400 !important;
-    }
-    
-    .stat-separator {
-        display: none !important; /* Usamos border-right en su lugar */
-    }
-    
-    /* Tarjetas resumen */
-    .summary-grid {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important; /* 3 columnas para carta */
-        gap: 8px !important;
-        margin: 10px 0 15px 0 !important;
-        page-break-after: avoid;
-    }
-    .summary-card {
-        padding: 10px 8px !important;
-        border: 1px solid #dee2e6 !important;
-        box-shadow: none !important;
-        page-break-inside: avoid;
-    }
-    .summary-value {
-        font-size: 12pt !important;
-        color: #003366 !important;
-    }
-    .summary-label {
-        font-size: 8pt !important;
-        color: #555 !important;
-    }
-    
-    /* ✅ GRÁFICOS - AJUSTADOS PARA CARTA */
-    .charts-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important; /* 2 gráficos por fila en carta */
-        gap: 12px !important;
-        margin: 15px 0 !important;
-    }
-    
-    .chart-card {
-        padding: 12px 10px !important;
-        border: 1px solid #dee2e6 !important;
-        box-shadow: none !important;
-        page-break-inside: avoid;
-        break-inside: avoid;
-    }
-    
-    .chart-card h4 {
-        font-size: 9pt !important;
-        margin: 0 0 8px 0 !important;
-        text-align: center !important;
-    }
-    
-    .chart-container {
-        height: 180px !important; /* Altura reducida para carta */
-        width: 100% !important;
-    }
-    
-    /* Ajustar canvas para impresión */
-    canvas {
-        max-width: 100% !important;
-        height: auto !important;
-    }
-    
-    /* Leyendas de gráficos más pequeñas */
-    .chartjs-legend {
-        font-size: 7pt !important;
-    }
-    
-    /* Evitar cortes en medio de elementos */
-    .chart-card,
-    .summary-card,
-    .stats-inline {
-        page-break-inside: avoid;
-        break-inside: avoid;
-    }
-    
-    /* Control de saltos de página */
-    .charts-grid {
-        page-break-before: auto;
-    }
-    
-    /* Forzar nueva página después de cada 6 gráficos si es necesario */
-    .chart-card:nth-child(6) {
-        page-break-after: auto;
-    }
-}
-    </style>
+  </style>
 </head>
-<body class="dashboard-page">
-    <!-- Navegación -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-                <img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-                <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
-            </div>
-            <div class="nav-user">
-                <span class="user-email" id="userEmail">Cargando...</span>
-                <button class="btn-logout" id="logoutBtn">
-                    <span class="logout-icon">🚪</span>
-                    <span class="logout-text">Cerrar Sesión</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Contenido Principal -->
-    <main class="dashboard-main">
-     <!-- ================= HEADER CON BREADCRUMB ================= -->
-<header class="module-header">
-    <div class="breadcrumb">
-        <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-        <span class="breadcrumb-separator">/</span>
-        <a href="transporte.html" class="breadcrumb-link">Transporte</a>
-        <span class="breadcrumb-separator">/</span>
-        <a href="planilla.html" class="breadcrumb-link">Planilla</a>
-        <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-current">Partes Generales</span>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>📊 Dashboard de Vehículos</h1>
+      <p>Estadísticas en tiempo real del parque vehicular - Región Occidental</p>
     </div>
-    <button class="btn-volver" onclick="window.location.href='planilla.html'">
-        ← Volver a Planilla
-    </button>
-</header>
 
-<!-- ================= TÍTULO DEL MÓDULO ================= -->
-<section class="module-title-section">
-    <h1 class="module-title">📊 Partes Generales</h1>
-    <p class="module-subtitle">Análisis visual del parque automotor institucional</p>
-</section>
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando datos de vehículos...</p>
+    </div>
 
-        <!-- ✅ ESTADÍSTICAS PRINCIPALES (6 indicadores incluyendo Total Vehículos) -->
-        <section class="stats-inline">
-            <div class="stat-item">
-                <span class="stat-value" id="totalVehiculos">⏳</span>
-                <span class="stat-label">Total Vehículos</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="totalMotos">⏳</span>
-                <span class="stat-label">Motos</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="operativos">⏳</span>
-                <span class="stat-label">Operativos</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="inoperativos">⏳</span>
-                <span class="stat-label">Inoperativos</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="desincorporados">⏳</span>
-                <span class="stat-label">Desinc.</span>
-            </div>
-        </section>
+    <!-- Error -->
+    <div id="error" class="error" style="display:none;"></div>
 
-        <!-- TARJETAS RESUMEN -->
-        <section class="summary-grid">
-            <div class="summary-card motos">
-                <div class="summary-value" id="countMoto">-</div>
-                <div class="summary-label">🏍️ Motos</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countCamioneta">-</div>
-                <div class="summary-label">🚙 Camionetas</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countAutomovil">-</div>
-                <div class="summary-label">🚗 Automóviles</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countCamion">-</div>
-                <div class="summary-label">🚚 Camiones</div>
-            </div>
-            <div class="summary-card ubic">
-                <div class="summary-value" id="countCCPEM">-</div>
-                <div class="summary-label">📍 CCPEM</div>
-            </div>
-            <div class="summary-card desinc">
-                <div class="summary-value" id="countDesincorporada">-</div>
-                <div class="summary-label">⚠️ Desinc.</div>
-            </div>
-        </section>
+    <!-- Stats Cards -->
+    <div id="statsContainer" style="display:none;">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">🚗 Vehículos Terrestres</div>
+          <div class="value" id="totalTerrestres">0</div>
+          <div class="subtext">Automóvil + Autobús + Camioneta</div>
+        </div>
+        <div class="stat-card success">
+          <div class="label">🏍️ Motocicletas</div>
+          <div class="value" id="totalMotos">0</div>
+          <div class="subtext">Moto + Especial</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="label">🐎 Tracción de Sangre</div>
+          <div class="value" id="totalTraccion">0</div>
+          <div class="subtext">Unidades ecuestres</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="label">🗑️ Desincorporados</div>
+          <div class="value" id="totalDesincorporados">0</div>
+          <div class="subtext">Bajas del inventario</div>
+        </div>
+        <div class="stat-card success">
+          <div class="label">✅ Operativos</div>
+          <div class="value" id="totalOperativos">0</div>
+          <div class="subtext">Listos para servicio</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="label">❌ Inoperativos</div>
+          <div class="value" id="totalInoperativos">0</div>
+          <div class="subtext">En reparación/mantenimiento</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📦 Total Registrado</div>
+          <div class="value" id="totalGeneral">0</div>
+          <div class="subtext">Unidades en sistema</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">🔄 Tasa Operativa</div>
+          <div class="value" id="tasaOperativa">0%</div>
+          <div class="subtext">Disponibilidad de flota</div>
+        </div>
+      </div>
 
-        <!-- ✅ BOTÓN DE IMPRIMIR -->
-        <section class="print-section">
-            <button class="btn-print" onclick="imprimirGraficos()">
-                🖨️ Imprimir Gráficos
-            </button>
-        </section>
+      <!-- Gráficos -->
+      <div class="charts-section">
+        <div class="chart-card">
+          <h3>📊 Distribución por Tipo de Vehículo</h3>
+          <div class="chart-container">
+            <canvas id="chartTipos"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>📈 Estado Operativo</h3>
+          <div class="chart-container">
+            <canvas id="chartEstado"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>🏍️ Detalle Motocicletas</h3>
+          <div class="chart-container">
+            <canvas id="chartMotos"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>📅 Vehículos por Año</h3>
+          <div class="chart-container">
+            <canvas id="chartAnos"></canvas>
+          </div>
+        </div>
+      </div>
 
-        <!-- GRÁFICOS - 3 POR FILA -->
-        <section class="charts-grid">
-            <!-- Fila 1 -->
-            <div class="chart-card">
-                <h4>📊 Estado del Parque</h4>
-                <div class="chart-container"><canvas id="chartEstatus"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h4>🔧 Situación Actual</h4>
-                <div class="chart-container"><canvas id="chartSituacion"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h4>🚗 Por Clase</h4>
-                <div class="chart-container"><canvas id="chartClase"></canvas></div>
-            </div>
-            
-            <!-- Fila 2 -->
-            <div class="chart-card">
-                <h4>🏁 Por Tipo</h4>
-                <div class="chart-container"><canvas id="chartTipo"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h4>🏷️ Marcas Top 10</h4>
-                <div class="chart-container"><canvas id="chartMarcas"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h4>📍 Ubicación Física</h4>
-                <div class="chart-container"><canvas id="chartUbicacion"></canvas></div>
-            </div>
-            
-            <!-- Fila 3 -->
-            <div class="chart-card">
-                <h4>📅 Por Año</h4>
-                <div class="chart-container"><canvas id="chartAno"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h4>🏢 Unidad Admin.</h4>
-                <div class="chart-container"><canvas id="chartUnidad"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h4>🎨 Por Color</h4>
-                <div class="chart-container"><canvas id="chartColor"></canvas></div>
-            </div>
-        </section>
-    </main>
+      <!-- Tabla de Resumen -->
+      <div class="table-section">
+        <h3>📋 Resumen por Categoría</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th>Subcategoría</th>
+              <th>Operativos</th>
+              <th>Inoperativos</th>
+              <th>Desincorporados</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="tablaResumen"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="../js/config.js" defer></script>
-    <script src="../js/partes.js" defer></script>
+  <script>
+    // ============================================
+    // CONFIGURACIÓN SUPABASE
+    // ============================================
+    const SUPABASE_URL = 'TU_SUPABASE_URL';
+    const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY';
+    
+    let supabase;
+    
+    async function initSupabase() {
+      if (window.supabase) return window.supabase;
+      
+      // Cargar librería si no está
+      if (!window.createClient) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+      
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      return supabase;
+    }
+
+    // ============================================
+    // LÓGICA DE PROCESAMIENTO DE DATOS
+    // ============================================
+    
+    function categorizarVehiculo(clase, tipo) {
+      const c = (clase || '').toUpperCase().trim();
+      const t = (tipo || '').toUpperCase().trim();
+      
+      // Vehículos terrestres (grupo principal)
+      if (['AUTOMOVIL', 'CAMIONETA', 'AUTOBUS', 'CAMION'].includes(c)) {
+        return 'terrestres';
+      }
+      
+      // Motocicletas
+      if (c === 'MOTO' || t === 'MOTO' || c === 'ESPECIAL' || t === 'ESPECIAL') {
+        return 'motos';
+      }
+      
+      // Tracción de sangre (separado)
+      if (c.includes('TRACCION') || c.includes('SANGRE') || t.includes('TRACCION')) {
+        return 'traccion';
+      }
+      
+      return 'otros';
+    }
+    
+    function clasificarEstado(estatus) {
+      const e = (estatus || '').toUpperCase().trim();
+      if (e.includes('DESINCORP') || e === 'BAJA') return 'desincorporado';
+      if (e.includes('OPERATIVA') && !e.includes('INOPERATIVA')) return 'operativo';
+      if (e.includes('INOPERATIVA') || e.includes('REPARACION') || e.includes('TALLER')) return 'inoperativo';
+      return 'inoperativo'; // Por defecto
+    }
+    
+    function procesarDatos(vehiculos) {
+      const stats = {
+        terrestres: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
+        motos: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
+        traccion: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
+        otros: { operativo: 0, inoperativo: 0, desincorporado: 0, total: 0 },
+        porAno: {},
+        porMarca: {},
+        total: 0
+      };
+      
+      vehiculos.forEach(v => {
+        const categoria = categorizarVehiculo(v.clase, v.tipo);
+        const estado = clasificarEstado(v.estatus);
+        const ano = v.ano || 'Sin dato';
+        const marca = (v.marca || 'Sin marca').toUpperCase();
+        
+        // Actualizar categoría
+        if (stats[categoria]) {
+          stats[categoria][estado]++;
+          stats[categoria].total++;
+        }
+        
+        // Por año
+        stats.porAno[ano] = (stats.porAno[ano] || 0) + 1;
+        
+        // Por marca (top 10)
+        stats.porMarca[marca] = (stats.porMarca[marca] || 0) + 1;
+        
+        stats.total++;
+      });
+      
+      // Calcular totales generales
+      stats.totalOperativos = stats.terrestres.operativo + stats.motos.operativo + stats.traccion.operativo + stats.otros.operativo;
+      stats.totalInoperativos = stats.terrestres.inoperativo + stats.motos.inoperativo + stats.traccion.inoperativo + stats.otros.inoperativo;
+      stats.totalDesincorporados = stats.terrestres.desincorporado + stats.motos.desincorporado + stats.traccion.desincorporado + stats.otros.desincorporado;
+      
+      return stats;
+    }
+
+    // ============================================
+    // RENDERIZADO DE GRÁFICOS (Chart.js)
+    // ============================================
+    
+    function crearGraficoTipos(stats) {
+      const ctx = document.getElementById('chartTipos').getContext('2d');
+      return new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Vehículos Terrestres', 'Motocicletas', 'Tracción de Sangre', 'Otros'],
+          datasets: [{
+            data: [stats.terrestres.total, stats.motos.total, stats.traccion.total, stats.otros.total],
+            backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#64748b'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true } }
+          },
+          cutout: '60%'
+        }
+      });
+    }
+    
+    function crearGraficoEstado(stats) {
+      const ctx = document.getElementById('chartEstado').getContext('2d');
+      return new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Operativos', 'Inoperativos', 'Desincorporados'],
+          datasets: [{
+            label: 'Cantidad de Vehículos',
+            data: [stats.totalOperativos, stats.totalInoperativos, stats.totalDesincorporados],
+            backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+    
+    function crearGraficoMotos(stats) {
+      const ctx = document.getElementById('chartMotos').getContext('2d');
+      return new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Motos + Especial', 'Tracción de Sangre'],
+          datasets: [{
+            data: [stats.motos.total, stats.traccion.total],
+            backgroundColor: ['#22c55e', '#f59e0b'],
+            borderWidth: 3,
+            borderColor: 'white'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+    
+    function crearGraficoAnos(stats) {
+      const ctx = document.getElementById('chartAnos').getContext('2d');
+      // Ordenar años y tomar últimos 10
+      const anosOrdenados = Object.keys(stats.porAno).sort().slice(-10);
+      const datosAnos = anosOrdenados.map(a => stats.porAno[a]);
+      
+      return new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: anosOrdenados,
+          datasets: [{
+            label: 'Vehículos incorporados',
+            data: datosAnos,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#3b82f6',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // ============================================
+    // RENDERIZADO DE TABLA Y ESTADÍSTICAS
+    // ============================================
+    
+    function renderizarEstadisticas(stats) {
+      // Cards principales
+      document.getElementById('totalTerrestres').textContent = stats.terrestres.total.toLocaleString();
+      document.getElementById('totalMotos').textContent = stats.motos.total.toLocaleString();
+      document.getElementById('totalTraccion').textContent = stats.traccion.total.toLocaleString();
+      document.getElementById('totalDesincorporados').textContent = stats.totalDesincorporados.toLocaleString();
+      document.getElementById('totalOperativos').textContent = stats.totalOperativos.toLocaleString();
+      document.getElementById('totalInoperativos').textContent = stats.totalInoperativos.toLocaleString();
+      document.getElementById('totalGeneral').textContent = stats.total.toLocaleString();
+      
+      // Tasa operativa
+      const activos = stats.totalOperativos + stats.totalInoperativos;
+      const tasa = activos > 0 ? Math.round((stats.totalOperativos / activos) * 100) : 0;
+      document.getElementById('tasaOperativa').textContent = `${tasa}%`;
+      
+      // Tabla de resumen
+      const tbody = document.getElementById('tablaResumen');
+      const filas = [
+        { cat: '🚗 Terrestres', sub: 'Automóvil/Camioneta/Autobús', stats: stats.terrestres },
+        { cat: '🏍️ Motocicletas', sub: 'Moto + Especial', stats: stats.motos },
+        { cat: '🐎 Tracción', sub: 'Tracción de Sangre', stats: stats.traccion }
+      ];
+      
+      tbody.innerHTML = filas.map(f => `
+        <tr>
+          <td><strong>${f.cat}</strong></td>
+          <td>${f.sub}</td>
+          <td><span class="badge badge-operativa">${f.stats.operativo}</span></td>
+          <td><span class="badge badge-inoperativa">${f.stats.inoperativo}</span></td>
+          <td><span class="badge badge-desincorporada">${f.stats.desincorporado}</span></td>
+          <td><strong>${f.stats.total}</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    // ============================================
+    // FUNCIÓN PRINCIPAL DE CARGA
+    // ============================================
+    
+    async function cargarDashboard() {
+      try {
+        // 1. Inicializar Supabase
+        const supabase = await initSupabase();
+        
+        // 2. Consultar vehículos
+        const { data: vehiculos, error } = await supabase
+          .from('vehiculos')
+          .select('id, marca, modelo, tipo, clase, ano, estatus, situacion')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        if (!vehiculos || vehiculos.length === 0) {
+          throw new Error('No se encontraron vehículos en la base de datos');
+        }
+        
+        // 3. Procesar datos
+        const stats = procesarDatos(vehiculos);
+        
+        // 4. Ocultar loading, mostrar contenido
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('statsContainer').style.display = 'block';
+        
+        // 5. Renderizar estadísticas
+        renderizarEstadisticas(stats);
+        
+        // 6. Crear gráficos
+        crearGraficoTipos(stats);
+        crearGraficoEstado(stats);
+        crearGraficoMotos(stats);
+        crearGraficoAnos(stats);
+        
+        console.log('✅ Dashboard cargado:', stats.total, 'vehículos procesados');
+        
+      } catch (err) {
+        console.error('❌ Error:', err);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = `Error: ${err.message}`;
+      }
+    }
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', cargarDashboard);
+  </script>
 </body>
 </html>
