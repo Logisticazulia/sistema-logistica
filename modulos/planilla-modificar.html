@@ -144,18 +144,36 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <span id="infoMessage">Ingrese Placa, ID, Facsímil, Serial o N° Identificación para buscar</span>
 </div>
 <!-- ================= BUSCADOR UNIVERSAL ================= -->
-<div class="search-container">
-<div class="search-group">
-<label for="searchUniversal">🔍 Búsqueda Universal</label>
-<input type="text" id="searchUniversal" class="search-input" placeholder="Ej: AB123CD | 1517 | 123456 | VIN...">
-<span class="search-hint">Busca por: Placa, ID, Facsímil, S/Carrocería, S/Motor o N° Identificación</span>
-</div>
-<button type="button" class="btn-search" id="btnSearch">
-<span class="btn-search-text">🔍 Buscar Vehículo</span>
-<span class="btn-search-loader"></span>
-</button>
-</div>
-<form id="vehicleForm" novalidate class="form-disabled">
+     <div class="search-section">
+                <h3>🔍 Buscar Vehículo en Base de Datos</h3>
+                <div id="searchAlert" class="alert"></div>
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Ingrese placa, facsimil, serial de carrocería o serial de motor..."
+                        autocomplete="off"
+                    >
+                    <button class="btn-search" onclick="buscarVehiculo()">
+                        <span>🔍</span>
+                        <span>Buscar</span>
+                    </button>
+                    <button class="btn-clear" onclick="limpiarBusqueda()">
+                        <span>🔄</span>
+                        <span>Limpiar</span>
+                    </button>
+                </div>
+                <div class="search-hint">
+                    <span>💡 Busque por:</span>
+                    <span>🚗 Placa</span>
+                    <span>📄 Facsimil</span>
+                    <span>🔢 Serial Carrocería</span>
+                    <span>⚙️ Serial Motor</span>
+                </div>
+            </div>
+            <h2>📝 Datos del Vehículo</h2>
+            <form id="fichaForm">
 <!-- Campo oculto para el ID -->
 <input type="hidden" id="vehicleId" name="id">
 <!-- ================= FILA 1: SERIALES + ESTATUS ================= -->
