@@ -13,56 +13,57 @@
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
 .form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
 
-/* ================= BARRA DE BÚSQUEDA (DISEÑO IGUAL A FICHA-CREAR) ================= */
-.search-bar-container {
-  background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  border-radius: 12px;
-  padding: 25px 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
-}
-.search-bar-header {
+/* ===== NUEVO ESTILO BARRA DE BÚSQUEDA ===== */
+.search-container {
+  background: #003366;
+  padding: 28px 32px;
+  border-radius: 14px;
+  margin-bottom: 25px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-  color: white;
-  font-size: 1.05rem;
-  font-weight: 700;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 4px 20px rgba(0, 51, 102, 0.35);
 }
-.search-bar-input-group {
+.search-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+.search-row {
   display: flex;
   gap: 12px;
-  align-items: stretch;
+  align-items: center;
+  width: 100%;
 }
-.search-bar-input {
+.search-input {
   flex: 1;
-  padding: 14px 18px;
-  border: 2px solid rgba(255,255,255,0.15);
+  padding: 13px 18px;
+  border: 2px solid transparent;
   border-radius: 8px;
-  font-size: 1rem;
-  background: rgba(255,255,255,0.95);
+  font-size: 0.95rem;
+  background: #f8f9fa;
+  transition: all 0.3s;
+  font-family: 'Roboto', sans-serif;
   color: #333;
-  transition: all 0.3s;
-  font-family: 'Roboto', sans-serif;
+  min-width: 0;
 }
-.search-bar-input:focus {
+.search-input::placeholder { color: #999; }
+.search-input:focus {
   outline: none;
-  border-color: #fff;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
-  background: #fff;
+  border-color: #005b96;
+  box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.2);
+  background: #ffffff;
 }
-.search-bar-input::placeholder { color: #999; }
-
-/* Botón Buscar - Verde */
-.btn-buscar {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+.btn-search {
+  background: #22c55e;
   color: white;
-  padding: 14px 28px;
+  padding: 13px 28px;
   border: none;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.92rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -70,19 +71,18 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   transition: all 0.3s;
   font-family: 'Roboto', sans-serif;
   white-space: nowrap;
+  height: fit-content;
 }
-.btn-buscar:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
-.btn-buscar:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
-
-/* Botón Limpiar - Amarillo */
-.btn-limpiar {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+.btn-search:hover { background: #16a34a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+.btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+.btn-clear {
+  background: #f59e0b;
   color: white;
-  padding: 14px 28px;
+  padding: 13px 28px;
   border: none;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.92rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -90,45 +90,21 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   transition: all 0.3s;
   font-family: 'Roboto', sans-serif;
   white-space: nowrap;
+  height: fit-content;
 }
-.btn-limpiar:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
-
-/* Hints - SIN FONDO */
-.search-bar-hints {
-  margin-top: 15px;
+.btn-clear:hover { background: #d97706; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+.search-hints {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: rgba(255,255,255,0.9);
-  font-size: 0.85rem;
+  gap: 16px;
   flex-wrap: wrap;
 }
-.search-bar-hints .hint-icon { color: #fbbf24; font-size: 1rem; }
-.search-bar-hints .hint-label { font-weight: 600; }
-/* ✅ SIN FONDO - solo texto */
-.search-bar-hints .hint-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: rgba(255,255,255,0.95);
-  font-size: 0.85rem;
-}
+.search-hints-label { font-weight: 600; color: rgba(255,255,255,0.85); }
+.search-hint-item { display: flex; align-items: center; gap: 5px; }
 
-/* Loader spinner */
-.btn-search-loader {
-  display: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.searching .btn-search-text { display: none; }
-.searching .btn-search-loader { display: inline-block; }
-
-/* ================= RESTO DE ESTILOS DEL FORMULARIO ================= */
+/* ================= RESTO DE ESTILOS ================= */
 .form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid; min-width: 0; transition: box-shadow 0.3s ease, transform 0.3s ease; height: 100%; margin-bottom: 25px; }
 .form-section:hover { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
 .form-section.identificacion { border-color: #005b96; }
@@ -168,8 +144,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-
-/* 🆕 ESTILOS COMPONENTES B/M/NT */
+/*  ESTILOS COMPONENTES B/M/NT */
 .inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
 .inspection-item { background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
@@ -192,11 +167,22 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .responsable-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
 .responsable-fields .full-width { grid-column: 1 / -1; }
 .resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #005b96; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; letter-spacing: 0.5px; }
-
-/* 🖨️ VISTA PREVIA */
+/* 🖨️ VISTA PREVIA SIEMPRE VISIBLE Y ORDENADA */
 .preview-divider { height: 3px; background: linear-gradient(90deg, #003366, #005b96); margin: 40px 0 30px; border-radius: 2px; }
 .preview-wrapper { margin-top: 0; padding: 0; }
-.print-page { width: 100%; max-width: 216mm; background: white; padding: 15mm; margin: 20px auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; overflow: visible; position: relative; }
+.print-page {
+width: 100%;
+max-width: 216mm;
+background: white;
+padding: 15mm;
+margin: 20px auto;
+box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+border: 1px solid #e2e8f0;
+font-size: 9pt;
+box-sizing: border-box;
+overflow: visible;
+position: relative;
+}
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 70px; height: 70px; object-fit: contain; }
 .print-logo.logo-izq { width: 300px; height: 110px; }
@@ -223,11 +209,12 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .pv-sign-box { border-top: 2px solid #0f172a; padding-top: 8px; text-align: center; }
 .pv-sign-name { font-weight: 700; font-size: 9pt; }
 .pv-sign-rango { font-size: 8pt; color: #4a5568; }
-
 @media (max-width: 1024px) { .inspection-grid { grid-template-columns: repeat(2, 1fr); } .print-page { padding: 12mm; } .pv-comps { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 768px) {
-  .search-bar-input-group { flex-direction: column; }
-  .search-bar-hints { flex-direction: column; align-items: flex-start; }
+  .search-container { padding: 20px; }
+  .search-row { flex-direction: column; }
+  .btn-search, .btn-clear { width: 100%; justify-content: center; }
+  .search-hints { flex-direction: column; gap: 8px; }
   .form-fields-grid { grid-template-columns: 1fr; }
   .inspection-grid, .tires-grid, .responsibles-grid, .responsable-fields { grid-template-columns: 1fr; }
   .responsable-fields .full-width { grid-column: span 1; }
@@ -238,119 +225,35 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   .pv-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 480px) { .pv-grid, .pv-grid-2, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
-
 @media print {
-  body, html { background: white; margin: 0; padding: 0; }
-  .navbar, .search-bar-container, .alert, .form-actions, .form-section, .no-print, .module-header, .module-title-section, .preview-divider, .dashboard-main > header, .dashboard-main > section { display: none !important; }
-  .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; }
-  .preview-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
-  .print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; min-height: auto !important; padding: 10mm !important; overflow: visible !important; position: static !important; }
-  .pv-section-title { page-break-after: avoid; break-after: avoid; margin-top: 15px; }
-  .pv-grid, .pv-item, .pv-comps, .pv-signatures, #pv_observaciones, .print-header, .official-use-box { page-break-inside: avoid !important; break-inside: avoid !important; }
-  .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  @page { size: letter portrait; margin: 10mm; }
+body, html { background: white; margin: 0; padding: 0; }
+.navbar, .search-container, .alert, .form-actions, .form-section,
+.no-print, .module-header, .module-title-section,
+.preview-divider, .dashboard-main > header, .dashboard-main > section {
+display: none !important;
+}
+.form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; }
+.preview-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
+.print-page {
+box-shadow: none !important; border: none !important; margin: 0 !important;
+width: 100% !important; max-width: 100% !important; min-height: auto !important;
+padding: 10mm !important; overflow: visible !important; position: static !important;
+}
+.pv-section-title { page-break-after: avoid; break-after: avoid; margin-top: 15px; }
+.pv-grid, .pv-item, .pv-comps, .pv-signatures, #pv_observaciones,
+.print-header, .official-use-box {
+page-break-inside: avoid !important;
+break-inside: avoid !important;
+}
+.print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+@page { size: letter portrait; margin: 10mm; }
 }
 </style>
 </head>
 <body class="dashboard-page">
 <nav class="navbar" role="navigation">
-  <div class="nav-container">
-    <div class="nav-brand">
-      <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-      <img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
-      <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
-    </div>
-    <div class="nav-user">
-      <span class="user-email" id="userEmail">Cargando...</span>
-      <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
-    </div>
-  </div>
-</nav>
-<main class="dashboard-main" role="main">
-  <header class="module-header">
-    <div class="breadcrumb">
-      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="transporte.html" class="breadcrumb-link">Transporte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">Crear Inspección PVR</span>
-    </div>
-    <button class="btn btn-secondary btn-sm" onclick="window.location.href='inspeccion.html'">← Volver</button>
-  </header>
-  <section class="module-title-section">
-    <h1 class="module-title">➕ Crear Inspección PVR</h1>
-    <p class="module-subtitle">Busque el vehículo y complete los datos de la inspección física</p>
-  </section>
-  <div class="form-container">
-    <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Guardado exitosamente</span></div>
-    <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al guardar</span></div>
-    <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa, Facsímil, S/Carrocería o S/Motor para iniciar</span></div>
-
-    <!-- ✅ BARRA DE BÚSQUEDA - DISEÑO IGUAL A FICHA-CREAR (SIN FONDO EN HINTS) -->
-    <div class="search-bar-container">
-      <div class="search-bar-header">
-        <span>🔍</span>
-        <span>Buscar Vehículo en Base de Datos</span>
-      </div>
-      <div class="search-bar-input-group">
-        <input type="text" id="searchVehicle" class="search-bar-input" placeholder="Ingrese placa, facsímil, serial de carrocería o serial de motor...">
-        <button type="button" class="btn-buscar" id="btnSearch">
-          <span class="btn-search-text">🔍 Buscar</span>
-          <span class="btn-search-loader"></span>
-        </button>
-        <button type="button" class="btn-limpiar" id="btnClear">
-          🔄 Limpiar
-        </button>
-      </div>
-      <div class="search-bar-hints">
-        <span class="hint-icon">💡</span>
-        <span class="hint-label">Busque por:</span>
-        <span class="hint-item">🚗 Placa</span>
-        <span class="hint-item">📄 Facsímil</span>
-        <span class="hint-item">🔢 Serial Carrocería</span>
-        <span class="hint-item">⚙️ Serial Motor</span>
-      </div>
-    </div>
-
-    <form id="inspectionForm" class="form-disabled" style="opacity: 0.6; pointer-events: none;">
-      <input type="hidden" id="vehicleId" name="vehicleId">
-      <!-- ... [Secciones del formulario: identificación, características, accesorios, componentes, cauchos, observaciones, responsables] ... -->
-      <div class="form-section identificacion full-width">
-        <div class="form-section-header"><span class="form-section-icon">📝</span><h2 class="form-section-title">Datos de la Inspección</h2></div>
-        <div class="form-fields-grid">
-          <div class="form-group"><label>N° DE INSPECCIÓN</label><input type="text" id="n_inspeccion" name="n_inspeccion" class="form-input" disabled placeholder="Generado automáticamente"></div>
-          <div class="form-group"><label>FECHA DE INSPECCIÓN</label><input type="date" id="fecha_inspeccion" name="fecha_inspeccion" class="form-input"></div>
-          <div class="form-group"><label>HORA</label><input type="time" id="hora" name="hora" class="form-input"></div>
-          <div class="form-group"><label>MOTIVO DE LA INSPECCIÓN <span style="color:#dc2626">*</span></label><input type="text" id="motivo_inspeccion" name="motivo_inspeccion" class="form-input" placeholder="Ej: Revisión preventiva" required></div>
-          <div class="form-group"><label>LUGAR</label><input type="text" id="lugar" name="lugar" class="form-input" placeholder="Ej: CCPE Zulia"></div>
-          <div class="form-group"><label>ASIGNACIÓN</label><input type="text" id="asignacion" name="asignacion" class="form-input" placeholder="Ej: Patrullaje Norte"></div>
-          <div class="form-group"><label>SUPERVISIÓN</label><input type="text" id="supervision" name="supervision" class="form-input" placeholder="Nombre del supervisor"></div>
-        </div>
-      </div>
-      <!-- ... [Resto del formulario permanece igual] ... -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" id="btnClearForm">🗑️ Limpiar / Buscar Otro</button>
-        <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>
-          <span class="btn-text">💾 Guardar Inspección</span>
-          <span class="btn-loader" style="display:none;">⏳ Guardando...</span>
-        </button>
-      </div>
-    </form>
-
-    <!-- 🖨️ VISTA PREVIA -->
-    <div class="preview-divider"></div>
-    <div id="previewWrapper" class="preview-wrapper">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;" class="no-print">
-        <h2 style="margin:0; color:#003366; font-size:1.1rem;">📄 Vista Previa Oficial</h2>
-      </div>
-      <div class="print-page" id="printPage">
-        <!-- ... [Contenido de vista previa igual] ... -->
-      </div>
-    </div>
-  </div>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="../js/config.js" defer></script>
-<script src="../js/inspeccion-crear-vehiculo.js" defer></script>
-</body>
-</html>
+<div class="nav-container">
+<div class="nav-brand">
+<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
+<img src="../img/logo_derecho.png" alt="Logo" class="nav-logo" width="35" height="35">
+<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA
