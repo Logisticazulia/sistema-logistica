@@ -65,27 +65,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.disabled = !activo || !usuarioActual;
     }
 
-    // 🔵 FUNCIÓN ACTUALIZADA: Genera el siguiente número secuencial desde la BD
+    // 🔵 FUNCIÓN ACTUALIZADA: Genera PVR-M-2026-0000001
     async function generarNInspeccion() {
         const now = new Date();
         const y = now.getFullYear();
         
         try {
-            // 1. Buscar el último registro en la tabla 'inspecciones_pvr' ordenado por fecha descendente
+            // Buscamos específicamente inspecciones de MOTO (PVR-M-) del año actual
+            // Esto evita que se mezcle con la numeración de vehículos normales
             const { data, error } = await supabase
                 .from('inspecciones_pvr')
                 .select('n_inspeccion')
-                .order('created_at', { ascending: false })
+                .ilike('n_inspeccion', `PVR-M-${y}%`) 
+                .order('n_inspeccion', { ascending: false })
                 .limit(1)
                 .maybeSingle();
             
             if (error) throw error;
 
-            let nextSeq = 1; // Por defecto empieza en 1 si no hay registros
+            let nextSeq = 1; // Por defecto empieza en 1
 
             if (data && data.n_inspeccion) {
-                // 2. Extraer el número secuencial del último registro (ej: "PVR-2026-0000001" -> 1)
-                // Buscamos el patrón de dígitos al final del string
+                // Extrae el número secuencial del final (ej: 0000001 -> 1)
                 const match = data.n_inspeccion.match(/(\d+)$/);
                 if (match) {
                     const lastNum = parseInt(match[1], 10);
@@ -93,17 +94,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            // 3. Formatear el número con ceros a la izquierda (7 dígitos)
+            // Formatear con 7 dígitos (0000001)
             const seqStr = String(nextSeq).padStart(7, '0');
-            return `PVR-${y}-${seqStr}`;
+            return `PVR-M-${y}-${seqStr}`;
 
         } catch (err) {
             console.error("Error generando número secuencial:", err);
-            // En caso de error de conexión, retornamos uno basado en fecha y random para no bloquear
+            // Fallback por si falla la conexión
             const m = String(now.getMonth()+1).padStart(2,'0');
             const d = String(now.getDate()).padStart(2,'0');
             const r = String(Math.floor(Math.random()*1000)).padStart(3,'0');
-            return `PVR-${y}${m}${d}-${r}`;
+            return `PVR-M-${y}${m}${d}-${r}`;
         }
     }
 
@@ -143,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('vehiculos')
                 .select('*')
                 .or(`placa.ilike.%${cleanQ}%,facsimil.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%`)
-                .in('clase', ['MOTO', 'ESPECIAL']) // ✅ Filtro estricto para MOTO y ESPECIALES
+                .in('clase', ['MOTO', 'ESPECIAL']) // ✅ Filtro estricto
                 .limit(1)
                 .maybeSingle();
             
@@ -197,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         toggleFormState(false);
         updatePreview();
         mostrarAlerta('info', 'Ingrese Placa o Serial para buscar una Moto o Especial');
-        setDefaults(); // Regenerar número al limpiar para obtener el siguiente disponible
+        setDefaults(); // Regenerar número al limpiar
     }
 
     function updatePreview() {
@@ -308,7 +309,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { error } = await supabase.from('inspecciones_pvr').insert([payload]);
             if(error) throw error;
             
-            mostrarAlerta('success', '✅ Inspección registrada exitosamente');
+            mostrarAlerta('success', '✅ Inspección de Moto registrada exitosamente');
             alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setTimeout(() => { limpiarFormulario(); }, 2000);
             
