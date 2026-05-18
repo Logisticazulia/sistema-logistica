@@ -12,9 +12,25 @@
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
 .form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
 
-/* 🔵 BARRA DE BÚSQUEDA AZUL */
-.search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-.search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+/* 🔵 BARRA DE BÚSQUEDA AZUL - MODIFICADA PARA SER MÁS ANCHA */
+.search-container { 
+    background: linear-gradient(135deg, #003366 0%, #005b96 100%); 
+    padding: 25px; 
+    border-radius: 10px; 
+    margin-bottom: 25px; 
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    width: 100%; /* Ocupa todo el ancho disponible */
+    box-sizing: border-box;
+}
+.search-group { 
+    flex: 4; /* Crece 4 veces más que el botón para hacer la barra más larga */
+    min-width: 300px; 
+    display: flex; 
+    flex-direction: column; 
+}
 .search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 .search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
 .search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
@@ -36,20 +52,17 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .form-input:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
 .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px; }
 .form-textarea { resize: vertical; min-height: 100px; }
-
 .form-actions { display: flex; justify-content: flex-end; gap: 18px; padding-top: 28px; margin-top: 28px; border-top: 2px solid #e8eef5; flex-wrap: wrap; }
 .btn { padding: 13px 32px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; border: none; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-primary { background: linear-gradient(135deg, #003366 0%, #005b96 100%); color: white; box-shadow: 0 4px 15px rgba(0, 51, 102, 0.35); }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 51, 102, 0.45); }
 .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
-
 .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 25px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-
 /* 🔵 COMPONENTES 4 COLUMNAS */
 .inspection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .inspection-col { display: flex; flex-direction: column; gap: 8px; max-height: 85vh; overflow-y: auto; padding-right: 8px; }
@@ -64,12 +77,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .opt-group label:nth-child(1):has(input:checked) { background: #10b981; border-color: #10b981; color: white; }
 .opt-group label:nth-child(2):has(input:checked) { background: #ef4444; border-color: #ef4444; color: white; }
 .opt-group label:nth-child(3):has(input:checked) { background: #f59e0b; border-color: #f59e0b; color: white; }
-
 .responsibles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
 .responsable-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
 .responsable-fields .full-width { grid-column: 1 / -1; }
 .resp-header { margin: 0 0 15px 0; font-size: 0.85rem; color: #005b96; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-
 .preview-divider { height: 3px; background: linear-gradient(90deg, #003366, #005b96); margin: 40px 0 30px; border-radius: 2px; }
 .print-page { width: 100%; max-width: 216mm; min-height: auto; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; overflow: visible; position: relative; }
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
@@ -91,9 +102,8 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .pv-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
 .pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
 .pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
-
 @media (max-width: 1024px) { .inspection-grid { grid-template-columns: repeat(2, 1fr); } .print-page { padding: 12mm; } .pv-comps { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 768px) { .search-container { flex-direction: column; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .responsibles-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-grid, .pv-grid-2, .pv-grid-3, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .search-container { flex-direction: column; } .search-group { flex: 1; } .form-fields-grid { grid-template-columns: 1fr; } .inspection-grid, .responsibles-grid { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } .pv-grid, .pv-grid-2, .pv-grid-3, .pv-grid-4 { grid-template-columns: 1fr; } .pv-comps { grid-template-columns: repeat(2, 1fr); } }
 @media print { body, html { background: white; margin: 0; padding: 0; } .navbar, .search-container, .alert, .form-actions, .form-section, .no-print { display: none !important; } .form-container { box-shadow: none; padding: 0; margin: 0; max-width: none; } .preview-divider { display: none; } .print-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 15mm !important; overflow: visible !important; } .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; } @page { size: letter portrait; margin: 0; } }
 </style>
 </head>
@@ -130,17 +140,21 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Guardado exitosamente</span></div>
 <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al guardar</span></div>
 <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa o Serial para buscar una Moto</span></div>
+
+<!-- ================= BARRA DE BÚSQUEDA ANCHA ================= -->
 <div class="search-container">
-<div class="search-group">
-<label for="searchMoto">🔍 Búsqueda Exclusiva de Motos</label>
-<input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
-<span class="search-hint">Solo buscará registros con Tipo/Clase = MOTO</span>
+    <div class="search-group">
+        <label for="searchMoto">🔍 Búsqueda Exclusiva de Motos</label>
+        <input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
+        <span class="search-hint">Solo buscará registros con Clase = MOTO o ESPECIAL</span>
+    </div>
+    <button type="button" class="btn-search" id="btnSearch">
+        <span class="btn-search-text">🔍 Buscar Moto</span>
+        <span class="btn-search-loader" style="display:none;">⏳</span>
+    </button>
 </div>
-<button type="button" class="btn-search" id="btnSearch">
-<span class="btn-search-text">🔍 Buscar Moto</span>
-<span class="btn-search-loader" style="display:none;">⏳</span>
-</button>
-</div>
+<!-- ================= FIN BARRA DE BÚSQUEDA ================= -->
+
 <form id="motoForm" style="opacity: 0.6; pointer-events: none;">
 <input type="hidden" id="motoId" name="motoId">
 <div class="form-section">
@@ -334,15 +348,14 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">POR LA COORDINACIÓN</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_coord_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_coord_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_coord_cedula">-</div></div></div>
 <div><div style="text-align:center; margin-bottom: 30px;"><div style="font-weight:700; margin-bottom:15px;">INSPECCIÓN REALIZADA POR:</div><div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div><div style="margin-top: 10px;" id="pv_insp_nombre">-</div><div style="color:#666; font-size:8pt;" id="pv_insp_rango">-</div><div style="font-size:8pt; margin-top:4px;" id="pv_insp_cedula">-</div></div></div>
 </div>
-    <!-- 🟦 CUADRO DE USO OFICIAL -->
+<!-- 🟦 CUADRO DE USO OFICIAL -->
 <div style="background: #e5e7eb; border: 2px solid #9ca3af; border-radius: 6px; padding: 12px; text-align: center; margin-top: 25px; print-color-adjust: exact; -webkit-print-color-adjust: exact;">
-    <p style="margin: 0; font-size: 9pt; font-weight: 800; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">
-        USO OFICIAL DEL DEPARTAMENTO DE TRANSPORTE Y LOGISTICA
-    </p>
+<p style="margin: 0; font-size: 9pt; font-weight: 800; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">
+USO OFICIAL DEL DEPARTAMENTO DE TRANSPORTE Y LOGISTICA
+</p>
 </div>
 </div>
 </div>
-
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
