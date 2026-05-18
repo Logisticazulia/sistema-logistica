@@ -238,6 +238,7 @@ placa: document.getElementById('placa')?.value, marca: document.getElementById('
 modelo: document.getElementById('modelo')?.value, ano: document.getElementById('ano')?.value, tipo: document.getElementById('tipo')?.value,
 color: document.getElementById('color')?.value, n_identificacion: document.getElementById('n_identificacion')?.value,
 s_carroceria: document.getElementById('s_carroceria')?.value, kms: parseFloat(document.getElementById('kms')?.value) || 0,
+kms: parseFloat(document.getElementById('kms')?.value) || 0, 
 inspector: usuarioActual.email || 'sistema', created_at: new Date().toISOString(),
 bateria: document.getElementById('bateria')?.value || 'NO', estacion_base: document.getElementById('estacion_base')?.value || 'NO',
 coctelera: document.getElementById('coctelera')?.value || 'NO', triangulo: document.getElementById('triangulo')?.value || 'NO',
