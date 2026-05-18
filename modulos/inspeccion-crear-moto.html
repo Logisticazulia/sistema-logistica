@@ -8,22 +8,88 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
+/* ================= ESTILOS BASE ================= */
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; overflow-x: hidden; color: #333; line-height: 1.5; }
 .form-container { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.12); margin: 25px auto; width: 100%; max-width: 1440px; }
 
-/* 🔵 BARRA DE BÚSQUEDA AZUL (EXACTAMENTE IGUAL A VEHICULOS) */
-.search-container { background: linear-gradient(135deg, #003366 0%, #005b96 100%); padding: 25px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-.search-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
-.search-group label { display: block; color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-.search-input { width: 100%; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 7px; font-size: 0.95rem; background: rgba(255,255,255,0.95); transition: all 0.3s; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
-.search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
-.btn-search { background: #f59e0b; color: white; padding: 12px 30px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Roboto', sans-serif; white-space: nowrap; height: fit-content; margin-bottom: 0; }
-.btn-search:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
-.btn-search:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
-.search-hint { color: rgba(255,255,255,0.9); font-size: 0.8rem; margin-top: 8px; display: block; }
+/* ================= NUEVA BARRA DE BÚSQUEDA (DISEÑO IMAGEN) ================= */
+.search-container {
+  background: #003366; /* Azul oscuro sólido */
+  padding: 20px 25px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.search-header {
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+.search-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #f0f2f5;
+  transition: all 0.3s;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+.search-input:focus { outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+.btn-search-custom {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  font-family: 'Roboto', sans-serif;
+  white-space: nowrap;
+  height: 46px; /* Alinear con el input */
+}
+/* Botón Buscar Verde */
+.btn-search-green {
+  background: #28a745;
+  color: white;
+  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+}
+.btn-search-green:hover { background: #218838; transform: translateY(-1px); }
+/* Botón Limpiar Amarillo */
+.btn-search-yellow {
+  background: #ffc107;
+  color: #212529;
+  box-shadow: 0 3px 6px rgba(255, 193, 7, 0.3);
+}
+.btn-search-yellow:hover { background: #e0a800; transform: translateY(-1px); }
+/* Footer de búsqueda (Texto inferior) */
+.search-footer {
+  margin-top: 12px;
+  color: #a0b4cc;
+  font-size: 0.82rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+.search-footer span { display: inline-flex; align-items: center; gap: 5px; }
+/* ================= FIN DE NUEVA BARRA DE BÚSQUEDA ================= */
 
-/* 🔵 SECCIONES Y SUBTÍTULOS AZULES */
 .form-section { background: #fafbfc; border-radius: 10px; padding: 22px; border-top: 5px solid #005b96; margin-bottom: 25px; }
 .form-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8eef5; }
 .form-section-icon { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; background: rgba(0, 91, 150, 0.2); }
@@ -129,18 +195,31 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al guardar</span></div>
 <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese Placa o Serial para buscar una Moto</span></div>
 
-<!-- 🔵 BARRA DE BÚSQUEDA (EXACTAMENTE IGUAL A VEHICULOS) -->
+<!-- ================= BARRA DE BÚSQUEDA ACTUALIZADA ================= -->
 <div class="search-container">
-<div class="search-group">
-<label for="searchMoto">🔍 Búsqueda Exacta de Moto</label>
-<input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
-<span class="search-hint">Búsqueda exacta por: Placa, Facsímil, Serial Carrocería o Serial Motor</span>
+  <div class="search-header">
+    🔍 Buscar Vehículo en Base de Datos
+  </div>
+  <div class="search-row">
+    <input type="text" id="searchMoto" class="search-input" placeholder="Ingrese placa, facsimil, serial de carrocería o serial de motor...">
+    <div style="display: flex; gap: 10px;">
+      <button type="button" class="btn-search-custom btn-search-green" id="btnSearch">
+        🔍 Buscar
+      </button>
+      <button type="button" class="btn-search-custom btn-search-yellow" id="btnClearSearch">
+        🔄 Limpiar
+      </button>
+    </div>
+  </div>
+  <div class="search-footer">
+    <span>💡 Busque por:</span>
+    <span>🚗 Placa</span>
+    <span>📄 Facsímil</span>
+    <span>🔢 Serial Carrocería</span>
+    <span>⚙️ Serial Motor</span>
+  </div>
 </div>
-<button type="button" class="btn-search" id="btnSearch">
-<span class="btn-search-text">🔍 Buscar Moto</span>
-<span class="btn-search-loader" style="display:none;">⏳</span>
-</button>
-</div>
+<!-- ================= FIN BARRA DE BÚSQUEDA ================= -->
 
 <form id="motoForm" style="opacity: 0.6; pointer-events: none;">
 <input type="hidden" id="motoId" name="motoId">
