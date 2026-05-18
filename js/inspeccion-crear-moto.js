@@ -38,13 +38,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const searchInput = document.getElementById('searchMoto');
     const btnSearch = document.getElementById('btnSearch');
-    // ✅ Se usan selectores opcionales o verificaciones para evitar el error de null
     const btnSearchText = btnSearch ? btnSearch.querySelector('.btn-search-text') : null;
     const btnSearchLoader = btnSearch ? btnSearch.querySelector('.btn-search-loader') : null;
     
     const inspectionForm = document.getElementById('motoForm');
     const btnSubmit = document.getElementById('btnSubmit');
-    // ✅ Corregido el ID del botón de limpiar para que coincida con el HTML
     const btnClear = document.getElementById('btnClearSearch') || document.getElementById('btnClear');
     
     const motoIdInput = document.getElementById('motoId');
@@ -67,23 +65,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.disabled = !activo || !usuarioActual;
     }
 
-    function generarNInspeccion() {
+    // 🔵 FUNCIÓN ACTUALIZADA: Genera el siguiente número secuencial desde la BD
+    async function generarNInspeccion() {
         const now = new Date();
         const y = now.getFullYear();
-        const m = String(now.getMonth()+1).padStart(2,'0');
-        const d = String(now.getDate()).padStart(2,'0');
-        const r = String(Math.floor(Math.random()*1000)).padStart(3,'0');
-        return `PVR-M-${y}${m}${d}-${r}`;
+        
+        try {
+            // 1. Buscar el último registro en la tabla 'inspecciones_pvr' ordenado por fecha descendente
+            const { data, error } = await supabase
+                .from('inspecciones_pvr')
+                .select('n_inspeccion')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            
+            if (error) throw error;
+
+            let nextSeq = 1; // Por defecto empieza en 1 si no hay registros
+
+            if (data && data.n_inspeccion) {
+                // 2. Extraer el número secuencial del último registro (ej: "PVR-2026-0000001" -> 1)
+                // Buscamos el patrón de dígitos al final del string
+                const match = data.n_inspeccion.match(/(\d+)$/);
+                if (match) {
+                    const lastNum = parseInt(match[1], 10);
+                    nextSeq = lastNum + 1;
+                }
+            }
+
+            // 3. Formatear el número con ceros a la izquierda (7 dígitos)
+            const seqStr = String(nextSeq).padStart(7, '0');
+            return `PVR-${y}-${seqStr}`;
+
+        } catch (err) {
+            console.error("Error generando número secuencial:", err);
+            // En caso de error de conexión, retornamos uno basado en fecha y random para no bloquear
+            const m = String(now.getMonth()+1).padStart(2,'0');
+            const d = String(now.getDate()).padStart(2,'0');
+            const r = String(Math.floor(Math.random()*1000)).padStart(3,'0');
+            return `PVR-${y}${m}${d}-${r}`;
+        }
     }
 
-    function setDefaults() {
+    async function setDefaults() {
         const now = new Date();
         const f = document.getElementById('fecha_inspeccion');
         if(f) f.value = now.toISOString().split('T')[0];
         const h = document.getElementById('hora');
         if(h) h.value = now.toTimeString().slice(0,5);
+        
         const n = document.getElementById('n_inspeccion');
-        if(n) n.value = generarNInspeccion();
+        if(n) {
+            n.value = 'Generando...';
+            n.value = await generarNInspeccion();
+        }
         updatePreview();
     }
 
@@ -91,11 +126,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const q = searchInput.value.trim();
         if(!q) { mostrarAlerta('info', 'Ingrese Placa o Serial para buscar'); return; }
         
-        // ✅ Se agregan validaciones para evitar el error "Cannot read properties of null"
         if(btnSearch) {
-            btnSearch.disabled = true;
-            if(btnSearchText) btnSearchText.style.display = 'none';
-            if(btnSearchLoader) btnSearchLoader.style.display = 'inline';
+            btnSearch.disabled=true;
+            if(btnSearchText) btnSearchText.style.display='none';
+            if(btnSearchLoader) btnSearchLoader.style.display='inline';
         }
         
         mostrarAlerta('info', '🔍 Buscando Moto...');
@@ -109,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('vehiculos')
                 .select('*')
                 .or(`placa.ilike.%${cleanQ}%,facsimil.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%`)
-                .in('clase', ['MOTO', 'ESPECIAL']) // ✅ Filtro estricto
+                .in('clase', ['MOTO', 'ESPECIAL']) // ✅ Filtro estricto para MOTO y ESPECIALES
                 .limit(1)
                 .maybeSingle();
             
@@ -148,7 +182,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error(err);
             mostrarAlerta('error', `Error: ${err.message}`);
         } finally {
-            // ✅ Restaurar estado del botón de forma segura
             if(btnSearch) {
                 btnSearch.disabled = false;
                 if(btnSearchText) btnSearchText.style.display = 'inline';
@@ -164,6 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         toggleFormState(false);
         updatePreview();
         mostrarAlerta('info', 'Ingrese Placa o Serial para buscar una Moto o Especial');
+        setDefaults(); // Regenerar número al limpiar para obtener el siguiente disponible
     }
 
     function updatePreview() {
@@ -227,8 +261,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(!motoIdInput.value) { mostrarAlerta('error','Busque una moto primero'); return; }
         
         btnSubmit.disabled = true;
-        btnSubmit.querySelector('.btn-text').style.display = 'none';
-        btnSubmit.querySelector('.btn-loader').style.display = 'inline';
+        if(btnSubmit.querySelector('.btn-text')) btnSubmit.querySelector('.btn-text').style.display = 'none';
+        if(btnSubmit.querySelector('.btn-loader')) btnSubmit.querySelector('.btn-loader').style.display = 'inline';
         
         try {
             const toIntOrNull = val => {
@@ -283,8 +317,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             mostrarAlerta('error', `Error: ${err.message}`);
         } finally {
             btnSubmit.disabled = false;
-            btnSubmit.querySelector('.btn-text').style.display = 'inline';
-            btnSubmit.querySelector('.btn-loader').style.display = 'none';
+            if(btnSubmit.querySelector('.btn-text')) btnSubmit.querySelector('.btn-text').style.display = 'inline';
+            if(btnSubmit.querySelector('.btn-loader')) btnSubmit.querySelector('.btn-loader').style.display = 'none';
         }
     });
 
