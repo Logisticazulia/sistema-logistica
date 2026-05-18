@@ -23,8 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const searchInput = document.getElementById('searchInspection');
   const btnSearch = document.getElementById('btnSearch');
+  // ✅ Se usan selectores seguros para evitar el error 'Cannot read properties of null'
   const btnSearchText = btnSearch?.querySelector('.btn-search-text');
   const btnSearchLoader = btnSearch?.querySelector('.btn-search-loader');
+  
   const inspectionForm = document.getElementById('inspectionForm');
   const btnSubmit = document.getElementById('btnSubmit');
   const btnClear = document.getElementById('btnClear');
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function setInput(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; }
   function setSelect(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; }
-  function setRadio(name, val) { 
+  function setRadio(name, val) {
     document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = (r.value === val));
   }
 
@@ -91,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('pv_insp_nombre').textContent = v('insp_nombre');
     document.getElementById('pv_insp_rango').textContent = vs('insp_rango');
     document.getElementById('pv_insp_cedula').textContent = v('insp_cedula');
-    
+
     const compGrid = document.getElementById('pv_comps_grid');
     if (compGrid) {
       compGrid.innerHTML = '';
@@ -111,18 +113,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function buscarInspeccion() {
     const rawQuery = searchInput?.value.trim();
     if (!rawQuery) { mostrarAlerta('info', 'Ingrese N° Inspección o Placa para buscar'); return; }
-    
-    if (btnSearch) { btnSearch.disabled = true; btnSearchText.style.display = 'none'; btnSearchLoader.style.display = 'inline'; }
-    mostrarAlerta('info', '🔍 Cargando inspección...');
 
+    // ✅ FIX: Validación segura de elementos antes de modificar estilos
+    if (btnSearch) { btnSearch.disabled = true; }
+    if (btnSearchText) btnSearchText.style.display = 'none';
+    if (btnSearchLoader) btnSearchLoader.style.display = 'inline';
+
+    mostrarAlerta('info', '🔍 Cargando inspección...');
     try {
       const q = rawQuery.replace(/\s+/g, '').toUpperCase();
+      
+      // ✅ NUEVO FILTRO: Solo permite buscar si la clase es AUTOMOVIL, CAMIONETA, AUTOBUS o CAMION
       const { data, error } = await supabase.from('inspecciones_pvr').select('*')
+        .in('clase', ['AUTOMOVIL', 'CAMIONETA', 'AUTOBUS', 'CAMION'])
         .or(`n_inspeccion.ilike.${q},placa.ilike.${q}`)
         .limit(1).maybeSingle();
 
       if (error) throw error;
-      if (!data) { mostrarAlerta('error', '❌ Inspección no encontrada.'); toggleFormState(false); return; }
+      if (!data) { 
+        mostrarAlerta('error', '❌ No encontrado o no es un vehículo válido (Solo Auto/Camioneta/Autobús/Camión).'); 
+        toggleFormState(false); 
+        return; 
+      }
 
       recordIdInput.value = data.id;
       setInput('n_inspeccion', data.n_inspeccion);
@@ -151,19 +163,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       setSelect('insp_rango', data.insp_rango);
       setInput('insp_cedula', data.insp_cedula);
       setInput('insp_telefono', data.insp_telefono);
-      
+
       // Accesorios
       setSelect('bateria', data.bateria); setSelect('estacion_base', data.estacion_base);
       setSelect('coctelera', data.coctelera); setSelect('triangulo', data.triangulo);
       setSelect('placas', data.placas); setSelect('herramientas', data.herramientas);
       setSelect('gato', data.gato); setSelect('sestacion_luces', data.sestacion_luces);
-      
+
       // Cauchos
       setRadio('caucho_del_izq', data.caucho_del_izq); setRadio('caucho_del_der', data.caucho_del_der);
       setRadio('caucho_tra_izq', data.caucho_tra_izq); setRadio('caucho_tra_der', data.caucho_tra_der);
       setRadio('caucho_repuesto', data.caucho_repuesto); setRadio('tapa_cauchos', data.tapa_cauchos);
-      
-      // Componentes (Todos los ~76 radios)
+
+      // Componentes (Lista completa de radios)
       const compNames = [
         'guardafango_del_izq','guardafango_del_der','guardafango_tra_izq','guardafango_tra_der',
         'puerta_del_izq','puerta_del_der','puerta_tra_izq','puerta_tra_der','parachoque_trasero','parachoque_delantero',
@@ -182,12 +194,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       toggleFormState(true);
       updatePreview();
-      mostrarAlerta('success', '✅ Inspección cargada. Puede modificar y actualizar.');
+      mostrarAlerta('success', '✅ Inspección cargada correctamente.');
     } catch (err) {
-      console.error('❌ Error búsqueda:', err); 
+      console.error('❌ Error búsqueda:', err);
       mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
-      if (btnSearch) { btnSearch.disabled = false; btnSearchText.style.display = 'inline'; btnSearchLoader.style.display = 'none'; }
+      // ✅ FIX: Restauración segura de estilos
+      if (btnSearch) { btnSearch.disabled = false; }
+      if (btnSearchText) btnSearchText.style.display = 'inline';
+      if (btnSearchLoader) btnSearchLoader.style.display = 'none';
     }
   }
 
@@ -199,9 +214,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function getComponentesValues() {
     const componentes = {};
-    document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => { 
-      if (!componentes[r.name]) componentes[r.name] = 'NT'; 
-      if (r.checked) componentes[r.name] = r.value; 
+    document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => {
+      if (!componentes[r.name]) componentes[r.name] = 'NT';
+      if (r.checked) componentes[r.name] = r.value;
     });
     return componentes;
   }
@@ -218,8 +233,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const rinVal = document.getElementById('rin_numero')?.value;
     if (rinVal && !/^\d{2}$/.test(rinVal)) { mostrarAlerta('error', 'El Nº de Rin debe contener exactamente 2 dígitos.'); return; }
-    
-    btnSubmit.disabled = true; btnSubmit.querySelector('.btn-text').style.display = 'none'; btnSubmit.querySelector('.btn-loader').style.display = 'inline';
+
+    btnSubmit.disabled = true; 
+    btnSubmit.querySelector('.btn-text').style.display = 'none'; 
+    btnSubmit.querySelector('.btn-loader').style.display = 'inline';
+
     try {
       const payload = {
         fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value,
@@ -247,22 +265,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       };
 
       const { error } = await supabase.from('inspecciones_pvr').update(payload).eq('id', recordIdInput.value);
-      if (error) throw error; 
+      if (error) throw error;
       
       mostrarAlerta('success', '✅ Inspección actualizada correctamente');
       alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => { limpiarFormulario(); }, 3000);
-    } catch (err) { 
-      console.error('Error al actualizar:', err); 
-      mostrarAlerta('error', `No se pudo actualizar: ${err.message}`); 
-    } finally { 
-      btnSubmit.disabled = false; btnSubmit.querySelector('.btn-text').style.display = 'inline'; btnSubmit.querySelector('.btn-loader').style.display = 'none'; 
+    } catch (err) {
+      console.error('Error al actualizar:', err);
+      mostrarAlerta('error', `No se pudo actualizar: ${err.message}`);
+    } finally {
+      btnSubmit.disabled = false; 
+      btnSubmit.querySelector('.btn-text').style.display = 'inline'; 
+      btnSubmit.querySelector('.btn-loader').style.display = 'none';
     }
   });
 
   inspectionForm?.addEventListener('input', updatePreview);
   inspectionForm?.addEventListener('change', updatePreview);
-
   updatePreview();
   mostrarAlerta('info', '🔍 Busque una inspección para habilitar la edición');
 });
