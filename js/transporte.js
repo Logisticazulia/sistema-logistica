@@ -6,112 +6,93 @@
     const SUPABASE_KEY = window.SUPABASE_KEY;
 
     if (!window.supabase || !SUPABASE_URL || !SUPABASE_KEY) {
-        console.error('❌ Error: Configuración de Supabase o SDK no disponible.');
+        console.error('❌ Configuración de Supabase o SDK no disponible.');
         return;
     }
 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // ================= REFERENCIAS AL DOM =================
-    const userEmailEl = document.getElementById('userEmail');
-    const logoutBtn = document.getElementById('logoutBtn');
-    
-    // Mapeo exacto a los nuevos IDs del HTML
-    const statsElements = {
+    // ✅ IDs exactos que coinciden con el HTML de abajo
+    const els = {
         total: document.getElementById('totalVehicles'),
-        autosBusCamion: document.getElementById('autosBusCamion'),
+        autoBusCamion: document.getElementById('autoBusCamion'),
         motos: document.getElementById('motosVehicles'),
         traccionSangre: document.getElementById('traccionSangre'),
         especial: document.getElementById('especialVehicles'),
         operativos: document.getElementById('operativosVehicles'),
-        inoperativos: document.getElementById('inoperativosVehicles')
+        inoperativos: document.getElementById('inoperativosVehicles'),
+        desincorporados: document.getElementById('desincorporadosVehicles')
     };
 
-    // Helper para normalizar texto (ignora mayúsculas/minúsculas y espacios extra)
-    const normalize = (str) => (str || '').trim().toUpperCase();
-
-    // ================= FUNCIONES DE UTILIDAD =================
-    async function mostrarUsuarioAutenticado() {
-        try {
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
-            if (error) throw error;
-            userEmailEl.textContent = session?.user?.email || 'Usuario no autenticado';
-        } catch (err) {
-            console.error('Error obteniendo sesión:', err);
-            userEmailEl.textContent = 'Error de sesión';
-        }
-    }
-
-    async function cerrarSesion() {
-        try {
-            await supabaseClient.auth.signOut();
-            window.location.href = '../index.html';
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-            window.location.href = '../index.html';
-        }
-    }
+    // Helper para normalizar texto (ignora espacios, acentos y mayúsculas/minúsculas)
+    const normalize = (txt) => (txt || '').trim().toUpperCase().replace(/\s+/g, ' ');
 
     // ================= CARGAR ESTADÍSTICAS =================
     async function cargarEstadisticas() {
         try {
-            console.log('📊 Cargando estadísticas de vehículos...');
+            console.log('📡 Obteniendo datos de Supabase...');
             
-            // ⚡ Optimización: Solo traemos las columnas que necesitamos
-            const { data, error } = await supabaseClient
-                .from('vehiculos')
-                .select('clase, estatus');
-
+            // ⚡ Solo traemos las columnas necesarias para optimizar la red
+            const { data, error } = await supabase.from('vehiculos').select('clase, estatus');
             if (error) throw error;
 
-            const vehiculos = data || [];
-            console.log(`📊 Registros obtenidos de BD: ${vehiculos.length}`);
+            const rows = data || [];
+            console.log(`📦 Registros recibidos: ${rows.length}`);
 
-            // 1️⃣ TOTAL: Cuenta todos los registros en la tabla
-            const total = vehiculos.length;
+            const total = rows.length;
 
-            // 🚫 Filtramos vehículos que NO estén DESINCORPORADOS para el resto de contadores
-            const activos = vehiculos.filter(v => normalize(v.estatus) !== 'DESINCORPORADA');
+            // 1️⃣ DESINCORPORADOS (Conteo separado)
+            const desincorporados = rows.filter(r => normalize(r.estatus) === 'DESINCORPORADA').length;
+            
+            // 2️⃣ ACTIVOS (Excluye desincorporados para el resto de contadores)
+            const activos = rows.filter(r => normalize(r.estatus) !== 'DESINCORPORADA');
 
-            // 2️⃣ AUTO / BUS / CAMIÓN
-            const tiposRuedas = ['AUTOBUS', 'AUTOMOVIL', 'CAMION', 'CAMIONETA'];
-            const autosBusCamion = activos.filter(v => tiposRuedas.includes(normalize(v.clase))).length;
+            // 3️⃣ CATEGORÍAS POR CLASE (Solo sobre activos)
+            const autoBusCamion = activos.filter(r => 
+                ['AUTOBUS', 'AUTOMOVIL', 'CAMION', 'CAMIONETA'].includes(normalize(r.clase))
+            ).length;
+            
+            const motos = activos.filter(r => normalize(r.clase) === 'MOTO').length;
+            const traccionSangre = activos.filter(r => normalize(r.clase) === 'TRACCION DE SANGRE').length;
+            const especial = activos.filter(r => normalize(r.clase) === 'ESPECIAL').length;
 
-            // 3️⃣ MOTOS
-            const motos = activos.filter(v => normalize(v.clase) === 'MOTO').length;
+            // 4️⃣ ESTADOS OPERATIVOS (Solo sobre activos)
+            const operativos = activos.filter(r => normalize(r.estatus) === 'OPERATIVA').length;
+            const inoperativos = activos.filter(r => normalize(r.estatus) === 'INOPERATIVA').length;
 
-            // 4️⃣ TRACCIÓN DE SANGRE
-            const traccionSangre = activos.filter(v => normalize(v.clase) === 'TRACCION DE SANGRE').length;
+            console.log('✅ Cálculo final:', { total, autoBusCamion, motos, traccionSangre, especial, operativos, inoperativos, desincorporados });
 
-            // 5️⃣ ESPECIAL
-            const especial = activos.filter(v => normalize(v.clase) === 'ESPECIAL').length;
-
-            // 6️⃣ OPERATIVOS e INOPERATIVOS (Solo desde la columna estatus, excluyendo desincorporados)
-            const operativos = activos.filter(v => normalize(v.estatus) === 'OPERATIVA').length;
-            const inoperativos = activos.filter(v => normalize(v.estatus) === 'INOPERATIVA').length;
-
-            // ✅ Actualización segura del DOM
-            const statsMap = { total, autosBusCamion, motos, traccionSangre, especial, operativos, inoperativos };
-            Object.entries(statsElements).forEach(([key, el]) => {
-                if (el) el.textContent = statsMap[key] ?? 0;
+            // 🟢 ACTUALIZACIÓN SEGURA DEL DOM
+            Object.entries({
+                total, autoBusCamion, motos, traccionSangre, especial, operativos, inoperativos, desincorporados
+            }).forEach(([key, val]) => {
+                if (els[key]) {
+                    els[key].textContent = val; // Reemplaza el ⏳ por el número
+                } else {
+                    console.warn(`⚠️ Elemento HTML no encontrado en el DOM: ${key}`);
+                }
             });
 
-            console.log('✅ Estadísticas renderizadas:', statsMap);
-        } catch (error) {
-            console.error('❌ Error en cargarEstadisticas:', error);
-            // Fallback seguro
-            Object.values(statsElements).forEach(el => { if (el) el.textContent = '0'; });
+        } catch (err) {
+            console.error('❌ Error crítico cargando estadísticas:', err);
+            // Fallback: pone 0 en todos los que existan para que no quede el loader
+            Object.values(els).forEach(el => { if (el) el.textContent = '0'; });
         }
     }
 
     // ================= INICIALIZACIÓN =================
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 Inicializando módulo de Transporte...');
-        mostrarUsuarioAutenticado();
         cargarEstadisticas();
 
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', cerrarSesion);
+            logoutBtn.addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = '../index.html';
+            });
         }
     });
 })();
