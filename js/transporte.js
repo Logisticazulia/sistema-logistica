@@ -1,153 +1,100 @@
-/**
- * TRANSPORTE - DASHBOARD PRINCIPAL
- * Muestra estadísticas del parque automotor
- */
-// ================= CONFIGURACIÓN =================
-const SUPABASE_URL = window.SUPABASE_URL;
-const SUPABASE_KEY = window.SUPABASE_KEY;
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-console.error('❌ Error: Configuración de Supabase no encontrada');
-}
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+(function() {
+    'use strict';
 
-// ================= REFERENCIAS AL DOM =================
-const userEmail = document.getElementById('userEmail');
-const logoutBtn = document.getElementById('logoutBtn');
+    // ================= CONFIGURACIÓN =================
+    const SUPABASE_URL = window.SUPABASE_URL;
+    const SUPABASE_KEY = window.SUPABASE_KEY;
 
-// Elementos de estadísticas
-const totalVehiclesEl = document.getElementById('totalVehicles');
-const automovilVehiclesEl = document.getElementById('automovilVehicles');
-const motosVehiclesEl = document.getElementById('motosVehicles');
-const especialesVehiclesEl = document.getElementById('especialesVehicles'); // ✅ NUEVO ELEMENTO
-const operativosVehiclesEl = document.getElementById('operativosVehicles');
-const inoperativosVehiclesEl = document.getElementById('inoperativosVehicles');
+    if (!window.supabase || !SUPABASE_URL || !SUPABASE_KEY) {
+        console.error('❌ Error: Configuración de Supabase o SDK no disponible.');
+        return; // Detiene la ejecución si falta la config o el SDK no cargó
+    }
 
-// ================= FUNCIONES DE UTILIDAD =================
-async function mostrarUsuarioAutenticado() {
-try {
-// ✅ SINTAXIS CORRECTA: data: { session }
-const { data: { session }, error } = await supabaseClient.auth.getSession();
-if (session?.user?.email) {
-userEmail.textContent = session.user.email;
-} else {
-userEmail.textContent = 'Usuario no autenticado';
-}
-} catch (err) {
-console.error('Error obteniendo sesión:', err);
-userEmail.textContent = 'Error de sesión';
-}
-}
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function cerrarSesion() {
-try {
-await supabaseClient.auth.signOut();
-window.location.href = '../index.html';
-} catch (error) {
-console.error('Error al cerrar sesión:', error);
-window.location.href = '../index.html';
-}
-}
+    // ================= REFERENCIAS AL DOM =================
+    const userEmailEl = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const statsElements = {
+        total: document.getElementById('totalVehicles'),
+        automoviles: document.getElementById('automovilVehicles'),
+        motos: document.getElementById('motosVehicles'),
+        operativos: document.getElementById('operativosVehicles'),
+        inoperativos: document.getElementById('inoperativosVehicles')
+    };
 
-// ================= CARGAR ESTADÍSTICAS =================
-async function cargarEstadisticas() {
-try {
-console.log('📊 Cargando estadísticas de vehículos...');
-const { data, error } = await supabaseClient
-.from('vehiculos')
-.select('tipo, clase, estatus')
-.order('created_at', { ascending: false });
+    // ================= FUNCIONES DE UTILIDAD =================
+    async function mostrarUsuarioAutenticado() {
+        try {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (error) throw error;
+            userEmailEl.textContent = session?.user?.email || 'Usuario no autenticado';
+        } catch (err) {
+            console.error('Error obteniendo sesión:', err);
+            userEmailEl.textContent = 'Error de sesión';
+        }
+    }
 
-if (error) {
-console.error('❌ Error al cargar vehículos:', error);
-throw error;
-}
+    async function cerrarSesion() {
+        try {
+            await supabaseClient.auth.signOut();
+            window.location.href = '../index.html';
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            window.location.href = '../index.html';
+        }
+    }
 
-const vehiculos = data || [];
-console.log(`📊 Total de vehículos en BD: ${vehiculos.length}`);
+    // Helper para normalizar texto (maneja acentos, mayúsculas y espacios)
+    const normalizeText = (str) => (str || '').trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 
-// ✅ CALCULAR ESTADÍSTICAS
+    // ================= CARGAR ESTADÍSTICAS =================
+    async function cargarEstadisticas() {
+        try {
+            console.log('📊 Cargando estadísticas de vehículos...');
+            
+            // Se eliminó 'situacion' ya que no se usa en el cálculo.
+            const { data, error } = await supabaseClient
+                .from('vehiculos')
+                .select('tipo, estatus');
 
-// 1. Total: Contamos todo lo que NO sea desincorporado para que el dashboard refleje flota activa
-const total = vehiculos.filter(v => 
-!v.estatus || v.estatus.trim().toUpperCase() !== 'DESINCORPORADA'
-).length;
+            if (error) throw error;
 
-// 2. Automóviles: Solo los operativos
-const automoviles = vehiculos.filter(v => {
-   const tipo = (v.tipo || '').trim().toUpperCase();
-   const estatus = (v.estatus || '').trim().toUpperCase();
-   return tipo === 'AUTOMOVIL' && estatus === 'OPERATIVA';
-}).length;
+            const vehiculos = data || [];
+            console.log(`📊 Total de vehículos en BD: ${vehiculos.length}`);
 
-// 3. Motos: SOLO operativas (Excluye desincorporadas y reparación)
-const motos = vehiculos.filter(v => {
-   const tipo = (v.tipo || '').trim().toUpperCase();
-   const clase = (v.clase || '').trim().toUpperCase();
-   const estatus = (v.estatus || '').trim().toUpperCase();
+            // ✅ CÁLCULO DE ESTADÍSTICAS CON NORMALIZACIÓN ROBUSTA
+            const total = vehiculos.length;
+            const automoviles = vehiculos.filter(v => normalizeText(v.tipo) === 'AUTOMOVIL').length;
+            const motos = vehiculos.filter(v => normalizeText(v.tipo) === 'MOTO').length;
+            // ⚠️ NOTA: Ajusta 'OPERATIVA'/'INOPERATIVA' si en tu BD usan 'OPERATIVO'/'INOPERATIVO'
+            const operativos = vehiculos.filter(v => normalizeText(v.estatus) === 'OPERATIVA').length;
+            const inoperativos = vehiculos.filter(v => normalizeText(v.estatus) === 'INOPERATIVA').length;
 
-   // Es moto si la clase es MOTO o el tipo incluye MOTO
-   const esMoto = clase === 'MOTO' || tipo.includes('MOTO');
-   const esOperativa = estatus === 'OPERATIVA';
+            // ✅ ACTUALIZACIÓN SEGURA DEL DOM
+            Object.entries(statsElements).forEach(([key, el]) => {
+                if (el) {
+                    el.textContent = { total, automoviles, motos, operativos, inoperativos }[key];
+                }
+            });
 
-   return esMoto && esOperativa;
-}).length;
+            console.log('📊 Estadísticas renderizadas:', { total, automoviles, motos, operativos, inoperativos });
+        } catch (error) {
+            console.error('❌ Error en cargarEstadisticas:', error);
+            // Fallback seguro en caso de error
+            Object.values(statsElements).forEach(el => { if (el) el.textContent = '0'; });
+        }
+    }
 
-// 4. Especiales (Embarcaciones): Solo operativas
-const especiales = vehiculos.filter(v => {
-   const tipo = (v.tipo || '').trim().toUpperCase();
-   const clase = (v.clase || '').trim().toUpperCase();
-   const estatus = (v.estatus || '').trim().toUpperCase();
+    // ================= INICIALIZACIÓN =================
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Inicializando módulo de Transporte...');
+        mostrarUsuarioAutenticado();
+        cargarEstadisticas();
 
-   // Es especial si la clase o tipo es ESPECIAL
-   const esEspecial = clase === 'ESPECIAL' || tipo === 'ESPECIAL';
-   const esOperativa = estatus === 'OPERATIVA';
-
-   return esEspecial && esOperativa;
-}).length;
-
-// 5. Totales de estado (Operativos vs Inoperativos)
-const operativos = vehiculos.filter(v =>
-   v.estatus && v.estatus.trim().toUpperCase() === 'OPERATIVA'
-).length;
-
-const inoperativos = vehiculos.filter(v =>
-   v.estatus && (v.estatus.trim().toUpperCase() === 'INOPERATIVA' || v.estatus.trim().toUpperCase() === 'DESINCORPORADA')
-).length;
-
-// ✅ ACTUALIZAR DOM
-if (totalVehiclesEl) totalVehiclesEl.textContent = total;
-if (automovilVehiclesEl) automovilVehiclesEl.textContent = automoviles;
-if (motosVehiclesEl) motosVehiclesEl.textContent = motos;
-if (especialesVehiclesEl) especialesVehiclesEl.textContent = especiales; // ✅ ACTUALIZAR ESPECIALES
-if (operativosVehiclesEl) operativosVehiclesEl.textContent = operativos;
-if (inoperativosVehiclesEl) inoperativosVehiclesEl.textContent = inoperativos;
-
-console.log('📊 Estadísticas:', { total, automoviles, motos, especiales, operativos, inoperativos });
-
-} catch (error) {
-console.error('❌ Error en cargarEstadisticas:', error);
-// Mostrar ceros en caso de error
-if (totalVehiclesEl) totalVehiclesEl.textContent = '0';
-if (automovilVehiclesEl) automovilVehiclesEl.textContent = '0';
-if (motosVehiclesEl) motosVehiclesEl.textContent = '0';
-if (especialesVehiclesEl) especialesVehiclesEl.textContent = '0';
-if (operativosVehiclesEl) operativosVehiclesEl.textContent = '0';
-if (inoperativosVehiclesEl) inoperativosVehiclesEl.textContent = '0';
-}
-}
-
-// ================= INICIALIZACIÓN =================
-document.addEventListener('DOMContentLoaded', () => {
-console.log('🚀 Inicializando módulo de Transporte...');
-if (supabaseClient) {
-mostrarUsuarioAutenticado();
-cargarEstadisticas();
-}
-
-// Event listener para logout
-if (logoutBtn) {
-logoutBtn.addEventListener('click', cerrarSesion);
-}
-
-console.log('✅ Módulo de Transporte inicializado');
-});
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', cerrarSesion);
+        }
+        console.log('✅ Módulo de Transporte inicializado correctamente.');
+    });
+})();
