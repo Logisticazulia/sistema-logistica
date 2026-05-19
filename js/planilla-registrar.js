@@ -357,3 +357,96 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✅ Inicialización completada');
 });
+// ================= LÓGICA DE EXCLUSIVIDAD MUTUA =================
+const unidadAdminSelect = document.getElementById('unidad_administrativa');
+const epmSelect = document.getElementById('epm');
+const eppSelect = document.getElementById('epp');
+
+function toggleExclusiveFields(source) {
+    if (source === 'unidad') {
+        // Si se selecciona Unidad Administrativa → bloquear EPM y EPP
+        if (epmSelect) {
+            epmSelect.disabled = true;
+            epmSelect.value = '';
+            epmSelect.style.opacity = '0.6';
+            epmSelect.style.cursor = 'not-allowed';
+        }
+        if (eppSelect) {
+            eppSelect.disabled = true;
+            eppSelect.value = '';
+            eppSelect.style.opacity = '0.6';
+            eppSelect.style.cursor = 'not-allowed';
+        }
+    } else if (source === 'epm' || source === 'epp') {
+        // Si se selecciona EPM o EPP → bloquear Unidad Administrativa
+        if (unidadAdminSelect) {
+            unidadAdminSelect.disabled = true;
+            unidadAdminSelect.value = '';
+            unidadAdminSelect.style.opacity = '0.6';
+            unidadAdminSelect.style.cursor = 'not-allowed';
+        }
+    }
+}
+
+function resetExclusiveFields() {
+    // Restaurar todos los campos si se deselecciona la opción activa
+    if (unidadAdminSelect && !unidadAdminSelect.value) {
+        if (epmSelect) {
+            epmSelect.disabled = false;
+            epmSelect.style.opacity = '1';
+            epmSelect.style.cursor = 'pointer';
+        }
+        if (eppSelect) {
+            eppSelect.disabled = false;
+            eppSelect.style.opacity = '1';
+            eppSelect.style.cursor = 'pointer';
+        }
+    }
+    if (epmSelect && !epmSelect.value && eppSelect && !eppSelect.value) {
+        if (unidadAdminSelect) {
+            unidadAdminSelect.disabled = false;
+            unidadAdminSelect.style.opacity = '1';
+            unidadAdminSelect.style.cursor = 'pointer';
+        }
+    }
+}
+
+// Event listeners para exclusividad
+if (unidadAdminSelect) {
+    unidadAdminSelect.addEventListener('change', function() {
+        if (this.value) {
+            toggleExclusiveFields('unidad');
+        } else {
+            resetExclusiveFields();
+        }
+    });
+}
+
+if (epmSelect) {
+    epmSelect.addEventListener('change', function() {
+        if (this.value) {
+            toggleExclusiveFields('epm');
+        } else {
+            resetExclusiveFields();
+        }
+    });
+}
+
+if (eppSelect) {
+    eppSelect.addEventListener('change', function() {
+        if (this.value) {
+            toggleExclusiveFields('epp');
+        } else {
+            resetExclusiveFields();
+        }
+    });
+}
+
+// Resetear al cargar si hay valores previos (para edición)
+document.addEventListener('DOMContentLoaded', () => {
+    // ... tu código existente ...
+    
+    // Aplicar estado inicial si hay valores preseleccionados
+    if (unidadAdminSelect?.value) toggleExclusiveFields('unidad');
+    else if (epmSelect?.value || eppSelect?.value) toggleExclusiveFields('epm');
+});
