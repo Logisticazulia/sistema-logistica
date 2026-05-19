@@ -339,22 +339,28 @@ function inicializarValidacionTiempoReal() {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando registro de vehículos...');
-    
     if (!form || !btnSubmit) {
         console.error('❌ Elementos críticos del DOM no encontrados');
         showAlert('error', 'Error de inicialización. Recargue la página.');
         return;
     }
-    
+
     mostrarUsuarioAutenticado();
     inicializarValidacionTiempoReal();
-    
+
+    // 🚫 BLOQUEAR ENVÍO CON TECLA ENTER EN TODO EL FORMULARIO
+    form.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Cancela el envío automático al presionar Enter
+        }
+    });
+
+    // ✅ EL GUARDADO SOLO SE EJECUTA AL HACER CLIC EN EL BOTÓN
     form.addEventListener('submit', guardarVehiculo);
-    
+
     if (logoutBtn) {
         logoutBtn.addEventListener('click', cerrarSesion);
     }
-    
     console.log('✅ Inicialización completada');
 });
 // ================= LÓGICA DE EXCLUSIVIDAD MUTUA =================
