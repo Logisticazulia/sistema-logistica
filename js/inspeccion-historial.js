@@ -23,48 +23,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     const supabase = await initSupabase();
     if (!supabase) return;
 
-    // 🔹 HELPER: IDENTIFICAR SI ES MOTO
-    const esMoto = (tipo) => {
-        if (!tipo) return false;
-        const t = tipo.toLowerCase();
-        return t.includes('moto') || t.includes('enduro') || t.includes('paseo') || t.includes('trimovil') || t.includes('traccion');
-    };
-
-    // 🔹 HELPER: OBTENER TODOS LOS COMPONENTES (MOTO JSONB + PATRULLA COLUMNAS)
-    const obtenerComponentes = (d) => {
-        const comps = {};
-        // 1. Componentes Motos (JSONB)
-        let motoComps = d.componentes_moto || {};
-        if (typeof motoComps === 'string') {
-            try { motoComps = JSON.parse(motoComps); } catch { motoComps = {}; }
+    // 🧠 LÓGICA MEJORADA PARA DETECTAR SI ES MOTO (FUNCIONA INCLUSO SI 'tipo' ESTÁ VACÍO)
+    function esMoto(row) {
+        if (!row) return false;
+        
+        // 1. Prioridad: Si tiene componentes_moto rellenos, es moto
+        if (row.componentes_moto) {
+            let c = row.componentes_moto;
+            if (typeof c === 'string') { try { c = JSON.parse(c); } catch(e){ c={}; } }
+            if (Object.keys(c).length > 0) return true;
         }
-        Object.assign(comps, motoComps);
 
-        // 2. Componentes Patrullas (Columnas individuales B/M/NT)
-        const ignoreKeys = ['id','vehiculo_id','n_inspeccion','fecha_inspeccion','hora','motivo','lugar','asignacion','supervision','placa','marca','modelo','ano','tipo','color','n_identificacion','s_carroceria','kms','inspector','created_at','updated_at','observaciones','coord_nombre','coord_rango','coord_cedula','coord_telefono','insp_nombre','insp_rango','insp_cedula','insp_telefono','componentes_moto','s_motor','deleted_at'];
-        Object.keys(d).forEach(k => {
-            if (!ignoreKeys.includes(k) && (d[k] === 'B' || d[k] === 'M' || d[k] === 'NT')) {
-                comps[k] = d[k];
+        // 2. Verificar columna 'tipo'
+        const t = (row.tipo || '').toLowerCase();
+        if (t.includes('moto') || t.includes('enduro') || t.includes('paseo') || t.includes('trimovil') || t.includes('bicicleta')) return true;
+
+        // 3. Verificar palabras clave en modelo/marca (fallback)
+        const m = (row.modelo || '').toLowerCase();
+        const ma = (row.marca || '').toLowerCase();
+        const keywords = ['dr ', 'dr650', 'dr-650', 'xt', 'ybr', 'xlr', 'bross', 'falcon', 'xcape', 'vstrom', 'kdx', 'klr'];
+        
+        if (keywords.some(k => m.includes(k))) return true;
+        if (['yamaha', 'suzuki', 'kawasaki', 'honda', 'hero', 'bajaj', 'empire', 'bera', 'kadi'].some(k => ma.includes(k))) return true;
+        
+        return false;
+    }
+
+    // 🧩 EXTRACCIÓN INTELIGENTE DE COMPONENTES
+    function obtenerComponentes(row) {
+        const res = {};
+        
+        // Si es Moto, usar JSONB
+        if (row.componentes_moto) {
+            let c = row.componentes_moto;
+            if (typeof c === 'string') { try { c = JSON.parse(c); } catch(e){ c={}; } }
+            Object.assign(res, c);
+        }
+
+        // Si es Vehículo/Patrulla, escanear columnas buscando valores B/M/NT
+        const metaKeys = ['id','vehiculo_id','n_inspeccion','fecha_inspeccion','hora','motivo','lugar','asignacion','supervision','placa','marca','modelo','ano','tipo','color','n_identificacion','s_carroceria','kms','inspector','created_at','observaciones','coord_nombre','coord_rango','coord_cedula','coord_telefono','insp_nombre','insp_rango','insp_cedula','insp_telefono','componentes_moto','s_motor','facsimil'];
+        
+        Object.keys(row).forEach(k => {
+            if (!metaKeys.includes(k)) {
+                const val = (row[k] || '').toString().toUpperCase();
+                if (['B', 'M', 'NT'].includes(val)) {
+                    res[k] = val;
+                }
             }
         });
-        return comps;
-    };
+        return res;
+    }
 
-    // 🔹 CARGAR DATOS DE INSPECCIONES (SIN JOIN)
+    // 🔹 CARGAR DATOS DE INSPECCIONES (SIN JOIN ERRÓNEO)
     async function cargarDatos(filtros = {}) {
         try {
             let query = supabase.from('inspecciones_pvr').select('*');
+            
             if (filtros.desde) query = query.gte('fecha_inspeccion', filtros.desde);
             if (filtros.hasta) query = query.lte('fecha_inspeccion', filtros.hasta);
             if (filtros.placa) query = query.ilike('placa', `%${filtros.placa}%`);
-            
+
             const { data, error } = await query.order('fecha_inspeccion', { ascending: false });
             if (error) throw error;
 
+            // Filtrado en cliente para asegurar precisión
             let result = data || [];
-            // Filtrado preciso en cliente
-            if (filtros.tipo === 'moto') result = result.filter(d => esMoto(d.tipo));
-            if (filtros.tipo === 'patrulla') result = result.filter(d => !esMoto(d.tipo));
+            if (filtros.tipo === 'moto') result = result.filter(r => esMoto(r));
+            if (filtros.tipo === 'patrulla') result = result.filter(r => !esMoto(r));
+
             return result;
         } catch (err) {
             console.error('❌ Error cargando datos:', err);
@@ -75,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🔹 CALCULAR KPIS
     function calcularKpis(data) {
         const total = data.length;
-        const motos = data.filter(d => esMoto(d.tipo)).length;
+        const motos = data.filter(r => esMoto(r)).length;
         const patrullas = total - motos;
+        
         let totalComponentes = 0, malos = 0;
-
         data.forEach(d => {
             const comps = obtenerComponentes(d);
             Object.values(comps).forEach(v => {
@@ -95,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('kpiPorcentaje').textContent = `⚠️ ${porcentaje}% del total`;
     }
 
-    // 🔹 RENDERIZAR GRÁFICOS CON CHART.JS
+    // 🔹 RENDERIZAR GRÁFICOS
     function renderGraficos(data) {
         // 1️⃣ Inspecciones por Mes
         const porMes = {};
@@ -141,8 +167,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
         });
-
         const topFallados = Object.entries(fallados).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        
         if (charts.topFallados) charts.topFallados.destroy();
         charts.topFallados = new Chart(document.getElementById('chartTopFallados'), {
             type: 'bar',
@@ -154,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const porInspector = {};
         data.forEach(d => { porInspector[d.insp_nombre || 'Sin asignar'] = (porInspector[d.insp_nombre || 'Sin asignar'] || 0) + 1; });
         const topInspectores = Object.entries(porInspector).sort((a, b) => b[1] - a[1]).slice(0, 8);
-
+        
         if (charts.inspectores) charts.inspectores.destroy();
         charts.inspectores = new Chart(document.getElementById('chartInspectores'), {
             type: 'bar',
@@ -176,9 +202,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         pageData.forEach(d => {
-            const esM = esMoto(d.tipo);
-            const tipoBadge = `<span class="badge ${esM ? 'badge-moto' : 'badge-patrulla'}">${esM ? '🏍️ Moto' : '🚓 Patrulla'}</span>`;
+            const moto = esMoto(d);
+            const tipoBadge = `<span class="badge ${moto ? 'badge-moto' : 'badge-patrulla'}">${moto ? '🏍️ Moto' : '🚓 Patrulla'}</span>`;
             
+            // Contar componentes "M"
             let malos = 0;
             Object.values(obtenerComponentes(d)).forEach(v => { if (v === 'M') malos++; });
 
@@ -212,8 +239,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
             if (error) throw error; if (!data) return;
 
-            document.getElementById('modalNInspeccion').textContent = `(${data.n_inspeccion || 'Sin ID'})`;
-            const esM = esMoto(data.tipo);
+            document.getElementById('modalNInspeccion').textContent = data.n_inspeccion || '';
+            const esM = esMoto(data);
             
             let html = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
@@ -230,7 +257,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div style="margin-bottom: 20px;"><strong>Observaciones:</strong><br>${data.observaciones || 'Sin observaciones.'}</div>
                 <div style="margin-bottom: 20px;">
                     <strong>Componentes en Mal Estado (M):</strong>
-                    <ul style="margin: 8px 0 0 20px; color: #ef4444;">`;
+                    <ul style="margin: 8px 0 0 20px; color: #ef4444;">
+            `;
             
             const comps = obtenerComponentes(data);
             let hayMalos = false;
@@ -280,7 +308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             let malos = 0;
             Object.values(obtenerComponentes(d)).forEach(v => { if (v === 'M') malos++; });
             return [
-                d.n_inspeccion, d.fecha_inspeccion, d.hora, esMoto(d.tipo) ? 'Moto' : 'Patrulla',
+                d.n_inspeccion, d.fecha_inspeccion, d.hora, esMoto(d) ? 'Moto' : 'Patrulla',
                 d.placa, d.marca, d.modelo, d.motivo, d.insp_nombre, malos
             ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(',');
         });
@@ -320,11 +348,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🚀 INICIALIZACIÓN
     const hoy = new Date().toISOString().split('T')[0];
     const hace30 = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
-    
-    if(!document.getElementById('filterDesde').value) document.getElementById('filterDesde').value = hace30;
-    if(!document.getElementById('filterHasta').value) document.getElementById('filterHasta').value = hoy;
+    if(document.getElementById('filterDesde').value) document.getElementById('filterDesde').value = hace30;
+    if(document.getElementById('filterHasta').value) document.getElementById('filterHasta').value = hoy;
 
-    allData = await cargarDatos({ desde: document.getElementById('filterDesde').value, hasta: document.getElementById('filterHasta').value });
+    allData = await cargarDatos({ desde: hace30, hasta: hoy });
     filteredData = [...allData];
     calcularKpis(filteredData);
     renderGraficos(filteredData);
