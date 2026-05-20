@@ -11,20 +11,24 @@
 /* ================= ESTILOS BASE ================= */
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; color: #333; line-height: 1.5; }
-.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+/* 🔥 CONTAINER AMPLIADO PARA PANTALLAS GRANDES */
+.container { max-width: 100%; margin: 0 auto; padding: 20px 30px; }
+
 .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
 
-/* ================= BARRA DE BÚSQUEDA UNIFICADA ================= */
+/* ================= BARRA DE BÚSQUEDA MÁS LARGA ================= */
 .search-container {
   background: #003366;
-  padding: 20px 25px;
+  padding: 22px 28px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  width: 100%;
+  box-sizing: border-box;
 }
 .search-header {
   color: white;
@@ -37,16 +41,17 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 }
 .search-row {
   display: flex;
-  gap: 12px;
+  gap: 14px; /* Espacio optimizado */
   align-items: center;
   width: 100%;
 }
 .search-input {
-  flex: 1;
-  padding: 12px 15px;
+  flex: 2; /* 🔑 Le da más peso al input para que sea más largo */
+  min-width: 400px;
+  padding: 13px 16px;
   border: none;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 1rem;
   background: #f0f2f5;
   transition: all 0.3s;
   font-family: 'Roboto', sans-serif;
@@ -54,7 +59,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 }
 .search-input:focus { outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
 .btn-search-custom {
-  padding: 12px 20px;
+  padding: 13px 22px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -66,7 +71,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   transition: all 0.3s;
   font-family: 'Roboto', sans-serif;
   white-space: nowrap;
-  height: 46px;
+  height: 48px;
 }
 .btn-search-green { background: #28a745; color: white; box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3); }
 .btn-search-green:hover { background: #218838; transform: translateY(-1px); }
@@ -141,7 +146,9 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
+  .container { padding: 15px; }
   .search-row { flex-direction: column; }
+  .search-input { min-width: 100%; }
   .btn-search-custom { width: 100%; justify-content: center; }
   .inspections-table { font-size: 0.85rem; }
   .inspections-table th, .inspections-table td { padding: 10px 8px; }
@@ -197,7 +204,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
   </section>
 
   <div class="container">
-    <!-- 🔍 BARRA DE BÚSQUEDA -->
+    <!-- 🔍 BARRA DE BÚSQUEDA AMPLIADA -->
     <div class="search-container">
       <div class="search-header">🔍 Búsqueda de Motocicleta</div>
       <div class="search-row">
