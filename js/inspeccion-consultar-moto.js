@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentPage = 1;
     let allInspections = [];
     let filteredInspections = [];
-    
+
+    // ================= ELEMENTOS DEL DOM =================
     const searchInput = document.getElementById('searchMoto');
     const btnSearch = document.getElementById('btnSearch');
     const btnClearSearch = document.getElementById('btnClearSearch');
@@ -20,9 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnNext = document.getElementById('btnNext');
     const currentPageNum = document.getElementById('currentPageNum');
     const totalPagesNum = document.getElementById('totalPagesNum');
-
-    // Regex estricto para identificar SOLO motos
-    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
 
     // ================= INICIALIZAR SUPABASE =================
     async function initSupabase() {
@@ -59,16 +57,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${d}/${m}/${y}`;
     }
 
-    // Función para validar si un registro es una Moto
-    const esMoto = (tipo) => tipo && motoTypesRegex.test(tipo);
+    // Regex para identificar estrictamente motos
+    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
 
     // ================= CARGAR TODO EL HISTORIAL =================
     async function cargarTodasInspecciones(page = 1) {
         try {
             resultsCount.textContent = '🔄 Cargando historial de motos...';
             const from = (page - 1) * ITEMS_PER_PAGE;
-
-            // 1. Obtener datos de la tabla inspecciones
+            
+            // 1. Traer datos: SELECCIONAMOS s_motor y tipo explícitamente
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .order('fecha_inspeccion', { ascending: false })
@@ -76,22 +74,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // 2. 🔒 FILTRAR: MANTENER SOLO MOTOS, DESCARTAR VEHÍCULOS
-            const motos = (data || []).filter(r => esMoto(r.tipo));
+            // 2. Filtrar solo motos en cliente
+            const motoData = (data || []).filter(r => motoTypesRegex.test(r.tipo));
             
             // Ajustar página si no hay resultados
-            if (motos.length === 0 && from > 0) { currentPage--; return cargarTodasInspecciones(currentPage || 1); }
+            if (motoData.length === 0 && from > 0) { currentPage--; return cargarTodasInspecciones(currentPage || 1); }
 
-            allInspections = motos;
+            allInspections = motoData;
             filteredInspections = [...allInspections];
-            currentPage = page;
-
-            renderTabla();
             
-            // Contar total de motos para la paginación (aproximado en vista)
-            // Para un conteo exacto real se necesitaría un count con filtro, 
-            // pero con este método se maneja bien la vista actual.
-            updatePaginationControls(filteredInspections.length > 0 ? filteredInspections.length : 0);
+            renderTabla();
+            updatePaginationControls(allInspections.length > 0 ? allInspections.length : 0);
 
             if (filteredInspections.length === 0) {
                 resultsSection.classList.remove('active'); 
@@ -124,9 +117,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="fecha">${formatDate(insp.fecha_inspeccion)}</td>
                 <td class="fecha">${insp.hora || '-'}</td>
                 <td class="placa">${insp.placa || '-'}</td>
+                <!-- CAMBIADO A s_motor -->
                 <td class="s-motor" style="font-family:monospace; font-size:0.85rem; color:#475569;">${insp.s_motor || '-'}</td>
                 <td class="motivo" title="${insp.motivo || ''}">${insp.motivo || '-'}</td>
-                <td><button class="btn-ver" data-id="${insp.id}"> Ver Detalle</button></td>
+                <td><button class="btn-ver" data-id="${insp.id}">👁️ Ver Detalle</button></td>
             `;
             resultsBody.appendChild(tr);
         });
@@ -165,8 +159,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // 🔒 FILTRAR: SOLO MOTOS (Si buscas un auto por placa, aquí lo descartará)
-            allInspections = (data || []).filter(r => esMoto(r.tipo));
+            // Filtrar solo motos
+            allInspections = (data || []).filter(r => motoTypesRegex.test(r.tipo));
             filteredInspections = [...allInspections];
             currentPage = 1;
 
