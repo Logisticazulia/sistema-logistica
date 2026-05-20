@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let filteredInspections = [];
 
     // ================= ELEMENTOS DEL DOM =================
-    // Usamos querySelector como respaldo por si hay IDs duplicados en el HTML
-    const searchInput = document.getElementById('searchMoto') || document.querySelector('.search-container .search-input');
+    // Selección robusta para evitar conflictos con IDs duplicados en tu HTML
+    const searchInputs = document.querySelectorAll('input.search-input');
     const btnSearch = document.getElementById('btnSearch');
     const btnClearSearch = document.getElementById('btnClearSearch');
     const resultsSection = document.getElementById('resultsSection');
@@ -23,11 +23,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentPageNum = document.getElementById('currentPageNum');
     const totalPagesNum = document.getElementById('totalPagesNum');
 
+    // 🏍️ Regex para detectar motos (insensible a mayúsculas/minúsculas)
+    // Acepta: MOTO, MOTOCICLETA, ENDURO, PASEO, TRIMOVIL, TRACCION DE SANGRE
+    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
+
+    // Función para leer el valor del input correcto
+    function getSearchValue() {
+        // Prioriza el input dentro de la barra de búsqueda principal
+        const specificInput = document.querySelector('.search-container .search-input');
+        if (specificInput && specificInput.offsetParent !== null) return specificInput.value.trim();
+        // Si no, usa el primer input disponible
+        const anyInput = document.querySelector('input.search-input');
+        return anyInput ? anyInput.value.trim() : '';
+    }
+
     // ================= INICIALIZAR SUPABASE =================
     async function initSupabase() {
         let attempts = 0;
         while (!window.supabase && attempts < 50) { await new Promise(res => setTimeout(res, 100)); attempts++; }
-        if (!window.supabase) return null;
+        if (!window.supabase) { mostrarAlerta('error', '❌ No se pudo conectar a la base de datos.'); return null; }
         if (window.supabase.auth) return window.supabase;
         const createFn = window.supabase.createClient || window.createClient;
         if (createFn && window.SUPABASE_URL && window.SUPABASE_KEY) {
@@ -38,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const supabase = await initSupabase();
-    if (!supabase) { mostrarAlerta('error', '❌ No se pudo conectar a la base de datos.'); return; }
+    if (!supabase) return;
 
     try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -49,7 +63,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function mostrarAlerta(tipo, mensaje) {
         [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
         const target = tipo === 'success' ? alertSuccess : tipo === 'error' ? alertError : alertInfo;
-        if (target) { const span = target.querySelector('span:last-child'); if(span) span.textContent = mensaje; target.style.display = 'flex'; }
+        if (target) { 
+            const span = target.querySelector('span:last-child'); 
+            if(span) span.textContent = mensaje; 
+            target.style.display = 'flex'; 
+        }
     }
 
     function formatDate(dateStr) {
@@ -58,14 +76,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${d}/${m}/${y}`;
     }
 
-    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
-
     // ================= CARGAR TODO EL HISTORIAL =================
     async function cargarTodasInspecciones(page = 1) {
         try {
-            resultsCount.textContent = '🔄 Cargando historial de motos...';
+            resultsCount.textContent = '🔄 Cargando historial...';
             const from = (page - 1) * ITEMS_PER_PAGE;
 
+            // Traemos datos sin filtro estricto en la BD para poder analizarlos
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .order('fecha_inspeccion', { ascending: false })
@@ -73,27 +90,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Filtrar solo motos en cliente
-            const motoData = (data || []).filter(r => motoTypesRegex.test(r.tipo));
+            const allData = data || [];
             
-            if (motoData.length === 0 && from > 0) { currentPage--; return cargarTodasInspecciones(currentPage || 1); }
+            // 🏍️ FILTRADO EN CLIENTE:
+            const motoData = allData.filter(r => motoTypesRegex.test(r.tipo));
+            const hiddenData = allData.filter(r => !motoTypesRegex.test(r.tipo));
+
+            // 🔍 DIAGNÓSTICO: Si hay datos ocultos, avisa al usuario
+            if (hiddenData.length > 0) {
+                console.warn(`⚠️ Se encontraron ${hiddenData.length} inspecciones pero se ocultaron porque su 'tipo' es "${hiddenData[0].tipo}" (no es MOTO).`);
+                console.table(hiddenData.slice(0, 3).map(i => ({ id: i.id, placa: i.placa, tipo: i.tipo })));
+            }
 
             allInspections = motoData;
             filteredInspections = [...allInspections];
             currentPage = page;
 
             renderTabla();
-            updatePaginationControls(allInspections.length > 0 ? allInspections.length : 0);
+            // Usamos el total de la página actual para paginación visual, 
+            // pero idealmente deberías hacer un count filtrado en el servidor.
+            updatePaginationControls(allData.length > 0 ? allData.length : 0); 
 
             if (filteredInspections.length === 0) {
                 resultsSection.classList.remove('active'); 
                 emptyState.style.display = 'block';
+                // Si había datos pero no motos, personalizamos el mensaje
+                if (allData.length > 0 && motoData.length === 0) {
+                    emptyState.innerHTML = '<div class="icon">🚫</div><p>No hay inspecciones de <strong>MOTOS</strong> registradas. (Se encontraron vehículos, pero están filtrados)</p>';
+                } else {
+                    emptyState.innerHTML = '<div class="icon">📭</div><p>No hay inspecciones registradas aún</p>';
+                }
             } else {
                 resultsSection.classList.add('active'); 
                 emptyState.style.display = 'none';
             }
         } catch (err) {
-            console.error('❌ Error cargando inspecciones motos:', err);
+            console.error('❌ Error cargando inspecciones:', err);
             mostrarAlerta('error', `No se pudo cargar el listado: ${err.message}`);
         }
     }
@@ -136,29 +168,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (btnPrev) btnPrev.disabled = currentPage <= 1;
         if (btnNext) btnNext.disabled = currentPage >= totalPages;
         
-        resultsCount.textContent = `${filteredInspections.length} registro${filteredInspections.length !== 1 ? 's' : ''} encontrados`;
+        resultsCount.textContent = `${filteredInspections.length} moto(s) encontrada(s)`;
     }
 
     // ================= BÚSQUEDA DIRECTA =================
-    async function buscarMoto(e) {
-        if(e) e.preventDefault(); // Evita que el formulario recargue la página si existe
-        
-        // Leemos el valor directamente del DOM al momento del clic para evitar referencias nulas o duplicados
-        const inputVal = searchInput ? searchInput.value.trim() : '';
-        console.log('🔍 Buscando:', inputVal);
-        
-        if (!inputVal) { 
-            mostrarAlerta('info', '📝 Ingrese Placa, Serial o Identificación para buscar.'); 
-            return; 
-        }
+    async function buscarMoto() {
+        const rawQuery = getSearchValue();
+        if (!rawQuery) { mostrarAlerta('info', '📝 Ingrese Placa, Serial o Identificación para buscar.'); return; }
         
         if (btnSearch) btnSearch.disabled = true;
         mostrarAlerta('info', '🔍 Buscando motocicleta...');
 
         try {
-            const q = inputVal.replace(/\s+/g, '').toUpperCase();
+            const q = rawQuery.replace(/\s+/g, '').toUpperCase();
             
-            // 🔍 Buscar en inspecciones_pvr con comodines % para coincidencia flexible
+            // Buscar en inspecciones_pvr
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .or(`placa.ilike.%${q}%,s_motor.ilike.%${q}%,n_identificacion.ilike.%${q}%,n_inspeccion.ilike.%${q}%`)
@@ -166,21 +190,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Filtrar solo motos
-            allInspections = (data || []).filter(r => motoTypesRegex.test(r.tipo));
-            filteredInspections = [...allInspections];
+            const allFound = data || [];
+            const motos = allFound.filter(r => motoTypesRegex.test(r.tipo));
+
+            // Diagnóstico de búsqueda
+            if (motos.length === 0 && allFound.length > 0) {
+                // Encontró datos, pero no son motos
+                console.warn(`⚠️ Búsqueda encontró resultados, pero son de tipo: "${allFound[0].tipo}".`);
+                mostrarAlerta('error', `⚠️ Se encontró el registro, pero es un vehículo (${allFound[0].tipo}), no una MOTO.`);
+                filteredInspections = [];
+            } else if (motos.length === 0) {
+                // No encontró nada
+                mostrarAlerta('error', '❌ No se encontraron inspecciones con ese dato.');
+                filteredInspections = [];
+            } else {
+                // Encontró motos
+                mostrarAlerta('success', `✅ ${motos.length} moto(s) encontrada(s).`);
+                filteredInspections = motos;
+            }
+            
+            allInspections = filteredInspections; // Actualizamos el estado
             currentPage = 1;
+            renderTabla();
+            updatePaginationControls(allFound.length > 0 ? allFound.length : 0);
 
             if (filteredInspections.length === 0) {
-                mostrarAlerta('error', '❌ No se encontraron inspecciones de MOTO con ese dato.');
                 resultsSection.classList.remove('active'); 
                 emptyState.style.display = 'block';
             } else {
-                renderTabla(); 
-                updatePaginationControls(filteredInspections.length);
                 resultsSection.classList.add('active'); 
                 emptyState.style.display = 'none';
-                mostrarAlerta('success', `✅ ${filteredInspections.length} inspección(es) encontrada(s).`);
             }
         } catch (err) {
             console.error('❌ Error búsqueda:', err);
@@ -191,7 +230,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function limpiarBusqueda() {
-        if(searchInput) searchInput.value = '';
+        // Limpiar todos los inputs con clase search-input
+        searchInputs.forEach(input => input.value = '');
         mostrarAlerta('info', '🔄 Cargando historial completo...');
         cargarTodasInspecciones(1);
     }
@@ -200,26 +240,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function abrirDetalle(id) {
         try {
             const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
-            if (error) throw error; 
-            if (!data) return;
-            
+            if (error) throw error; if (!data) return;
             poblarVistaPrevia(data);
-            if (detailModal) { 
-                detailModal.classList.add('active'); 
-                document.body.style.overflow = 'hidden'; 
-            }
+            if (detailModal) { detailModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
         } catch (err) {
             console.error('❌ Error cargando detalle:', err);
             mostrarAlerta('error', `No se pudo cargar el detalle: ${err.message}`);
         }
     }
 
-    function cerrarModal() { 
-        if (detailModal) { 
-            detailModal.classList.remove('active'); 
-            document.body.style.overflow = ''; 
-        } 
-    }
+    function cerrarModal() { if (detailModal) { detailModal.classList.remove('active'); document.body.style.overflow = ''; } }
 
     function poblarVistaPrevia(data) {
         const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val || '-'; };
@@ -267,21 +297,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ================= EVENT LISTENERS =================
-    if (btnSearch) {
-        btnSearch.addEventListener('click', buscarMoto);
-    }
+    // Aseguramos que funcione en cualquiera de los inputs
+    searchInputs.forEach(input => {
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarMoto(); });
+    });
+
+    if (btnSearch) btnSearch.addEventListener('click', buscarMoto);
     if (btnClearSearch) btnClearSearch.addEventListener('click', limpiarBusqueda);
-    
-    if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarMoto(e); });
-    }
-    
     if (modalClose) modalClose.addEventListener('click', cerrarModal);
     if (detailModal) detailModal.addEventListener('click', (e) => { if (e.target === detailModal) cerrarModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal && detailModal.classList.contains('active')) cerrarModal(); });
     
-    if (btnPrev) btnPrev.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
-    if (btnNext) btnNext.addEventListener('click', () => { const tp = Math.ceil((filteredInspections.length || allInspections.length) / ITEMS_PER_PAGE); if (currentPage < tp) { currentPage++; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
+    if (btnPrev) btnPrev.addEventListener('click', () => { 
+        if (currentPage > 1) { currentPage--; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } 
+    });
+    if (btnNext) btnNext.addEventListener('click', () => { 
+        const tp = Math.ceil((filteredInspections.length || allInspections.length) / ITEMS_PER_PAGE); 
+        if (currentPage < tp) { currentPage++; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } 
+    });
 
     await cargarTodasInspecciones(1);
 });
