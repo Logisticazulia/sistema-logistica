@@ -25,7 +25,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
-.alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+ { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
 /* ================= TABLA DE RESULTADOS ================= */
 .results-section { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,51,102,0.12); padding: 25px; margin-bottom: 30px; }
 .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e8eef5; }
@@ -97,6 +97,79 @@ body * { visibility: hidden; }
 .print-page * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 @page { size: letter portrait; margin: 0; }
 }
+  /* ================= ESTILO BARRA UNIFICADA ================= */
+.search-container {
+    background: #003366;
+    padding: 20px 25px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.search-header {
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.search-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+}
+.search-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #f0f2f5;
+    transition: all 0.3s;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+.search-input:focus { outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+
+.btn-search-custom {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    font-family: 'Roboto', sans-serif;
+    white-space: nowrap;
+    height: 46px;
+}
+.btn-search-green {
+    background: #28a745;
+    color: white;
+    box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+}
+.btn-search-green:hover { background: #218838; transform: translateY(-1px); }
+.btn-search-yellow {
+    background: #ffc107;
+    color: #212529;
+    box-shadow: 0 3px 6px rgba(255, 193, 7, 0.3);
+}
+.btn-search-yellow:hover { background: #e0a800; transform: translateY(-1px); }
+.search-footer {
+    margin-top: 12px;
+    color: #a0b4cc;
+    font-size: 0.82rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+.search-footer span { display: inline-flex; align-items: center; gap: 5px; }
 </style>
 </head>
 <body class="dashboard-page">
@@ -132,23 +205,23 @@ body * { visibility: hidden; }
 </section>
 <div class="container">
 <!-- 🔍 BARRA DE BÚSQUEDA -->
+<!-- 🔍 BARRA DE BÚSQUEDA UNIFICADA -->
 <div class="search-container">
-<div class="search-group">
-<label for="searchVehicle">🔍 Búsqueda de Vehículo</label>
-<input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | 123456 | VIN...">
-  <div class="search-footer">
+    <div class="search-header">🔍 Búsqueda de Vehículo</div>
+    <div class="search-row">
+        <input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | Facsímil | Serial Carrocería | Serial Motor | N° Identificación">
+        <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-search-custom btn-search-green" id="btnSearch">🔍 Buscar Vehículo</button>
+        </div>
+    </div>
+    <div class="search-footer">
         <span>💡 Busque por:</span>
-        <span>🔢 N° Inspección</span>
-        <span>🏍️ Placa</span>
+        <span>🚗 Placa</span>
+        <span>📋 Facsímil</span>
         <span>🔧 S/Carrocería</span>
         <span>🆔 N/Identificación</span>
         <span>⚙️ S/Motor</span>
     </div>
-</div>
-<button type="button" class="btn-search" id="btnSearch">
-<span class="btn-search-text">🔍 Buscar Vehículo</span>
-<span class="btn-search-loader" style="display:none;">⏳</span>
-</button>
 </div>
 <!-- 📋 ALERTAS -->
 <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Operación exitosa</span></div>
