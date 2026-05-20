@@ -3,8 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentPage = 1;
     let allInspections = [];
     let filteredInspections = [];
-
-    // ================= ELEMENTOS DEL DOM =================
+    
     const searchInput = document.getElementById('searchMoto');
     const btnSearch = document.getElementById('btnSearch');
     const btnClearSearch = document.getElementById('btnClearSearch');
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="placa">${insp.placa || '-'}</td>
                 <td class="s-motor" style="font-family:monospace; font-size:0.85rem; color:#475569;">${insp.s_motor || '-'}</td>
                 <td class="motivo" title="${insp.motivo || ''}">${insp.motivo || '-'}</td>
-                <td><button class="btn-ver" data-id="${insp.id}">👁️ Ver Detalle</button></td>
+                <td><button class="btn-ver" data-id="${insp.id}"> Ver Detalle</button></td>
             `;
             resultsBody.appendChild(tr);
         });
