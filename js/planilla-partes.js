@@ -1,4 +1,6 @@
-// planilla-partes.js - Dashboard estadístico con paginación y lógica de exclusión blindada
+// 🌍 VARIABLE GLOBAL PARA QUE LA FUNCIÓN DE IMPRESIÓN PUEDA ACCEDER A ELLA
+let unidadesData = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     const supabaseUrl = window.SUPABASE_URL;
     const supabaseKey = window.SUPABASE_KEY;
@@ -13,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('tablaResumenBody');
     const pagContainer = document.getElementById('paginationControls');
     
-    let unidadesData = [];
     const itemsPerPage = 20;
     let currentPage = 1;
 
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 🔄 PROCESAR Y AGRUPAR (LÓGICA EXACTA SOLICITADA)
+    // 🔄 PROCESAR Y AGRUPAR
     function procesarDatos(vehiculos) {
         const stats = {
             total: 0, patrulleras: 0, motos: 0, traccion: 0, especial: 0,
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const estatusRaw = normalize(v.estatus);
             const claseRaw = normalize(v.clase || v.tipo || '');
 
-            // ✅ 1. CLASIFICACIÓN DE ESTATUS
+            // 1. CLASIFICACIÓN DE ESTATUS
             const esDesinc = estatusRaw === 'DESINCORPORADA';
             const esInop = !esDesinc && (estatusRaw === 'INOPERATIVA' || estatusRaw === 'REPARACION' || estatusRaw === 'TALLER');
 
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stats.porEstatus['Operativo']++;
             }
 
-            // ✅ 2. CLASIFICACIÓN POR TIPO (SOLO SI NO ESTÁ DESINCORPORADO)
+            // 2. CLASIFICACIÓN POR TIPO (SOLO SI NO ESTÁ DESINCORPORADO)
             if (!esDesinc) {
                 if (tiposRuedas.includes(claseRaw)) stats.patrulleras++;
                 else if (claseRaw === 'MOTO') stats.motos++;
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (claseRaw === 'ESPECIAL') stats.especial++;
             }
 
-            // ✅ 3. DATOS PARA GRÁFICOS
+            // 3. DATOS PARA GRÁFICOS
             const marca = (v.marca || '').trim() || 'Sin Registrar';
             const modelo = (v.modelo || '').trim() || 'Sin Modelo';
             const situacion = normalize(v.situacion || v.estatus || 'SIN DEFINIR');
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stats.porSituacion[situacion] = (stats.porSituacion[situacion] || 0) + 1;
             stats.porAno[ano] = (stats.porAno[ano] || 0) + 1;
 
-            // ✅ 4. UNIDAD ADMINISTRATIVA (PARA TABLA)
+            // 4. UNIDAD ADMINISTRATIVA (PARA TABLA)
             const unidad = (v.unidad_administrativa || 'Sin Asignar').trim();
             if (!stats.porUnidad[unidad]) {
                 stats.porUnidad[unidad] = { total: 0, patrulleras: 0, motos: 0, traccion: 0, inoperativos: 0, desincorporados: 0 };
@@ -133,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(fechaReporte) fechaReporte.textContent = new Date().toLocaleString('es-ES');
     }
 
-    // 📈 ACTUALIZAR TARJETAS (8 INDICADORES)
+    // 📈 ACTUALIZAR TARJETAS
     function renderStats(s) {
         const ids = [
             'totalVehicles', 'autosBusCamion', 'motosVehicles', 
@@ -287,14 +288,14 @@ document.addEventListener('DOMContentLoaded', () => {
         finally { const b = document.querySelector('.btn-pdf'); b.innerHTML = '📄 Exportar PDF'; b.disabled = false; }
     };
 });
-// 🖨️ IMPRIMIR TABLA COMPLETA (SIN PAGINACIÓN, FORMATO CARTA)
+
+// 🖨️ IMPRIMIR TABLA COMPLETA (FUNCIÓN GLOBAL ACCEDIENDO A unidadesData)
 window.imprimirTablaCompleta = function() {
     if (!unidadesData || unidadesData.length === 0) {
         alert("⚠️ No hay datos cargados para imprimir.");
         return;
     }
 
-    // Generar filas completas
     const filasHTML = unidadesData.map(d => {
         const activos = d.total - d.inoperativos - d.desincorporados;
         const pct = d.total > 0 ? Math.round((activos / d.total) * 100) : 0;
@@ -311,7 +312,6 @@ window.imprimirTablaCompleta = function() {
             </tr>`;
     }).join('');
 
-    // Abrir ventana dedicada para impresión
     const printWin = window.open('', '_blank', 'width=900,height=700');
     printWin.document.write(`
         <!DOCTYPE html>
@@ -335,8 +335,6 @@ window.imprimirTablaCompleta = function() {
                 .badge.alta { background: #d1fae5; color: #059669; }
                 .badge.media { background: #fef3c7; color: #d97706; }
                 .badge.baja { background: #fee2e2; color: #dc2626; }
-                
-                /* Forzar colores exactos en impresión */
                 @media print {
                     body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     th { background: #003366 !important; color: #ffffff !important; }
@@ -369,9 +367,5 @@ window.imprimirTablaCompleta = function() {
     `);
     printWin.document.close();
     printWin.focus();
-    
-    // Esperar a que el DOM se renderice antes de abrir el diálogo de impresión
-    setTimeout(() => {
-        printWin.print();
-    }, 400);
+    setTimeout(() => { printWin.print(); }, 400);
 };
