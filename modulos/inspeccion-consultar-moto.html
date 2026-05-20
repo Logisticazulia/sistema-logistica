@@ -149,25 +149,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 
   <div class="container">
     <!-- 🔍 BARRA DE BÚSQUEDA AMPLIADA -->
-    <div class="search-container">
-      <div class="search-header">🔍 Búsqueda de Motocicleta</div>
-      <div class="search-row">
-        <input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | Facsímil | Serial de Motor | N° Inspección | N° Identificación">
+ <div class="search-container">
+    <div class="search-header">🔍 Búsqueda de Vehículo</div>
+    <div class="search-row">
+        <input type="text" id="searchVehicle" class="search-input" placeholder="Ej: AB123CD | Facsímil | Serial Carrocería | Serial Motor | N° Identificación">
         <div style="display: flex; gap: 10px;">
-          <button type="button" class="btn-search-custom btn-search-green" id="btnSearch">🔍 Buscar Moto</button>
-          <button type="button" class="btn-search-custom btn-search-yellow" id="btnClearSearch">🔄 Limpiar</button>
+            <button type="button" class="btn-search-custom btn-search-green" id="btnSearch">🔍 Buscar Vehículo</button>
         </div>
-      </div>
-      <div class="search-footer">
-        <span>💡 Busque por:</span>
-        <span>🏷️ Placa</span>
-        <span>📄 Facsímil</span>
-        <span>⚙️ Serial Motor</span>
-        <span>🆔 N/Identificación</span>
-        <span>🔢 N° Inspección</span>
-      </div>
     </div>
-
+    <div class="search-footer">
+        <span>💡 Busque por:</span>
+        <span>🚗 Placa</span>
+        <span>📋 Facsímil</span>
+        <span>🔧 S/Carrocería</span>
+        <span>🆔 N/Identificación</span>
+        <span>⚙️ S/Motor</span>
+    </div>
+</div>
     <!-- 📋 ALERTAS -->
     <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Operación exitosa</span></div>
     <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error</span></div>
