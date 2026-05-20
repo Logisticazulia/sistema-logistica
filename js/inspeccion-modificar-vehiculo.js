@@ -1,254 +1,411 @@
-/**
- * MODIFICAR INSPECCIÓN PVR - LÓGICA ACTUALIZADA
- * Búsqueda por: N° Inspección, Placa, S/Carrocería, N° Identificación, Facsímil y S/Motor
- */
-(async function() {
-    'use strict';
+// ============================================
+// MODIFICAR VEHÍCULO - LÓGICA COMPLETA (TABLA VEHICULOS)
+// ============================================
 
-    // ================= CONFIGURACIÓN =================
-    const normalize = (str) => (str || '').trim().toUpperCase().replace(/\s+/g, '');
-    let supabase = null;
+// Configuración de Supabase
+const supabaseClient = window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+);
 
-    // Esperar a que el SDK cargue
-    let attempts = 0;
-    while (!window.supabase && attempts < 50) {
-        await new Promise(res => setTimeout(res, 100));
-        attempts++;
+// Estado global
+let vehiculoSeleccionado = null;
+let isEditing = false;
+
+// ============================================
+// FUNCIONES DE BÚSQUEDA
+// ============================================
+async function buscarVehiculo() {
+  const searchInput = document.getElementById('searchUniversal');
+  const searchTerm = searchInput.value.trim().toUpperCase();
+  
+  // Limpiar alertas previas
+  ocultarTodasLasAlertas();
+  
+  if (!searchTerm) {
+    mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
+    return;
+  }
+  
+  console.log('🔍 Buscando vehículo:', searchTerm);
+  mostrarAlerta('⏳ Buscando en base de datos...', 'info');
+  
+  const btnSearch = document.getElementById('btnSearch');
+  btnSearch.disabled = true;
+  btnSearch.classList.add('searching');
+  
+  try {
+    // ✅ BÚSQUEDA EXACTA POR 5 CAMPOS (incluye facsimil)
+    const { data, error } = await supabaseClient
+      .from('vehiculos')
+      .select('*')
+      .or(`placa.eq.${searchTerm},facsimil.eq.${searchTerm},s_carroceria.eq.${searchTerm},s_motor.eq.${searchTerm},n_identificacion.eq.${searchTerm}`)
+      .limit(1);
+    
+    if (error) {
+      console.error('❌ Error en la búsqueda:', error);
+      mostrarAlerta('❌ Error al buscar: ' + error.message, 'error');
+      return;
     }
-
-    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
-        console.error('❌ Error: Configuración o SDK de Supabase no disponible.');
-        return;
+    
+    if (!data || data.length === 0) {
+      mostrarAlerta('❌ No se encontró ningún vehículo con: ' + searchTerm, 'error');
+      vehiculoSeleccionado = null;
+      resetearFormulario();
+      return;
     }
+    
+    vehiculoSeleccionado = data[0];
+    console.log('✅ Vehículo encontrado:', vehiculoSeleccionado);
+    
+    llenarFormulario(vehiculoSeleccionado);
+    mostrarAlerta(
+      `✅ Vehículo encontrado: ${vehiculoSeleccionado.marca} ${vehiculoSeleccionado.modelo} - Placa: ${vehiculoSeleccionado.placa}`, 
+      'success'
+    );
+    
+    // Habilitar botones de edición
+    document.getElementById('btnEdit').style.display = 'inline-flex';
+    document.getElementById('btnCancel').disabled = false;
+    
+  } catch (error) {
+    console.error('❌ Error en buscarVehiculo:', error);
+    mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
+  } finally {
+    btnSearch.disabled = false;
+    btnSearch.classList.remove('searching');
+  }
+}
 
-    try {
-        supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-    } catch (err) {
-        console.error('❌ Error al inicializar Supabase:', err);
-        return;
+// ============================================
+// FUNCIONES DE LLENADO DE FORMULARIO
+// ============================================
+function llenarFormulario(vehiculo) {
+  console.log('📝 Llenando formulario con vehículo:', vehiculo);
+  
+  // Mapeo completo de campos de BD a formulario (incluye facsimil)
+  const mapeoCampos = {
+    'marca': 'marca',
+    'modelo': 'modelo',
+    'tipo': 'tipo',
+    'clase': 'clase',
+    'ano': 'ano',
+    'color': 'color',
+    's_carroceria': 's_carroceria',
+    's_motor': 's_motor',
+    'placa': 'placa',
+    'facsimil': 'facsimil',  // ✅ Campo agregado
+    'n_identificacion': 'n_identificacion',
+    'situacion': 'situacion',
+    'estatus': 'estatus',
+    'unidad_administrativa': 'unidad_administrativa',
+    'redip': 'redip',
+    'ccpe': 'ccpe',
+    'epm': 'epm',
+    'epp': 'epp',
+    'ubicacion_fisica': 'ubicacion_fisica',
+    'asignacion': 'asignacion',
+    'observacion': 'observacion',
+    'observacion_extra': 'observacion_extra',
+    'certificado_origen': 'certificado_origen',
+    'fecha_inspeccion': 'fecha_inspeccion',
+    'n_tramite': 'n_tramite',
+    'ubicacion_titulo': 'ubicacion_titulo'
+  };
+  
+  Object.entries(mapeoCampos).forEach(([dbField, formField]) => {
+    const element = document.getElementById(formField);
+    if (!element) return;
+    
+    const value = vehiculo[dbField];
+    if (value === undefined || value === null) {
+      element.value = '';
+      return;
     }
-
-    // ================= REFERENCIAS DOM =================
-    const searchInput = document.getElementById('searchInspection');
-    const btnSearch = document.getElementById('btnSearch');
-    const btnSearchText = btnSearch?.querySelector('.btn-search-text') || btnSearch;
-    const btnSearchLoader = btnSearch?.querySelector('.btn-search-loader');
-    const form = document.getElementById('inspectionForm');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const btnClear = document.getElementById('btnClear');
-    const recordIdInput = document.getElementById('recordId');
-    const alertSuccess = document.getElementById('alertSuccess');
-    const alertError = document.getElementById('alertError');
-    const alertInfo = document.getElementById('alertInfo');
-
-    // ================= UTILIDADES =================
-    function mostrarAlerta(tipo, mensaje) {
-        [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
-        const target = tipo === 'success' ? alertSuccess : tipo === 'error' ? alertError : alertInfo;
-        if (target) {
-            target.querySelector('span:last-child').textContent = mensaje;
-            target.style.display = 'flex';
-        }
+    
+    if (element.tagName === 'SELECT') {
+      const dbValue = String(value).toUpperCase().trim();
+      const options = Array.from(element.options);
+      
+      // Búsqueda flexible para selects (con/sin espacios)
+      let matchingOption = options.find(opt => {
+        const optValue = opt.value.toUpperCase().trim();
+        return optValue === dbValue || optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '');
+      });
+      
+      if (matchingOption) {
+        element.value = matchingOption.value;
+      } else {
+        // Agregar opción dinámica si no existe
+        const newOption = document.createElement('option');
+        newOption.value = dbValue;
+        newOption.textContent = dbValue;
+        newOption.selected = true;
+        element.appendChild(newOption);
+        console.log(`⚠️ Opción agregada dinámicamente: ${formField} = ${dbValue}`);
+      }
+    } else {
+      element.value = value;
     }
+  });
+  
+  // ID oculto para actualización
+  document.getElementById('vehicleId').value = vehiculo.id;
+  console.log('✅ Formulario llenado correctamente');
+}
 
-    function setInput(id, val) {
-        const el = document.getElementById(id);
-        if (el) el.value = val ?? '';
+function resetearFormulario() {
+  document.getElementById('vehicleForm').reset();
+  document.getElementById('vehicleId').value = '';
+  toggleFormFields(false);
+}
+
+function limpiarBusqueda() {
+  document.getElementById('searchUniversal').value = '';
+  ocultarTodasLasAlertas();
+  mostrarAlerta('ℹ️ Ingrese placa, facsímil, serial o N° identificación para buscar', 'info');
+  
+  resetearFormulario();
+  vehiculoSeleccionado = null;
+  
+  document.getElementById('btnEdit').style.display = 'none';
+  document.getElementById('btnCancel').disabled = true;
+}
+
+// ============================================
+// FUNCIONES DE EDICIÓN
+// ============================================
+function toggleFormFields(enable) {
+  const fields = document.querySelectorAll('#vehicleForm input, #vehicleForm select, #vehicleForm textarea');
+  fields.forEach(field => {
+    if (field.id !== 'vehicleId') {
+      field.disabled = !enable;
     }
+  });
+  
+  const form = document.getElementById('vehicleForm');
+  form.classList.toggle('form-disabled', !enable);
+  isEditing = enable;
+}
 
-    function setSelect(id, val) {
-        const el = document.getElementById(id);
-        if (el) el.value = val ?? '';
+function editarVehiculo() {
+  if (!vehiculoSeleccionado) {
+    mostrarAlerta('⚠️ Primero debe buscar un vehículo', 'error');
+    return;
+  }
+  
+  toggleFormFields(true);
+  document.getElementById('btnEdit').style.display = 'none';
+  document.getElementById('btnSubmit').style.display = 'inline-flex';
+  document.getElementById('btnCancel').disabled = false;
+  
+  mostrarAlerta('ℹ️ Editando vehículo. TODOS los campos son modificables.', 'info');
+}
+
+function cancelarEdicion() {
+  if (vehiculoSeleccionado) {
+    llenarFormulario(vehiculoSeleccionado);
+  }
+  toggleFormFields(false);
+  document.getElementById('btnEdit').style.display = 'inline-flex';
+  document.getElementById('btnSubmit').style.display = 'none';
+  document.getElementById('btnCancel').disabled = false;
+  
+  mostrarAlerta('ℹ️ Edición cancelada. Los cambios no fueron guardados.', 'info');
+}
+
+// ============================================
+// FUNCIONES DE GUARDADO (UPDATE)
+// ============================================
+async function guardarVehiculo(event) {
+  event.preventDefault();
+  
+  if (!vehiculoSeleccionado) {
+    mostrarAlerta('⚠️ No hay vehículo seleccionado', 'error');
+    return;
+  }
+  
+  const form = document.getElementById('vehicleForm');
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    mostrarAlerta('⚠️ Complete todos los campos requeridos', 'error');
+    return;
+  }
+  
+  const btnSubmit = document.getElementById('btnSubmit');
+  btnSubmit.disabled = true;
+  btnSubmit.classList.add('loading');
+  
+  try {
+    // ✅ ACTUALIZAR TODOS LOS CAMPOS (incluye facsimil)
+    const vehiculoActualizado = {
+      marca: document.getElementById('marca').value.trim().toUpperCase(),
+      modelo: document.getElementById('modelo').value.trim().toUpperCase(),
+      tipo: document.getElementById('tipo').value.trim().toUpperCase(),
+      clase: document.getElementById('clase').value.trim().toUpperCase(),
+      ano: document.getElementById('ano').value.trim() || null,
+      color: document.getElementById('color').value.trim().toUpperCase(),
+      s_carroceria: document.getElementById('s_carroceria').value.trim(),
+      s_motor: document.getElementById('s_motor').value.trim() || null,
+      placa: document.getElementById('placa').value.trim().toUpperCase(),
+      facsimil: document.getElementById('facsimil').value.trim() || null,  // ✅ Campo agregado
+      n_identificacion: document.getElementById('n_identificacion').value.trim() || null,
+      situacion: document.getElementById('situacion').value.trim().toUpperCase(),
+      estatus: document.getElementById('estatus').value.trim().toUpperCase(),
+      unidad_administrativa: document.getElementById('unidad_administrativa').value.trim(),
+      redip: document.getElementById('redip').value.trim() || null,
+      ccpe: document.getElementById('ccpe').value.trim() || null,
+      epm: document.getElementById('epm').value.trim() || null,
+      epp: document.getElementById('epp').value.trim() || null,
+      ubicacion_fisica: document.getElementById('ubicacion_fisica').value.trim() || null,
+      asignacion: document.getElementById('asignacion').value.trim() || null,
+      observacion: document.getElementById('observacion').value.trim() || null,
+      observacion_extra: document.getElementById('observacion_extra').value.trim() || null,
+      certificado_origen: document.getElementById('certificado_origen').value.trim() || null,
+      fecha_inspeccion: document.getElementById('fecha_inspeccion').value || null,
+      n_tramite: document.getElementById('n_tramite').value.trim() || null,
+      ubicacion_titulo: document.getElementById('ubicacion_titulo').value.trim() || null,
+    };
+    
+    console.log('📝 Actualizando vehículo ID:', vehiculoSeleccionado.id);
+    
+    const { data, error } = await supabaseClient
+      .from('vehiculos')
+      .update(vehiculoActualizado)
+      .eq('id', vehiculoSeleccionado.id)
+      .select();
+    
+    if (error) {
+      console.error('❌ Error al actualizar:', error);
+      mostrarAlerta('❌ Error al guardar: ' + error.message, 'error');
+      return;
     }
+    
+    console.log('✅ Vehículo actualizado:', data);
+    mostrarAlerta('✅ Vehículo actualizado exitosamente', 'success');
+    
+    // Actualizar estado local
+    vehiculoSeleccionado = { ...vehiculoSeleccionado, ...data[0] };
+    
+    // Limpiar después de éxito
+    setTimeout(limpiarTodoParaNuevaBusqueda, 2000);
+    
+  } catch (error) {
+    console.error('❌ Error en guardarVehiculo:', error);
+    mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
+  } finally {
+    btnSubmit.disabled = false;
+    btnSubmit.classList.remove('loading');
+  }
+}
 
-    function setRadio(name, val) {
-        document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
-            if (val) r.checked = (r.value.toUpperCase() === normalize(val));
-        });
-    }
+// ============================================
+// FUNCIONES DE UTILIDAD
+// ============================================
+function ocultarTodasLasAlertas() {
+  ['alertInfo', 'alertError', 'alertSuccess'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
 
-    // ================= BUSCAR INSPECCIÓN (✅ ACTUALIZADA) =================
-    async function buscarInspeccion() {
-        const rawQuery = searchInput?.value.trim();
-        if (!rawQuery) {
-            mostrarAlerta('info', 'Ingrese un término para buscar');
-            return;
-        }
+function mostrarAlerta(mensaje, tipo) {
+  ocultarTodasLasAlertas();
+  
+  const config = {
+    success: { id: 'alertSuccess', msgId: 'successMessage' },
+    error: { id: 'alertError', msgId: 'errorMessage' },
+    info: { id: 'alertInfo', msgId: 'infoMessage' }
+  };
+  
+  const { id, msgId } = config[tipo] || config.info;
+  const alertEl = document.getElementById(id);
+  const msgEl = document.getElementById(msgId);
+  
+  if (alertEl && msgEl) {
+    msgEl.textContent = mensaje;
+    alertEl.style.display = 'flex';
+  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Auto-ocultar (excepto info inicial)
+  if (tipo !== 'info') {
+    setTimeout(() => {
+      if (alertEl) alertEl.style.display = 'none';
+    }, 5000);
+  }
+}
 
-        if (btnSearch) btnSearch.disabled = true;
-        if (btnSearchText) btnSearchText.style.display = 'none';
-        if (btnSearchLoader) btnSearchLoader.style.display = 'inline';
-        mostrarAlerta('info', '🔍 Buscando en base de datos...');
+function limpiarTodoParaNuevaBusqueda() {
+  console.log('🧹 Limpiando formulario para nueva búsqueda...');
+  
+  document.getElementById('searchUniversal').value = '';
+  document.getElementById('vehicleForm').reset();
+  document.getElementById('vehicleId').value = '';
+  
+  toggleFormFields(false);
+  document.getElementById('btnEdit').style.display = 'inline-flex';
+  document.getElementById('btnSubmit').style.display = 'none';
+  document.getElementById('btnCancel').disabled = true;
+  
+  vehiculoSeleccionado = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  mostrarAlerta('ℹ️ Ingrese placa, facsímil, serial o N° identificación para buscar un vehículo', 'info');
+}
 
-        try {
-            const q = normalize(rawQuery);
-
-            // ✅ CONSULTA AMPLIADA: Busca en 6 campos simultáneamente
-            const { data: pvr, error: errPvr } = await supabase
-                .from('inspecciones_pvr')
-                .select('*')
-                .or(`n_inspeccion.ilike.${q},placa.ilike.${q},s_carroceria.ilike.${q},n_identificacion.ilike.${q},facsimil.ilike.${q},s_motor.ilike.${q}`)
-                .limit(1)
-                .maybeSingle();
-
-            if (errPvr) {
-                console.error('❌ Error en consulta Supabase:', errPvr);
-                mostrarAlerta('error', '⚠️ Error de conexión o columna inexistente. Revisa consola.');
-                return;
-            }
-
-            if (!pvr) {
-                mostrarAlerta('error', '❌ No se encontró ninguna inspección con esos datos.');
-                form?.classList.add('form-disabled');
-                return;
-            }
-
-            // ✅ Todo válido: Cargar formulario
-            recordIdInput.value = pvr.id;
-            llenarFormulario(pvr);
-            form?.classList.remove('form-disabled');
-            mostrarAlerta('success', '✅ Inspección cargada correctamente. Puede editar y guardar.');
-
-        } catch (err) {
-            console.error('❌ Error crítico en buscarInspeccion:', err);
-            mostrarAlerta('error', `Error inesperado: ${err.message}`);
-        } finally {
-            if (btnSearch) btnSearch.disabled = false;
-            if (btnSearchText) btnSearchText.style.display = 'inline';
-            if (btnSearchLoader) btnSearchLoader.style.display = 'none';
-        }
-    }
-
-    function limpiarFormulario() {
-        if (searchInput) searchInput.value = '';
-        if (recordIdInput) recordIdInput.value = '';
-        if (form) { form.reset(); form.classList.add('form-disabled'); }
-        mostrarAlerta('info', '🔍 Busque una inspección para habilitar la edición');
-    }
-
-    // ================= LLENAR FORMULARIO =================
-    function llenarFormulario(data) {
-        // Campos de texto
-        ['n_inspeccion','fecha_inspeccion','hora','motivo','lugar','asignacion','supervision',
-         'placa','marca','modelo','ano','tipo','color','n_identificacion','s_carroceria','kms',
-         'observaciones','coord_nombre','coord_cedula','coord_telefono','insp_nombre','insp_cedula','insp_telefono'
-        ].forEach(field => setInput(field, data[field]));
-
-        // Selects
-        ['coord_rango','insp_rango','bateria','estacion_base','coctelera','triangulo','placas',
-         'herramientas','gato','sestacion_luces'
-        ].forEach(field => setSelect(field, data[field]));
-
-        // Cauchos
-        ['caucho_del_izq','caucho_del_der','caucho_tra_izq','caucho_tra_der','caucho_repuesto','tapa_cauchos']
-            .forEach(field => setRadio(field, data[field]));
-
-        // Componentes (~76 items)
-        const compNames = [
-            'guardafango_del_izq','guardafango_del_der','guardafango_tra_izq','guardafango_tra_der',
-            'puerta_del_izq','puerta_del_der','puerta_tra_izq','puerta_tra_der','parachoque_trasero','parachoque_delantero',
-            'capot','puerta_cabina','parabrisas_trasero','parabrisas_delantero','espejo_der','espejo_izq','cables_bateria',
-            'tapa_gasolina','caja_velocidades','asientos_delanteros','vidrio_lat_del_izq','vidrio_lat_del_der','vidrio_lat_tra_izq',
-            'vidrio_lat_tra_der','antena_gps','limpia_parabrisas','tablero_instrum','tablero_aa','stop_tras_der','stop_tras_izq',
-            'faro_del_der','faro_del_izq','buche_del_der','buche_del_izq','buche_tras_der','buche_tras_izq','coctelera_comp',
-            'tapa_radiador','tapa_distribuidor','asientos_traseros','volante','corneta','reproductor','luces_der','luces_izq',
-            'faros_neblina_der','faros_neblina_izq','cerradura_der','cerradura_izq','bombonas_gas','cinturones','camara_motor',
-            'electroventilador','alternador','compresor_aa','radiador_comp','aspa_radiador','varilla_aceite','tapa_bomba_hidr',
-            'espoilder_del','radiador_aa','arranque','computadora','bomba_freno','bomba_direccion','fan_cooler','cajetin_direccion',
-            'diferencial_trans','disco_freno_d_der','disco_freno_d_izq','tambor_freno_t_der','tambor_freno_t_izq','cuerpo_aceleracion',
-            'parrilla_delantera','llave_cruz','cuña_inmovilizacion','extintor','cenicero','cardan_del','cardan_tras'
-        ];
-        compNames.forEach(name => setRadio(name, data[name]));
-
-        if (typeof window.updatePreview === 'function') window.updatePreview();
-    }
-
-    // ================= GUARDAR INSPECCIÓN =================
-    form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!recordIdInput.value) {
-            mostrarAlerta('error', '⚠️ Debe buscar y cargar una inspección primero.');
-            return;
-        }
-
-        if (btnSubmit) {
-            btnSubmit.disabled = true;
-            btnSubmit.querySelector('.btn-text')?.style.setProperty('display', 'none');
-            btnSubmit.querySelector('.btn-loader')?.style.setProperty('display', 'inline');
-        }
-
-        try {
-            const componentes = {};
-            document.querySelectorAll('.inspection-item input[type="radio"]').forEach(r => {
-                if (!componentes[r.name]) componentes[r.name] = 'NT';
-                if (r.checked) componentes[r.name] = r.value;
-            });
-
-            const payload = {
-                fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value,
-                hora: document.getElementById('hora')?.value,
-                motivo: document.getElementById('motivo')?.value,
-                lugar: document.getElementById('lugar')?.value,
-                asignacion: document.getElementById('asignacion')?.value,
-                supervision: document.getElementById('supervision')?.value,
-                kms: parseFloat(document.getElementById('kms')?.value) || 0,
-                bateria: document.getElementById('bateria')?.value || 'NO',
-                estacion_base: document.getElementById('estacion_base')?.value || 'NO',
-                coctelera: document.getElementById('coctelera')?.value || 'NO',
-                triangulo: document.getElementById('triangulo')?.value || 'NO',
-                placas: document.getElementById('placas')?.value || 'NO',
-                herramientas: document.getElementById('herramientas')?.value || 'NO',
-                gato: document.getElementById('gato')?.value || 'NO',
-                sestacion_luces: document.getElementById('sestacion_luces')?.value || 'NO',
-                caucho_del_izq: document.querySelector('input[name="caucho_del_izq"]:checked')?.value || 'M',
-                caucho_del_der: document.querySelector('input[name="caucho_del_der"]:checked')?.value || 'M',
-                caucho_tra_izq: document.querySelector('input[name="caucho_tra_izq"]:checked')?.value || 'M',
-                caucho_tra_der: document.querySelector('input[name="caucho_tra_der"]:checked')?.value || 'M',
-                caucho_repuesto: document.querySelector('input[name="caucho_repuesto"]:checked')?.value || 'M',
-                tapa_cauchos: document.querySelector('input[name="tapa_cauchos"]:checked')?.value || 'NO',
-                observaciones: document.getElementById('observaciones')?.value || '',
-                coord_nombre: document.getElementById('coord_nombre')?.value,
-                coord_rango: document.getElementById('coord_rango')?.value,
-                coord_cedula: document.getElementById('coord_cedula')?.value,
-                coord_telefono: document.getElementById('coord_telefono')?.value,
-                insp_nombre: document.getElementById('insp_nombre')?.value,
-                insp_rango: document.getElementById('insp_rango')?.value,
-                insp_cedula: document.getElementById('insp_cedula')?.value,
-                insp_telefono: document.getElementById('insp_telefono')?.value,
-                ...componentes
-            };
-
-            const { error } = await supabase
-                .from('inspecciones_pvr')
-                .update(payload)
-                .eq('id', recordIdInput.value);
-
-            if (error) throw error;
-
-            mostrarAlerta('success', '✅ Inspección actualizada exitosamente');
-            if (alertSuccess) alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => limpiarFormulario(), 2500);
-
-        } catch (err) {
-            console.error('❌ Error al guardar:', err);
-            mostrarAlerta('error', `No se pudo actualizar: ${err.message}`);
-        } finally {
-            if (btnSubmit) {
-                btnSubmit.disabled = false;
-                btnSubmit.querySelector('.btn-text')?.style.setProperty('display', 'inline');
-                btnSubmit.querySelector('.btn-loader')?.style.setProperty('display', 'none');
-            }
-        }
+// ============================================
+// INICIALIZACIÓN Y EVENTOS
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Inicializando modificación de vehículos...');
+  
+  // Bind de eventos
+  const btnEdit = document.getElementById('btnEdit');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const btnCancel = document.getElementById('btnCancel');
+  const btnSearch = document.getElementById('btnSearch');
+  const btnClear = document.getElementById('btnClearSearch');
+  const searchInput = document.getElementById('searchUniversal');
+  const logoutBtn = document.getElementById('logoutBtn');
+  
+  if (btnEdit) btnEdit.addEventListener('click', editarVehiculo);
+  if (btnSubmit) btnSubmit.addEventListener('click', guardarVehiculo);
+  if (btnCancel) btnCancel.addEventListener('click', cancelarEdicion);
+  if (btnSearch) btnSearch.addEventListener('click', buscarVehiculo);
+  if (btnClear) btnClear.addEventListener('click', limpiarBusqueda);
+  
+  if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') buscarVehiculo();
     });
+  }
+  
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      if (confirm('¿Está seguro de cerrar sesión?')) {
+        await supabaseClient.auth.signOut();
+        window.location.href = '../index.html';
+      }
+    });
+  }
+  
+  // Cargar usuario y estado inicial
+  cargarUsuario();
+  mostrarAlerta('ℹ️ Ingrese placa, facsímil, serial o N° identificación para buscar un vehículo', 'info');
+  
+  console.log('✅ Modificación de vehículos inicializada');
+});
 
-    // ================= EVENT LISTENERS =================
-    btnSearch?.addEventListener('click', buscarInspeccion);
-    searchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarInspeccion(); });
-    btnClear?.addEventListener('click', limpiarFormulario);
-
-    // Estado inicial
-    form?.classList.add('form-disabled');
-    mostrarAlerta('info', '🔍 Busque una inspección para habilitar la edición');
-    console.log('✅ Módulo de Modificación PVR inicializado correctamente');
-
-})();
+async function cargarUsuario() {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const userEmail = document.getElementById('userEmail');
+    if (userEmail && session?.user?.email) {
+      userEmail.textContent = session.user.email;
+    }
+  } catch (error) {
+    console.error('Error al cargar usuario:', error);
+  }
+}
