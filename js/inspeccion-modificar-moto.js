@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnSearchLoader = btnSearch?.querySelector('.btn-search-loader');
     const motoForm = document.getElementById('motoForm');
     const btnSubmit = document.getElementById('btnSubmit');
-    const btnClearForm = document.getElementById('btnClear'); // ID del botón en el form
     const btnClearSearch = document.getElementById('btnClearSearch'); // ID del botón en la barra
+    const btnClearForm = document.getElementById('btnClear'); // ID del botón en el form
     const recordIdInput = document.getElementById('recordId');
     const alertSuccess = document.getElementById('alertSuccess');
     const alertError = document.getElementById('alertError');
@@ -65,7 +65,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!motoForm) return;
         motoForm.style.opacity = activo ? '1' : '0.6';
         motoForm.style.pointerEvents = activo ? 'auto' : 'none';
-        if (btnSubmit) btnSubmit.disabled = !activo || !usuarioActual;
+        if (btnSubmit) {
+            btnSubmit.disabled = !activo || !usuarioActual;
+        }
     }
 
     // ==========================================
@@ -83,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ==========================================
-    // FUNCIÓN DE BÚSQUEDA (VERSIÓN FINAL)
+    // FUNCIÓN DE BÚSQUEDA (VERSIÓN DEFINITIVA)
     // ==========================================
     async function buscarInspeccion() {
         const q = searchInput?.value.trim();
@@ -103,16 +105,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cleanQ = q.replace(/\s+/g, '').toUpperCase();
             console.log('🔍 Término buscado:', cleanQ);
 
-            // 📝 Cláusula OR SOLO con columnas que SÍ existen en inspecciones_pvr
-            // (facsimil está en vehiculos, no en inspecciones_pvr)
+            // 📝 Cláusula OR SOLO con columnas que existen en inspecciones_pvr
+            // (placa, s_carroceria, n_identificacion, s_motor, n_inspeccion)
             const orClause = `n_inspeccion.ilike.%${cleanQ}%,placa.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,n_identificacion.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%`;
             
             console.log('📝 Cláusula OR:', orClause);
 
-            // 1️⃣ Buscamos en inspecciones_pvr Y traemos el tipo de la tabla vehiculos (fallback)
+            // 1️⃣ Buscamos en inspecciones_pvr Y traemos 'clase' desde la tabla vehiculos
+            // Esto asegura que validemos contra la clasificación real del vehículo
             const { data, error } = await supabase
                 .from('inspecciones_pvr')
-                .select('*, vehiculos!vehiculo_id(tipo)') // Join automático si tienes RLS/relación configurada
+                .select('*, vehiculos!vehiculo_id(clase)') 
                 .or(orClause)
                 .limit(1)
                 .maybeSingle();
@@ -130,15 +133,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 2️⃣ Validar que sea MOTO (prioriza inspecciones_pvr.tipo, si está vacío usa vehiculos.tipo)
-            const tipoPvr = (data.tipo || '').toUpperCase().trim();
-            const tipoVehiculo = data.vehiculos?.tipo ? data.vehiculos.tipo.toUpperCase().trim() : '';
-            const tipoFinal = tipoPvr || tipoVehiculo || '';
+            // 2️⃣ Validar que sea MOTO usando la columna CLASE de la tabla vehiculos
+            // Si no hay relación vehiculos, fallback a tipo (aunque el usuario pidió clase)
+            const claseVal = data.vehiculos?.clase ? data.vehiculos.clase.toUpperCase().trim() : '';
+            const tipoVal = (data.tipo || '').toUpperCase().trim();
             
-            console.log('🏍️ Tipos detectados -> PVR:', tipoPvr, '| Vehiculos:', tipoVehiculo, '| Final:', tipoFinal);
+            console.log('🏍️ Validación -> Clase:', claseVal, '| Tipo:', tipoVal);
 
-            if (!tipoFinal.includes('MOTO')) {
-                mostrarAlerta('error', `⚠️ Registro encontrado pero es tipo '${tipoFinal || '(NO DEFINIDO)'}'. Este módulo SOLO permite editar MOTOS.`);
+            // Validamos que la CLASE contenga "MOTO"
+            if (!claseVal.includes('MOTO')) {
+                mostrarAlerta('error', `⚠️ Registro encontrado pero es clase '${claseVal || '(NO DEFINIDA)'}'. Este módulo SOLO permite editar MOTOS.`);
                 toggleFormState(false);
                 return;
             }
@@ -255,8 +259,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     if(btnSearch) btnSearch.addEventListener('click', buscarInspeccion);
     if(searchInput) searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') buscarInspeccion(); });
-    if(btnClearForm) btnClearForm.addEventListener('click', limpiarFormulario);
     if(btnClearSearch) btnClearSearch.addEventListener('click', limpiarFormulario);
+    if(btnClearForm) btnClearForm.addEventListener('click', limpiarFormulario);
 
     if(motoForm) {
         motoForm.addEventListener('input', updatePreview);
