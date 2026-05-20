@@ -1,40 +1,60 @@
 // ==========================================
-// FUNCIÓN DE BÚSQUEDA ACTUALIZADA
+// FUNCIÓN DE BÚSQUEDA BLINDADA + DIAGNÓSTICO
 // ==========================================
 async function buscarInspeccion() {
     const q = searchInput?.value.trim();
-    if(!q) {
-        mostrarAlerta('info', 'Ingrese un término de búsqueda');
+    if (!q) {
+        mostrarAlerta('info', '⚠️ Ingrese Placa, Serial, Cédula o Facsímil');
         return;
     }
-    if(btnSearch) {
+
+    // UI Loading
+    if (btnSearch) {
         btnSearch.disabled = true;
-        if(btnSearchText) btnSearchText.style.display = 'none';
-        if(btnSearchLoader) btnSearchLoader.style.display = 'inline';
+        if (btnSearchText) btnSearchText.style.display = 'none';
+        if (btnSearchLoader) btnSearchLoader.style.display = 'inline';
     }
-    mostrarAlerta('info', '🔍 Buscando...');
+    mostrarAlerta('info', '🔍 Consultando base de datos...');
+
     try {
         const cleanQ = q.replace(/\s+/g, '').toUpperCase();
-        
-        // 🔍 Cláusula OR con todos los campos solicitados
-        const orClause = `n_inspeccion.ilike.%${cleanQ}%,placa.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,n_identificacion.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%,facsimil.ilike.%${cleanQ}%`;
+        console.log('🔍 Término buscado:', cleanQ);
 
-        const { data, error } = await supabase
+        // 🔧 Cláusula OR para Supabase v2
+        // ⚠️ Si la columna 'facsimil' NO existe en tu tabla de Supabase, quítala de esta lista.
+        const orClause = `n_inspeccion.ilike.%${cleanQ}%,placa.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,n_identificacion.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%,facsimil.ilike.%${cleanQ}%`;
+        
+        console.log('📝 Cláusula OR generada:', orClause);
+
+        // Ejecutar consulta
+        let query = supabase
             .from('inspecciones_pvr')
             .select('*')
-            .ilike('tipo', '%MOTO%') // 🏍️ Filtra SOLO motos (ajusta 'MOTO' si en tu BD es 'MOTOCICLETA')
             .or(orClause)
-            .limit(1)
-            .maybeSingle();
+            .limit(1);
 
-        if(error) throw error;
-        if(!data) {
-            mostrarAlerta('error', '❌ Inspección de MOTO no encontrada');
+        // 🏍️ FILTRO DE TIPO: Usa .ilike para captar variaciones (MOTO, MOTOCICLETA, Moto, etc.)
+        // Si en tu BD el campo se llama diferente, ajústalo aquí.
+        query = query.ilike('tipo', '%MOTO%');
+
+        const { data, error } = await query.maybeSingle();
+        console.log('📦 Respuesta cruda de Supabase:', { data, error });
+
+        if (error) {
+            console.error('❌ Error de PostgREST:', error);
+            throw error;
+        }
+
+        if (!data) {
+            mostrarAlerta('error', '❌ No se encontró ninguna MOTO. Verifique el dato o revise la columna "tipo" en su BD.');
             toggleFormState(false);
             return;
         }
-        // Cargar datos básicos
-        recordIdInput.value = data.id;
+
+        // ✅ Carga exitosa
+        console.log('✅ Inspección encontrada. ID:', data.id);
+        if (recordIdInput) recordIdInput.value = data.id || '';
+
         const camposBasicos = [
             'n_inspeccion', 'fecha_inspeccion', 'hora', 'motivo_inspeccion',
             'lugar', 'asignacion', 'supervision', 'placa', 'marca', 'modelo',
@@ -42,32 +62,33 @@ async function buscarInspeccion() {
             'observaciones', 'coord_nombre', 'coord_rango', 'coord_cedula',
             'coord_telefono', 'insp_nombre', 'insp_rango', 'insp_cedula', 'insp_telefono'
         ];
+
         camposBasicos.forEach(campo => {
             const el = document.getElementById(campo);
-            if(el) el.value = data[campo] || '';
-        });
-        // Cargar componentes desde JSONB
-        const comps = data.componentes_moto || {};
-        document.querySelectorAll('.inspection-item input[type="radio"]').forEach(radio => {
-            const nombreComponente = radio.name;
-            const valorComponente = comps[nombreComponente];
-            if (valorComponente) {
-                radio.checked = (radio.value === valorComponente);
-            } else {
-                radio.checked = false;
+            if (el) {
+                el.value = data[campo] ?? '';
             }
         });
+
+        // Cargar componentes JSONB
+        const comps = data.componentes_moto || {};
+        document.querySelectorAll('.inspection-item input[type="radio"]').forEach(radio => {
+            const valor = comps[radio.name];
+            radio.checked = valor ? radio.value === valor : false;
+        });
+
         toggleFormState(true);
-        updatePreview();
-        mostrarAlerta('success', '✅ Inspección cargada. Edite y actualice.');
-    } catch(err) {
-        console.error('❌ Error en búsqueda:', err);
-        mostrarAlerta('error', `Error: ${err.message}`);
+        if (typeof updatePreview === 'function') updatePreview();
+        mostrarAlerta('success', '✅ MOTO cargada. Edite y presione "Actualizar".');
+
+    } catch (err) {
+        console.error('💥 Error capturado en búsqueda:', err);
+        mostrarAlerta('error', `Fallo al buscar: ${err.message || 'Revise consola F12'}`);
     } finally {
-        if(btnSearch) {
+        if (btnSearch) {
             btnSearch.disabled = false;
-            if(btnSearchText) btnSearchText.style.display = 'inline';
-            if(btnSearchLoader) btnSearchLoader.style.display = 'none';
+            if (btnSearchText) btnSearchText.style.display = 'inline';
+            if (btnSearchLoader) btnSearchLoader.style.display = 'none';
         }
     }
 }
