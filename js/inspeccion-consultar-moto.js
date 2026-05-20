@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let filteredInspections = [];
 
     // ================= ELEMENTOS DEL DOM =================
-    // Selección robusta para evitar conflictos con IDs duplicados en tu HTML
-    const searchInputs = document.querySelectorAll('input.search-input');
+    const searchInput = document.getElementById('searchMoto') || document.querySelector('.search-container .search-input');
     const btnSearch = document.getElementById('btnSearch');
     const btnClearSearch = document.getElementById('btnClearSearch');
     const resultsSection = document.getElementById('resultsSection');
@@ -23,19 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentPageNum = document.getElementById('currentPageNum');
     const totalPagesNum = document.getElementById('totalPagesNum');
 
-    // 🏍️ Regex para detectar motos (insensible a mayúsculas/minúsculas)
-    // Acepta: MOTO, MOTOCICLETA, ENDURO, PASEO, TRIMOVIL, TRACCION DE SANGRE
+    // Regex para identificar Motos y también registros sin tipo definido
     const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
-
-    // Función para leer el valor del input correcto
-    function getSearchValue() {
-        // Prioriza el input dentro de la barra de búsqueda principal
-        const specificInput = document.querySelector('.search-container .search-input');
-        if (specificInput && specificInput.offsetParent !== null) return specificInput.value.trim();
-        // Si no, usa el primer input disponible
-        const anyInput = document.querySelector('input.search-input');
-        return anyInput ? anyInput.value.trim() : '';
-    }
+    // Regex para EXCLUIR vehículos de 4 ruedas explícitos
+    const vehicleTypesRegex = /PICKUP|CAMIONETA|SEDAN|BUS|CAMION|TRAILER|VAM|MINIBUS|MACHITO|SPORT WAGON/i;
 
     // ================= INICIALIZAR SUPABASE =================
     async function initSupabase() {
@@ -63,11 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function mostrarAlerta(tipo, mensaje) {
         [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
         const target = tipo === 'success' ? alertSuccess : tipo === 'error' ? alertError : alertInfo;
-        if (target) { 
-            const span = target.querySelector('span:last-child'); 
-            if(span) span.textContent = mensaje; 
-            target.style.display = 'flex'; 
-        }
+        if (target) { const span = target.querySelector('span:last-child'); if(span) span.textContent = mensaje; target.style.display = 'flex'; }
     }
 
     function formatDate(dateStr) {
@@ -76,50 +62,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${d}/${m}/${y}`;
     }
 
+    // Función mejorada: Muestra si es Moto o si NO es un vehículo de 4 ruedas
+    const esMoto = (r) => {
+        if (!r) return false;
+        const t = (r.tipo || '').toUpperCase();
+        // Si es explícitamente moto, OK
+        if (motoTypesRegex.test(t)) return true;
+        // Si no es explícitamente un auto/camioneta, lo mostramos (incluye null)
+        if (!vehicleTypesRegex.test(t)) return true;
+        return false;
+    };
+
     // ================= CARGAR TODO EL HISTORIAL =================
     async function cargarTodasInspecciones(page = 1) {
         try {
             resultsCount.textContent = '🔄 Cargando historial...';
             const from = (page - 1) * ITEMS_PER_PAGE;
 
-            // Traemos datos sin filtro estricto en la BD para poder analizarlos
             const { data, error } = await supabase.from('inspecciones_pvr')
-                .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
+                .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo, marca, modelo')
                 .order('fecha_inspeccion', { ascending: false })
                 .range(from, from + ITEMS_PER_PAGE - 1);
 
             if (error) throw error;
 
             const allData = data || [];
+            // ✅ FILTRADO MEJORADO: Muestra motos y registros sin tipo, oculta pickups/camionetas
+            const filteredData = allData.filter(r => esMoto(r));
             
-            // 🏍️ FILTRADO EN CLIENTE:
-            const motoData = allData.filter(r => motoTypesRegex.test(r.tipo));
-            const hiddenData = allData.filter(r => !motoTypesRegex.test(r.tipo));
-
-            // 🔍 DIAGNÓSTICO: Si hay datos ocultos, avisa al usuario
-            if (hiddenData.length > 0) {
-                console.warn(`⚠️ Se encontraron ${hiddenData.length} inspecciones pero se ocultaron porque su 'tipo' es "${hiddenData[0].tipo}" (no es MOTO).`);
-                console.table(hiddenData.slice(0, 3).map(i => ({ id: i.id, placa: i.placa, tipo: i.tipo })));
-            }
-
-            allInspections = motoData;
+            allInspections = filteredData;
             filteredInspections = [...allInspections];
             currentPage = page;
 
             renderTabla();
-            // Usamos el total de la página actual para paginación visual, 
-            // pero idealmente deberías hacer un count filtrado en el servidor.
-            updatePaginationControls(allData.length > 0 ? allData.length : 0); 
+            updatePaginationControls(filteredData.length > 0 ? filteredData.length : 0);
 
             if (filteredInspections.length === 0) {
                 resultsSection.classList.remove('active'); 
                 emptyState.style.display = 'block';
-                // Si había datos pero no motos, personalizamos el mensaje
-                if (allData.length > 0 && motoData.length === 0) {
-                    emptyState.innerHTML = '<div class="icon">🚫</div><p>No hay inspecciones de <strong>MOTOS</strong> registradas. (Se encontraron vehículos, pero están filtrados)</p>';
-                } else {
-                    emptyState.innerHTML = '<div class="icon">📭</div><p>No hay inspecciones registradas aún</p>';
-                }
             } else {
                 resultsSection.classList.add('active'); 
                 emptyState.style.display = 'none';
@@ -168,12 +148,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (btnPrev) btnPrev.disabled = currentPage <= 1;
         if (btnNext) btnNext.disabled = currentPage >= totalPages;
         
-        resultsCount.textContent = `${filteredInspections.length} moto(s) encontrada(s)`;
+        resultsCount.textContent = `${filteredInspections.length} registro${filteredInspections.length !== 1 ? 's' : ''} encontrados`;
     }
 
     // ================= BÚSQUEDA DIRECTA =================
     async function buscarMoto() {
-        const rawQuery = getSearchValue();
+        const rawQuery = searchInput?.value.trim();
         if (!rawQuery) { mostrarAlerta('info', '📝 Ingrese Placa, Serial o Identificación para buscar.'); return; }
         
         if (btnSearch) btnSearch.disabled = true;
@@ -184,32 +164,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Buscar en inspecciones_pvr
             const { data, error } = await supabase.from('inspecciones_pvr')
-                .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
+                .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo, marca, modelo')
                 .or(`placa.ilike.%${q}%,s_motor.ilike.%${q}%,n_identificacion.ilike.%${q}%,n_inspeccion.ilike.%${q}%`)
                 .order('fecha_inspeccion', { ascending: false });
 
             if (error) throw error;
 
             const allFound = data || [];
-            const motos = allFound.filter(r => motoTypesRegex.test(r.tipo));
+            // ✅ FILTRADO MEJORADO EN BÚSQUEDA
+            const motos = allFound.filter(r => esMoto(r));
 
-            // Diagnóstico de búsqueda
             if (motos.length === 0 && allFound.length > 0) {
-                // Encontró datos, pero no son motos
-                console.warn(`⚠️ Búsqueda encontró resultados, pero son de tipo: "${allFound[0].tipo}".`);
+                // Encontró datos pero son vehículos (Pickup, Sedán, etc.)
                 mostrarAlerta('error', `⚠️ Se encontró el registro, pero es un vehículo (${allFound[0].tipo}), no una MOTO.`);
                 filteredInspections = [];
             } else if (motos.length === 0) {
-                // No encontró nada
                 mostrarAlerta('error', '❌ No se encontraron inspecciones con ese dato.');
                 filteredInspections = [];
             } else {
-                // Encontró motos
                 mostrarAlerta('success', `✅ ${motos.length} moto(s) encontrada(s).`);
                 filteredInspections = motos;
             }
             
-            allInspections = filteredInspections; // Actualizamos el estado
+            allInspections = filteredInspections;
             currentPage = 1;
             renderTabla();
             updatePaginationControls(allFound.length > 0 ? allFound.length : 0);
@@ -230,8 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function limpiarBusqueda() {
-        // Limpiar todos los inputs con clase search-input
-        searchInputs.forEach(input => input.value = '');
+        if (searchInput) searchInput.value = '';
         mostrarAlerta('info', '🔄 Cargando historial completo...');
         cargarTodasInspecciones(1);
     }
@@ -297,13 +273,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ================= EVENT LISTENERS =================
-    // Aseguramos que funcione en cualquiera de los inputs
-    searchInputs.forEach(input => {
-        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarMoto(); });
-    });
-
     if (btnSearch) btnSearch.addEventListener('click', buscarMoto);
     if (btnClearSearch) btnClearSearch.addEventListener('click', limpiarBusqueda);
+    
+    const inputs = document.querySelectorAll('input.search-input');
+    inputs.forEach(input => {
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarMoto(); });
+    });
+    
     if (modalClose) modalClose.addEventListener('click', cerrarModal);
     if (detailModal) detailModal.addEventListener('click', (e) => { if (e.target === detailModal) cerrarModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal && detailModal.classList.contains('active')) cerrarModal(); });
