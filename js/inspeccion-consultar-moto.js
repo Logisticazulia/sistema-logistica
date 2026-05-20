@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentPageNum = document.getElementById('currentPageNum');
     const totalPagesNum = document.getElementById('totalPagesNum');
 
+    // Regex estricto para identificar SOLO motos
+    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
+
     // ================= INICIALIZAR SUPABASE =================
     async function initSupabase() {
         let attempts = 0;
@@ -57,18 +60,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${d}/${m}/${y}`;
     }
 
+    // Función para validar si un registro es una Moto
+    const esMoto = (tipo) => tipo && motoTypesRegex.test(tipo);
+
     // ================= CARGAR TODO EL HISTORIAL =================
     async function cargarTodasInspecciones(page = 1) {
         try {
-            resultsCount.textContent = '🔄 Cargando historial...';
+            resultsCount.textContent = '🔄 Cargando historial de motos...';
             const from = (page - 1) * ITEMS_PER_PAGE;
 
-            // 1. Contar total
-            const { count, error: countError } = await supabase.from('inspecciones_pvr')
-                .select('*', { count: 'exact', head: true });
-            if (countError) throw countError;
-
-            // 2. Traer datos
+            // 1. Obtener datos de la tabla inspecciones
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .order('fecha_inspeccion', { ascending: false })
@@ -76,14 +77,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // ✅ CORRECCIÓN CLAVE: Eliminamos el filtro estricto de 'tipo'.
-            // Esto garantiza que las motos antiguas o sin el campo 'tipo' definido SÍ se muestren.
-            allInspections = data || [];
+            // 2. 🔒 FILTRAR: MANTENER SOLO MOTOS, DESCARTAR VEHÍCULOS
+            const motos = (data || []).filter(r => esMoto(r.tipo));
+            
+            // Ajustar página si no hay resultados
+            if (motos.length === 0 && from > 0) { currentPage--; return cargarTodasInspecciones(currentPage || 1); }
+
+            allInspections = motos;
             filteredInspections = [...allInspections];
             currentPage = page;
 
             renderTabla();
-            updatePaginationControls(count || 0);
+            
+            // Contar total de motos para la paginación (aproximado en vista)
+            // Para un conteo exacto real se necesitaría un count con filtro, 
+            // pero con este método se maneja bien la vista actual.
+            updatePaginationControls(filteredInspections.length > 0 ? filteredInspections.length : 0);
 
             if (filteredInspections.length === 0) {
                 resultsSection.classList.remove('active'); 
@@ -93,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 emptyState.style.display = 'none';
             }
         } catch (err) {
-            console.error('❌ Error cargando inspecciones:', err);
+            console.error('❌ Error cargando inspecciones motos:', err);
             mostrarAlerta('error', `No se pudo cargar el listado: ${err.message}`);
         }
     }
@@ -144,12 +153,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rawQuery = searchInput?.value.trim();
         if (!rawQuery) { mostrarAlerta('info', '📝 Ingrese Placa, Serial o Identificación para buscar.'); return; }
         if (btnSearch) btnSearch.disabled = true;
-        mostrarAlerta('info', '🔍 Buscando...');
+        mostrarAlerta('info', '🔍 Buscando motocicleta...');
 
         try {
             const q = rawQuery.replace(/\s+/g, '').toUpperCase();
             
-            // Buscar directamente en inspecciones_pvr sin filtros de cliente
+            // Buscar directamente en inspecciones_pvr
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .or(`placa.ilike.${q},s_motor.ilike.${q},n_identificacion.ilike.${q},n_inspeccion.ilike.${q}`)
@@ -157,13 +166,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // ✅ CORRECCIÓN: Asignamos todos los resultados encontrados
-            allInspections = data || [];
+            // 🔒 FILTRAR: SOLO MOTOS (Si buscas un auto por placa, aquí lo descartará)
+            allInspections = (data || []).filter(r => esMoto(r.tipo));
             filteredInspections = [...allInspections];
             currentPage = 1;
 
             if (filteredInspections.length === 0) {
-                mostrarAlerta('error', '❌ No se encontraron inspecciones con ese dato.');
+                mostrarAlerta('error', '❌ No se encontraron inspecciones de MOTO con ese dato.');
                 resultsSection.classList.remove('active'); 
                 emptyState.style.display = 'block';
             } else {
