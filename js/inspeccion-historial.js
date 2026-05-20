@@ -23,7 +23,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const supabase = await initSupabase();
     if (!supabase) return;
 
-    // 🔹 HELPER: IDENTIFICAR SI ES MOTO (FUNCIONA INCLUSO SI 'tipo' ESTÁ VACÍO)
+    // 🔹 CARGAR USUARIO (CORREGIDO PARA NO QUEDARSE EN "CARGANDO...")
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const el = document.getElementById('userEmail');
+        if (el) {
+            if (user) {
+                el.textContent = user.email || 'Usuario';
+            } else {
+                // Si no hay sesión activa, mostramos "Invitado" para quitar el "Cargando..."
+                el.textContent = 'Invitado';
+            }
+        }
+    } catch (err) {
+        console.warn('⚠️ No se pudo verificar sesión:', err);
+        const el = document.getElementById('userEmail');
+        if (el) el.textContent = 'Invitado';
+    }
+
+    // 🔹 HELPER: IDENTIFICAR SI ES MOTO
     const esMoto = (row) => {
         if (!row) return false;
         // 1. Si tiene componentes_moto rellenos, es moto
@@ -71,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw error;
 
             let result = data || [];
+            // Filtrado en cliente para asegurar precisión
             if (filtros.tipo === 'moto') result = result.filter(r => esMoto(r));
             if (filtros.tipo === 'patrulla') result = result.filter(r => !esMoto(r));
             return result;
@@ -80,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 🔹 CALCULAR KPIS (Actualizado a los IDs correctos de tu HTML)
+    // 🔹 CALCULAR KPIS
     function calcularKpis(data) {
         const total = data.length;
         const motos = data.filter(r => esMoto(r)).length;
@@ -203,7 +222,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             tbody.appendChild(tr);
         });
 
-        // ✅ CORRECCIÓN: Usar 'tableCount' que sí existe en tu HTML de Historial
         document.getElementById('tableCount').textContent = `${data.length} registro${data.length !== 1 ? 's' : ''}`;
         const btnPrev = document.getElementById('btnPrev');
         const btnNext = document.getElementById('btnNext');
@@ -329,6 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🚀 INICIALIZACIÓN
     const hoy = new Date().toISOString().split('T')[0];
     const hace30 = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+    
     if(document.getElementById('filterDesde')) document.getElementById('filterDesde').value = hace30;
     if(document.getElementById('filterHasta')) document.getElementById('filterHasta').value = hoy;
 
