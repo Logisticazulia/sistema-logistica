@@ -1,21 +1,40 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 🔹 CONFIGURACIÓN
-    const ITEMS_PER_PAGE = 10;
+    const ITEMS_PER_PAGE = 15;
     let currentPage = 1;
-    let allData = [];
-    let filteredData = [];
-    let charts = {};
+    let allInspections = [];
+    let filteredInspections = [];
 
-    // 🔹 INICIALIZAR SUPABASE
+    // ================= ELEMENTOS DEL DOM =================
+    const searchInput = document.getElementById('searchMoto');
+    const btnSearch = document.getElementById('btnSearch');
+    const btnClearSearch = document.getElementById('btnClearSearch');
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsBody = document.getElementById('resultsBody');
+    const resultsCount = document.getElementById('resultsCount');
+    const emptyState = document.getElementById('emptyState');
+    const detailModal = document.getElementById('detailModal');
+    const modalClose = document.getElementById('modalClose');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const alertInfo = document.getElementById('alertInfo');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const currentPageNum = document.getElementById('currentPageNum');
+    const totalPagesNum = document.getElementById('totalPagesNum');
+
+    // Regex flexible para identificar motos (Mismo que funcionó bien)
+    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
+
+    // ================= INICIALIZAR SUPABASE =================
     async function initSupabase() {
         let attempts = 0;
         while (!window.supabase && attempts < 50) { await new Promise(res => setTimeout(res, 100)); attempts++; }
-        if (!window.supabase) return null;
+        if (!window.supabase) { mostrarAlerta('error', '❌ No se pudo conectar a la base de datos.'); return null; }
         if (window.supabase.auth) return window.supabase;
         const createFn = window.supabase.createClient || window.createClient;
         if (createFn && window.SUPABASE_URL && window.SUPABASE_KEY) {
             try { window.supabase = createFn(window.SUPABASE_URL, window.SUPABASE_KEY); return window.supabase; }
-            catch (err) { console.error('❌ Error init Supabase:', err); return null; }
+            catch (err) { return null; }
         }
         return null;
     }
@@ -23,337 +42,251 @@ document.addEventListener('DOMContentLoaded', async () => {
     const supabase = await initSupabase();
     if (!supabase) return;
 
-    // 🧠 LÓGICA MEJORADA PARA DETECTAR SI ES MOTO (FUNCIONA INCLUSO SI 'tipo' ESTÁ VACÍO)
-    function esMoto(row) {
-        if (!row) return false;
+    // 🔥 CORRECCIÓN: Carga robusta del usuario
+    try {
+        // Usamos getSession que es más rápido y no requiere validación de red estricta para leer caché
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+        const el = document.getElementById('userEmail');
         
-        // 1. Prioridad: Si tiene componentes_moto rellenos, es moto
-        if (row.componentes_moto) {
-            let c = row.componentes_moto;
-            if (typeof c === 'string') { try { c = JSON.parse(c); } catch(e){ c={}; } }
-            if (Object.keys(c).length > 0) return true;
-        }
-
-        // 2. Verificar columna 'tipo'
-        const t = (row.tipo || '').toLowerCase();
-        if (t.includes('moto') || t.includes('enduro') || t.includes('paseo') || t.includes('trimovil') || t.includes('bicicleta')) return true;
-
-        // 3. Verificar palabras clave en modelo/marca (fallback)
-        const m = (row.modelo || '').toLowerCase();
-        const ma = (row.marca || '').toLowerCase();
-        const keywords = ['dr ', 'dr650', 'dr-650', 'xt', 'ybr', 'xlr', 'bross', 'falcon', 'xcape', 'vstrom', 'kdx', 'klr'];
-        
-        if (keywords.some(k => m.includes(k))) return true;
-        if (['yamaha', 'suzuki', 'kawasaki', 'honda', 'hero', 'bajaj', 'empire', 'bera', 'kadi'].some(k => ma.includes(k))) return true;
-        
-        return false;
-    }
-
-    // 🧩 EXTRACCIÓN INTELIGENTE DE COMPONENTES
-    function obtenerComponentes(row) {
-        const res = {};
-        
-        // Si es Moto, usar JSONB
-        if (row.componentes_moto) {
-            let c = row.componentes_moto;
-            if (typeof c === 'string') { try { c = JSON.parse(c); } catch(e){ c={}; } }
-            Object.assign(res, c);
-        }
-
-        // Si es Vehículo/Patrulla, escanear columnas buscando valores B/M/NT
-        const metaKeys = ['id','vehiculo_id','n_inspeccion','fecha_inspeccion','hora','motivo','lugar','asignacion','supervision','placa','marca','modelo','ano','tipo','color','n_identificacion','s_carroceria','kms','inspector','created_at','observaciones','coord_nombre','coord_rango','coord_cedula','coord_telefono','insp_nombre','insp_rango','insp_cedula','insp_telefono','componentes_moto','s_motor','facsimil'];
-        
-        Object.keys(row).forEach(k => {
-            if (!metaKeys.includes(k)) {
-                const val = (row[k] || '').toString().toUpperCase();
-                if (['B', 'M', 'NT'].includes(val)) {
-                    res[k] = val;
-                }
+        if (el) {
+            if (user) {
+                el.textContent = user.email || user.user_metadata?.name || 'Usuario';
+            } else {
+                // Si no hay sesión, cambiamos el texto para que NO se quede en "Cargando..."
+                el.textContent = 'Invitado';
             }
-        });
-        return res;
+        }
+    } catch (err) {
+        console.warn('⚠️ No se pudo verificar sesión:', err);
     }
 
-    // 🔹 CARGAR DATOS DE INSPECCIONES (SIN JOIN ERRÓNEO)
-    async function cargarDatos(filtros = {}) {
-        try {
-            let query = supabase.from('inspecciones_pvr').select('*');
-            
-            if (filtros.desde) query = query.gte('fecha_inspeccion', filtros.desde);
-            if (filtros.hasta) query = query.lte('fecha_inspeccion', filtros.hasta);
-            if (filtros.placa) query = query.ilike('placa', `%${filtros.placa}%`);
+    // ================= FUNCIONES AUXILIARES =================
+    function mostrarAlerta(tipo, mensaje) {
+        [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
+        const target = tipo === 'success' ? alertSuccess : tipo === 'error' ? alertError : alertInfo;
+        if (target) { const span = target.querySelector('span:last-child'); if(span) span.textContent = mensaje; target.style.display = 'flex'; }
+    }
 
-            const { data, error } = await query.order('fecha_inspeccion', { ascending: false });
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const [y, m, d] = dateStr.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    // ================= CARGAR TODO EL HISTORIAL =================
+    async function cargarTodasInspecciones(page = 1) {
+        try {
+            resultsCount.textContent = '🔄 Cargando motos...';
+            const from = (page - 1) * ITEMS_PER_PAGE;
+
+            // Traer datos
+            const { data, error } = await supabase.from('inspecciones_pvr')
+                .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
+                .order('fecha_inspeccion', { ascending: false })
+                .range(from, from + ITEMS_PER_PAGE - 1);
+
             if (error) throw error;
 
-            // Filtrado en cliente para asegurar precisión
-            let result = data || [];
-            if (filtros.tipo === 'moto') result = result.filter(r => esMoto(r));
-            if (filtros.tipo === 'patrulla') result = result.filter(r => !esMoto(r));
+            // Filtrar solo motos en cliente (Lógica probada)
+            const motoData = (data || []).filter(r => motoTypesRegex.test(r.tipo));
+            
+            // Ajustar página si no hay resultados
+            if (motoData.length === 0 && from > 0) { currentPage--; return cargarTodasInspecciones(currentPage || 1); }
 
-            return result;
+            allInspections = motoData;
+            filteredInspections = [...allInspections];
+            
+            renderTabla();
+            updatePaginationControls(allInspections.length > 0 ? allInspections.length : 0);
+
+            if (filteredInspections.length === 0) {
+                resultsSection.classList.remove('active'); 
+                emptyState.style.display = 'block';
+            } else {
+                resultsSection.classList.add('active'); 
+                emptyState.style.display = 'none';
+            }
         } catch (err) {
-            console.error('❌ Error cargando datos:', err);
-            return [];
+            console.error('❌ Error cargando inspecciones motos:', err);
+            mostrarAlerta('error', `No se pudo cargar el listado: ${err.message}`);
         }
     }
 
-    // 🔹 CALCULAR KPIS
-    function calcularKpis(data) {
-        const total = data.length;
-        const motos = data.filter(r => esMoto(r)).length;
-        const patrullas = total - motos;
-        
-        let totalComponentes = 0, malos = 0;
-        data.forEach(d => {
-            const comps = obtenerComponentes(d);
-            Object.values(comps).forEach(v => {
-                if (v) { totalComponentes++; if (v === 'M') malos++; }
-            });
-        });
-
-        document.getElementById('kpiTotal').textContent = total.toLocaleString();
-        document.getElementById('kpiPatrullas').textContent = patrullas.toLocaleString();
-        document.getElementById('kpiMotos').textContent = motos.toLocaleString();
-        document.getElementById('kpiMalos').textContent = malos.toLocaleString();
-        
-        const porcentaje = totalComponentes > 0 ? ((malos / totalComponentes) * 100).toFixed(1) : 0;
-        document.getElementById('kpiPorcentaje').textContent = `⚠️ ${porcentaje}% del total`;
-    }
-
-    // 🔹 RENDERIZAR GRÁFICOS
-    function renderGraficos(data) {
-        // 1️⃣ Inspecciones por Mes
-        const porMes = {};
-        data.forEach(d => {
-            const mes = d.fecha_inspeccion?.slice(0, 7) || 'Desconocido';
-            porMes[mes] = (porMes[mes] || 0) + 1;
-        });
-        const labelsMeses = Object.keys(porMes).sort();
-        const valoresMeses = labelsMeses.map(m => porMes[m]);
-
-        if (charts.meses) charts.meses.destroy();
-        charts.meses = new Chart(document.getElementById('chartMeses'), {
-            type: 'line',
-            data: {
-                labels: labelsMeses.map(m => { const [y, mm] = m.split('-'); return `${mm}/${y.slice(2)}`; }),
-                datasets: [{ label: 'Inspecciones', data: valoresMeses, borderColor: '#005b96', backgroundColor: 'rgba(0, 91, 150, 0.1)', tension: 0.4, fill: true }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
-
-        // 2️⃣ Distribución B/M/NT
-        let b = 0, m = 0, nt = 0;
-        data.forEach(d => {
-            Object.values(obtenerComponentes(d)).forEach(v => {
-                if (v === 'B') b++; else if (v === 'M') m++; else nt++;
-            });
-        });
-
-        if (charts.distribucion) charts.distribucion.destroy();
-        charts.distribucion = new Chart(document.getElementById('chartDistribucion'), {
-            type: 'doughnut',
-            data: { labels: ['Bueno', 'Malo', 'N/T'], datasets: [{ data: [b, m, nt], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'], borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-        });
-
-        // 3️⃣ Top 10 Componentes Fallados
-        const fallados = {};
-        data.forEach(d => {
-            Object.entries(obtenerComponentes(d)).forEach(([k, v]) => {
-                if (v === 'M') {
-                    const label = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    fallados[label] = (fallados[label] || 0) + 1;
-                }
-            });
-        });
-        const topFallados = Object.entries(fallados).sort((a, b) => b[1] - a[1]).slice(0, 10);
-        
-        if (charts.topFallados) charts.topFallados.destroy();
-        charts.topFallados = new Chart(document.getElementById('chartTopFallados'), {
-            type: 'bar',
-            data: { labels: topFallados.map(([k]) => k), datasets: [{ label: 'Veces en Mal Estado', data: topFallados.map(([, v]) => v), backgroundColor: '#ef4444', borderRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
-        });
-
-        // 4️⃣ Inspecciones por Inspector
-        const porInspector = {};
-        data.forEach(d => { porInspector[d.insp_nombre || 'Sin asignar'] = (porInspector[d.insp_nombre || 'Sin asignar'] || 0) + 1; });
-        const topInspectores = Object.entries(porInspector).sort((a, b) => b[1] - a[1]).slice(0, 8);
-        
-        if (charts.inspectores) charts.inspectores.destroy();
-        charts.inspectores = new Chart(document.getElementById('chartInspectores'), {
-            type: 'bar',
-            data: { labels: topInspectores.map(([k]) => k), datasets: [{ label: 'Inspecciones', data: topInspectores.map(([, v]) => v), backgroundColor: '#005b96', borderRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-        });
-    }
-
-    // 🔹 RENDERIZAR TABLA
-    function renderTabla(data, page = 1) {
-        const start = (page - 1) * ITEMS_PER_PAGE;
-        const pageData = data.slice(start, start + ITEMS_PER_PAGE);
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
+    // ================= RENDERIZAR TABLA =================
+    function renderTabla() {
+        resultsBody.innerHTML = '';
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const pageData = filteredInspections.slice(start, start + ITEMS_PER_PAGE);
 
         if (pageData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #64748b;">No hay registros</td></tr>';
+            resultsBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #64748b;">📭 No hay resultados para mostrar</td></tr>';
             return;
         }
 
-        pageData.forEach(d => {
-            const moto = esMoto(d);
-            const tipoBadge = `<span class="badge ${moto ? 'badge-moto' : 'badge-patrulla'}">${moto ? '🏍️ Moto' : '🚓 Patrulla'}</span>`;
-            
-            // Contar componentes "M"
-            let malos = 0;
-            Object.values(obtenerComponentes(d)).forEach(v => { if (v === 'M') malos++; });
-
+        pageData.forEach(insp => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${d.n_inspeccion || '-'}</strong></td>
-                <td>${d.fecha_inspeccion?.split('-').reverse().join('/') || '-'}</td>
-                <td>${tipoBadge}</td>
-                <td><strong>${d.placa || '-'}</strong></td>
-                <td>${d.insp_nombre || '-'}</td>
-                <td><span style="color: ${malos > 0 ? '#ef4444' : '#10b981'}; font-weight: 600;">${malos}</span></td>
-                <td><button class="btn-ver-detalle" data-id="${d.id}">👁️ Ver</button></td>
+                <td class="n-inspeccion">${insp.n_inspeccion || '-'}</td>
+                <td class="fecha">${formatDate(insp.fecha_inspeccion)}</td>
+                <td class="fecha">${insp.hora || '-'}</td>
+                <td class="placa">${insp.placa || '-'}</td>
+                <td class="s-motor" style="font-family:monospace; font-size:0.85rem; color:#475569;">${insp.s_motor || '-'}</td>
+                <td class="motivo" title="${insp.motivo || ''}">${insp.motivo || '-'}</td>
+                <td><button class="btn-ver" data-id="${insp.id}">👁️ Ver Detalle</button></td>
             `;
-            tbody.appendChild(tr);
+            resultsBody.appendChild(tr);
         });
 
-        document.getElementById('tableCount').textContent = `${data.length} registro${data.length !== 1 ? 's' : ''}`;
-        const btnPrev = document.getElementById('btnPrev');
-        const btnNext = document.getElementById('btnNext');
-        if(btnPrev) btnPrev.disabled = page <= 1;
-        if(btnNext) btnNext.disabled = page >= Math.ceil(data.length / ITEMS_PER_PAGE);
-
-        tbody.querySelectorAll('.btn-ver-detalle').forEach(btn => {
+        resultsBody.querySelectorAll('.btn-ver').forEach(btn => {
             btn.addEventListener('click', () => abrirDetalle(btn.dataset.id));
         });
     }
 
-    // 🔹 ABRIR MODAL CON DETALLE
-    async function abrirDetalle(id) {
+    function updatePaginationControls(totalItems) {
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+        currentPageNum.textContent = currentPage;
+        totalPagesNum.textContent = totalPages;
+        
+        if (btnPrev) btnPrev.disabled = currentPage <= 1;
+        if (btnNext) btnNext.disabled = currentPage >= totalPages;
+        
+        resultsCount.textContent = `${filteredInspections.length} registro${filteredInspections.length !== 1 ? 's' : ''} encontrados`;
+    }
+
+    // ================= BÚSQUEDA DIRECTA =================
+    async function buscarMoto() {
+        const rawQuery = searchInput?.value.trim();
+        if (!rawQuery) { mostrarAlerta('info', '📝 Ingrese Placa, Serial o Identificación para buscar.'); return; }
+        if (btnSearch) btnSearch.disabled = true;
+        mostrarAlerta('info', '🔍 Buscando motocicleta...');
+
         try {
-            const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
-            if (error) throw error; if (!data) return;
-
-            document.getElementById('modalNInspeccion').textContent = data.n_inspeccion || '';
-            const esM = esMoto(data);
+            const q = rawQuery.replace(/\s+/g, '').toUpperCase();
             
-            let html = `
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-                    <div><strong>N° Inspección:</strong> ${data.n_inspeccion || '-'}</div>
-                    <div><strong>Fecha:</strong> ${data.fecha_inspeccion?.split('-').reverse().join('/') || '-'}</div>
-                    <div><strong>Hora:</strong> ${data.hora || '-'}</div>
-                    <div><strong>Motivo:</strong> ${data.motivo || '-'}</div>
-                    <div><strong>Lugar:</strong> ${data.lugar || '-'}</div>
-                    <div><strong>Asignación:</strong> ${data.asignacion || '-'}</div>
-                    <div><strong>Tipo:</strong> ${esM ? '🏍️ MOTO' : '🚓 VEHÍCULO'}</div>
-                    <div><strong>Placa:</strong> ${data.placa || '-'}</div>
-                    <div><strong>Marca/Modelo:</strong> ${data.marca || '-'} ${data.modelo || ''}</div>
-                </div>
-                <div style="margin-bottom: 20px;"><strong>Observaciones:</strong><br>${data.observaciones || 'Sin observaciones.'}</div>
-                <div style="margin-bottom: 20px;">
-                    <strong>Componentes en Mal Estado (M):</strong>
-                    <ul style="margin: 8px 0 0 20px; color: #ef4444;">
-            `;
-            
-            const comps = obtenerComponentes(data);
-            let hayMalos = false;
-            Object.entries(comps).forEach(([k, v]) => {
-                if (v === 'M') {
-                    hayMalos = true;
-                    html += `<li>${k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</li>`;
-                }
-            });
-            if (!hayMalos) html += '<li style="color:#10b981">Todos los componentes reportados están en buen estado (B) o N/T.</li>';
+            // Buscar directamente en inspecciones_pvr
+            const { data, error } = await supabase.from('inspecciones_pvr')
+                .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
+                .or(`placa.ilike.%${q}%,s_motor.ilike.%${q}%,n_identificacion.ilike.%${q}%,n_inspeccion.ilike.%${q}%`)
+                .order('fecha_inspeccion', { ascending: false });
 
-            html += `</ul></div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                <div style="text-align: center;">
-                    <div style="font-weight: 700; margin-bottom: 10px;">POR LA COORDINACIÓN</div>
-                    <div style="border-top: 2px solid #000; width: 80%; margin: 0 auto 8px;"></div>
-                    <div>${data.coord_nombre || '-'}</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">${data.coord_rango || ''}${data.coord_cedula ? ` | C.I. ${data.coord_cedula}` : ''}</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-weight: 700; margin-bottom: 10px;">INSPECCIÓN REALIZADA POR:</div>
-                    <div style="border-top: 2px solid #000; width: 80%; margin: 0 auto 8px;"></div>
-                    <div>${data.insp_nombre || '-'}</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">${data.insp_rango || ''}${data.insp_cedula ? ` | C.I. ${data.insp_cedula}` : ''}</div>
-                </div>
-            </div>`;
+            if (error) throw error;
 
-            document.getElementById('modalBody').innerHTML = html;
-            document.getElementById('detailModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            // Filtrar solo motos
+            allInspections = (data || []).filter(r => motoTypesRegex.test(r.tipo));
+            filteredInspections = [...allInspections];
+            currentPage = 1;
+
+            if (filteredInspections.length === 0) {
+                mostrarAlerta('error', '❌ No se encontraron inspecciones de MOTO con ese dato.');
+                resultsSection.classList.remove('active'); 
+                emptyState.style.display = 'block';
+            } else {
+                renderTabla(); 
+                updatePaginationControls(filteredInspections.length);
+                resultsSection.classList.add('active'); 
+                emptyState.style.display = 'none';
+                mostrarAlerta('success', `✅ ${filteredInspections.length} inspección(es) encontrada(s).`);
+            }
         } catch (err) {
-            console.error('❌ Error cargando detalle:', err);
-            alert('No se pudo cargar el detalle');
+            console.error('❌ Error búsqueda:', err);
+            mostrarAlerta('error', `Error al buscar: ${err.message}`);
+        } finally { 
+            if (btnSearch) btnSearch.disabled = false; 
         }
     }
 
-    function cerrarModal() {
-        document.getElementById('detailModal').classList.remove('active');
-        document.body.style.overflow = '';
+    function limpiarBusqueda() {
+        if(searchInput) searchInput.value = '';
+        mostrarAlerta('info', '🔄 Cargando historial completo...');
+        cargarTodasInspecciones(1);
     }
 
-    // 🔹 EXPORTAR A EXCEL (CSV)
-    function exportarExcel() {
-        if (filteredData.length === 0) { alert('No hay datos para exportar'); return; }
-        const headers = ['N° Inspección', 'Fecha', 'Hora', 'Tipo', 'Placa', 'Marca', 'Modelo', 'Motivo', 'Inspector', 'Componentes M'];
-        const rows = filteredData.map(d => {
-            let malos = 0;
-            Object.values(obtenerComponentes(d)).forEach(v => { if (v === 'M') malos++; });
-            return [
-                d.n_inspeccion, d.fecha_inspeccion, d.hora, esMoto(d) ? 'Moto' : 'Patrulla',
-                d.placa, d.marca, d.modelo, d.motivo, d.insp_nombre, malos
-            ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(',');
-        });
-        const csv = [headers.join(','), ...rows].join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `inspecciones_historial_${new Date().toISOString().slice(0,10)}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
+    // ================= MODAL Y VISTA PREVIA =================
+    async function abrirDetalle(id) {
+        try {
+            const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
+            if (error) throw error; 
+            if (!data) return;
+            
+            poblarVistaPrevia(data);
+            if (detailModal) { 
+                detailModal.classList.add('active'); 
+                document.body.style.overflow = 'hidden'; 
+            }
+        } catch (err) {
+            console.error('❌ Error cargando detalle:', err);
+            mostrarAlerta('error', `No se pudo cargar el detalle: ${err.message}`);
+        }
     }
 
-    // 🎧 EVENT LISTENERS
-    document.getElementById('btnAplicarFiltros')?.addEventListener('click', async () => {
-        const filtros = {
-            desde: document.getElementById('filterDesde').value,
-            hasta: document.getElementById('filterHasta').value,
-            tipo: document.getElementById('filterTipo').value,
-            placa: document.getElementById('filterPlaca').value.trim()
-        };
-        allData = await cargarDatos(filtros);
-        filteredData = [...allData];
-        currentPage = 1;
-        calcularKpis(filteredData);
-        renderGraficos(filteredData);
-        renderTabla(filteredData, currentPage);
+    function cerrarModal() { 
+        if (detailModal) { 
+            detailModal.classList.remove('active'); 
+            document.body.style.overflow = ''; 
+        } 
+    }
+
+    function poblarVistaPrevia(data) {
+        const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val || '-'; };
+        
+        set('pv_n_inspeccion', data.n_inspeccion); 
+        set('pv_fecha', formatDate(data.fecha_inspeccion)); 
+        set('pv_hora', data.hora);
+        set('pv_motivo', data.motivo); 
+        set('pv_lugar', `${data.lugar || '-'} / ${data.asignacion || '-'}`);
+        set('pv_placa', data.placa); 
+        set('pv_marca_modelo', `${data.marca || '-'} ${data.modelo || '-'}`);
+        set('pv_ano_color', `${data.ano || '-'} / ${data.color || '-'}`);
+        set('pv_s_carroceria', data.s_carroceria); 
+        set('pv_s_motor', data.s_motor);
+        set('pv_n_id', data.n_identificacion); 
+        set('pv_kms', data.kms ? `${Number(data.kms).toLocaleString()} km` : '-');
+        
+        set('pv_coord_nombre', data.coord_nombre); 
+        set('pv_coord_rango', data.coord_rango); 
+        set('pv_coord_cedula', data.coord_cedula);
+        set('pv_insp_nombre', data.insp_nombre); 
+        set('pv_insp_rango', data.insp_rango); 
+        set('pv_insp_cedula', data.insp_cedula);
+        set('pv_observaciones', data.observaciones || 'Sin observaciones.');
+
+        const compGrid = document.getElementById('pv_comps_grid'); 
+        compGrid.innerHTML = '';
+        
+        let comps = data.componentes_moto || {};
+        const compKeys = Object.keys(comps);
+        
+        if (compKeys.length > 0) {
+            compKeys.forEach(key => {
+                const val = comps[key] || 'NT';
+                const cls = val === 'B' ? 'status-B' : val === 'M' ? 'status-M' : 'status-NT';
+                const div = document.createElement('div');
+                div.className = 'pv-comp';
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                div.innerHTML = `<div class="pv-comp-label">${label}</div><div class="pv-comp-status ${cls}">${val}</div>`;
+                compGrid.appendChild(div);
+            });
+        } else {
+            compGrid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#999; padding:20px;">⚠️ Sin componentes registrados.</div>';
+        }
+    }
+
+    // ================= EVENT LISTENERS =================
+    if (btnSearch) btnSearch.addEventListener('click', buscarMoto);
+    if (btnClearSearch) btnClearSearch.addEventListener('click', limpiarBusqueda);
+    
+    const inputs = document.querySelectorAll('input.search-input');
+    inputs.forEach(input => {
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarMoto(); });
     });
+    
+    if (modalClose) modalClose.addEventListener('click', cerrarModal);
+    if (detailModal) detailModal.addEventListener('click', (e) => { if (e.target === detailModal) cerrarModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal && detailModal.classList.contains('active')) cerrarModal(); });
+    
+    if (btnPrev) btnPrev.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
+    if (btnNext) btnNext.addEventListener('click', () => { const tp = Math.ceil((filteredInspections.length || allInspections.length) / ITEMS_PER_PAGE); if (currentPage < tp) { currentPage++; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
 
-    document.getElementById('btnExportar')?.addEventListener('click', exportarExcel);
-    document.getElementById('btnPrev')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTabla(filteredData, currentPage); } });
-    document.getElementById('btnNext')?.addEventListener('click', () => { const maxPage = Math.ceil(filteredData.length / ITEMS_PER_PAGE); if (currentPage < maxPage) { currentPage++; renderTabla(filteredData, currentPage); } });
-    document.getElementById('modalClose')?.addEventListener('click', cerrarModal);
-    document.getElementById('detailModal')?.addEventListener('click', e => { if (e.target.id === 'detailModal') cerrarModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
-
-    // 🚀 INICIALIZACIÓN
-    const hoy = new Date().toISOString().split('T')[0];
-    const hace30 = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
-    if(document.getElementById('filterDesde').value) document.getElementById('filterDesde').value = hace30;
-    if(document.getElementById('filterHasta').value) document.getElementById('filterHasta').value = hoy;
-
-    allData = await cargarDatos({ desde: hace30, hasta: hoy });
-    filteredData = [...allData];
-    calcularKpis(filteredData);
-    renderGraficos(filteredData);
-    renderTabla(filteredData, currentPage);
+    await cargarTodasInspecciones(1);
 });
