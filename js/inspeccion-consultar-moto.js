@@ -57,20 +57,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${d}/${m}/${y}`;
     }
 
-    const motoTypesRegex = /MOTO|ENDURO|PASEO|TRIMOVIL|TRACCION DE SANGRE/i;
-
     // ================= CARGAR TODO EL HISTORIAL =================
     async function cargarTodasInspecciones(page = 1) {
         try {
-            resultsCount.textContent = '🔄 Cargando historial de motos...';
+            resultsCount.textContent = '🔄 Cargando historial...';
             const from = (page - 1) * ITEMS_PER_PAGE;
-            
-            // 1. Contar total de motos
+
+            // 1. Contar total
             const { count, error: countError } = await supabase.from('inspecciones_pvr')
                 .select('*', { count: 'exact', head: true });
             if (countError) throw countError;
 
-            // 2. Traer datos y filtrar solo motos en cliente (más seguro y rápido)
+            // 2. Traer datos
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .order('fecha_inspeccion', { ascending: false })
@@ -78,25 +76,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Filtrar solo motos
-            const motoData = (data || []).filter(r => motoTypesRegex.test(r.tipo));
-            
-            // Ajustar página si no hay resultados
-            if (motoData.length === 0 && from > 0) { currentPage--; return cargarTodasInspecciones(currentPage || 1); }
-
-            allInspections = motoData;
+            // ✅ CORRECCIÓN CLAVE: Eliminamos el filtro estricto de 'tipo'.
+            // Esto garantiza que las motos antiguas o sin el campo 'tipo' definido SÍ se muestren.
+            allInspections = data || [];
             filteredInspections = [...allInspections];
-            
+            currentPage = page;
+
             renderTabla();
             updatePaginationControls(count || 0);
-            
+
             if (filteredInspections.length === 0) {
-                resultsSection.classList.remove('active'); emptyState.style.display = 'block';
+                resultsSection.classList.remove('active'); 
+                emptyState.style.display = 'block';
             } else {
-                resultsSection.classList.add('active'); emptyState.style.display = 'none';
+                resultsSection.classList.add('active'); 
+                emptyState.style.display = 'none';
             }
         } catch (err) {
-            console.error('❌ Error cargando inspecciones motos:', err);
+            console.error('❌ Error cargando inspecciones:', err);
             mostrarAlerta('error', `No se pudo cargar el listado: ${err.message}`);
         }
     }
@@ -132,12 +129,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updatePaginationControls(totalItems) {
-        // Filtramos solo motos para el conteo real
-        const totalMotos = Math.max(1, Math.ceil(filteredInspections.length / ITEMS_PER_PAGE)); 
-        const totalPages = totalItems > 0 ? totalMotos : 1;
-        
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
         currentPageNum.textContent = currentPage;
-        totalPagesNum.textContent = totalPages;
+        totalPagesNum.textContent = totalPages || 1;
+        
         if (btnPrev) btnPrev.disabled = currentPage <= 1;
         if (btnNext) btnNext.disabled = currentPage >= totalPages;
         
@@ -149,12 +144,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rawQuery = searchInput?.value.trim();
         if (!rawQuery) { mostrarAlerta('info', '📝 Ingrese Placa, Serial o Identificación para buscar.'); return; }
         if (btnSearch) btnSearch.disabled = true;
-        mostrarAlerta('info', '🔍 Buscando motocicleta...');
+        mostrarAlerta('info', '🔍 Buscando...');
 
         try {
             const q = rawQuery.replace(/\s+/g, '').toUpperCase();
             
-            // Buscar directamente en inspecciones_pvr
+            // Buscar directamente en inspecciones_pvr sin filtros de cliente
             const { data, error } = await supabase.from('inspecciones_pvr')
                 .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_motor, motivo, tipo')
                 .or(`placa.ilike.${q},s_motor.ilike.${q},n_identificacion.ilike.${q},n_inspeccion.ilike.${q}`)
@@ -162,23 +157,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Filtrar solo motos
-            allInspections = (data || []).filter(r => motoTypesRegex.test(r.tipo));
+            // ✅ CORRECCIÓN: Asignamos todos los resultados encontrados
+            allInspections = data || [];
             filteredInspections = [...allInspections];
             currentPage = 1;
 
             if (filteredInspections.length === 0) {
-                mostrarAlerta('error', '❌ No se encontraron inspecciones para esa motocicleta.');
-                resultsSection.classList.remove('active'); emptyState.style.display = 'block';
+                mostrarAlerta('error', '❌ No se encontraron inspecciones con ese dato.');
+                resultsSection.classList.remove('active'); 
+                emptyState.style.display = 'block';
             } else {
-                renderTabla(); updatePaginationControls(filteredInspections.length);
-                resultsSection.classList.add('active'); emptyState.style.display = 'none';
+                renderTabla(); 
+                updatePaginationControls(filteredInspections.length);
+                resultsSection.classList.add('active'); 
+                emptyState.style.display = 'none';
                 mostrarAlerta('success', `✅ ${filteredInspections.length} inspección(es) encontrada(s).`);
             }
         } catch (err) {
             console.error('❌ Error búsqueda:', err);
             mostrarAlerta('error', `Error al buscar: ${err.message}`);
-        } finally { if (btnSearch) btnSearch.disabled = false; }
+        } finally { 
+            if (btnSearch) btnSearch.disabled = false; 
+        }
     }
 
     function limpiarBusqueda() {
@@ -191,37 +191,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function abrirDetalle(id) {
         try {
             const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
-            if (error) throw error; if (!data) return;
+            if (error) throw error; 
+            if (!data) return;
+            
             poblarVistaPrevia(data);
-            if (detailModal) { detailModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            if (detailModal) { 
+                detailModal.classList.add('active'); 
+                document.body.style.overflow = 'hidden'; 
+            }
         } catch (err) {
             console.error('❌ Error cargando detalle:', err);
             mostrarAlerta('error', `No se pudo cargar el detalle: ${err.message}`);
         }
     }
 
-    function cerrarModal() { if (detailModal) { detailModal.classList.remove('active'); document.body.style.overflow = ''; } }
+    function cerrarModal() { 
+        if (detailModal) { 
+            detailModal.classList.remove('active'); 
+            document.body.style.overflow = ''; 
+        } 
+    }
 
     function poblarVistaPrevia(data) {
         const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val || '-'; };
-        set('pv_n_inspeccion', data.n_inspeccion); set('pv_fecha', formatDate(data.fecha_inspeccion)); set('pv_hora', data.hora);
-        set('pv_motivo', data.motivo); set('pv_lugar', `${data.lugar || '-'} / ${data.asignacion || '-'}`);
-        set('pv_placa', data.placa); set('pv_marca_modelo', `${data.marca || '-'} ${data.modelo || '-'}`);
+        
+        set('pv_n_inspeccion', data.n_inspeccion); 
+        set('pv_fecha', formatDate(data.fecha_inspeccion)); 
+        set('pv_hora', data.hora);
+        set('pv_motivo', data.motivo); 
+        set('pv_lugar', `${data.lugar || '-'} / ${data.asignacion || '-'}`);
+        set('pv_placa', data.placa); 
+        set('pv_marca_modelo', `${data.marca || '-'} ${data.modelo || '-'}`);
         set('pv_ano_color', `${data.ano || '-'} / ${data.color || '-'}`);
-        set('pv_s_carroceria', data.s_carroceria); set('pv_s_motor', data.s_motor);
-        set('pv_n_id', data.n_identificacion); set('pv_kms', data.kms ? `${Number(data.kms).toLocaleString()} km` : '-');
-        set('pv_coord_nombre', data.coord_nombre); set('pv_coord_rango', data.coord_rango); set('pv_coord_cedula', data.coord_cedula);
-        set('pv_insp_nombre', data.insp_nombre); set('pv_insp_rango', data.insp_rango); set('pv_insp_cedula', data.insp_cedula);
+        set('pv_s_carroceria', data.s_carroceria); 
+        set('pv_s_motor', data.s_motor);
+        set('pv_n_id', data.n_identificacion); 
+        set('pv_kms', data.kms ? `${Number(data.kms).toLocaleString()} km` : '-');
+        
+        set('pv_coord_nombre', data.coord_nombre); 
+        set('pv_coord_rango', data.coord_rango); 
+        set('pv_coord_cedula', data.coord_cedula);
+        set('pv_insp_nombre', data.insp_nombre); 
+        set('pv_insp_rango', data.insp_rango); 
+        set('pv_insp_cedula', data.insp_cedula);
         set('pv_observaciones', data.observaciones || 'Sin observaciones.');
 
-        const compGrid = document.getElementById('pv_comps_grid'); compGrid.innerHTML = '';
-        // Intentar cargar desde JSONB componentes_moto, o desde columnas planas si no existe
-        let comps = data.componentes_moto || {};
-        if (Object.keys(comps).length === 0) {
-             // Fallback: extraer componentes del CSV plano si es necesario (opcional, depende de cómo se guarden)
-        }
+        const compGrid = document.getElementById('pv_comps_grid'); 
+        compGrid.innerHTML = '';
         
+        // Cargar componentes JSONB
+        let comps = data.componentes_moto || {};
         const compKeys = Object.keys(comps);
+        
         if (compKeys.length > 0) {
             compKeys.forEach(key => {
                 const val = comps[key] || 'NT';
@@ -245,8 +266,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (detailModal) detailModal.addEventListener('click', (e) => { if (e.target === detailModal) cerrarModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal && detailModal.classList.contains('active')) cerrarModal(); });
     
-    if (btnPrev) btnPrev.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
-    if (btnNext) btnNext.addEventListener('click', () => { const tp = Math.ceil((filteredInspections.length || allInspections.length) / ITEMS_PER_PAGE); if (currentPage < tp) { currentPage++; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } });
+    if (btnPrev) btnPrev.addEventListener('click', () => { 
+        if (currentPage > 1) { currentPage--; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } 
+    });
+    if (btnNext) btnNext.addEventListener('click', () => { 
+        const tp = Math.ceil((filteredInspections.length || allInspections.length) / ITEMS_PER_PAGE); 
+        if (currentPage < tp) { currentPage++; renderTabla(); updatePaginationControls(filteredInspections.length || allInspections.length); resultsSection.scrollIntoView({ behavior: 'smooth' }); } 
+    });
 
     await cargarTodasInspecciones(1);
 });
