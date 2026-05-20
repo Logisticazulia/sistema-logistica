@@ -121,30 +121,47 @@ function updatePaginationControls(totalItems) {
 async function buscarVehiculo() {
     const rawQuery = searchInput?.value.trim();
     if (!rawQuery) { mostrarAlerta('info', 'Ingrese Placa, Facsímil o Serial para buscar'); return; }
-    
-    // ✅ CORRECCIÓN: Verificación segura de elementos antes de modificar .style
-    if (btnSearch) {
-        btnSearch.disabled = true;
-        if (btnSearchText) btnSearchText.style.display = 'none';
-        if (btnSearchLoader) btnSearchLoader.style.display = 'inline';
-    }
-    
+
+    if (btnSearch) { btnSearch.disabled = true; btnSearchText.style.display = 'none'; btnSearchLoader.style.display = 'inline'; }
     mostrarAlerta('info', '🔍 Buscando vehículo...');
+
     try {
         const q = rawQuery.replace(/\s+/g, '').toUpperCase();
-        const { data: vehiculo, error } = await supabase.from('vehiculos').select('id')
-            .or(`placa.ilike.${q},facsimil.ilike.${q},s_carroceria.ilike.${q},s_motor.ilike.${q}`).limit(1).maybeSingle();
-        if (error) throw error;
-        if (!vehiculo) { mostrarAlerta('error', '❌ Vehículo no encontrado'); return; }
         
+        // 1️⃣ Buscar en tabla vehiculos
+        const { data: resultados, error } = await supabase.from('vehiculos')
+            .select('id, clase, tipo')
+            .or(`placa.ilike.${q},facsimil.ilike.${q},s_carroceria.ilike.${q},s_motor.ilike.${q}`)
+            .limit(10);
+
+        if (error) throw error;
+
+        // 2️⃣ Filtrar EXCLUYENDO MOTOS explícitamente (según tu CSV)
+        const vehiculo = (resultados || []).find(v => {
+            const c = (v.clase || '').toUpperCase();
+            const t = (v.tipo || '').toUpperCase();
+            // Rechaza si contiene MOTO, ENDURO, PASEO, TRIMOVIL o ESPECIAL
+            return !c.includes('MOTO') && !t.includes('MOTO') && !t.includes('ENDURO') && 
+                   !t.includes('PASEO') && !t.includes('TRIMOVIL') && !c.includes('ESPECIAL');
+        });
+
+        if (!vehiculo) {
+            mostrarAlerta('error', '❌ No se encontró un VEHÍCULO. El dato buscado corresponde a una moto o no existe en la base de datos.');
+            return;
+        }
+
+        // 3️⃣ Buscar inspecciones SOLO de ese vehículo válido
         const { data, error: inspError } = await supabase.from('inspecciones_pvr')
             .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo')
-            .eq('vehiculo_id', vehiculo.id).order('fecha_inspeccion', { ascending: false });
+            .eq('vehiculo_id', vehiculo.id)
+            .order('fecha_inspeccion', { ascending: false });
+
         if (inspError) throw inspError;
-        
+
         allInspections = data || [];
         filteredInspections = [...allInspections];
         currentPage = 1;
+
         if (filteredInspections.length === 0) {
             resultsSection.classList.remove('active');
             emptyState.style.display = 'block';
@@ -160,15 +177,9 @@ async function buscarVehiculo() {
         console.error('❌ Error búsqueda:', err);
         mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
-        // ✅ CORRECCIÓN: Verificación segura en el bloque finally
-        if (btnSearch) {
-            btnSearch.disabled = false;
-            if (btnSearchText) btnSearchText.style.display = 'inline';
-            if (btnSearchLoader) btnSearchLoader.style.display = 'none';
-        }
+        if (btnSearch) { btnSearch.disabled = false; btnSearchText.style.display = 'inline'; btnSearchLoader.style.display = 'none'; }
     }
 }
-
 // 🆕 POBLAR VISTA PREVIA EXACTA COMO EN CREAR
 function poblarVistaPrevia(data) {
     const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val || '-'; };
