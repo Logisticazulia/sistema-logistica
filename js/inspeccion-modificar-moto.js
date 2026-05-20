@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const payload = {
                     fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value || null,
                     hora: document.getElementById('hora')?.value || null,
-                    motivo: document.getElementById('motivo_inspeccion')?.value || null,
+                    motivo: document.getElementById('motivo_inspeccion').value = data.motivo || '';
                     lugar: document.getElementById('lugar')?.value || null,
                     asignacion: document.getElementById('asignacion')?.value || null,
                     supervision: document.getElementById('supervision')?.value || null,
