@@ -1,4 +1,4 @@
-// planilla-partes.js - Dashboard estadístico con paginación y manejo seguro de datos
+// planilla-partes.js - Dashboard estadístico con paginación y lógica de exclusión blindada
 document.addEventListener('DOMContentLoaded', () => {
     const supabaseUrl = window.SUPABASE_URL;
     const supabaseKey = window.SUPABASE_KEY;
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 20;
     let currentPage = 1;
 
-    // Helper idéntico a transporte.js
+    // Helper de normalización
     const normalize = (txt) => (txt || '').trim().toUpperCase().replace(/\s+/g, ' ');
 
     // 🚀 INICIALIZACIÓN
@@ -54,54 +54,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 🔄 PROCESAR Y AGRUPAR (Blindado y sincronizado con transporte.js)
+    // 🔄 PROCESAR Y AGRUPAR (LÓGICA EXACTA SOLICITADA)
     function procesarDatos(vehiculos) {
         const stats = {
-            total: 0, 
-            patrulleras: 0, motos: 0, traccion: 0, especial: 0,
+            total: 0, patrulleras: 0, motos: 0, traccion: 0, especial: 0,
             operativos: 0, inoperativos: 0, desincorporados: 0,
             porEstatus: { 'Operativo': 0, 'Inoperativo': 0, 'Desincorporado': 0 },
             porSituacion: {}, porMarca: {}, porModelo: {}, porAno: {}, porUnidad: {}
         };
 
-        // Definiciones exactas
         const tiposRuedas = ['AUTOBUS', 'AUTOMOVIL', 'CAMION', 'CAMIONETA'];
 
         vehiculos.forEach(v => {
             stats.total++;
-            
+            const estatusRaw = normalize(v.estatus);
             const claseRaw = normalize(v.clase || v.tipo || '');
-            const estatusRaw = normalize(v.estatus || '');
-            const situacionRaw = normalize(v.situacion || v.estatus || 'SIN DEFINIR');
 
-            // 1. TIPO AGRUPADO (Sincronizado con barra azul)
-            if (tiposRuedas.includes(claseRaw)) stats.patrulleras++;
-            else if (claseRaw === 'MOTO') stats.motos++;
-            else if (claseRaw === 'TRACCION DE SANGRE') stats.traccion++;
-            else if (claseRaw === 'ESPECIAL') stats.especial++;
-
-            // 2. ESTATUS Y EXCLUSIÓN DE DESINCORPORADOS
-            const esDesinc = estatusRaw.includes('DESINCORPORADA');
-            const esInop = !esDesinc && (estatusRaw.includes('INOPERATIVA') || estatusRaw.includes('REPARACION') || estatusRaw.includes('TALLER'));
+            // ✅ 1. CLASIFICACIÓN DE ESTATUS
+            const esDesinc = estatusRaw === 'DESINCORPORADA';
+            const esInop = !esDesinc && (estatusRaw === 'INOPERATIVA' || estatusRaw === 'REPARACION' || estatusRaw === 'TALLER');
 
             if (esDesinc) {
                 stats.desincorporados++;
                 stats.porEstatus['Desincorporado']++;
+            } else if (esInop) {
+                stats.inoperativos++;
+                stats.porEstatus['Inoperativo']++;
             } else {
-                // Solo sobre activos
-                if (esInop) {
-                    stats.inoperativos++;
-                    stats.porEstatus['Inoperativo']++;
-                } else {
-                    stats.operativos++;
-                    stats.porEstatus['Operativo']++;
-                }
+                stats.operativos++;
+                stats.porEstatus['Operativo']++;
             }
 
-            // 3. CAMPOS PARA GRÁFICOS
+            // ✅ 2. CLASIFICACIÓN POR TIPO (SOLO SI NO ESTÁ DESINCORPORADO)
+            if (!esDesinc) {
+                if (tiposRuedas.includes(claseRaw)) stats.patrulleras++;
+                else if (claseRaw === 'MOTO') stats.motos++;
+                else if (claseRaw === 'TRACCION DE SANGRE') stats.traccion++;
+                else if (claseRaw === 'ESPECIAL') stats.especial++;
+            }
+
+            // ✅ 3. DATOS PARA GRÁFICOS
             const marca = (v.marca || '').trim() || 'Sin Registrar';
             const modelo = (v.modelo || '').trim() || 'Sin Modelo';
-            const situacion = situacionRaw;
+            const situacion = normalize(v.situacion || v.estatus || 'SIN DEFINIR');
             const ano = v.ano ? String(v.ano).trim() : 'N/D';
 
             stats.porMarca[marca] = (stats.porMarca[marca] || 0) + 1;
@@ -109,17 +104,20 @@ document.addEventListener('DOMContentLoaded', () => {
             stats.porSituacion[situacion] = (stats.porSituacion[situacion] || 0) + 1;
             stats.porAno[ano] = (stats.porAno[ano] || 0) + 1;
 
-            // 4. UNIDAD ADMINISTRATIVA (PARA TABLA)
+            // ✅ 4. UNIDAD ADMINISTRATIVA (PARA TABLA)
             const unidad = (v.unidad_administrativa || 'Sin Asignar').trim();
             if (!stats.porUnidad[unidad]) {
                 stats.porUnidad[unidad] = { total: 0, patrulleras: 0, motos: 0, traccion: 0, inoperativos: 0, desincorporados: 0 };
             }
             stats.porUnidad[unidad].total++;
-            if (tiposRuedas.includes(claseRaw)) stats.porUnidad[unidad].patrulleras++;
-            if (claseRaw === 'MOTO') stats.porUnidad[unidad].motos++;
-            if (claseRaw === 'TRACCION DE SANGRE') stats.porUnidad[unidad].traccion++;
-            if (esInop) stats.porUnidad[unidad].inoperativos++;
-            if (esDesinc) stats.porUnidad[unidad].desincorporados++;
+            if (!esDesinc) {
+                if (tiposRuedas.includes(claseRaw)) stats.porUnidad[unidad].patrulleras++;
+                if (claseRaw === 'MOTO') stats.porUnidad[unidad].motos++;
+                if (claseRaw === 'TRACCION DE SANGRE') stats.porUnidad[unidad].traccion++;
+                if (esInop) stats.porUnidad[unidad].inoperativos++;
+            } else {
+                stats.porUnidad[unidad].desincorporados++;
+            }
         });
 
         // Preparar datos para tabla paginada
@@ -135,20 +133,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if(fechaReporte) fechaReporte.textContent = new Date().toLocaleString('es-ES');
     }
 
-    // 📈 ACTUALIZAR TARJETAS (Sincronizada con transporte.html)
+    // 📈 ACTUALIZAR TARJETAS (8 INDICADORES)
     function renderStats(s) {
-        // Mapeo de IDs actualizados en el HTML
         const ids = [
             'totalVehicles', 'autosBusCamion', 'motosVehicles', 
             'traccionSangre', 'especialVehicles', 
-            'operativosVehicles', 'inoperativosVehicles'
+            'operativosVehicles', 'inoperativosVehicles', 'desincorporadosVehicles'
         ];
-        
-        // Valores correspondientes
         const vals = [
             s.total, s.patrulleras, s.motos, 
             s.traccion, s.especial, 
-            s.operativos, s.inoperativos
+            s.operativos, s.inoperativos, s.desincorporados
         ];
 
         ids.forEach((id, i) => { 
@@ -172,10 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         createChart('chartTipos', {
             type: 'doughnut',
-            data: { 
-                labels: ['Auto/Bus/Camión', 'Motos', 'Tracción', 'Especial'], 
-                datasets: [{ data: [s.patrulleras, s.motos, s.traccion, s.especial], backgroundColor: ['#003366','#e76f51','#2a9d8f','#9b5de5'] }] 
-            },
+            data: { labels: ['Auto/Bus/Camión', 'Motos', 'Tracción', 'Especial'], datasets: [{ data: [s.patrulleras, s.motos, s.traccion, s.especial], backgroundColor: ['#003366','#e76f51','#2a9d8f','#9b5de5'] }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
 
@@ -285,18 +277,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const btn = document.querySelector('.btn-pdf');
             btn.innerHTML = '⏳ Generando...'; btn.disabled = true;
-            
             const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#fff' });
             const pdf = new jsPDF('p', 'mm', 'a4');
             const w = 210; 
             const h = (canvas.height * w) / canvas.width;
-            
             pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
             pdf.save(`Partes_Generales_${new Date().toISOString().slice(0,10)}.pdf`);
         } catch(e) { console.error(e); alert('❌ Error al exportar'); }
-        finally { 
-            const b = document.querySelector('.btn-pdf'); 
-            b.innerHTML = '📄 Exportar PDF'; b.disabled = false; 
-        }
+        finally { const b = document.querySelector('.btn-pdf'); b.innerHTML = '📄 Exportar PDF'; b.disabled = false; }
     };
 });
