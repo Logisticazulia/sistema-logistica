@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return comps;
     };
 
-    // 🔹 CARGAR DATOS DE INSPECCIONES
+    // 🔹 CARGAR DATOS DE INSPECCIONES (SIN JOIN)
     async function cargarDatos(filtros = {}) {
         try {
             let query = supabase.from('inspecciones_pvr').select('*');
@@ -58,11 +58,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (filtros.hasta) query = query.lte('fecha_inspeccion', filtros.hasta);
             if (filtros.placa) query = query.ilike('placa', `%${filtros.placa}%`);
             
-            // Filtrado en cliente para mayor precisión
             const { data, error } = await query.order('fecha_inspeccion', { ascending: false });
             if (error) throw error;
 
             let result = data || [];
+            // Filtrado preciso en cliente
             if (filtros.tipo === 'moto') result = result.filter(d => esMoto(d.tipo));
             if (filtros.tipo === 'patrulla') result = result.filter(d => !esMoto(d.tipo));
             return result;
@@ -210,8 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function abrirDetalle(id) {
         try {
             const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
-            if (error) throw error;
-            if (!data) return;
+            if (error) throw error; if (!data) return;
 
             document.getElementById('modalNInspeccion').textContent = `(${data.n_inspeccion || 'Sin ID'})`;
             const esM = esMoto(data.tipo);
