@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnSearchLoader = btnSearch?.querySelector('.btn-search-loader');
     const motoForm = document.getElementById('motoForm');
     const btnSubmit = document.getElementById('btnSubmit');
-    const btnClearSearch = document.getElementById('btnClearSearch'); // ✅ Corregido ID
+    const btnClearForm = document.getElementById('btnClear'); // ID del botón en el form
+    const btnClearSearch = document.getElementById('btnClearSearch'); // ID del botón en la barra
     const recordIdInput = document.getElementById('recordId');
     const alertSuccess = document.getElementById('alertSuccess');
     const alertError = document.getElementById('alertError');
@@ -64,9 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!motoForm) return;
         motoForm.style.opacity = activo ? '1' : '0.6';
         motoForm.style.pointerEvents = activo ? 'auto' : 'none';
-        if (btnSubmit) {
-            btnSubmit.disabled = !activo || !usuarioActual;
-        }
+        if (btnSubmit) btnSubmit.disabled = !activo || !usuarioActual;
     }
 
     // ==========================================
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ==========================================
-    // FUNCIÓN DE BÚSQUEDA ACTUALIZADA (DOBLE VERIFICACIÓN)
+    // FUNCIÓN DE BÚSQUEDA (VERSIÓN FINAL)
     // ==========================================
     async function buscarInspeccion() {
         const q = searchInput?.value.trim();
@@ -104,21 +103,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cleanQ = q.replace(/\s+/g, '').toUpperCase();
             console.log('🔍 Término buscado:', cleanQ);
 
-            // 📝 Cláusula OR con las 5 columnas de tu CSV
-            // ⚠️ Se eliminó 'facsimil' porque no aparece en tu CSV. Si existe en tu BD, puedes agregarlo aquí.
+            // 📝 Cláusula OR SOLO con columnas que SÍ existen en inspecciones_pvr
+            // (facsimil está en vehiculos, no en inspecciones_pvr)
             const orClause = `n_inspeccion.ilike.%${cleanQ}%,placa.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,n_identificacion.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%`;
             
             console.log('📝 Cláusula OR:', orClause);
 
-            // 1️⃣ PASO 1: Buscar el registro SIN filtrar por tipo para diagnosticar
+            // 1️⃣ Buscamos en inspecciones_pvr Y traemos el tipo de la tabla vehiculos (fallback)
             const { data, error } = await supabase
                 .from('inspecciones_pvr')
-                .select('*')
+                .select('*, vehiculos!vehiculo_id(tipo)') // Join automático si tienes RLS/relación configurada
                 .or(orClause)
                 .limit(1)
                 .maybeSingle();
 
-            console.log('📦 Respuesta cruda de Supabase:', { data, error });
+            console.log('📦 Respuesta Supabase:', { data, error });
 
             if (error) {
                 console.error('❌ Error de PostgREST:', error);
@@ -126,24 +125,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (!data) {
-                mostrarAlerta('error', '❌ No se encontró ningún registro con ese dato. Verifique el número/placa/serial.');
+                mostrarAlerta('error', '❌ No se encontró ningún PVR con ese dato.');
                 toggleFormState(false);
                 return;
             }
 
-            // 2️⃣ PASO 2: Verificar que sea MOTO
-            const tipoVal = data.tipo || '';
-            console.log('✅ Registro encontrado. Tipo:', tipoVal);
+            // 2️⃣ Validar que sea MOTO (prioriza inspecciones_pvr.tipo, si está vacío usa vehiculos.tipo)
+            const tipoPvr = (data.tipo || '').toUpperCase().trim();
+            const tipoVehiculo = data.vehiculos?.tipo ? data.vehiculos.tipo.toUpperCase().trim() : '';
+            const tipoFinal = tipoPvr || tipoVehiculo || '';
+            
+            console.log('🏍️ Tipos detectados -> PVR:', tipoPvr, '| Vehiculos:', tipoVehiculo, '| Final:', tipoFinal);
 
-            if (!tipoVal.toUpperCase().includes('MOTO')) {
-                mostrarAlerta('error', `⚠️ Registro encontrado pero es tipo '${tipoVal}'. Este módulo solo permite editar MOTOS.`);
+            if (!tipoFinal.includes('MOTO')) {
+                mostrarAlerta('error', `⚠️ Registro encontrado pero es tipo '${tipoFinal || '(NO DEFINIDO)'}'. Este módulo SOLO permite editar MOTOS.`);
                 toggleFormState(false);
                 return;
             }
 
             // ✅ Cargar datos en el formulario
             recordIdInput.value = data.id;
-            
             const camposBasicos = [
                 'n_inspeccion', 'fecha_inspeccion', 'hora', 'motivo_inspeccion',
                 'lugar', 'asignacion', 'supervision', 'placa', 'marca', 'modelo',
@@ -151,12 +152,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'observaciones', 'coord_nombre', 'coord_rango', 'coord_cedula',
                 'coord_telefono', 'insp_nombre', 'insp_rango', 'insp_cedula', 'insp_telefono'
             ];
-            
             camposBasicos.forEach(campo => {
                 const el = document.getElementById(campo);
-                if (el) {
-                    el.value = data[campo] ?? '';
-                }
+                if (el) el.value = data[campo] ?? '';
             });
 
             // Cargar componentes JSONB
@@ -168,10 +166,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             toggleFormState(true);
             if (typeof updatePreview === 'function') updatePreview();
-            mostrarAlerta('success', '✅ MOTO cargada. Edite y presione "Actualizar".');
+            mostrarAlerta('success', '✅ MOTO cargada correctamente. Edite y presione "Actualizar".');
 
         } catch (err) {
-            console.error('💥 Error capturado en búsqueda:', err);
+            console.error('💥 Error capturado:', err);
             mostrarAlerta('error', `Fallo al buscar: ${err.message || 'Revise consola F12'}`);
         } finally {
             if (btnSearch) {
@@ -257,7 +255,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     if(btnSearch) btnSearch.addEventListener('click', buscarInspeccion);
     if(searchInput) searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') buscarInspeccion(); });
-    if(btnClearSearch) btnClearSearch.addEventListener('click', limpiarFormulario); // ✅ Corregido ID
+    if(btnClearForm) btnClearForm.addEventListener('click', limpiarFormulario);
+    if(btnClearSearch) btnClearSearch.addEventListener('click', limpiarFormulario);
 
     if(motoForm) {
         motoForm.addEventListener('input', updatePreview);
