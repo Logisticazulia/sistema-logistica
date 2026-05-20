@@ -26,6 +26,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
 .alert-error { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+/* ================= TABLA DE RESULTADOS ================= */
 .results-section { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,51,102,0.12); padding: 25px; margin-bottom: 30px; }
 .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e8eef5; }
 .results-title { font-size: 1.1rem; color: #003366; font-weight: 700; margin: 0; }
@@ -45,6 +46,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
 .empty-state .icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
 .empty-state p { margin: 0; font-size: 1rem; }
+/* ================= MODAL VISTA PREVIA ================= */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
 .modal-overlay.active { display: flex; }
 .modal-content { background: white; border-radius: 12px; max-width: 220mm; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
@@ -56,6 +58,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .modal-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 20px; border-top: 2px solid #e8eef5; position: sticky; bottom: 0; background: white; }
 .btn-print { background: linear-gradient(135deg, #003366, #005b96); color: white; padding: 10px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
 .btn-print:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,51,102,0.3); }
+/* 🖨️ ESTILOS DE VISTA PREVIA */
 .print-page { width: 100%; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; }
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 85px; height: 85px; object-fit: contain; }
@@ -130,7 +133,7 @@ body * { visibility: hidden; }
 <div class="search-container">
 <div class="search-group">
 <label for="searchMoto">🏍️ Búsqueda de Motocicleta</label>
-<input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | 1P00947 | JS1SP46A...">
+<input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | 123456 | JS1SP...">
 <span class="search-hint">Búsqueda exacta por: Placa, Serial Carrocería, Serial Motor o Facsímil</span>
 </div>
 <button type="button" class="btn-search" id="btnSearch">
@@ -140,7 +143,7 @@ body * { visibility: hidden; }
 </div>
 <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Operación exitosa</span></div>
 <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error</span></div>
-<div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Cargando historial...</span></div>
+<div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Cargando historial de motos...</span></div>
 <section id="resultsSection" class="results-section active">
 <div class="results-header">
 <h2 class="results-title">📋 Historial de Inspecciones Motos</h2>
