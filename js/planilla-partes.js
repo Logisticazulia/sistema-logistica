@@ -287,3 +287,91 @@ document.addEventListener('DOMContentLoaded', () => {
         finally { const b = document.querySelector('.btn-pdf'); b.innerHTML = '📄 Exportar PDF'; b.disabled = false; }
     };
 });
+// 🖨️ IMPRIMIR TABLA COMPLETA (SIN PAGINACIÓN, FORMATO CARTA)
+window.imprimirTablaCompleta = function() {
+    if (!unidadesData || unidadesData.length === 0) {
+        alert("⚠️ No hay datos cargados para imprimir.");
+        return;
+    }
+
+    // Generar filas completas
+    const filasHTML = unidadesData.map(d => {
+        const activos = d.total - d.inoperativos - d.desincorporados;
+        const pct = d.total > 0 ? Math.round((activos / d.total) * 100) : 0;
+        const cls = pct >= 80 ? 'alta' : pct >= 50 ? 'media' : 'baja';
+        return `
+            <tr>
+                <td>${d.nombre}</td>
+                <td style="text-align:center;">${d.patrulleras}</td>
+                <td style="text-align:center;">${d.motos}</td>
+                <td style="text-align:center;">${d.traccion}</td>
+                <td style="text-align:center; color:#dc2626; font-weight:600;">${d.inoperativos}</td>
+                <td style="text-align:center; color:#64748b;">${d.desincorporados}</td>
+                <td style="text-align:center;"><span class="badge ${cls}">${pct}%</span></td>
+            </tr>`;
+    }).join('');
+
+    // Abrir ventana dedicada para impresión
+    const printWin = window.open('', '_blank', 'width=900,height=700');
+    printWin.document.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Resumen por Unidad Administrativa</title>
+            <style>
+                @page { size: letter; margin: 12mm; }
+                body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #111; margin: 0; }
+                h2 { text-align: center; color: #003366; margin: 0 0 5px 0; font-size: 16pt; }
+                .meta { text-align: center; color: #555; font-size: 9pt; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+                table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+                thead { display: table-header-group; }
+                tfoot { display: table-footer-group; }
+                tr { page-break-inside: avoid; page-break-after: auto; }
+                th { background: #003366; color: #fff; padding: 8px 6px; text-align: left; font-size: 9pt; font-weight: 600; }
+                td { padding: 7px 6px; border-bottom: 1px solid #ddd; font-size: 9.5pt; }
+                tr:nth-child(even) { background: #f8fafc; }
+                .badge { padding: 3px 8px; border-radius: 12px; font-size: 8.5pt; font-weight: 700; }
+                .badge.alta { background: #d1fae5; color: #059669; }
+                .badge.media { background: #fef3c7; color: #d97706; }
+                .badge.baja { background: #fee2e2; color: #dc2626; }
+                
+                /* Forzar colores exactos en impresión */
+                @media print {
+                    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    th { background: #003366 !important; color: #ffffff !important; }
+                    .badge { border: 1px solid #ccc; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2>📋 Resumen por Unidad Administrativa</h2>
+            <div class="meta">
+                Total de unidades: <strong>${unidadesData.length}</strong> | 
+                Generado: ${new Date().toLocaleString('es-ES')}
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Unidad Administrativa</th>
+                        <th style="width: 12%; text-align:center;">Patrulleras</th>
+                        <th style="width: 12%; text-align:center;">Motos</th>
+                        <th style="width: 15%; text-align:center;">Tracción de Sangre</th>
+                        <th style="width: 12%; text-align:center;">Inoperativos</th>
+                        <th style="width: 12%; text-align:center;">Desincorporados</th>
+                        <th style="width: 10%; text-align:center;">% Operatividad</th>
+                    </tr>
+                </thead>
+                <tbody>${filasHTML}</tbody>
+            </table>
+        </body>
+        </html>
+    `);
+    printWin.document.close();
+    printWin.focus();
+    
+    // Esperar a que el DOM se renderice antes de abrir el diálogo de impresión
+    setTimeout(() => {
+        printWin.print();
+    }, 400);
+};
