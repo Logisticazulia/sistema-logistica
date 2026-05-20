@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
-    // INICIALIZACIÓN DE SUPABASE
+    // 1. INICIALIZACIÓN DE SUPABASE
     // ==========================================
     async function initSupabase() {
         let attempts = 0;
@@ -13,23 +13,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             return null;
         }
         if (window.supabase.auth) return window.supabase;
+        
         const createFn = window.supabase.createClient || window.createClient;
         if (createFn && window.SUPABASE_URL && window.SUPABASE_KEY) {
             try {
                 window.supabase = createFn(window.SUPABASE_URL, window.SUPABASE_KEY);
                 return window.supabase;
             } catch (err) {
-                console.error('❌ Error inicializando Supabase:', err);
+                console.error('❌ Error init Supabase:', err);
                 return null;
             }
         }
         return null;
     }
+
     const supabase = await initSupabase();
     if (!supabase) return;
 
     // ==========================================
-    // VARIABLES GLOBALES
+    // 2. VARIABLES GLOBALES
     // ==========================================
     let usuarioActual = null;
     const searchInput = document.getElementById('searchInspection');
@@ -38,26 +40,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnSearchLoader = btnSearch?.querySelector('.btn-search-loader');
     const motoForm = document.getElementById('motoForm');
     const btnSubmit = document.getElementById('btnSubmit');
-    const btnClearSearch = document.getElementById('btnClearSearch'); // ID del botón en la barra
-    const btnClearForm = document.getElementById('btnClear'); // ID del botón en el form
+    const btnClearForm = document.getElementById('btnClear');
+    const btnClearSearch = document.getElementById('btnClearSearch');
     const recordIdInput = document.getElementById('recordId');
     const alertSuccess = document.getElementById('alertSuccess');
     const alertError = document.getElementById('alertError');
     const alertInfo = document.getElementById('alertInfo');
 
     // ==========================================
-    // FUNCIONES DE UTILIDAD
+    // 3. FUNCIONES DE UTILIDAD
     // ==========================================
     function mostrarAlerta(tipo, mensaje) {
-        [alertSuccess, alertError, alertInfo].forEach(el => { if(el) el.style.display = 'none'; });
+        [alertSuccess, alertError, alertInfo].forEach(el => { if (el) el.style.display = 'none'; });
         const target = tipo === 'success' ? alertSuccess : tipo === 'error' ? alertError : alertInfo;
-        if(target) {
+        if (target) {
             const span = target.querySelector('span:last-child');
-            if(span) span.textContent = mensaje;
+            if (span) span.textContent = mensaje;
             target.style.display = 'flex';
         }
         if (tipo !== 'info') {
-            setTimeout(() => { if(target) target.style.display = 'none'; }, 5000);
+            setTimeout(() => { if (target) target.style.display = 'none'; }, 5000);
         }
     }
 
@@ -65,116 +67,120 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!motoForm) return;
         motoForm.style.opacity = activo ? '1' : '0.6';
         motoForm.style.pointerEvents = activo ? 'auto' : 'none';
-        if (btnSubmit) {
-            btnSubmit.disabled = !activo || !usuarioActual;
-        }
+        if (btnSubmit) btnSubmit.disabled = !activo || !usuarioActual;
     }
 
     // ==========================================
-    // VERIFICAR SESIÓN
+    // 4. VERIFICAR SESIÓN
     // ==========================================
     try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
             usuarioActual = user;
             const el = document.getElementById('userEmail');
-            if(el) el.textContent = user.email || 'Usuario';
+            if (el) el.textContent = user.email || 'Usuario';
         }
     } catch (err) {
         console.warn('⚠️ Sesión no verificada:', err);
     }
 
     // ==========================================
-    // FUNCIÓN DE BÚSQUEDA (VERSIÓN DEFINITIVA)
+    // 5. FUNCIÓN DE BÚSQUEDA (VERSIÓN DEFINITIVA)
     // ==========================================
     async function buscarInspeccion() {
         const q = searchInput?.value.trim();
         if (!q) {
-            mostrarAlerta('info', '⚠️ Ingrese Placa, Serial, Cédula o N° de Inspección');
+            mostrarAlerta('info', '⚠️ Ingrese Placa, Serial, Cédula o N° Inspección');
             return;
         }
 
-        if(btnSearch) {
+        // UI Loading
+        if (btnSearch) {
             btnSearch.disabled = true;
-            if(btnSearchText) btnSearchText.style.display = 'none';
-            if(btnSearchLoader) btnSearchLoader.style.display = 'inline';
+            if (btnSearchText) btnSearchText.style.display = 'none';
+            if (btnSearchLoader) btnSearchLoader.style.display = 'inline';
         }
         mostrarAlerta('info', '🔍 Consultando base de datos...');
 
         try {
             const cleanQ = q.replace(/\s+/g, '').toUpperCase();
-            console.log('🔍 Término buscado:', cleanQ);
+            console.log('🔍 Buscando:', cleanQ);
 
-            // 📝 Cláusula OR SOLO con columnas que existen en inspecciones_pvr
-            // (placa, s_carroceria, n_identificacion, s_motor, n_inspeccion)
+            // 📝 Cláusula OR con los 5 campos solicitados
             const orClause = `n_inspeccion.ilike.%${cleanQ}%,placa.ilike.%${cleanQ}%,s_carroceria.ilike.%${cleanQ}%,n_identificacion.ilike.%${cleanQ}%,s_motor.ilike.%${cleanQ}%`;
-            
-            console.log('📝 Cláusula OR:', orClause);
 
-            // 1️⃣ Buscamos en inspecciones_pvr Y traemos 'clase' desde la tabla vehiculos
-            // Esto asegura que validemos contra la clasificación real del vehículo
+            // 🔍 Búsqueda + JOIN automático para traer 'clase' desde la tabla vehiculos
             const { data, error } = await supabase
                 .from('inspecciones_pvr')
-                .select('*, vehiculos!vehiculo_id(clase)') 
+                .select('*, vehiculos!vehiculo_id(clase)')
                 .or(orClause)
                 .limit(1)
                 .maybeSingle();
 
-            console.log('📦 Respuesta Supabase:', { data, error });
-
-            if (error) {
-                console.error('❌ Error de PostgREST:', error);
-                throw error;
-            }
-
+            console.log('📦 Respuesta:', { data, error });
+            if (error) throw error;
             if (!data) {
                 mostrarAlerta('error', '❌ No se encontró ningún PVR con ese dato.');
                 toggleFormState(false);
                 return;
             }
 
-            // 2️⃣ Validar que sea MOTO usando la columna CLASE de la tabla vehiculos
-            // Si no hay relación vehiculos, fallback a tipo (aunque el usuario pidió clase)
-            const claseVal = data.vehiculos?.clase ? data.vehiculos.clase.toUpperCase().trim() : '';
-            const tipoVal = (data.tipo || '').toUpperCase().trim();
-            
-            console.log('🏍️ Validación -> Clase:', claseVal, '| Tipo:', tipoVal);
+            // 🏍️ VALIDACIÓN ESTRICTA POR CLASE
+            const claseVehiculo = (data.vehiculos?.clase || '').toUpperCase().trim();
+            console.log('🏍️ Clase detectada:', claseVehiculo);
 
-            // Validamos que la CLASE contenga "MOTO"
-            if (!claseVal.includes('MOTO')) {
-                mostrarAlerta('error', `⚠️ Registro encontrado pero es clase '${claseVal || '(NO DEFINIDA)'}'. Este módulo SOLO permite editar MOTOS.`);
+            if (!claseVehiculo.includes('MOTO')) {
+                mostrarAlerta('error', `⚠️ Registro encontrado pero es clase '${claseVehiculo || 'NO DEFINIDA'}'. Este módulo SOLO permite editar MOTOS.`);
                 toggleFormState(false);
                 return;
             }
 
-            // ✅ Cargar datos en el formulario
-            recordIdInput.value = data.id;
-            const camposBasicos = [
-                'n_inspeccion', 'fecha_inspeccion', 'hora', 'motivo_inspeccion',
-                'lugar', 'asignacion', 'supervision', 'placa', 'marca', 'modelo',
-                'ano', 'color', 's_carroceria', 's_motor', 'n_identificacion',
-                'observaciones', 'coord_nombre', 'coord_rango', 'coord_cedula',
-                'coord_telefono', 'insp_nombre', 'insp_rango', 'insp_cedula', 'insp_telefono'
-            ];
-            camposBasicos.forEach(campo => {
-                const el = document.getElementById(campo);
-                if (el) el.value = data[campo] ?? '';
-            });
+            // ✅ CARGA DE DATOS AL FORMULARIO
+            recordIdInput.value = data.id || '';
+
+            // Mapeo seguro de campos
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+            setVal('n_inspeccion', data.n_inspeccion);
+            setVal('fecha_inspeccion', data.fecha_inspeccion);
+            setVal('hora', data.hora);
+            setVal('lugar', data.lugar);
+            setVal('asignacion', data.asignacion);
+            setVal('supervision', data.supervision);
+            setVal('placa', data.placa);
+            setVal('marca', data.marca);
+            setVal('modelo', data.modelo);
+            setVal('ano', data.ano);
+            setVal('color', data.color);
+            setVal('s_carroceria', data.s_carroceria);
+            setVal('s_motor', data.s_motor);
+            setVal('n_identificacion', data.n_identificacion);
+            setVal('observaciones', data.observaciones);
+            setVal('coord_nombre', data.coord_nombre);
+            setVal('coord_rango', data.coord_rango);
+            setVal('coord_cedula', data.coord_cedula);
+            setVal('coord_telefono', data.coord_telefono);
+            setVal('insp_nombre', data.insp_nombre);
+            setVal('insp_rango', data.insp_rango);
+            setVal('insp_cedula', data.insp_cedula);
+            setVal('insp_telefono', data.insp_telefono);
+            
+            // ✅ CORRECCIÓN CRÍTICA: Leer 'motivo' directamente de la BD
+            setVal('motivo_inspeccion', data.motivo);
 
             // Cargar componentes JSONB
             const comps = data.componentes_moto || {};
             document.querySelectorAll('.inspection-item input[type="radio"]').forEach(radio => {
-                const valor = comps[radio.name];
-                radio.checked = valor ? radio.value === valor : false;
+                const valorGuardado = comps[radio.name];
+                radio.checked = valorGuardado ? radio.value === valorGuardado : false;
             });
 
             toggleFormState(true);
-            if (typeof updatePreview === 'function') updatePreview();
+            updatePreview();
             mostrarAlerta('success', '✅ MOTO cargada correctamente. Edite y presione "Actualizar".');
 
         } catch (err) {
-            console.error('💥 Error capturado:', err);
-            mostrarAlerta('error', `Fallo al buscar: ${err.message || 'Revise consola F12'}`);
+            console.error('💥 Error búsqueda:', err);
+            mostrarAlerta('error', `Fallo al buscar: ${err.message}`);
         } finally {
             if (btnSearch) {
                 btnSearch.disabled = false;
@@ -185,19 +191,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ==========================================
-    // LIMPIAR FORMULARIO
+    // 6. LIMPIAR FORMULARIO
     // ==========================================
     function limpiarFormulario() {
-        if(searchInput) searchInput.value = '';
-        if(motoForm) motoForm.reset();
-        if(recordIdInput) recordIdInput.value = '';
+        if (searchInput) searchInput.value = '';
+        if (motoForm) motoForm.reset();
+        if (recordIdInput) recordIdInput.value = '';
         toggleFormState(false);
         updatePreview();
         mostrarAlerta('info', '🔍 Busque una inspección para habilitar la edición');
     }
 
     // ==========================================
-    // ACTUALIZAR VISTA PREVIA
+    // 7. ACTUALIZAR VISTA PREVIA
     // ==========================================
     function updatePreview() {
         const v = (id) => { const el = document.getElementById(id); return el?.value || '-'; };
@@ -224,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('pv_insp_cedula').textContent = v('insp_cedula');
 
         const compGrid = document.getElementById('pv_comps_grid');
-        if(compGrid) {
+        if (compGrid) {
             compGrid.innerHTML = '';
             document.querySelectorAll('.inspection-item').forEach(item => {
                 const labelEl = item.querySelector('.item-label');
@@ -243,7 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ==========================================
-    // OBTENER VALORES DE COMPONENTES
+    // 8. OBTENER VALORES DE COMPONENTES
     // ==========================================
     function getComponentesMotoValues() {
         const componentes = {};
@@ -255,27 +261,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ==========================================
-    // EVENT LISTENERS
+    // 9. EVENT LISTENERS
     // ==========================================
-    if(btnSearch) btnSearch.addEventListener('click', buscarInspeccion);
-    if(searchInput) searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') buscarInspeccion(); });
-    if(btnClearSearch) btnClearSearch.addEventListener('click', limpiarFormulario);
-    if(btnClearForm) btnClearForm.addEventListener('click', limpiarFormulario);
+    if (btnSearch) btnSearch.addEventListener('click', buscarInspeccion);
+    if (searchInput) searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') buscarInspeccion(); });
+    if (btnClearForm) btnClearForm.addEventListener('click', limpiarFormulario);
+    if (btnClearSearch) btnClearSearch.addEventListener('click', limpiarFormulario);
 
-    if(motoForm) {
+    if (motoForm) {
         motoForm.addEventListener('input', updatePreview);
         motoForm.addEventListener('change', updatePreview);
+        
         motoForm.addEventListener('submit', async e => {
             e.preventDefault();
-            if(!usuarioActual) { mostrarAlerta('error', '🔐 Inicie sesión para guardar'); return; }
-            if(!recordIdInput.value) { mostrarAlerta('error', 'Busque una inspección primero'); return; }
+            if (!usuarioActual) { mostrarAlerta('error', '🔐 Inicie sesión para guardar'); return; }
+            if (!recordIdInput.value) { mostrarAlerta('error', 'Busque una inspección primero'); return; }
             
             btnSubmit.disabled = true;
             try {
                 const payload = {
                     fecha_inspeccion: document.getElementById('fecha_inspeccion')?.value || null,
                     hora: document.getElementById('hora')?.value || null,
-                    motivo: document.getElementById('motivo_inspeccion').value = data.motivo || '';
+                    motivo: document.getElementById('motivo_inspeccion')?.value || null,
                     lugar: document.getElementById('lugar')?.value || null,
                     asignacion: document.getElementById('asignacion')?.value || null,
                     supervision: document.getElementById('supervision')?.value || null,
@@ -290,15 +297,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                     insp_telefono: document.getElementById('insp_telefono')?.value || null,
                     componentes_moto: getComponentesMotoValues()
                 };
+                
+                // Eliminar campos nulos para no sobreescribir con NULL
                 Object.keys(payload).forEach(key => { if (payload[key] === null) delete payload[key]; });
 
-                const { error } = await supabase.from('inspecciones_pvr').update(payload).eq('id', recordIdInput.value);
-                if(error) throw error;
+                const { error } = await supabase
+                    .from('inspecciones_pvr')
+                    .update(payload)
+                    .eq('id', recordIdInput.value);
+                    
+                if (error) throw error;
 
                 mostrarAlerta('success', '✅ Inspección de Moto actualizada');
-                if(alertSuccess) alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (alertSuccess) alertSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 setTimeout(limpiarFormulario, 2000);
-            } catch(err) {
+            } catch (err) {
                 console.error('❌ Error al actualizar:', err);
                 mostrarAlerta('error', `Error: ${err.message}`);
             } finally {
@@ -307,6 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Inicialización
     updatePreview();
     mostrarAlerta('info', '🔍 Busque una inspección para habilitar la edición');
 });
