@@ -117,6 +117,8 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div id="alertSuccess" class="alert alert-success"><span>✅</span><span id="successMessage">Actualizado exitosamente</span></div>
 <div id="alertError" class="alert alert-error"><span>❌</span><span id="errorMessage">Error al actualizar</span></div>
 <div id="alertInfo" class="alert alert-info"><span>ℹ️</span><span id="infoMessage">Ingrese N° Inspección o Placa para buscar</span></div>
+
+<!-- BARRA DE BÚSQUEDA ACTUALIZADA -->
 <div class="search-container">
 <div class="search-group">
 <label for="searchInspection">🔍 Buscar Inspección de Moto</label>
@@ -128,6 +130,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <span class="btn-search-loader" style="display:none;">⏳</span>
 </button>
 </div>
+
 <form id="motoForm" style="opacity: 0.6; pointer-events: none;">
 <input type="hidden" id="recordId" name="recordId">
 <div class="form-section">
@@ -168,7 +171,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 <div class="inspection-item"><span class="item-label">PATA DE FRENO</span><div class="opt-group"><label><input type="radio" name="pata_freno" value="B"><span>B</span></label><label><input type="radio" name="pata_freno" value="M"><span>M</span></label><label><input type="radio" name="pata_freno" value="NT"><span>N/T</span></label></div></div>
 <div class="inspection-item"><span class="item-label">MANILLA DE CLOUTCH</span><div class="opt-group"><label><input type="radio" name="manilla_cloutch" value="B"><span>B</span></label><label><input type="radio" name="manilla_cloutch" value="M"><span>M</span></label><label><input type="radio" name="manilla_cloutch" value="NT"><span>N/T</span></label></div></div>
 <div class="inspection-item"><span class="item-label">MANILLA DE FRENO</span><div class="opt-group"><label><input type="radio" name="manilla_freno" value="B"><span>B</span></label><label><input type="radio" name="manilla_freno" value="M"><span>M</span></label><label><input type="radio" name="manilla_freno" value="NT"><span>N/T</span></label></div></div>
-<div class="inspection-item"><span class="item-label">ESPEJO RETROVISOR DER.</span><div class="opt-group"><label><input type="radio" name="espejo_retrovisor_der" value="B"><span>B</span></label><label><input type="radio" name="espejo_retrovisor_der" value="M"><span>M</span></label><label><input type="radio" name="espejo_retrovisor_der" value="NT"><span>N/T</span></label></div></div>
+<div class="inspection-item"><span class="item-label">ESPEJO RETROVISOR DER.</span><div class="opt-group"><label><input type="radio" name="espejo_retrovisor_der" value="B"><span>B</span></label><label><input type="radio" name="espejo_retrovisor_der" value="M"><span>M</span></label><label><input type="radio" name="espejo_retrovisor_izq" value="NT"><span>N/T</span></label></div></div>
 <div class="inspection-item"><span class="item-label">ESPEJO RETROVISOR IZQ.</span><div class="opt-group"><label><input type="radio" name="espejo_retrovisor_izq" value="B"><span>B</span></label><label><input type="radio" name="espejo_retrovisor_izq" value="M"><span>M</span></label><label><input type="radio" name="espejo_retrovisor_izq" value="NT"><span>N/T</span></label></div></div>
 <div class="inspection-item"><span class="item-label">SWITCHERA</span><div class="opt-group"><label><input type="radio" name="switchera" value="B"><span>B</span></label><label><input type="radio" name="switchera" value="M"><span>M</span></label><label><input type="radio" name="switchera" value="NT"><span>N/T</span></label></div></div>
 <div class="inspection-item"><span class="item-label">BASTON IZQUIERDO</span><div class="opt-group"><label><input type="radio" name="baston_izq" value="B"><span>B</span></label><label><input type="radio" name="baston_izq" value="M"><span>M</span></label><label><input type="radio" name="baston_izq" value="NT"><span>N/T</span></label></div></div>
