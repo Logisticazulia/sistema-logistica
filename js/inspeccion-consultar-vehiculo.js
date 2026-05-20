@@ -56,14 +56,18 @@ function formatDate(dateStr) {
 
 async function cargarTodasInspecciones(page = 1) {
     try {
-        resultsCount.textContent = '🔄 Cargando...';
+        resultsCount.textContent = '🔄 Cargando patrullas...';
         const { count, error: countError } = await supabase.from('inspecciones_pvr').select('*', { count: 'exact', head: true });
         if (countError) throw countError;
         const from = (page - 1) * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
+        
+        // 🔒 FILTRO: Solo vehiculos que NO sean motos
         const { data, error } = await supabase.from('inspecciones_pvr')
-            .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo, vehiculo_id')
+            .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo, vehiculo_id, tipo')
+            .not('tipo', 'ilike', '%MOTO%') 
             .order('fecha_inspeccion', { ascending: false }).range(from, to);
+            
         if (error) throw error;
         allInspections = data || [];
         filteredInspections = [...allInspections];
@@ -118,69 +122,73 @@ function updatePaginationControls(totalItems) {
     resultsCount.textContent = `${filteredInspections.length} registro${filteredInspections.length !== 1 ? 's' : ''}`;
 }
 
+// 🆘 FUNCIÓN BUSCAR ACTUALIZADA Y BLINDADA
 async function buscarVehiculo() {
     const rawQuery = searchInput?.value.trim();
     if (!rawQuery) { mostrarAlerta('info', 'Ingrese Placa, Facsímil o Serial para buscar'); return; }
-
-    if (btnSearch) { btnSearch.disabled = true; btnSearchText.style.display = 'none'; btnSearchLoader.style.display = 'inline'; }
-    mostrarAlerta('info', '🔍 Buscando vehículo...');
-
+    
+    // ✅ CORRECCIÓN: Verificación segura antes de tocar .style
+    if (btnSearch) btnSearch.disabled = true;
+    if (btnSearchText) btnSearchText.style.display = 'none';
+    if (btnSearchLoader) btnSearchLoader.style.display = 'inline';
+    
+    mostrarAlerta('info', '🔍 Buscando patrulla/vehículo...');
     try {
         const q = rawQuery.replace(/\s+/g, '').toUpperCase();
         
         // 1️⃣ Buscar en tabla vehiculos
-        const { data: resultados, error } = await supabase.from('vehiculos')
-            .select('id, clase, tipo')
+        const { data: vehiculos, error } = await supabase.from('vehiculos').select('id, clase')
             .or(`placa.ilike.${q},facsimil.ilike.${q},s_carroceria.ilike.${q},s_motor.ilike.${q}`)
-            .limit(10);
-
+            .limit(5);
+            
         if (error) throw error;
 
-        // 2️⃣ Filtrar EXCLUYENDO MOTOS explícitamente (según tu CSV)
-        const vehiculo = (resultados || []).find(v => {
+        // 2️⃣ Filtrar EXCLUYENDO MOTOS explícitamente
+        const vehiculoValido = (vehiculos || []).find(v => {
             const c = (v.clase || '').toUpperCase();
-            const t = (v.tipo || '').toUpperCase();
-            // Rechaza si contiene MOTO, ENDURO, PASEO, TRIMOVIL o ESPECIAL
-            return !c.includes('MOTO') && !t.includes('MOTO') && !t.includes('ENDURO') && 
-                   !t.includes('PASEO') && !t.includes('TRIMOVIL') && !c.includes('ESPECIAL');
+            return !c.includes('MOTO');
         });
 
-        if (!vehiculo) {
-            mostrarAlerta('error', '❌ No se encontró un VEHÍCULO. El dato buscado corresponde a una moto o no existe en la base de datos.');
+        if (!vehiculoValido) {
+            mostrarAlerta('error', '❌ Vehículo no encontrado o corresponde a una MOTOCICLETA.');
             return;
         }
-
-        // 3️⃣ Buscar inspecciones SOLO de ese vehículo válido
+        
+        // 3️⃣ Buscar inspecciones PVR SOLO de ese vehículo válido
         const { data, error: inspError } = await supabase.from('inspecciones_pvr')
             .select('id, n_inspeccion, fecha_inspeccion, hora, placa, s_carroceria, motivo')
-            .eq('vehiculo_id', vehiculo.id)
+            .eq('vehiculo_id', vehiculoValido.id)
+            .not('tipo', 'ilike', '%MOTO%') // 🔒 Doble filtro de seguridad
             .order('fecha_inspeccion', { ascending: false });
-
+            
         if (inspError) throw inspError;
-
+        
         allInspections = data || [];
         filteredInspections = [...allInspections];
         currentPage = 1;
-
+        
         if (filteredInspections.length === 0) {
             resultsSection.classList.remove('active');
             emptyState.style.display = 'block';
-            emptyState.innerHTML = '<div class="icon">📭</div><p>Este vehículo no tiene inspecciones registradas</p>';
+            emptyState.innerHTML = '<div class="icon">📭</div><p>Esta patrulla/vehículo no tiene inspecciones PVR registradas</p>';
         } else {
             resultsSection.classList.add('active');
             emptyState.style.display = 'none';
             renderTabla();
             updatePaginationControls(filteredInspections.length);
         }
-        mostrarAlerta('success', `✅ Vehículo encontrado. Mostrando ${filteredInspections.length} inspección(es).`);
+        mostrarAlerta('success', `✅ Patrulla encontrada. Mostrando ${filteredInspections.length} inspección(es).`);
     } catch (err) {
         console.error('❌ Error búsqueda:', err);
         mostrarAlerta('error', `Error: ${err.message}`);
     } finally {
-        if (btnSearch) { btnSearch.disabled = false; btnSearchText.style.display = 'inline'; btnSearchLoader.style.display = 'none'; }
+        // ✅ CORRECCIÓN: Verificación segura en finally
+        if (btnSearch) btnSearch.disabled = false;
+        if (btnSearchText) btnSearchText.style.display = 'inline';
+        if (btnSearchLoader) btnSearchLoader.style.display = 'none';
     }
 }
-// 🆕 POBLAR VISTA PREVIA EXACTA COMO EN CREAR
+
 function poblarVistaPrevia(data) {
     const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val || '-'; };
     set('pv_n_inspeccion', data.n_inspeccion);
@@ -190,7 +198,7 @@ function poblarVistaPrevia(data) {
     set('pv_lugar', `${data.lugar || '-'} / ${data.asignacion || '-'}`);
     set('pv_placa', data.placa);
     set('pv_marca_modelo', `${data.marca || '-'} ${data.modelo || '-'}`);
-    set('pv_ano_tipo', `${data.ano || '-'} - ${data.tipo || '-'}`);
+    set('pv_ano_tipo', `${data.ano || '-'} - ${data.tipo || 'VEHÍCULO'}`);
     set('pv_color', data.color);
     set('pv_s_carroceria', data.s_carroceria);
     set('pv_n_id', data.n_identificacion);
