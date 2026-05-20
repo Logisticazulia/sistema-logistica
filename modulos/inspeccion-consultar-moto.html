@@ -11,9 +11,7 @@
 /* ================= ESTILOS BASE ================= */
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; color: #333; line-height: 1.5; }
-/* 🔥 CONTAINER AMPLIADO PARA PANTALLAS GRANDES */
 .container { max-width: 100%; margin: 0 auto; padding: 20px 30px; }
-
 .alert { padding: 16px 22px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; font-size: 0.92rem; font-weight: 500; animation: slideDown 0.3s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .alert-success { background: #d1fae5; color: #059669; border: 1px solid #059669; }
@@ -22,70 +20,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 
 /* ================= BARRA DE BÚSQUEDA MÁS LARGA ================= */
 .search-container {
-  background: #003366;
-  padding: 22px 28px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  width: 100%;
-  box-sizing: border-box;
+  background: #003366; padding: 22px 28px; border-radius: 10px; margin-bottom: 25px; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; box-sizing: border-box;
 }
-.search-header {
-  color: white;
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.search-row {
-  display: flex;
-  gap: 14px; /* Espacio optimizado */
-  align-items: center;
-  width: 100%;
-}
-.search-input {
-  flex: 2; /* 🔑 Le da más peso al input para que sea más largo */
-  min-width: 400px;
-  padding: 13px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  background: #f0f2f5;
-  transition: all 0.3s;
-  font-family: 'Roboto', sans-serif;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-}
+.search-header { color: white; font-size: 1.05rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+.search-row { display: flex; gap: 14px; align-items: center; width: 100%; }
+/* 🔑 BARRA MÁS LARGA */
+.search-input { flex: 3; min-width: 550px; padding: 13px 16px; border: none; border-radius: 8px; font-size: 1rem; background: #f0f2f5; transition: all 0.3s; font-family: 'Roboto', sans-serif; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
 .search-input:focus { outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
-.btn-search-custom {
-  padding: 13px 22px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s;
-  font-family: 'Roboto', sans-serif;
-  white-space: nowrap;
-  height: 48px;
-}
+.btn-search-custom { padding: 13px 22px; border: none; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Roboto', sans-serif; white-space: nowrap; height: 48px; }
 .btn-search-green { background: #28a745; color: white; box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3); }
 .btn-search-green:hover { background: #218838; transform: translateY(-1px); }
 .btn-search-yellow { background: #ffc107; color: #212529; box-shadow: 0 3px 6px rgba(255, 193, 7, 0.3); }
 .btn-search-yellow:hover { background: #e0a800; transform: translateY(-1px); }
-.search-footer {
-  margin-top: 12px;
-  color: #a0b4cc;
-  font-size: 0.82rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-}
+.search-footer { margin-top: 12px; color: #a0b4cc; font-size: 0.82rem; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
 .search-footer span { display: inline-flex; align-items: center; gap: 5px; }
 
 /* ================= TABLA DE RESULTADOS ================= */
@@ -121,8 +69,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .modal-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 20px; border-top: 2px solid #e8eef5; position: sticky; bottom: 0; background: white; }
 .btn-print { background: linear-gradient(135deg, #003366, #005b96); color: white; padding: 10px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
 .btn-print:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,51,102,0.3); }
-
-/* 🖨️ ESTILOS DE VISTA PREVIA */
 .print-page { width: 100%; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; font-size: 9pt; box-sizing: border-box; }
 .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; display: flex; align-items: center; justify-content: space-between; }
 .print-logo { width: 85px; height: 85px; object-fit: contain; }
@@ -144,7 +90,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 .pv-signatures > div > div { text-align:center; margin-bottom: 30px; }
 .pv-sign-name { font-weight: 700; font-size: 9pt; } .pv-sign-rango { font-size: 8pt; color: #4a5568; }
 
-/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .container { padding: 15px; }
   .search-row { flex-direction: column; }
@@ -158,8 +103,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
 }
 @media (max-width: 1024px) { .pv-comps { grid-template-columns: repeat(4, 1fr); } }
 @media print {
-  body * { visibility: hidden; }
-  .modal-overlay.active, .modal-overlay.active * { visibility: visible; }
+  body * { visibility: hidden; } .modal-overlay.active, .modal-overlay.active * { visibility: visible; }
   .modal-overlay.active { position: absolute; left: 0; top: 0; background: white; width: 100%; height: auto; overflow: visible; padding: 0; }
   .modal-header, .modal-actions, .modal-close { display: none !important; }
   .modal-content { box-shadow: none; max-height: none; overflow: visible; width: 100%; max-width: none; }
@@ -208,7 +152,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
     <div class="search-container">
       <div class="search-header">🔍 Búsqueda de Motocicleta</div>
       <div class="search-row">
-        <input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | Facsímil | Serial de Motor | N° Identificación">
+        <input type="text" id="searchMoto" class="search-input" placeholder="Ej: AB123CD | Facsímil | Serial de Motor | N° Inspección | N° Identificación">
         <div style="display: flex; gap: 10px;">
           <button type="button" class="btn-search-custom btn-search-green" id="btnSearch">🔍 Buscar Moto</button>
           <button type="button" class="btn-search-custom btn-search-yellow" id="btnClearSearch">🔄 Limpiar</button>
@@ -220,6 +164,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; paddin
         <span>📄 Facsímil</span>
         <span>⚙️ Serial Motor</span>
         <span>🆔 N/Identificación</span>
+        <span>🔢 N° Inspección</span>
       </div>
     </div>
 
