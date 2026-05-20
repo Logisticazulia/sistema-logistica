@@ -23,28 +23,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     const supabase = await initSupabase();
     if (!supabase) return;
 
+    // 🔹 HELPER: IDENTIFICAR SI ES MOTO
+    const esMoto = (tipo) => {
+        if (!tipo) return false;
+        const t = tipo.toLowerCase();
+        return t.includes('moto') || t.includes('enduro') || t.includes('paseo') || t.includes('trimovil') || t.includes('traccion');
+    };
+
+    // 🔹 HELPER: OBTENER TODOS LOS COMPONENTES (MOTO JSONB + PATRULLA COLUMNAS)
+    const obtenerComponentes = (d) => {
+        const comps = {};
+        // 1. Componentes Motos (JSONB)
+        let motoComps = d.componentes_moto || {};
+        if (typeof motoComps === 'string') {
+            try { motoComps = JSON.parse(motoComps); } catch { motoComps = {}; }
+        }
+        Object.assign(comps, motoComps);
+
+        // 2. Componentes Patrullas (Columnas individuales B/M/NT)
+        const ignoreKeys = ['id','vehiculo_id','n_inspeccion','fecha_inspeccion','hora','motivo','lugar','asignacion','supervision','placa','marca','modelo','ano','tipo','color','n_identificacion','s_carroceria','kms','inspector','created_at','updated_at','observaciones','coord_nombre','coord_rango','coord_cedula','coord_telefono','insp_nombre','insp_rango','insp_cedula','insp_telefono','componentes_moto','s_motor','deleted_at'];
+        Object.keys(d).forEach(k => {
+            if (!ignoreKeys.includes(k) && (d[k] === 'B' || d[k] === 'M' || d[k] === 'NT')) {
+                comps[k] = d[k];
+            }
+        });
+        return comps;
+    };
+
     // 🔹 CARGAR DATOS DE INSPECCIONES
     async function cargarDatos(filtros = {}) {
         try {
-            // CORRECCIÓN: Eliminamos el JOIN con vehiculos. Leemos tipo/clase directamente de inspecciones_pvr
             let query = supabase.from('inspecciones_pvr').select('*');
-
             if (filtros.desde) query = query.gte('fecha_inspeccion', filtros.desde);
             if (filtros.hasta) query = query.lte('fecha_inspeccion', filtros.hasta);
             if (filtros.placa) query = query.ilike('placa', `%${filtros.placa}%`);
-
-            const { data, error } = await query.order('fecha_inspeccion', { ascending: false });
             
+            // Filtrado en cliente para mayor precisión
+            const { data, error } = await query.order('fecha_inspeccion', { ascending: false });
             if (error) throw error;
 
-            // Filtrar por tipo en el cliente para asegurar precisión (Moto vs Vehículo)
             let result = data || [];
-            if (filtros.tipo === 'moto') {
-                result = result.filter(d => esMoto(d));
-            } else if (filtros.tipo === 'patrulla') {
-                result = result.filter(d => !esMoto(d));
-            }
-
+            if (filtros.tipo === 'moto') result = result.filter(d => esMoto(d.tipo));
+            if (filtros.tipo === 'patrulla') result = result.filter(d => !esMoto(d.tipo));
             return result;
         } catch (err) {
             console.error('❌ Error cargando datos:', err);
@@ -52,53 +72,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 🔹 DETERMINAR SI ES MOTO
-    function esMoto(row) {
-        if (!row) return false;
-        const texto = `${row.tipo} ${row.clase} ${row.marca} ${row.modelo}`.toLowerCase();
-        return texto.includes('moto') || texto.includes('enduro') || texto.includes('paseo') || texto.includes('trimovil');
-    }
-
-    // 🔹 OBTENER COMPONENTES (UNIFICADO MOTO/PATRULLA)
-    function obtenerTodosComponentes(d) {
-        const comps = {};
-        // 1. Componentes Moto (JSONB)
-        if (d.componentes_moto && typeof d.componentes_moto === 'object') {
-            Object.assign(comps, d.componentes_moto);
-        }
-        // 2. Componentes Patrulla (Columnas individuales)
-        // Iteramos todas las claves del objeto
-        Object.keys(d).forEach(k => {
-            if (['n_inspeccion','fecha_inspeccion','hora','motivo','lugar','asignacion','supervision',
-                 'placa','marca','modelo','ano','tipo','color','n_identificacion','s_carroceria','kms',
-                 'inspector','created_at','observaciones','coord_nombre','coord_rango','coord_cedula','coord_telefono',
-                 'insp_nombre','insp_rango','insp_cedula','insp_telefono','componentes_moto','s_motor','id','vehiculo_id'].includes(k)) return;
-            
-            // Si no es un campo base, lo tomamos como componente si tiene valor B/M/NT
-            const val = d[k];
-            if (val === 'B' || val === 'M' || val === 'NT') {
-                comps[k] = val;
-            }
-        });
-        return comps;
-    }
-
     // 🔹 CALCULAR KPIS
     function calcularKpis(data) {
         const total = data.length;
-        const motos = data.filter(esMoto).length;
+        const motos = data.filter(d => esMoto(d.tipo)).length;
         const patrullas = total - motos;
-
-        // Contar componentes en estado "M" (Malo)
         let totalComponentes = 0, malos = 0;
 
         data.forEach(d => {
-            const comps = obtenerTodosComponentes(d);
+            const comps = obtenerComponentes(d);
             Object.values(comps).forEach(v => {
-                if (v) {
-                    totalComponentes++;
-                    if (v === 'M') malos++;
-                }
+                if (v) { totalComponentes++; if (v === 'M') malos++; }
             });
         });
 
@@ -127,14 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             type: 'line',
             data: {
                 labels: labelsMeses.map(m => { const [y, mm] = m.split('-'); return `${mm}/${y.slice(2)}`; }),
-                datasets: [{
-                    label: 'Inspecciones',
-                    data: valoresMeses,
-                    borderColor: '#005b96',
-                    backgroundColor: 'rgba(0, 91, 150, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
+                datasets: [{ label: 'Inspecciones', data: valoresMeses, borderColor: '#005b96', backgroundColor: 'rgba(0, 91, 150, 0.1)', tension: 0.4, fill: true }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
@@ -142,33 +119,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2️⃣ Distribución B/M/NT
         let b = 0, m = 0, nt = 0;
         data.forEach(d => {
-            const comps = obtenerTodosComponentes(d);
-            Object.values(comps).forEach(v => {
-                if (v === 'B') b++;
-                else if (v === 'M') m++;
-                else if (v === 'NT') nt++;
+            Object.values(obtenerComponentes(d)).forEach(v => {
+                if (v === 'B') b++; else if (v === 'M') m++; else nt++;
             });
         });
 
         if (charts.distribucion) charts.distribucion.destroy();
         charts.distribucion = new Chart(document.getElementById('chartDistribucion'), {
             type: 'doughnut',
-            data: {
-                labels: ['Bueno', 'Malo', 'N/T'],
-                datasets: [{
-                    data: [b, m, nt],
-                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
-                    borderWidth: 0
-                }]
-            },
+            data: { labels: ['Bueno', 'Malo', 'N/T'], datasets: [{ data: [b, m, nt], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'], borderWidth: 0 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
 
         // 3️⃣ Top 10 Componentes Fallados
         const fallados = {};
         data.forEach(d => {
-            const comps = obtenerTodosComponentes(d);
-            Object.entries(comps).forEach(([k, v]) => {
+            Object.entries(obtenerComponentes(d)).forEach(([k, v]) => {
                 if (v === 'M') {
                     const label = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     fallados[label] = (fallados[label] || 0) + 1;
@@ -177,51 +143,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         const topFallados = Object.entries(fallados).sort((a, b) => b[1] - a[1]).slice(0, 10);
-
         if (charts.topFallados) charts.topFallados.destroy();
         charts.topFallados = new Chart(document.getElementById('chartTopFallados'), {
             type: 'bar',
-            data: {
-                labels: topFallados.map(([k]) => k),
-                datasets: [{
-                    label: 'Veces en Mal Estado',
-                    data: topFallados.map(([, v]) => v),
-                    backgroundColor: '#ef4444',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-                plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true } }
-            }
+            data: { labels: topFallados.map(([k]) => k), datasets: [{ label: 'Veces en Mal Estado', data: topFallados.map(([, v]) => v), backgroundColor: '#ef4444', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
         });
 
         // 4️⃣ Inspecciones por Inspector
         const porInspector = {};
-        data.forEach(d => {
-            const insp = d.insp_nombre || 'Sin asignar';
-            porInspector[insp] = (porInspector[insp] || 0) + 1;
-        });
+        data.forEach(d => { porInspector[d.insp_nombre || 'Sin asignar'] = (porInspector[d.insp_nombre || 'Sin asignar'] || 0) + 1; });
         const topInspectores = Object.entries(porInspector).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
         if (charts.inspectores) charts.inspectores.destroy();
         charts.inspectores = new Chart(document.getElementById('chartInspectores'), {
             type: 'bar',
-            data: {
-                labels: topInspectores.map(([k]) => k),
-                datasets: [{
-                    label: 'Inspecciones',
-                    data: topInspectores.map(([, v]) => v),
-                    backgroundColor: '#005b96',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
+            data: { labels: topInspectores.map(([k]) => k), datasets: [{ label: 'Inspecciones', data: topInspectores.map(([, v]) => v), backgroundColor: '#005b96', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         });
     }
 
@@ -238,13 +176,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         pageData.forEach(d => {
-            const moto = esMoto(d);
-            const tipoBadge = `<span class="badge ${moto ? 'badge-moto' : 'badge-patrulla'}">${moto ? '🏍️ Moto' : '🚓 Patrulla'}</span>`;
+            const esM = esMoto(d.tipo);
+            const tipoBadge = `<span class="badge ${esM ? 'badge-moto' : 'badge-patrulla'}">${esM ? '🏍️ Moto' : '🚓 Patrulla'}</span>`;
             
-            // Contar componentes "M"
             let malos = 0;
-            const comps = obtenerTodosComponentes(d);
-            Object.values(comps).forEach(v => { if (v === 'M') malos++; });
+            Object.values(obtenerComponentes(d)).forEach(v => { if (v === 'M') malos++; });
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -259,7 +195,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             tbody.appendChild(tr);
         });
 
-        // Paginación
         document.getElementById('tableCount').textContent = `${data.length} registro${data.length !== 1 ? 's' : ''}`;
         const btnPrev = document.getElementById('btnPrev');
         const btnNext = document.getElementById('btnNext');
@@ -274,43 +209,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🔹 ABRIR MODAL CON DETALLE
     async function abrirDetalle(id) {
         try {
-            // Buscar directamente en la lista filtrada o recargar si no está
-            const item = allData.find(d => d.id === id) || filteredData.find(d => d.id === id);
-            if (!item) {
-                // Si no está en memoria, traerlo
-                const { data } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
-                if(!data) throw new Error('No encontrado');
-                item = data;
-            }
+            const { data, error } = await supabase.from('inspecciones_pvr').select('*').eq('id', id).single();
+            if (error) throw error;
+            if (!data) return;
 
-            document.getElementById('modalNInspeccion').textContent = `(${item.n_inspeccion || 'Sin ID'})`;
+            document.getElementById('modalNInspeccion').textContent = `(${data.n_inspeccion || 'Sin ID'})`;
+            const esM = esMoto(data.tipo);
             
-            const moto = esMoto(item);
             let html = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-                    <div><strong>N° Inspección:</strong> ${item.n_inspeccion || '-'}</div>
-                    <div><strong>Fecha:</strong> ${item.fecha_inspeccion?.split('-').reverse().join('/') || '-'}</div>
-                    <div><strong>Hora:</strong> ${item.hora || '-'}</div>
-                    <div><strong>Motivo:</strong> ${item.motivo || '-'}</div>
-                    <div><strong>Lugar:</strong> ${item.lugar || '-'}</div>
-                    <div><strong>Asignación:</strong> ${item.asignacion || '-'}</div>
-                    <div><strong>Tipo:</strong> ${moto ? '🏍️ MOTO' : '🚓 VEHÍCULO'}</div>
-                    <div><strong>Placa:</strong> ${item.placa || '-'}</div>
-                    <div><strong>Marca/Modelo:</strong> ${item.marca || '-'} ${item.modelo || ''}</div>
+                    <div><strong>N° Inspección:</strong> ${data.n_inspeccion || '-'}</div>
+                    <div><strong>Fecha:</strong> ${data.fecha_inspeccion?.split('-').reverse().join('/') || '-'}</div>
+                    <div><strong>Hora:</strong> ${data.hora || '-'}</div>
+                    <div><strong>Motivo:</strong> ${data.motivo || '-'}</div>
+                    <div><strong>Lugar:</strong> ${data.lugar || '-'}</div>
+                    <div><strong>Asignación:</strong> ${data.asignacion || '-'}</div>
+                    <div><strong>Tipo:</strong> ${esM ? '🏍️ MOTO' : '🚓 VEHÍCULO'}</div>
+                    <div><strong>Placa:</strong> ${data.placa || '-'}</div>
+                    <div><strong>Marca/Modelo:</strong> ${data.marca || '-'} ${data.modelo || ''}</div>
                 </div>
-                <div style="margin-bottom: 20px;"><strong>Observaciones:</strong><br>${item.observaciones || 'Sin observaciones.'}</div>
+                <div style="margin-bottom: 20px;"><strong>Observaciones:</strong><br>${data.observaciones || 'Sin observaciones.'}</div>
                 <div style="margin-bottom: 20px;">
                     <strong>Componentes en Mal Estado (M):</strong>
-                    <ul style="margin: 8px 0 0 20px; color: #ef4444;">
-            `;
+                    <ul style="margin: 8px 0 0 20px; color: #ef4444;">`;
             
-            const comps = obtenerTodosComponentes(item);
+            const comps = obtenerComponentes(data);
             let hayMalos = false;
             Object.entries(comps).forEach(([k, v]) => {
                 if (v === 'M') {
                     hayMalos = true;
-                    const label = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    html += `<li>${label}</li>`;
+                    html += `<li>${k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</li>`;
                 }
             });
             if (!hayMalos) html += '<li style="color:#10b981">Todos los componentes reportados están en buen estado (B) o N/T.</li>';
@@ -320,14 +248,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div style="text-align: center;">
                     <div style="font-weight: 700; margin-bottom: 10px;">POR LA COORDINACIÓN</div>
                     <div style="border-top: 2px solid #000; width: 80%; margin: 0 auto 8px;"></div>
-                    <div>${item.coord_nombre || '-'}</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">${item.coord_rango || ''}${item.coord_cedula ? ` | C.I. ${item.coord_cedula}` : ''}</div>
+                    <div>${data.coord_nombre || '-'}</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">${data.coord_rango || ''}${data.coord_cedula ? ` | C.I. ${data.coord_cedula}` : ''}</div>
                 </div>
                 <div style="text-align: center;">
                     <div style="font-weight: 700; margin-bottom: 10px;">INSPECCIÓN REALIZADA POR:</div>
                     <div style="border-top: 2px solid #000; width: 80%; margin: 0 auto 8px;"></div>
-                    <div>${item.insp_nombre || '-'}</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">${item.insp_rango || ''}${item.insp_cedula ? ` | C.I. ${item.insp_cedula}` : ''}</div>
+                    <div>${data.insp_nombre || '-'}</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">${data.insp_rango || ''}${data.insp_cedula ? ` | C.I. ${data.insp_cedula}` : ''}</div>
                 </div>
             </div>`;
 
@@ -348,14 +276,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🔹 EXPORTAR A EXCEL (CSV)
     function exportarExcel() {
         if (filteredData.length === 0) { alert('No hay datos para exportar'); return; }
-        const headers = ['N° Inspección', 'Fecha', 'Hora', 'Tipo', 'Placa', 'Marca', 'Modelo', 'Motivo', 'Inspector', 'Componentes Malos'];
+        const headers = ['N° Inspección', 'Fecha', 'Hora', 'Tipo', 'Placa', 'Marca', 'Modelo', 'Motivo', 'Inspector', 'Componentes M'];
         const rows = filteredData.map(d => {
-            const moto = esMoto(d);
             let malos = 0;
-            const comps = obtenerTodosComponentes(d);
-            Object.values(comps).forEach(v => { if (v === 'M') malos++; });
+            Object.values(obtenerComponentes(d)).forEach(v => { if (v === 'M') malos++; });
             return [
-                d.n_inspeccion, d.fecha_inspeccion, d.hora, moto ? 'Moto' : 'Patrulla',
+                d.n_inspeccion, d.fecha_inspeccion, d.hora, esMoto(d.tipo) ? 'Moto' : 'Patrulla',
                 d.placa, d.marca, d.modelo, d.motivo, d.insp_nombre, malos
             ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(',');
         });
@@ -396,7 +322,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hoy = new Date().toISOString().split('T')[0];
     const hace30 = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
     
-    // Configurar fechas por defecto si están vacías
     if(!document.getElementById('filterDesde').value) document.getElementById('filterDesde').value = hace30;
     if(!document.getElementById('filterHasta').value) document.getElementById('filterHasta').value = hoy;
 
