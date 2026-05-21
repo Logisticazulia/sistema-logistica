@@ -31,7 +31,8 @@
         .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border-bottom: 3px solid #003366; padding-bottom: 10px; }
         .results-header h2 { margin: 0; border: none; padding: 0; color: #003366; font-size: 20px; }
         .filter-container { display: flex; align-items: center; gap: 10px; }
-        .filter-container select { padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        .filter-container label { font-weight: 600; color: #555; }
+        .filter-container select { padding: 8px 12px; border: 2px solid #003366; border-radius: 4px; font-size: 14px; cursor: pointer; background: white; }
         
         .table-container { overflow-x: auto; border-radius: 4px; border: 1px solid #e0e0e0; }
         .results-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px; }
@@ -85,6 +86,11 @@
             .modal { display: block !important; position: static; background: white; padding: 0; }
             .modal-content { box-shadow: none; padding: 0; width: 100%; }
         }
+        @media (max-width: 768px) {
+            .results-header { flex-direction: column; align-items: flex-start; }
+            .filter-container { width: 100%; margin-top: 10px; }
+            .pagination-bar { flex-direction: column; gap: 15px; }
+        }
     </style>
 </head>
 <body class="dashboard-page">
@@ -113,6 +119,11 @@
             <button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">← Volver</button>
         </header>
 
+        <section class="module-title-section">
+            <h1 class="module-title">🔍 Consultar Ficha Técnica</h1>
+            <p class="module-subtitle">Busque y visualice las fichas técnicas registradas</p>
+        </section>
+
         <div class="container">
             <!-- Sección de Búsqueda -->
             <div class="search-section">
@@ -132,14 +143,14 @@
                 </div>
             </div>
 
-            <!-- Sección de Resultados (FILTRO AL LADO DEL TÍTULO) -->
+            <!-- Sección de Resultados con FILTRO AL LADO DEL TÍTULO -->
             <div class="results-section">
                 <div class="results-header">
                     <h2>📋 Resultados de Búsqueda</h2>
                     <div class="filter-container">
                         <label for="filtroTipo">Filtrar:</label>
                         <select id="filtroTipo" onchange="aplicarFiltro()">
-                            <option value="todos">📋 Todos los registros</option>
+                            <option value="todos">📋 Todos</option>
                             <option value="motos">🏍️ Solo Motos</option>
                             <option value="vehiculos">🚗 Solo Vehículos</option>
                         </select>
@@ -172,13 +183,13 @@
 
                 <!-- PAGINACIÓN -->
                 <div class="pagination-bar">
-                    <div class="pagination-info" style="color: #555; font-size: 13px;">
+                    <div style="color: #555; font-size: 13px;">
                         Mostrando <span id="mostrandoInicio">0</span> - <span id="mostrandoFin">0</span> de <span id="totalRegistros">0</span>
                     </div>
                     <div class="pagination-controls">
-                        <button class="btn-page" id="btnAnterior" onclick="cambiarPagina(-1)">⬅️ Anterior</button>
+                        <button class="btn-page" id="btnAnterior" onclick="cambiarPagina(-1)" disabled>⬅️ Anterior</button>
                         <span class="page-info">Pág <span id="paginaActual">1</span> de <span id="totalPaginas">1</span></span>
-                        <button class="btn-page" id="btnSiguiente" onclick="cambiarPagina(1)">Siguiente ➡️</button>
+                        <button class="btn-page" id="btnSiguiente" onclick="cambiarPagina(1)" disabled>Siguiente ➡️</button>
                     </div>
                 </div>
             </div>
@@ -191,7 +202,7 @@
             <div class="modal-close" onclick="cerrarModal()">&times;</div>
             <div class="ficha-tecnica" id="fichaDetalle">
                 <div class="ficha-header">
-                    <img src="../img/logo.png" alt="Logo" width="80">
+                    <img src="../img/logo_izquierdo.png" alt="Logo" width="80">
                     <div class="ficha-title">
                         <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
                         <h2>REDIP: OCCIDENTAL</h2>
@@ -232,6 +243,7 @@
     <!-- ================= SCRIPTS ================= -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
+    <!-- ✅ CORREGIDO: Nombre exacto del archivo JS -->
     <script src="../js/ficha-consulta.js"></script>
 </body>
 </html>
