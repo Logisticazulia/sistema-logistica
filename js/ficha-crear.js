@@ -1,13 +1,14 @@
 /**
  * FICHA TÉCNICA - VERSIÓN ESTABLE
- * ✅ Sintaxis corregida (fileName)
- * ✅ Búsqueda exacta normalizada
- * ✅ Sin ReferenceError
+ * ✅ Formulario bloqueado por defecto con candado
+ * ✅ Botón Volver funcional
+ * ✅ Miniaturas visibles en formulario y vista previa
  */
 
 let supabaseClient = null;
 const fotosData = { foto1: null, foto2: null, foto3: null, foto4: null };
-const CAMPOS_BLOQUEADOS = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'placa', 'facsimil', 'estatus', 'dependencia'];
+const CAMPOS_BLOQUEADOS = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'placa', 'facsimil', 'estatus', 'dependencia', 'causa', 'mecanica', 'diagnostico', 'ubicacion', 'tapiceria', 'cauchos', 'luces', 'observaciones'];
+const INPUTS_FOTOS = ['foto1', 'foto2', 'foto3', 'foto4'];
 var duplicadosEncontrados = { placa: false, facsimil: false, s_carroceria: false, s_motor: false };
 var debounceTimers = {};
 
@@ -18,8 +19,7 @@ function mostrarAlerta(mensaje, tipo) {
     alertDiv.textContent = mensaje;
     alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
-    alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => alertDiv.style.display = 'none', 5000);
+    setTimeout(() => alertDiv.style.display = 'none', 6000);
 }
 
 function mostrarAlertaDuplicado(campo, mensaje, existe) {
@@ -35,12 +35,8 @@ function mostrarAlertaDuplicado(campo, mensaje, existe) {
         alerta.className = 'duplicate-alert';
         alerta.innerHTML = '⚠️ ' + mensaje;
         formGroup.appendChild(alerta);
-        input.style.borderColor = '#dc2626';
-        input.style.backgroundColor = '#fef2f2';
         duplicadosEncontrados[campo] = true;
     } else {
-        input.style.borderColor = '#ddd';
-        input.style.backgroundColor = 'white';
         duplicadosEncontrados[campo] = false;
     }
     actualizarEstadoBotonGuardar();
@@ -103,6 +99,29 @@ async function verificarDuplicadosAntesDeGuardar(placa, facsimil, s_carroceria, 
     } catch (err) { return { existe: false, duplicados: [] }; }
 }
 
+// ================= BLOQUEO / DESBLOQUEO =================
+function bloquearCampos() {
+    CAMPOS_BLOQUEADOS.forEach(id => {
+        var e = document.getElementById(id);
+        if (e) { e.disabled = true; e.closest('.form-group').classList.add('locked'); }
+    });
+    INPUTS_FOTOS.forEach(id => {
+        var e = document.getElementById(id);
+        if (e) { e.disabled = true; }
+    });
+}
+
+function desbloquearCampos() {
+    CAMPOS_BLOQUEADOS.forEach(id => {
+        var e = document.getElementById(id);
+        if (e) { e.disabled = false; e.closest('.form-group').classList.remove('locked'); }
+    });
+    INPUTS_FOTOS.forEach(id => {
+        var e = document.getElementById(id);
+        if (e) e.disabled = false;
+    });
+}
+
 // ================= BÚSQUEDA =================
 async function buscarVehiculo() {
     var input = document.getElementById('searchInput');
@@ -117,15 +136,17 @@ async function buscarVehiculo() {
         if (!res.data.length) return mostrarAlerta('❌ No encontrado: ' + term, 'error');
         
         var v = res.data[0];
+        // Verificar ficha existente
         var ids = [normalizarSerial(v.placa), normalizarSerial(v.facsimil), normalizarSerial(v.s_carroceria), normalizarSerial(v.s_motor)].filter(Boolean);
         if (ids.length) {
             var fRes = await supabaseClient.from('fichas_tecnicas').select('id').or(ids.map(i => 'placa.eq."' + i + '"').join(','));
             if (fRes.data.length) return mostrarAlerta('⚠️ Vehículo ya tiene ficha', 'error');
         }
         
+        // ✅ DESBLOQUEAR AL ENCONTRAR
+        desbloquearCampos();
         llenarFormulario(v);
-        bloquearCamposPrincipales();
-        mostrarAlerta('✅ Encontrado: ' + v.marca + ' ' + v.modelo, 'success');
+        mostrarAlerta('✅ Formulario desbloqueado', 'success');
     } catch (err) { mostrarAlerta('❌ Error: ' + err.message, 'error'); }
 }
 
@@ -187,7 +208,6 @@ async function guardarFicha() {
         for(let i=1; i<=4; i++) {
             var inp = document.getElementById('foto'+i);
             if(inp && inp.files[0]) {
-                // ✅ SINTAXIS CORREGIDA: concatenación segura
                 var fileName = 'ficha_'+Date.now()+'_f'+i+'_'+(placa||'sin') + '.jpg';
                 var up = await supabaseClient.storage.from('fichas-tecnicas').upload(fileName, inp.files[0], {cacheControl:'3600'});
                 if(up.data?.path) data['foto'+i+'_url'] = supabaseClient.storage.from('fichas-tecnicas').getPublicUrl(fileName).data.publicUrl;
@@ -198,32 +218,45 @@ async function guardarFicha() {
         if(res.error) throw res.error;
         
         mostrarAlerta('✅ ¡GUARDADA EXITOSAMENTE!', 'success');
-        setTimeout(limpiarBusqueda, 2000);
+        setTimeout(limpiarTodo, 2000);
     } catch(e) { mostrarAlerta('❌ Error: '+e.message, 'error'); }
 }
 
-// ================= LIMPIAR & PREVIEW =================
-function limpiarBusqueda() {
-    document.getElementById('fichaForm').reset();
-    desbloquearCampos();
-    actualizarVistaPrevia();
-    document.querySelectorAll('.duplicate-alert').forEach(e => e.remove());
-    duplicadosEncontrados = {placa:false,facsimil:false,s_carroceria:false,s_motor:false};
-    actualizarEstadoBotonGuardar();
-    for(let j=1; j<=4; j++) fotosData['foto'+j] = null;
-    actualizarFotosPreview();
-    mostrarAlerta('🔄 Limpiado', 'info');
+// ================= FOTOS & VISTA PREVIA =================
+function previewImage(input, previewId) {
+    if (input.files?.[0]) {
+        var reader = new FileReader();
+        reader.onload = (e) => {
+            var img = document.getElementById(previewId);
+            var container = document.getElementById(previewId + 'Container');
+            var placeholder = container?.querySelector('.placeholder');
+            var btnRemove = container?.parentElement.querySelector('.btn-remove');
+            if (img) { img.src = e.target.result; img.style.display = 'block'; }
+            if (placeholder) placeholder.style.display = 'none';
+            if (btnRemove) btnRemove.style.display = 'flex';
+            
+            var fotoNum = previewId.replace('previewFoto', 'foto');
+            fotosData[fotoNum] = e.target.result;
+            actualizarFotosPreview();
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 }
 
-function bloquearCamposPrincipales() { CAMPOS_BLOQUEADOS.forEach(id => { var e=document.getElementById(id); if(e) e.disabled=true; }); }
-function desbloquearCampos() { CAMPOS_BLOQUEADOS.forEach(id => { var e=document.getElementById(id); if(e) e.disabled=false; }); }
-
-function actualizarVistaPrevia() {
-    ['marca','modelo','tipo','clase','serialCarroceria','color','placa','facsimil','serialMotor','dependencia','estatus','causa','mecanica','diagnostico','ubicacion','tapiceria','cauchos','luces','observaciones'].forEach(c => {
-        var prev = document.getElementById('preview' + c.charAt(0).toUpperCase() + c.slice(1));
-        var el = document.getElementById(c);
-        if(prev && el) prev.textContent = el.value || 'N/A';
-    });
+function removeFoto(num) {
+    var input = document.getElementById('foto' + num);
+    var img = document.getElementById('previewFoto' + num);
+    var container = document.getElementById('previewFoto' + num + 'Container');
+    var placeholder = container?.querySelector('.placeholder');
+    var btnRemove = container?.parentElement.querySelector('.btn-remove');
+    
+    if (input) input.value = '';
+    if (img) { img.src = ''; img.style.display = 'none'; }
+    if (placeholder) placeholder.style.display = 'flex';
+    if (btnRemove) btnRemove.style.display = 'none';
+    
+    fotosData['foto' + num] = null;
+    actualizarFotosPreview();
 }
 
 function actualizarFotosPreview() {
@@ -235,19 +268,26 @@ function actualizarFotosPreview() {
     }
 }
 
-function previewImage(input, previewId) {
-    if (input.files?.[0]) {
-        var reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById(previewId).src = e.target.result;
-            fotosData[previewId.replace('previewFoto', 'foto')] = e.target.result;
-            actualizarFotosPreview();
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
+function actualizarVistaPrevia() {
+    ['marca','modelo','tipo','clase','serialCarroceria','color','placa','facsimil','serialMotor','dependencia','estatus','causa','mecanica','diagnostico','ubicacion','tapiceria','cauchos','luces','observaciones'].forEach(c => {
+        var prev = document.getElementById('preview' + c.charAt(0).toUpperCase() + c.slice(1));
+        var el = document.getElementById(c);
+        if(prev && el) prev.textContent = el.value || 'N/A';
+    });
 }
 
-// ================= INICIALIZACIÓN =================
+function limpiarTodo() {
+    document.getElementById('fichaForm').reset();
+    bloquearCampos();
+    actualizarVistaPrevia();
+    document.querySelectorAll('.duplicate-alert').forEach(e => e.remove());
+    duplicadosEncontrados = {placa:false,facsimil:false,s_carroceria:false,s_motor:false};
+    actualizarEstadoBotonGuardar();
+    for(let j=1; j<=4; j++) removeFoto(j);
+    mostrarAlerta('🔄 Limpiado', 'info');
+}
+
+// ================= CARGA USUARIO =================
 async function cargarUsuario() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -255,23 +295,33 @@ async function cargarUsuario() {
     } catch(e) {}
 }
 
+// ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', () => {
     inicializarSupabase();
+    bloquearCampos(); // ✅ BLOQUEADO POR DEFECTO
     actualizarVistaPrevia();
+    actualizarFotosPreview();
     
+    // ✅ EVENT LISTENERS SEGUROS
     document.getElementById('btnBuscar')?.addEventListener('click', buscarVehiculo);
-    document.getElementById('btnLimpiarBusqueda')?.addEventListener('click', limpiarBusqueda);
+    document.getElementById('btnLimpiarBusqueda')?.addEventListener('click', () => { document.getElementById('searchInput').value = ''; limpiarTodo(); });
     document.getElementById('btnGuardar')?.addEventListener('click', guardarFicha);
-    document.getElementById('btnLimpiarForm')?.addEventListener('click', limpiarBusqueda);
+    document.getElementById('btnLimpiarForm')?.addEventListener('click', limpiarTodo);
+    
+    // ✅ BOTÓN VOLVER FUNCIONAL
+    document.getElementById('btnVolver')?.addEventListener('click', () => window.location.href = 'ficha.html');
     document.getElementById('logoutBtn')?.addEventListener('click', () => { if(confirm('¿Cerrar sesión?')) window.location.href = '../index.html'; });
     document.getElementById('searchInput')?.addEventListener('keypress', e => { if(e.key==='Enter') buscarVehiculo(); });
     
+    // Validación predictiva
     [{id:'placa', nom:'Placa', campo:'placa'},{id:'facsimil', nom:'Facsimil', campo:'facsimil'},{id:'serialCarroceria', nom:'Chasis', campo:'s_carroceria'},{id:'serialMotor', nom:'Motor', campo:'s_motor'}].forEach(c => {
         document.getElementById(c.id)?.addEventListener('input', e => {
             clearTimeout(debounceTimers[c.id]);
             debounceTimers[c.id] = setTimeout(() => verificarDuplicadoEnTiempoReal(c.campo, e.target.value, c.nom), 800);
         });
     });
-    ['tapiceria','cauchos','luces','causa','mecanica','diagnostico','ubicacion','observaciones'].forEach(id => document.getElementById(id)?.addEventListener('change', actualizarVistaPrevia));
+    
+    // Actualizar vista previa al cambiar campos
+    ['tapiceria','cauchos','luces','causa','mecanica','diagnostico','ubicacion','observaciones'].forEach(id => document.getElementById(id)?.addEventListener('input', actualizarVistaPrevia));
     cargarUsuario();
 });
