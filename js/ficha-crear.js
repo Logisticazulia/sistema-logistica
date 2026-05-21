@@ -278,16 +278,20 @@ async function guardarFicha() {
         return mostrarAlerta('⚠️ Debe buscar y cargar un vehículo antes de guardar', 'error');
     }
 
-    // ✅ 2. Validar CAMPOS TÉCNICOS EDITABLES (Obligatorios)
+    // ✅ 2. Validar TODOS los campos técnicos obligatorios (Editables + Desplegables)
     var camposTecnicos = [
         { id: 'causa', label: 'Causa' },
         { id: 'mecanica', label: 'Mecánica' },
         { id: 'diagnostico', label: 'Diagnóstico' },
-        { id: 'ubicacion', label: 'Ubicación' }
+        { id: 'ubicacion', label: 'Ubicación' },
+        { id: 'tapiceria', label: 'Tapicería' },
+        { id: 'cauchos', label: 'Cauchos' },
+        { id: 'luces', label: 'Luces' }
     ];
+
     var faltantes = camposTecnicos.filter(c => !document.getElementById(c.id)?.value?.trim());
     if (faltantes.length > 0) {
-        return mostrarAlerta('⚠️ Complete la Información Técnico Mecánica: ' + faltantes.map(c => c.label).join(', '), 'error');
+        return mostrarAlerta('⚠️ Complete todos los campos técnicos: ' + faltantes.map(c => c.label).join(', '), 'error');
     }
 
     // ✅ 3. Validar mínimo 2 fotos
