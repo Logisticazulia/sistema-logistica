@@ -291,13 +291,13 @@ async function guardarFicha() {
 
     var faltantes = camposTecnicos.filter(c => !document.getElementById(c.id)?.value?.trim());
     if (faltantes.length > 0) {
-        return mostrarAlerta('⚠️ Complete todos los campos técnicos: ' + faltantes.map(c => c.label).join(', '), 'error');
+        return mostrarAlerta('⚠️ Complete la Información Técnico Mecánica: ' + faltantes.map(c => c.label).join(', '), 'error');
     }
 
-    // ✅ 3. Validar mínimo 2 fotos
+    // ✅ 3. Validar EXACTAMENTE 4 FOTOS (CAMBIO SOLICITADO)
     var fotosCargadas = [fotosData.foto1, fotosData.foto2, fotosData.foto3, fotosData.foto4].filter(f => f !== null).length;
-    if (fotosCargadas < 2) {
-        return mostrarAlerta('📸 Debe cargar al menos 2 fotos del vehículo', 'error');
+    if (fotosCargadas < 4) {
+        return mostrarAlerta('📸 Debe cargar las 4 fotos obligatorias del vehículo', 'error');
     }
 
     // ✅ 4. Verificar duplicados finales antes de insertar
