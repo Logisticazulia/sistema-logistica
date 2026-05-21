@@ -1,14 +1,15 @@
-/**
- * ============================================
- * CONSULTA DE FICHAS TÉCNICAS - SUPABASE
- * VERSIÓN COMPATIBLE CON ficha-consulta.html
- * ============================================
- */
+// ============================================
+// CONSULTAR FICHAS TÉCNICAS - LÓGICA COMPLETA
+// ============================================
 
 // ================= CONFIGURACIÓN =================
 let supabaseClient = null;
-let allFichas = [];
-let filteredFichas = [];
+
+// ================= ESTADO =================
+let fichasEncontradas = [];
+let fichasFiltradas = [];
+let paginaActual = 1;
+const registrosPorPagina = 15;
 
 // ================= INICIALIZAR SUPABASE =================
 function inicializarSupabase() {
@@ -16,18 +17,14 @@ function inicializarSupabase() {
         console.error('❌ Librería Supabase no cargada');
         return false;
     }
-    
     var url = window.SUPABASE_URL;
     var key = window.SUPABASE_KEY;
-    
     if (!url || !key) {
         console.error('❌ Configuración de Supabase no encontrada');
         return false;
     }
-    
     try {
         supabaseClient = window.supabase.createClient(url, key);
-        console.log('✅ Supabase inicializado correctamente');
         return true;
     } catch (error) {
         console.error('❌ Error al inicializar Supabase:', error);
@@ -35,96 +32,10 @@ function inicializarSupabase() {
     }
 }
 
-// ================= CARGAR FICHAS TÉCNICAS =================
-async function cargarFichas() {
-    try {
-        console.log('📊 Cargando fichas técnicas desde Supabase...');
-        
-        var result = await supabaseClient
-            .from('fichas_tecnicas')
-            .select('*')
-            .order('fecha_creacion', { ascending: false });
-        
-        if (result.error) {
-            console.error('❌ Error al cargar fichas:', result.error);
-            mostrarAlerta('Error al cargar datos: ' + result.error.message, 'error');
-            return;
-        }
-        
-        allFichas = result.data || [];
-        filteredFichas = [].concat(allFichas);
-        
-        console.log('✅ Fichas cargadas:', allFichas.length);
-        renderTable();
-        
-    } catch (error) {
-        console.error('❌ Error cargando fichas:', error);
-        mostrarAlerta('Error: ' + error.message, 'error');
-    }
-}
-
-// ================= BUSCAR FICHA =================
-async function buscarVehiculo() {
-    var searchInput = document.getElementById('searchInput');
-    
-    if (!searchInput) {
-        mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
-        return;
-    }
-    
-    var searchTerm = searchInput.value.trim().toUpperCase();
-    
-    if (!searchTerm) {
-        filteredFichas = [].concat(allFichas);
-        renderTable();
-        return;
-    }
-    
-    console.log('🔍 Buscando ficha:', searchTerm);
-    mostrarAlerta('⏳ Buscando...', 'info');
-    
-    try {
-        var result = await supabaseClient
-            .from('fichas_tecnicas')
-            .select('*')
-            .or('placa.eq.' + searchTerm + ',facsimil.eq.' + searchTerm + ',s_carroceria.eq.' + searchTerm + ',s_motor.eq.' + searchTerm + ',marca.ilike.%' + searchTerm + '%,modelo.ilike.%' + searchTerm + '%')
-            .order('fecha_creacion', { ascending: false });
-        
-        if (result.error) {
-            console.error('❌ Error en búsqueda:', result.error);
-            mostrarAlerta('Error: ' + result.error.message, 'error');
-            return;
-        }
-        
-        filteredFichas = result.data || [];
-        
-        console.log('📊 Resultados:', filteredFichas.length);
-        
-        if (filteredFichas.length === 0) {
-            mostrarAlerta('❌ No se encontró ninguna ficha con: ' + searchTerm, 'error');
-        } else {
-            mostrarAlerta('✅ ' + filteredFichas.length + ' ficha(s) encontrada(s)', 'success');
-        }
-        
-        renderTable();
-        
-    } catch (error) {
-        console.error('❌ Error en buscarVehiculo:', error);
-        mostrarAlerta('Error: ' + error.message, 'error');
-    }
-}
-
-// ================= LIMPIAR BÚSQUEDA =================
-function limpiarBusqueda() {
-    var searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    var searchAlert = document.getElementById('searchAlert');
-    if (searchAlert) searchAlert.style.display = 'none';
-    
-    filteredFichas = [].concat(allFichas);
-    renderTable();
-    mostrarAlerta('🔄 Búsqueda limpiada', 'info');
+// ================= LIMPIAR TEXTO =================
+function limpiarTexto(texto) {
+    if (!texto) return '';
+    return texto.toString().trim().toUpperCase();
 }
 
 // ================= MOSTRAR ALERTA =================
@@ -135,173 +46,258 @@ function mostrarAlerta(mensaje, tipo) {
     alertDiv.textContent = mensaje;
     alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
-    
-    setTimeout(function() {
+
+    // Auto-scroll suave
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    setTimeout(() => {
         alertDiv.style.display = 'none';
     }, 5000);
 }
 
-// ================= RENDERIZAR TABLA =================
-function renderTable() {
-    var tbody = document.getElementById('resultsBody');
+// ================= BUSCAR VEHÍCULO =================
+async function buscarVehiculo() {
+    var searchInput = document.getElementById('searchInput');
+    if (!searchInput) return mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
     
-    if (!tbody) {
-        console.error('❌ tbody#resultsBody no encontrado');
-        return;
-    }
+    var searchTerm = limpiarTexto(searchInput.value);
+    if (!searchTerm) return mostrarAlerta('⚠️ Ingrese un término de búsqueda', 'error');
+
+    mostrarAlerta('⏳ Buscando en base de datos...', 'info');
     
-    if (filteredFichas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 50px; color: #666;">📭 No hay fichas técnicas registradas</td></tr>';
-        return;
-    }
-    
-    var html = '';
-    for (var i = 0; i < filteredFichas.length; i++) {
-        var ficha = filteredFichas[i];
-        var estatusClass = 'badge badge-operativa';
-        var estatusText = ficha.estatus_ficha || 'N/A';
-        
-        if (estatusText.toUpperCase().indexOf('INOPERATIVO') !== -1) {
-            estatusClass = 'badge badge-inoperativa';
+    var btnSearch = document.querySelector('.btn-search');
+    if (btnSearch) btnSearch.disabled = true;
+
+    try {
+        // Buscar por placa, facsimil, seriales, marca y modelo
+        var result = await supabaseClient
+            .from('fichas_tecnicas')
+            .select('*')
+            .or(
+                'placa.eq."' + searchTerm + '",' +
+                'facsimil.eq."' + searchTerm + '",' +
+                's_carroceria.eq."' + searchTerm + '",' +
+                's_motor.eq."' + searchTerm + '",' +
+                'marca.ilike.%' + searchTerm + '%,' +
+                'modelo.ilike.%' + searchTerm + '%'
+            )
+            .order('created_at', { ascending: false });
+
+        if (result.error) throw result.error;
+
+        if (!result.data || result.data.length === 0) {
+            mostrarAlerta('❌ No se encontró ninguna ficha con: ' + searchTerm, 'error');
+            fichasEncontradas = [];
+            fichasFiltradas = [];
+            paginaActual = 1;
+            renderizarTabla();
+            actualizarPaginacion();
+            return;
         }
+
+        fichasEncontradas = result.data;
+        mostrarAlerta('✅ Se encontraron ' + fichasEncontradas.length + ' ficha(s)', 'success');
         
-        html += '<tr>' +
-            '<td><strong>' + (ficha.placa || 'N/A') + '</strong></td>' +
-            '<td>' + (ficha.marca || 'N/A') + '</td>' +
-            '<td>' + (ficha.modelo || 'N/A') + '</td>' +
-            '<td>' + (ficha.tipo || 'N/A') + '</td>' +
-            '<td>' + (ficha.color || 'N/A') + '</td>' +
-            '<td><span class="' + estatusClass + '">' + estatusText + '</span></td>' +
-            '<td>' + (ficha.dependencia || 'N/A').substring(0, 30) + '...</td>' +
-            '<td>' +
-            '<button class="btn-view" onclick="verFicha(\'' + (ficha.id || '') + '\')">👁️ Ver</button>' +
-            '<button class="btn-print" onclick="imprimirFicha(\'' + (ficha.id || '') + '\')">🖨️</button>' +
-            '</td>' +
-            '</tr>';
+        // Resetear filtro y aplicar
+        document.getElementById('filtroTipo').value = 'todos';
+        aplicarFiltro();
+    } catch (error) {
+        console.error('❌ Error en buscarVehiculo:', error);
+        mostrarAlerta('❌ Error: ' + error.message, 'error');
+    } finally {
+        if (btnSearch) btnSearch.disabled = false;
     }
-    
+}
+
+// ================= APLICAR FILTRO =================
+function aplicarFiltro() {
+    var filtroSelect = document.getElementById('filtroTipo');
+    var valorFiltro = filtroSelect.value;
+
+    if (valorFiltro === 'todos') {
+        fichasFiltradas = fichasEncontradas.slice();
+    } else if (valorFiltro === 'motos') {
+        fichasFiltradas = fichasEncontradas.filter(function(f) {
+            return f.tipo && limpiarTexto(f.tipo) === 'MOTO';
+        });
+    } else if (valorFiltro === 'vehiculos') {
+        // Todo lo que NO sea MOTO
+        fichasFiltradas = fichasEncontradas.filter(function(f) {
+            return !f.tipo || limpiarTexto(f.tipo) !== 'MOTO';
+        });
+    }
+
+    paginaActual = 1;
+    renderizarTabla();
+    actualizarPaginacion();
+}
+
+// ================= RENDERIZAR TABLA =================
+function renderizarTabla() {
+    var tbody = document.getElementById('resultsBody');
+    var inicio = (paginaActual - 1) * registrosPorPagina;
+    var fin = inicio + registrosPorPagina;
+    var fichasPagina = fichasFiltradas.slice(inicio, fin);
+
+    if (fichasPagina.length === 0) {
+        tbody.innerHTML = 
+            '<tr>' +
+                '<td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">' +
+                    '📭 No hay resultados para mostrar' +
+                '</td>' +
+            '</tr>';
+        return;
+    }
+
+    var html = fichasPagina.map(function(ficha) {
+        var fecha = ficha.created_at ? new Date(ficha.created_at).toLocaleDateString('es-VE') : 'N/A';
+        var estatus = ficha.estatus_ficha || 'N/A';
+        var colorEstatus = estatus === 'OPERATIVO' ? '#d4edda' : 
+                          estatus === 'INOPERATIVO' ? '#fff3cd' : '#f8d7da';
+        var colorTexto = estatus === 'OPERATIVO' ? '#155724' : 
+                        estatus === 'INOPERATIVO' ? '#856404' : '#721c24';
+        var tipoIcono = ficha.tipo === 'MOTO' ? '🏍️' : '🚗';
+
+        return 
+            '<tr>' +
+                '<td><strong>' + (ficha.placa || 'N/A') + '</strong></td>' +
+                '<td>' + (ficha.marca || 'N/A') + '</td>' +
+                '<td>' + (ficha.modelo || 'N/A') + '</td>' +
+                '<td>' + tipoIcono + ' ' + (ficha.tipo || 'N/A') + '</td>' +
+                '<td>' + (ficha.color || 'N/A') + '</td>' +
+                '<td><span style="padding: 4px 8px; border-radius: 4px; background: ' + colorEstatus + '; color: ' + colorTexto + '; font-weight: 600;">' + estatus + '</span></td>' +
+                '<td>' + (ficha.dependencia || 'N/A') + '</td>' +
+                '<td>' +
+                    '<button class="btn-view" onclick="verFicha(\'' + ficha.id + '\')">' +
+                        '👁️ Ver Ficha' +
+                    '</button>' +
+                '</td>' +
+            '</tr>';
+    }).join('');
+
     tbody.innerHTML = html;
 }
 
-// ================= FUNCIÓN SEGURA PARA SETEAR TEXTO =================
-function setTexto(idElemento, valor, esOpcional) {
-    var el = document.getElementById(idElemento);
-    if (el) {
-        el.textContent = valor !== undefined && valor !== null ? valor : 'N/A';
-        return true;
-    } else {
-        // Solo mostrar warning si NO es opcional
-        if (!esOpcional) {
-            console.warn('⚠️ Elemento requerido no encontrado:', idElemento);
+// ================= ACTUALIZAR PAGINACIÓN =================
+function actualizarPaginacion() {
+    var totalPaginas = Math.ceil(fichasFiltradas.length / registrosPorPagina) || 1;
+    var inicio = fichasFiltradas.length > 0 ? (paginaActual - 1) * registrosPorPagina + 1 : 0;
+    var fin = Math.min(paginaActual * registrosPorPagina, fichasFiltradas.length);
+
+    var elPaginaActual = document.getElementById('paginaActual');
+    var elTotalPaginas = document.getElementById('totalPaginas');
+    var elMostrandoInicio = document.getElementById('mostrandoInicio');
+    var elMostrandoFin = document.getElementById('mostrandoFin');
+    var elTotalRegistros = document.getElementById('totalRegistros');
+    var btnAnterior = document.getElementById('btnAnterior');
+    var btnSiguiente = document.getElementById('btnSiguiente');
+
+    if (elPaginaActual) elPaginaActual.textContent = paginaActual;
+    if (elTotalPaginas) elTotalPaginas.textContent = totalPaginas;
+    if (elMostrandoInicio) elMostrandoInicio.textContent = inicio;
+    if (elMostrandoFin) elMostrandoFin.textContent = fin;
+    if (elTotalRegistros) elTotalRegistros.textContent = fichasFiltradas.length;
+    if (btnAnterior) btnAnterior.disabled = paginaActual === 1;
+    if (btnSiguiente) btnSiguiente.disabled = paginaActual === totalPaginas || totalPaginas === 0;
+}
+
+// ================= CAMBIAR PÁGINA =================
+function cambiarPagina(direccion) {
+    var totalPaginas = Math.ceil(fichasFiltradas.length / registrosPorPagina) || 1;
+    var nuevaPagina = paginaActual + direccion;
+
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+        paginaActual = nuevaPagina;
+        renderizarTabla();
+        actualizarPaginacion();
+
+        // Scroll suave a la tabla
+        var resultsSection = document.querySelector('.results-section');
+        if (resultsSection) {
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        return false;
     }
 }
 
-// ================= FUNCIÓN SEGURA PARA SETEAR HTML =================
-function setHtml(idElemento, valor, esOpcional) {
-    var el = document.getElementById(idElemento);
-    if (el) {
-        el.innerHTML = valor !== undefined && valor !== null ? valor : 'N/A';
-        return true;
-    } else {
-        if (!esOpcional) {
-            console.warn('⚠️ Elemento requerido no encontrado:', idElemento);
-        }
-        return false;
-    }
-}
-
-// ================= VER FICHA DETALLADA =================
+// ================= VER FICHA =================
 function verFicha(id) {
-    console.log('🔍 Buscando ficha con ID:', id);
-    
-    var ficha = null;
-    for (var i = 0; i < allFichas.length; i++) {
-        if (String(allFichas[i].id) === String(id)) {
-            ficha = allFichas[i];
-            break;
-        }
-    }
-    
+    var ficha = fichasEncontradas.find(function(f) {
+        return f.id == id;
+    });
+
     if (!ficha) {
         mostrarAlerta('❌ Ficha no encontrada', 'error');
         return;
     }
-    
-    console.log('✅ Ficha encontrada:', ficha.placa);
-    
-    // ✅ Llenar datos del modal - campos REQUERIDOS (sin esOpcional)
-    setTexto('modalMarca', ficha.marca);
-    setTexto('modalModelo', ficha.modelo);
-    setTexto('modalTipo', ficha.tipo);
-    setTexto('modalClase', ficha.clase);
-    setTexto('modalColor', ficha.color);
-    setTexto('modalSerialCarroceria', ficha.s_carroceria);
-    setTexto('modalSerialMotor', ficha.s_motor);
-    setTexto('modalPlaca', ficha.placa);
-    setTexto('modalFacsimilar', ficha.facsimil);
-    setTexto('modalDependencia', ficha.dependencia);
-    setTexto('modalEstatus', ficha.estatus_ficha);
-    
-    // Información técnico mecánica
-    setTexto('modalCausa', ficha.causa);
-    setTexto('modalMecanica', ficha.mecanica);
-    setTexto('modalDiagnostico', ficha.diagnostico);
-    setTexto('modalUbicacion', ficha.ubicacion);
-    setTexto('modalTapiceria', ficha.tapiceria);
-    setTexto('modalCauchos', ficha.cauchos);
-    setTexto('modalLuces', ficha.luces);
-    
-    // Observaciones
-    setHtml('modalObservaciones', ficha.observaciones || 'Sin observaciones');
-    
-    // ✅ Fecha y creador - campos OPCIONALES (con esOpcional=true)
-    if (ficha.fecha_creacion) {
-        var fechaCreacion = new Date(ficha.fecha_creacion).toLocaleString('es-VE');
-        setTexto('modalFechaCreacion', fechaCreacion, true);
-    }
-    setTexto('modalCreadoPor', ficha.creado_por, true);
-    
-    // ✅ CARGAR FOTOS CON VERIFICACIÓN
-    cargarFotosModal(ficha);
-    
-    // ✅ MOSTRAR MODAL - con pequeño delay para asegurar renderizado
-    setTimeout(function() {
-        var modal = document.getElementById('fichaModal');
-        if (modal) {
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-    }, 50);
-}
 
-// ================= CARGAR FOTOS EN MODAL =================
-function cargarFotosModal(ficha) {
+    // Llenar datos del modal
+    var campos = [
+        { key: 'marca', id: 'modalMarca' },
+        { key: 'modelo', id: 'modalModelo' },
+        { key: 'tipo', id: 'modalTipo' },
+        { key: 'clase', id: 'modalClase' },
+        { key: 'color', id: 'modalColor' },
+        { key: 'placa', id: 'modalPlaca' },
+        { key: 'facsimil', id: 'modalFacsimilar' },
+        { key: 'dependencia', id: 'modalDependencia' },
+        { key: 's_carroceria', id: 'modalSerialCarroceria' },
+        { key: 's_motor', id: 'modalSerialMotor' },
+        { key: 'estatus_ficha', id: 'modalEstatus' },
+        { key: 'causa', id: 'modalCausa' },
+        { key: 'diagnostico', id: 'modalDiagnostico' },
+        { key: 'mecanica', id: 'modalMecanica' },
+        { key: 'ubicacion', id: 'modalUbicacion' },
+        { key: 'tapiceria', id: 'modalTapiceria' },
+        { key: 'cauchos', id: 'modalCauchos' },
+        { key: 'luces', id: 'modalLuces' },
+        { key: 'observaciones', id: 'modalObservaciones' }
+    ];
+
+    campos.forEach(function(campo) {
+        var el = document.getElementById(campo.id);
+        if (el) el.textContent = ficha[campo.key] || 'N/A';
+    });
+
+    // Fecha y creador
+    var fechaEl = document.getElementById('modalFechaCreacion');
+    if (fechaEl) fechaEl.textContent = ficha.created_at ? new Date(ficha.created_at).toLocaleString('es-VE') : 'N/A';
+    
+    var creadorEl = document.getElementById('modalCreadoPor');
+    if (creadorEl) creadorEl.textContent = ficha.creado_por || 'N/A';
+
+    // Fotos
     for (var i = 1; i <= 4; i++) {
-        var img = document.getElementById('modalImg' + i);
-        var box = document.getElementById('modalBox' + i);
-        var span = box ? box.querySelector('span') : null;
-        
         var fotoUrl = ficha['foto' + i + '_url'];
-        
-        if (fotoUrl && fotoUrl.trim() !== '' && img && box && span) {
-            img.src = fotoUrl;
-            img.style.display = 'block';
-            span.style.display = 'none';
-        } else if (span) {
-            if (img) img.style.display = 'none';
-            span.style.display = 'block';
+        var imgElement = document.getElementById('modalImg' + i);
+        var boxElement = document.getElementById('modalBox' + i);
+        var spanElement = boxElement ? boxElement.querySelector('span') : null;
+
+        if (fotoUrl && imgElement && spanElement) {
+            imgElement.src = fotoUrl;
+            imgElement.style.display = 'block';
+            spanElement.style.display = 'none';
+        } else if (spanElement) {
+            if (imgElement) imgElement.style.display = 'none';
+            spanElement.style.display = 'block';
         }
+    }
+
+    // Mostrar modal
+    var modal = document.getElementById('fichaModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
 }
 
 // ================= CERRAR MODAL =================
 function cerrarModal() {
     var modal = document.getElementById('fichaModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
@@ -310,77 +306,77 @@ function imprimirFicha() {
     window.print();
 }
 
+// ================= LIMPIAR BÚSQUEDA =================
+function limpiarBusqueda() {
+    var searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    var filtroTipo = document.getElementById('filtroTipo');
+    if (filtroTipo) filtroTipo.value = 'todos';
+
+    fichasEncontradas = [];
+    fichasFiltradas = [];
+    paginaActual = 1;
+
+    var alertDiv = document.getElementById('searchAlert');
+    if (alertDiv) alertDiv.style.display = 'none';
+
+    renderizarTabla();
+    actualizarPaginacion();
+
+    mostrarAlerta('🔄 Búsqueda limpiada', 'info');
+}
+
 // ================= CARGAR USUARIO =================
 async function cargarUsuario() {
     try {
-        if (supabaseClient) {
-            var result = await supabaseClient.auth.getSession();
-            var session = result.data ? result.data.session : null;
-            
-            if (session && session.user && session.user.email) {
-                var userEmail = document.getElementById('userEmail');
-                if (userEmail) {
-                    userEmail.textContent = session.user.email;
-                }
-            }
-        }
+        var res = await supabaseClient.auth.getSession();
+        var email = res.data?.session?.user?.email;
+        var userEmailEl = document.getElementById('userEmail');
+        if (userEmailEl) userEmailEl.textContent = email || 'Invitado';
     } catch (error) {
         console.error('Error al cargar usuario:', error);
     }
 }
 
-// ================= CERRAR SESIÓN =================
-async function cerrarSesion() {
-    if (confirm('¿Está seguro de cerrar sesión?')) {
-        try {
-            if (supabaseClient) {
-                await supabaseClient.auth.signOut();
-            }
-            if (typeof localStorage !== 'undefined') {
-                localStorage.clear();
-            }
-            window.location.href = '../index.html';
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-            window.location.href = '../index.html';
-        }
-    }
-}
-
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Inicializando consulta de fichas técnicas...');
-    
-    if (!inicializarSupabase()) {
-        console.warn('⚠️ Supabase no disponible');
-    }
-    
-    cargarFichas();
-    cargarUsuario();
-    
-    // Event listeners
+    if (!inicializarSupabase()) return;
+
+    // Búsqueda con Enter
     var searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                e.preventDefault();
                 buscarVehiculo();
             }
         });
     }
-    
+
+    // Cerrar sesión
     var logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', cerrarSesion);
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('¿Cerrar sesión?')) {
+                window.location.href = '../index.html';
+            }
+        });
     }
-    
-    // Cerrar modal al hacer click fuera
+
+    // Cerrar modal al hacer clic fuera
     window.onclick = function(event) {
         var modal = document.getElementById('fichaModal');
         if (event.target === modal) {
             cerrarModal();
         }
     };
-    
-    console.log('✅ Inicialización completada');
+
+    // Cargar usuario
+    cargarUsuario();
+
+    // Estado inicial
+    renderizarTabla();
+    actualizarPaginacion();
+
+    console.log('✅ Consulta de fichas inicializada');
 });
