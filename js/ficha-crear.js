@@ -269,21 +269,30 @@ function limpiarBusqueda() {
 
 // ================= GUARDAR FICHA =================
 async function guardarFicha() {
-    // ✅ 1. Validar INMEDIATAMENTE que el vehículo esté cargado (campos bloqueados)
-    var camposVehiculo = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
-    var vehiculoNoCargado = camposVehiculo.some(c => !document.getElementById(c)?.value?.trim());
-
-    if (vehiculoNoCargado) {
-        return mostrarAlerta('⚠️ Debe llenar todos los campos obligatorios', 'error');
+    // ✅ 1. Validar que se haya buscado un vehículo primero
+    if (!document.getElementById('marca').value?.trim()) {
+        return mostrarAlerta('⚠️ Debe buscar y cargar un vehículo antes de guardar', 'error');
     }
 
-    // ✅ 2. Validar INMEDIATAMENTE las fotos (MÍNIMO 2)
+    // ✅ 2. Validar CAMPOS TÉCNICOS EDITABLES (Obligatorios)
+    var camposTecnicos = [
+        { id: 'causa', label: 'Causa' },
+        { id: 'mecanica', label: 'Mecánica' },
+        { id: 'diagnostico', label: 'Diagnóstico' },
+        { id: 'ubicacion', label: 'Ubicación' }
+    ];
+    var faltantes = camposTecnicos.filter(c => !document.getElementById(c.id)?.value?.trim());
+    if (faltantes.length > 0) {
+        return mostrarAlerta('⚠️ Complete la Información Técnico Mecánica: ' + faltantes.map(c => c.label).join(', '), 'error');
+    }
+
+    // ✅ 3. Validar mínimo 2 fotos
     var fotosCargadas = [fotosData.foto1, fotosData.foto2, fotosData.foto3, fotosData.foto4].filter(f => f !== null).length;
     if (fotosCargadas < 2) {
         return mostrarAlerta('📸 Debe cargar al menos 2 fotos del vehículo', 'error');
     }
 
-    // ✅ 3. Verificar duplicados finales antes de insertar
+    // ✅ 4. Verificar duplicados finales antes de insertar
     var placa = limpiarTexto(document.getElementById('placa').value);
     var facsimil = limpiarTexto(document.getElementById('facsimil').value);
     var s_carroceria = limpiarTexto(document.getElementById('serialCarroceria').value);
