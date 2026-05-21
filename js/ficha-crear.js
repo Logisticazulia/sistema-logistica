@@ -247,14 +247,19 @@ function desbloquearCampos() {
 }
 
 // ================= LIMPIAR BÚSQUEDA =================
+// ================= LIMPIAR BÚSQUEDA =================
 function limpiarBusqueda() {
     document.getElementById('searchInput').value = '';
     document.getElementById('fichaForm').reset();
-    desbloquearCampos();
+    
+    // ✅ REFORZAR BLOQUEO (Nunca se desbloquean los campos de solo lectura)
+    bloquearCampos(); 
+    
     actualizarVistaPrevia();
     document.querySelectorAll('.duplicate-alert').forEach(e => e.remove());
     duplicadosEncontrados = { placa: false, facsimil: false, s_carroceria: false, s_motor: false };
     actualizarEstadoBotonGuardar();
+    
     for (var j = 1; j <= 4; j++) {
         var img = document.getElementById('previewFoto' + j);
         if (img) { img.src = ''; img.style.display = 'none'; img.parentElement.querySelector('.placeholder').style.display = 'flex'; }
@@ -266,7 +271,6 @@ function limpiarBusqueda() {
     actualizarFotosPreview();
     mostrarAlerta('🔄 Formulario limpiado', 'info');
 }
-
 // ================= GUARDAR FICHA =================
 async function guardarFicha() {
     // ✅ 1. Validar que se haya buscado un vehículo primero
