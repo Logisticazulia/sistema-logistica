@@ -185,33 +185,40 @@ async function buscarVehiculo() {
 }
 
 // ================= LLENAR FORMULARIO =================
+// ================= LLENAR FORMULARIO =================
 function llenarFormulario(vehiculo) {
     var map = { 'marca': 'marca', 'modelo': 'modelo', 'tipo': 'tipo', 'clase': 'clase', 'color': 'color', 's_carroceria': 'serialCarroceria', 's_motor': 'serialMotor', 'placa': 'placa', 'facsimil': 'facsimil', 'unidad_administrativa': 'dependencia', 'observacion': 'observaciones' };
+    
     Object.keys(map).forEach(function(db) {
         var el = document.getElementById(map[db]);
-        if (el && vehiculo[db]) {
-            if (el.tagName === 'SELECT') {
-                var opt = Array.from(el.options).find(o => o.value.toUpperCase() === limpiarTexto(vehiculo[db]));
-                el.value = opt ? opt.value : limpiarTexto(vehiculo[db]);
-            } else {
-                el.value = vehiculo[db];
+        if (el) {
+            var val = limpiarTexto(vehiculo[db]);
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.value = val;
+            } else if (el.tagName === 'SELECT') {
+                var opt = Array.from(el.options).find(o => o.value === val);
+                el.value = opt ? opt.value : val;
             }
         }
     });
-    
-    // ✅ Mapeo robusto para Estatus (incluye DESINCORPORADA -> DESINCORPORADO)
+
+    // ✅ LÓGICA BLINDADA PARA ESTATUS (maneja espacios invisibles y géneros)
     var est = document.getElementById('estatus');
     if (est) {
-        var val = (vehiculo.estatus || vehiculo.situacion || '').toUpperCase()
-            .replace('OPERATIVA','OPERATIVO')
-            .replace('INOPERATIVA','INOPERATIVO')
-            .replace('DESINCORPORADA','DESINCORPORADO');
+        // 1. Obtener, limpiar espacios y pasar a mayúsculas
+        var raw = (vehiculo.estatus || vehiculo.situacion || '').toString().trim().toUpperCase();
+        
+        // 2. Normalizar terminaciones (OPERATIVA -> OPERATIVO, DESINCORPORADA -> DESINCORPORADO)
+        var val = raw.replace(/OPERATIVA$/, 'OPERATIVO')
+                     .replace(/INOPERATIVA$/, 'INOPERATIVO')
+                     .replace(/DESINCORPORADA$/, 'DESINCORPORADO');
+
+        // 3. Buscar y asignar
         var opt = Array.from(est.options).find(o => o.value === val);
         est.value = opt ? opt.value : val;
     }
     actualizarVistaPrevia();
 }
-
 // ================= BLOQUEAR / DESBLOQUEAR =================
 function bloquearCampos() {
     CAMPOS_BLOQUEADOS.forEach(c => {
