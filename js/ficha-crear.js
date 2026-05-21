@@ -352,6 +352,8 @@ document.addEventListener('DOMContentLoaded', function() {
     bloquearCampos();
     actualizarVistaPrevia();
     actualizarFotosPreview();
+
+    document.getElementById('btnBuscar')?.addEventListener('click', buscarVehiculo);
     
     document.getElementById('btnGuardar')?.addEventListener('click', guardarFicha);
     document.getElementById('btnLimpiar')?.addEventListener('click', limpiarBusqueda);
