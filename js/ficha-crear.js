@@ -193,13 +193,14 @@ async function buscarVehiculo() {
     }
 }
 
+
 // ================= LLENAR FORMULARIO =================
 function llenarFormulario(vehiculo) {
     var map = { 'marca': 'marca', 'modelo': 'modelo', 'tipo': 'tipo', 'clase': 'clase', 'color': 'color', 's_carroceria': 'serialCarroceria', 's_motor': 'serialMotor', 'placa': 'placa', 'facsimil': 'facsimil', 'unidad_administrativa': 'dependencia', 'observacion': 'observaciones' };
-    
     Object.keys(map).forEach(function(db) {
         var el = document.getElementById(map[db]);
         if (el && vehiculo[db]) {
+            // Si es select, busca la opción. Si es input, asigna directo.
             if (el.tagName === 'SELECT') {
                 var opt = Array.from(el.options).find(o => o.value.toUpperCase() === limpiarTexto(vehiculo[db]));
                 el.value = opt ? opt.value : limpiarTexto(vehiculo[db]);
@@ -209,6 +210,16 @@ function llenarFormulario(vehiculo) {
         }
     });
     
+    // ✅ Mapeo robusto para Estatus/Situacion
+    var est = document.getElementById('estatus');
+    if (est) {
+        var rawVal = (vehiculo.estatus || vehiculo.situacion || '').toUpperCase();
+        var val = rawVal.replace('OPERATIVA','OPERATIVO').replace('INOPERATIVA','INOPERATIVO').replace('DESINCORPORADA','DESINCORPORADO');
+        var opt = Array.from(est.options).find(o => o.value === val);
+        est.value = opt ? opt.value : val;
+    }
+    actualizarVistaPrevia();
+}
     var est = document.getElementById('estatus');
     if (est) {
         var val = (vehiculo.estatus || vehiculo.situacion || '').toUpperCase().replace('OPERATIVA','OPERATIVO').replace('INOPERATIVA','INOPERATIVO');
