@@ -1,5 +1,6 @@
 // ============================================
 // CONSULTAR FICHAS TÉCNICAS - LÓGICA COMPLETA
+// Archivo: ficha-consultar.js
 // ============================================
 
 // ================= CONFIGURACIÓN =================
@@ -47,7 +48,7 @@ function mostrarAlerta(mensaje, tipo) {
     alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
 
-    // Auto-scroll suave
+    // Auto-scroll suave hacia la alerta
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -103,7 +104,8 @@ async function buscarVehiculo() {
         mostrarAlerta('✅ Se encontraron ' + fichasEncontradas.length + ' ficha(s)', 'success');
         
         // Resetear filtro y aplicar
-        document.getElementById('filtroTipo').value = 'todos';
+        var filtroSelect = document.getElementById('filtroTipo');
+        if (filtroSelect) filtroSelect.value = 'todos';
         aplicarFiltro();
     } catch (error) {
         console.error('❌ Error en buscarVehiculo:', error);
@@ -116,21 +118,25 @@ async function buscarVehiculo() {
 // ================= APLICAR FILTRO =================
 function aplicarFiltro() {
     var filtroSelect = document.getElementById('filtroTipo');
+    if (!filtroSelect) return;
+    
     var valorFiltro = filtroSelect.value;
 
     if (valorFiltro === 'todos') {
         fichasFiltradas = fichasEncontradas.slice();
     } else if (valorFiltro === 'motos') {
+        // Solo MOTO
         fichasFiltradas = fichasEncontradas.filter(function(f) {
             return f.tipo && limpiarTexto(f.tipo) === 'MOTO';
         });
     } else if (valorFiltro === 'vehiculos') {
-        // Todo lo que NO sea MOTO
+        // Todo lo que NO sea MOTO (CAMIONETA, AUTOMOVIL, BUS, CAMION, etc.)
         fichasFiltradas = fichasEncontradas.filter(function(f) {
             return !f.tipo || limpiarTexto(f.tipo) !== 'MOTO';
         });
     }
 
+    // Resetear a página 1 al aplicar filtro
     paginaActual = 1;
     renderizarTabla();
     actualizarPaginacion();
@@ -139,6 +145,8 @@ function aplicarFiltro() {
 // ================= RENDERIZAR TABLA =================
 function renderizarTabla() {
     var tbody = document.getElementById('resultsBody');
+    if (!tbody) return;
+    
     var inicio = (paginaActual - 1) * registrosPorPagina;
     var fin = inicio + registrosPorPagina;
     var fichasPagina = fichasFiltradas.slice(inicio, fin);
@@ -215,7 +223,7 @@ function cambiarPagina(direccion) {
         renderizarTabla();
         actualizarPaginacion();
 
-        // Scroll suave a la tabla
+        // Scroll suave a la tabla de resultados
         var resultsSection = document.querySelector('.results-section');
         if (resultsSection) {
             resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
