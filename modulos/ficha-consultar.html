@@ -1052,6 +1052,28 @@ body {
             </div>
         </div>
     </div>
+    <!-- FILTRO Y PAGINACIÓN -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <label style="font-weight: 600; color: #003366;">Filtrar por:</label>
+        <select id="filtroTipo" onchange="aplicarFiltroYOrdenar()" style="padding: 8px 12px; border: 2px solid #003366; border-radius: 4px; font-size: 14px; cursor: pointer;">
+            <option value="todos">📋 Todos los Vehículos</option>
+            <option value="MOTO">🏍️ Solo Motos</option>
+            <option value="CAMIONETA,AUTOMOVIL,BUS,CAMION,MINIBUS,TRIMOVIL,ESPECIAL">🚗 Solo Vehículos</option>
+        </select>
+    </div>
+    
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <button onclick="cambiarPagina(-1)" id="btnAnterior" class="btn btn-secondary" style="padding: 8px 16px; margin: 0;">⬅️ Anterior</button>
+        <span style="font-weight: 600; color: #003366;">
+            Página <span id="paginaActual">1</span> de <span id="totalPaginas">1</span>
+        </span>
+        <button onclick="cambiarPagina(1)" id="btnSiguiente" class="btn btn-primary" style="padding: 8px 16px; margin: 0;">Siguiente ➡️</button>
+    </div>
+</div>
+<div style="text-align: center; margin-top: 10px; color: #666; font-size: 13px;">
+    Mostrando <span id="mostrandoInicio">0</span> - <span id="mostrandoFin">0</span> de <span id="totalRegistros">0</span> registros
+</div>
 </main>
 
 <!-- ================= SCRIPTS ================= -->
