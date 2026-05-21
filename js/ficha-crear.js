@@ -270,17 +270,27 @@ function limpiarBusqueda() {
 // ================= GUARDAR FICHA =================
 async function guardarFicha() {
     var form = document.getElementById('fichaForm');
-    if (!form.checkValidity()) return form.reportValidity(), mostrarAlerta('⚠️ Complete campos requeridos', 'error');
-    if (!document.getElementById('marca').value) return mostrarAlerta('⚠️ Busque un vehículo primero', 'error');
     
+    // ✅ 1. Validación nativa de campos required habilitados
+    if (!form.checkValidity()) return form.reportValidity(), mostrarAlerta('⚠️ Complete los campos obligatorios', 'error');
+    
+    // ✅ 2. Validar que los datos de la BD estén cargados (campos disabled no validan con checkValidity)
+    var camposRequeridos = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
+    var camposVacios = camposRequeridos.filter(c => !document.getElementById(c)?.value?.trim());
+    if (camposVacios.length > 0) return mostrarAlerta('⚠️ Busque un vehículo primero para cargar los datos', 'error');
+
+    // ✅ 3. Validar que existan al menos 2 fotos cargadas
+    var fotosCargadas = [fotosData.foto1, fotosData.foto2, fotosData.foto3, fotosData.foto4].filter(f => f !== null).length;
+    if (fotosCargadas < 2) return mostrarAlerta('⚠️ Debe cargar al menos 2 fotos del vehículo', 'error');
+
+    // ✅ 4. Verificar duplicados finales (Placa, Facsimil, Chasis, Motor)
     var placa = limpiarTexto(document.getElementById('placa').value);
     var facsimil = limpiarTexto(document.getElementById('facsimil').value);
     var s_carroceria = limpiarTexto(document.getElementById('serialCarroceria').value);
     var s_motor = limpiarTexto(document.getElementById('serialMotor').value);
-    
     var verif = await verificarDuplicadosAntesDeGuardar(placa, facsimil, s_carroceria, s_motor);
     if (verif.existe) return mostrarAlerta('❌ YA EXISTE FICHA CON: ' + verif.duplicados.join(', '), 'error');
-    
+
     mostrarAlerta('⏳ Guardando ficha...', 'info');
     try {
         var data = {
@@ -323,7 +333,6 @@ async function guardarFicha() {
         mostrarAlerta('❌ Error al guardar: ' + e.message, 'error');
     }
 }
-
 async function verificarDuplicadosAntesDeGuardar(placa, facsimil, s_carroceria, s_motor) {
     var conds = [];
     if (placa) conds.push('placa.eq."' + placa + '"');
