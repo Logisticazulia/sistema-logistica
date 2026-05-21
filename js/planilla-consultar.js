@@ -123,8 +123,6 @@ function setupSearchEnter() {
 // Aplicar filtros
 function aplicarFiltros() {
     if (!filterTipo) getDOMElements();
-    
-    // Obtener valores de los filtros
     const filterTipoValue = filterTipo ? filterTipo.value.trim().toUpperCase() : '';
     const filterClaseValue = filterClase ? filterClase.value.trim().toUpperCase() : '';
     const filterSituacionValue = filterSituacion ? filterSituacion.value.trim().toUpperCase() : '';
@@ -132,36 +130,22 @@ function aplicarFiltros() {
     const filterUnidadValue = filterUnidad ? filterUnidad.value.trim().toUpperCase() : '';
     const filterEPMValue = filterEPM ? filterEPM.value.trim().toUpperCase() : '';
     const filterEPPValue = filterEPP ? filterEPP.value.trim().toUpperCase() : '';
-    
-    console.log('Filtros aplicados:', {
-        tipo: filterTipoValue || 'TODOS',
-        clase: filterClaseValue || 'TODAS',
-        situacion: filterSituacionValue || 'TODAS',
-        estatus: filterEstatusValue || 'TODOS',
-        unidad: filterUnidadValue || 'TODAS',
-        epm: filterEPMValue || 'TODOS',
-        epp: filterEPPValue || 'TODOS'
-    });
-    
-    // Filtrar vehículos
+
     filteredVehicles = allVehicles.filter(v => {
-        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.trim().toUpperCase() === filterTipoValue);
-        const matchesClase = !filterClaseValue || (v.clase && v.clase.trim().toUpperCase() === filterClaseValue);
-        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.trim().toUpperCase() === filterSituacionValue);
-        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.trim().toUpperCase() === filterEstatusValue);
-        const matchesUnidad = !filterUnidadValue || (v.unidad_administrativa && v.unidad_administrativa.trim().toUpperCase() === filterUnidadValue);
-        const matchesEPM = !filterEPMValue || (v.epm && v.epm.trim().toUpperCase() === filterEPMValue);
-        const matchesEPP = !filterEPPValue || (v.epp && v.epp.trim().toUpperCase() === filterEPPValue);
-        
+        // ✅ Usa includes() para mayor tolerancia a espacios o variaciones
+        const matchesTipo = !filterTipoValue || (v.tipo && v.tipo.trim().toUpperCase().includes(filterTipoValue));
+        const matchesClase = !filterClaseValue || (v.clase && v.clase.trim().toUpperCase().includes(filterClaseValue));
+        const matchesSituacion = !filterSituacionValue || (v.situacion && v.situacion.trim().toUpperCase().includes(filterSituacionValue));
+        const matchesEstatus = !filterEstatusValue || (v.estatus && v.estatus.trim().toUpperCase().includes(filterEstatusValue));
+        const matchesUnidad = !filterUnidadValue || (v.unidad_administrativa && v.unidad_administrativa.trim().toUpperCase().includes(filterUnidadValue));
+        const matchesEPM = !filterEPMValue || (v.epm && v.epm.trim().toUpperCase().includes(filterEPMValue));
+        const matchesEPP = !filterEPPValue || (v.epp && v.epp.trim().toUpperCase().includes(filterEPPValue));
         return matchesTipo && matchesClase && matchesSituacion && matchesEstatus && matchesUnidad && matchesEPM && matchesEPP;
     });
-    
-    console.log(`Vehículos filtrados: ${filteredVehicles.length} de ${allVehicles.length}`);
     currentPage = 1;
     renderTable();
     renderPagination();
 }
-
 function limpiarFiltros() {
     if (filterTipo) filterTipo.value = '';
     if (filterClase) filterClase.value = '';
