@@ -14,23 +14,27 @@ var duplicadosEncontrados = { placa: false, facsimil: false, s_carroceria: false
 var debounceTimers = {};
 
 // ================= FUNCIONES DE UTILIDAD =================
+// ================= MOSTRAR ALERTA CON AUTO-SCROLL ÚNICO =================
 function mostrarAlerta(mensaje, tipo) {
     var alertDiv = document.getElementById('searchAlert');
     if (!alertDiv) return;
+
     alertDiv.textContent = mensaje;
     alertDiv.className = 'alert alert-' + tipo;
     alertDiv.style.display = 'block';
-    
-    // ✅ SCROLL AUTOMÁTICO HACIA LA ALERTA (Sube automáticamente al mostrar)
-    setTimeout(() => {
-        alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-    
+
+    // 🔄 AUTO-SCROLL GARANTIZADO (Espera a que el DOM se pinte antes de hacer scroll)
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    // Ocultar automáticamente después de 5 segundos
     setTimeout(() => {
         alertDiv.style.display = 'none';
     }, 5000);
 }
-
 function mostrarAlertaDuplicado(campo, mensaje, existe) {
     var input = document.getElementById(campo);
     if (!input) return;
