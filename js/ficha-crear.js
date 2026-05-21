@@ -269,25 +269,26 @@ function limpiarBusqueda() {
 
 // ================= GUARDAR FICHA =================
 async function guardarFicha() {
-    var form = document.getElementById('fichaForm');
-    
-    // ✅ 1. Validación nativa de campos required habilitados
-    if (!form.checkValidity()) return form.reportValidity(), mostrarAlerta('⚠️ Complete los campos obligatorios', 'error');
-    
-    // ✅ 2. Validar que los datos de la BD estén cargados (campos disabled no validan con checkValidity)
-    var camposRequeridos = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
-    var camposVacios = camposRequeridos.filter(c => !document.getElementById(c)?.value?.trim());
-    if (camposVacios.length > 0) return mostrarAlerta('⚠️ Busque un vehículo primero para cargar los datos', 'error');
+    // ✅ 1. Validar INMEDIATAMENTE que el vehículo esté cargado (campos bloqueados)
+    var camposVehiculo = ['marca', 'modelo', 'tipo', 'clase', 'serialCarroceria', 'serialMotor', 'color', 'estatus', 'dependencia'];
+    var vehiculoNoCargado = camposVehiculo.some(c => !document.getElementById(c)?.value?.trim());
 
-    // ✅ 3. Validar que existan al menos 2 fotos cargadas
+    if (vehiculoNoCargado) {
+        return mostrarAlerta('⚠️ Debe llenar todos los campos obligatorios', 'error');
+    }
+
+    // ✅ 2. Validar INMEDIATAMENTE las fotos (MÍNIMO 2)
     var fotosCargadas = [fotosData.foto1, fotosData.foto2, fotosData.foto3, fotosData.foto4].filter(f => f !== null).length;
-    if (fotosCargadas < 2) return mostrarAlerta('⚠️ Debe cargar al menos 2 fotos del vehículo', 'error');
+    if (fotosCargadas < 2) {
+        return mostrarAlerta('📸 Debe cargar al menos 2 fotos del vehículo', 'error');
+    }
 
-    // ✅ 4. Verificar duplicados finales (Placa, Facsimil, Chasis, Motor)
+    // ✅ 3. Verificar duplicados finales antes de insertar
     var placa = limpiarTexto(document.getElementById('placa').value);
     var facsimil = limpiarTexto(document.getElementById('facsimil').value);
     var s_carroceria = limpiarTexto(document.getElementById('serialCarroceria').value);
     var s_motor = limpiarTexto(document.getElementById('serialMotor').value);
+
     var verif = await verificarDuplicadosAntesDeGuardar(placa, facsimil, s_carroceria, s_motor);
     if (verif.existe) return mostrarAlerta('❌ YA EXISTE FICHA CON: ' + verif.duplicados.join(', '), 'error');
 
@@ -313,7 +314,7 @@ async function guardarFicha() {
             creado_por: document.getElementById('userEmail')?.textContent || 'anonimo',
             fecha_creacion: new Date().toISOString()
         };
-        
+
         for (let i = 1; i <= 4; i++) {
             var inp = document.getElementById('foto' + i);
             if (inp && inp.files[0]) {
@@ -322,10 +323,10 @@ async function guardarFicha() {
                 if (up.data?.path) data['foto' + i + '_url'] = supabaseClient.storage.from('fichas-tecnicas').getPublicUrl(fileName).data.publicUrl;
             }
         }
-        
+
         var res = await supabaseClient.from('fichas_tecnicas').insert(data).select();
         if (res.error) throw res.error;
-        
+
         mostrarAlerta('✅ ¡FICHA GUARDADA EXITOSAMENTE!', 'success');
         setTimeout(limpiarBusqueda, 2000);
     } catch (e) {
