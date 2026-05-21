@@ -3,388 +3,201 @@
 // Archivo: ficha-consultar.js
 // ============================================
 
-// ================= CONFIGURACIÓN =================
 let supabaseClient = null;
-
-// ================= ESTADO =================
 let fichasEncontradas = [];
 let fichasFiltradas = [];
 let paginaActual = 1;
-const registrosPorPagina = 15;
+const REGISTROS_POR_PAGINA = 15;
 
-// ================= INICIALIZAR SUPABASE =================
 function inicializarSupabase() {
-    if (typeof window.supabase === 'undefined') {
-        console.error('❌ Librería Supabase no cargada');
-        return false;
-    }
-    var url = window.SUPABASE_URL;
-    var key = window.SUPABASE_KEY;
-    if (!url || !key) {
-        console.error('❌ Configuración de Supabase no encontrada');
-        return false;
-    }
+    if (typeof window.supabase === 'undefined') return false;
+    const url = window.SUPABASE_URL;
+    const key = window.SUPABASE_KEY;
+    if (!url || !key) return false;
     try {
         supabaseClient = window.supabase.createClient(url, key);
         return true;
-    } catch (error) {
-        console.error('❌ Error al inicializar Supabase:', error);
-        return false;
-    }
+    } catch (e) { return false; }
 }
 
-// ================= LIMPIAR TEXTO =================
-function limpiarTexto(texto) {
-    if (!texto) return '';
-    return texto.toString().trim().toUpperCase();
+function limpiarTexto(t) { return t ? t.toString().trim().toUpperCase() : ''; }
+
+function mostrarAlerta(msg, tipo) {
+    const el = document.getElementById('searchAlert');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'alert alert-' + tipo;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => el.style.display = 'none', 5000);
 }
 
-// ================= MOSTRAR ALERTA =================
-function mostrarAlerta(mensaje, tipo) {
-    var alertDiv = document.getElementById('searchAlert');
-    if (!alertDiv) return;
-    
-    alertDiv.textContent = mensaje;
-    alertDiv.className = 'alert alert-' + tipo;
-    alertDiv.style.display = 'block';
-
-    // Auto-scroll suave hacia la alerta
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-    });
-
-    setTimeout(() => {
-        alertDiv.style.display = 'none';
-    }, 5000);
-}
-
-// ================= BUSCAR VEHÍCULO =================
 async function buscarVehiculo() {
-    var searchInput = document.getElementById('searchInput');
-    if (!searchInput) return mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
-    
-    var searchTerm = limpiarTexto(searchInput.value);
-    if (!searchTerm) return mostrarAlerta('⚠️ Ingrese un término de búsqueda', 'error');
+    const input = document.getElementById('searchInput');
+    const term = limpiarTexto(input.value);
+    if (!term) return mostrarAlerta('⚠️ Ingrese un término de búsqueda', 'error');
 
-    mostrarAlerta('⏳ Buscando en base de datos...', 'info');
-    
-    var btnSearch = document.querySelector('.btn-search');
-    if (btnSearch) btnSearch.disabled = true;
+    mostrarAlerta('⏳ Buscando...', 'info');
+    const btn = document.getElementById('btnSearch');
+    btn.disabled = true;
 
     try {
-        // Buscar por placa, facsimil, seriales, marca y modelo
-        var result = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
             .or(
-                'placa.eq."' + searchTerm + '",' +
-                'facsimil.eq."' + searchTerm + '",' +
-                's_carroceria.eq."' + searchTerm + '",' +
-                's_motor.eq."' + searchTerm + '",' +
-                'marca.ilike.%' + searchTerm + '%,' +
-                'modelo.ilike.%' + searchTerm + '%'
+                `placa.ilike.%${term}%,facsimil.ilike.%${term}%,s_carroceria.ilike.%${term}%,s_motor.ilike.%${term}%,marca.ilike.%${term}%,modelo.ilike.%${term}%`
             )
             .order('created_at', { ascending: false });
 
-        if (result.error) throw result.error;
+        if (error) throw error;
 
-        if (!result.data || result.data.length === 0) {
-            mostrarAlerta('❌ No se encontró ninguna ficha con: ' + searchTerm, 'error');
-            fichasEncontradas = [];
-            fichasFiltradas = [];
-            paginaActual = 1;
-            renderizarTabla();
-            actualizarPaginacion();
-            return;
-        }
+        fichasEncontradas = data || [];
+        if (fichasEncontradas.length === 0) return mostrarAlerta('❌ No se encontraron resultados', 'error');
 
-        fichasEncontradas = result.data;
-        mostrarAlerta('✅ Se encontraron ' + fichasEncontradas.length + ' ficha(s)', 'success');
-        
-        // Resetear filtro y aplicar
-        var filtroSelect = document.getElementById('filtroTipo');
-        if (filtroSelect) filtroSelect.value = 'todos';
+        mostrarAlerta('✅ ' + fichasEncontradas.length + ' ficha(s) encontrada(s)', 'success');
+        document.getElementById('filtroTipo').value = 'todos';
         aplicarFiltro();
-    } catch (error) {
-        console.error('❌ Error en buscarVehiculo:', error);
-        mostrarAlerta('❌ Error: ' + error.message, 'error');
+    } catch (e) {
+        console.error(e);
+        mostrarAlerta('❌ Error: ' + e.message, 'error');
     } finally {
-        if (btnSearch) btnSearch.disabled = false;
+        btn.disabled = false;
     }
 }
 
-// ================= APLICAR FILTRO =================
 function aplicarFiltro() {
-    var filtroSelect = document.getElementById('filtroTipo');
-    if (!filtroSelect) return;
+    const tipo = document.getElementById('filtroTipo').value;
+    const t = limpiarTexto;
     
-    var valorFiltro = filtroSelect.value;
-
-    if (valorFiltro === 'todos') {
-        fichasFiltradas = fichasEncontradas.slice();
-    } else if (valorFiltro === 'motos') {
-        // Solo MOTO
-        fichasFiltradas = fichasEncontradas.filter(function(f) {
-            return f.tipo && limpiarTexto(f.tipo) === 'MOTO';
-        });
-    } else if (valorFiltro === 'vehiculos') {
-        // Todo lo que NO sea MOTO (CAMIONETA, AUTOMOVIL, BUS, CAMION, etc.)
-        fichasFiltradas = fichasEncontradas.filter(function(f) {
-            return !f.tipo || limpiarTexto(f.tipo) !== 'MOTO';
-        });
-    }
-
-    // Resetear a página 1 al aplicar filtro
+    if (tipo === 'todos') fichasFiltradas = [...fichasEncontradas];
+    else if (tipo === 'motos') fichasFiltradas = fichasEncontradas.filter(f => t(f.tipo) === 'MOTO');
+    else if (tipo === 'vehiculos') fichasFiltradas = fichasEncontradas.filter(f => t(f.tipo) !== 'MOTO');
+    
     paginaActual = 1;
     renderizarTabla();
     actualizarPaginacion();
 }
 
-// ================= RENDERIZAR TABLA =================
 function renderizarTabla() {
-    var tbody = document.getElementById('resultsBody');
+    const tbody = document.getElementById('resultsBody');
     if (!tbody) return;
     
-    var inicio = (paginaActual - 1) * registrosPorPagina;
-    var fin = inicio + registrosPorPagina;
-    var fichasPagina = fichasFiltradas.slice(inicio, fin);
+    const inicio = (paginaActual - 1) * REGISTROS_POR_PAGINA;
+    const fin = inicio + REGISTROS_POR_PAGINA;
+    const datos = fichasFiltradas.slice(inicio, fin);
 
-    if (fichasPagina.length === 0) {
-        tbody.innerHTML = 
-            '<tr>' +
-                '<td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">' +
-                    '📭 No hay resultados para mostrar' +
-                '</td>' +
-            '</tr>';
+    if (datos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#666;">📭 No hay registros en esta página</td></tr>';
         return;
     }
 
-    var html = fichasPagina.map(function(ficha) {
-        var fecha = ficha.created_at ? new Date(ficha.created_at).toLocaleDateString('es-VE') : 'N/A';
-        var estatus = ficha.estatus_ficha || 'N/A';
-        var colorEstatus = estatus === 'OPERATIVO' ? '#d4edda' : 
-                          estatus === 'INOPERATIVO' ? '#fff3cd' : '#f8d7da';
-        var colorTexto = estatus === 'OPERATIVO' ? '#155724' : 
-                        estatus === 'INOPERATIVO' ? '#856404' : '#721c24';
-        var tipoIcono = ficha.tipo === 'MOTO' ? '🏍️' : '🚗';
-
-        return 
-            '<tr>' +
-                '<td><strong>' + (ficha.placa || 'N/A') + '</strong></td>' +
-                '<td>' + (ficha.marca || 'N/A') + '</td>' +
-                '<td>' + (ficha.modelo || 'N/A') + '</td>' +
-                '<td>' + tipoIcono + ' ' + (ficha.tipo || 'N/A') + '</td>' +
-                '<td>' + (ficha.color || 'N/A') + '</td>' +
-                '<td><span style="padding: 4px 8px; border-radius: 4px; background: ' + colorEstatus + '; color: ' + colorTexto + '; font-weight: 600;">' + estatus + '</span></td>' +
-                '<td>' + (ficha.dependencia || 'N/A') + '</td>' +
-                '<td>' +
-                    '<button class="btn-view" onclick="verFicha(\'' + ficha.id + '\')">' +
-                        '👁️ Ver Ficha' +
-                    '</button>' +
-                '</td>' +
-            '</tr>';
+    tbody.innerHTML = datos.map(f => {
+        const est = f.estatus_ficha || 'N/A';
+        const bg = est === 'OPERATIVO' ? '#d4edda' : est === 'INOPERATIVO' ? '#fff3cd' : '#f8d7da';
+        const color = est === 'OPERATIVO' ? '#155724' : est === 'INOPERATIVO' ? '#856404' : '#721c24';
+        const icono = limpiarTexto(f.tipo) === 'MOTO' ? '🏍️' : '🚗';
+        
+        return `<tr>
+            <td><strong>${f.placa || 'N/A'}</strong></td>
+            <td>${f.marca || 'N/A'}</td>
+            <td>${f.modelo || 'N/A'}</td>
+            <td>${icono} ${f.tipo || 'N/A'}</td>
+            <td>${f.color || 'N/A'}</td>
+            <td><span style="padding:4px 8px;border-radius:4px;background:${bg};color:${color};font-weight:600;">${est}</span></td>
+            <td>${f.dependencia || 'N/A'}</td>
+            <td><button class="btn-view" onclick="verFicha('${f.id}')">👁️ Ver</button></td>
+        </tr>`;
     }).join('');
-
-    tbody.innerHTML = html;
 }
 
-// ================= ACTUALIZAR PAGINACIÓN =================
 function actualizarPaginacion() {
-    var totalPaginas = Math.ceil(fichasFiltradas.length / registrosPorPagina) || 1;
-    var inicio = fichasFiltradas.length > 0 ? (paginaActual - 1) * registrosPorPagina + 1 : 0;
-    var fin = Math.min(paginaActual * registrosPorPagina, fichasFiltradas.length);
+    const total = fichasFiltradas.length;
+    const paginas = Math.max(1, Math.ceil(total / REGISTROS_POR_PAGINA));
+    const inicio = total > 0 ? (paginaActual - 1) * REGISTROS_POR_PAGINA + 1 : 0;
+    const fin = Math.min(paginaActual * REGISTROS_POR_PAGINA, total);
 
-    var elPaginaActual = document.getElementById('paginaActual');
-    var elTotalPaginas = document.getElementById('totalPaginas');
-    var elMostrandoInicio = document.getElementById('mostrandoInicio');
-    var elMostrandoFin = document.getElementById('mostrandoFin');
-    var elTotalRegistros = document.getElementById('totalRegistros');
-    var btnAnterior = document.getElementById('btnAnterior');
-    var btnSiguiente = document.getElementById('btnSiguiente');
+    const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    set('mostrandoInicio', inicio);
+    set('mostrandoFin', fin);
+    set('totalRegistros', total);
+    set('paginaActual', paginaActual);
+    set('totalPaginas', paginas);
 
-    if (elPaginaActual) elPaginaActual.textContent = paginaActual;
-    if (elTotalPaginas) elTotalPaginas.textContent = totalPaginas;
-    if (elMostrandoInicio) elMostrandoInicio.textContent = inicio;
-    if (elMostrandoFin) elMostrandoFin.textContent = fin;
-    if (elTotalRegistros) elTotalRegistros.textContent = fichasFiltradas.length;
-    if (btnAnterior) btnAnterior.disabled = paginaActual === 1;
-    if (btnSiguiente) btnSiguiente.disabled = paginaActual === totalPaginas || totalPaginas === 0;
+    const btnA = document.getElementById('btnAnterior');
+    const btnS = document.getElementById('btnSiguiente');
+    if (btnA) btnA.disabled = paginaActual === 1;
+    if (btnS) btnS.disabled = paginaActual === paginas;
 }
 
-// ================= CAMBIAR PÁGINA =================
-function cambiarPagina(direccion) {
-    var totalPaginas = Math.ceil(fichasFiltradas.length / registrosPorPagina) || 1;
-    var nuevaPagina = paginaActual + direccion;
-
-    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
-        paginaActual = nuevaPagina;
+function cambiarPagina(dir) {
+    const paginas = Math.ceil(fichasFiltradas.length / REGISTROS_POR_PAGINA) || 1;
+    const nueva = paginaActual + dir;
+    if (nueva >= 1 && nueva <= paginas) {
+        paginaActual = nueva;
         renderizarTabla();
         actualizarPaginacion();
-
-        // Scroll suave a la tabla de resultados
-        var resultsSection = document.querySelector('.results-section');
-        if (resultsSection) {
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        document.querySelector('.results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
-// ================= VER FICHA =================
 function verFicha(id) {
-    var ficha = fichasEncontradas.find(function(f) {
-        return f.id == id;
+    const f = fichasEncontradas.find(x => x.id == id);
+    if (!f) return mostrarAlerta('❌ Ficha no encontrada', 'error');
+
+    const map = ['marca','modelo','tipo','clase','color','placa','facsimil','dependencia','s_carroceria','s_motor','estatus_ficha','causa','diagnostico','mecanica','ubicacion','tapiceria','cauchos','luces','observaciones'];
+    map.forEach(k => {
+        const el = document.getElementById('modal' + k.charAt(0).toUpperCase() + k.slice(1));
+        if (el) el.textContent = f[k] || 'N/A';
     });
 
-    if (!ficha) {
-        mostrarAlerta('❌ Ficha no encontrada', 'error');
-        return;
+    for (let i = 1; i <= 4; i++) {
+        const img = document.getElementById('modalImg' + i);
+        const box = document.getElementById('modalBox' + i);
+        const span = box ? box.querySelector('span') : null;
+        const url = f['foto' + i + '_url'];
+        if (url && img && span) { img.src = url; img.style.display = 'block'; span.style.display = 'none'; }
+        else if (span && img) { img.style.display = 'none'; span.style.display = 'block'; }
     }
 
-    // Llenar datos del modal
-    var campos = [
-        { key: 'marca', id: 'modalMarca' },
-        { key: 'modelo', id: 'modalModelo' },
-        { key: 'tipo', id: 'modalTipo' },
-        { key: 'clase', id: 'modalClase' },
-        { key: 'color', id: 'modalColor' },
-        { key: 'placa', id: 'modalPlaca' },
-        { key: 'facsimil', id: 'modalFacsimilar' },
-        { key: 'dependencia', id: 'modalDependencia' },
-        { key: 's_carroceria', id: 'modalSerialCarroceria' },
-        { key: 's_motor', id: 'modalSerialMotor' },
-        { key: 'estatus_ficha', id: 'modalEstatus' },
-        { key: 'causa', id: 'modalCausa' },
-        { key: 'diagnostico', id: 'modalDiagnostico' },
-        { key: 'mecanica', id: 'modalMecanica' },
-        { key: 'ubicacion', id: 'modalUbicacion' },
-        { key: 'tapiceria', id: 'modalTapiceria' },
-        { key: 'cauchos', id: 'modalCauchos' },
-        { key: 'luces', id: 'modalLuces' },
-        { key: 'observaciones', id: 'modalObservaciones' }
-    ];
-
-    campos.forEach(function(campo) {
-        var el = document.getElementById(campo.id);
-        if (el) el.textContent = ficha[campo.key] || 'N/A';
-    });
-
-    // Fecha y creador
-    var fechaEl = document.getElementById('modalFechaCreacion');
-    if (fechaEl) fechaEl.textContent = ficha.created_at ? new Date(ficha.created_at).toLocaleString('es-VE') : 'N/A';
-    
-    var creadorEl = document.getElementById('modalCreadoPor');
-    if (creadorEl) creadorEl.textContent = ficha.creado_por || 'N/A';
-
-    // Fotos
-    for (var i = 1; i <= 4; i++) {
-        var fotoUrl = ficha['foto' + i + '_url'];
-        var imgElement = document.getElementById('modalImg' + i);
-        var boxElement = document.getElementById('modalBox' + i);
-        var spanElement = boxElement ? boxElement.querySelector('span') : null;
-
-        if (fotoUrl && imgElement && spanElement) {
-            imgElement.src = fotoUrl;
-            imgElement.style.display = 'block';
-            spanElement.style.display = 'none';
-        } else if (spanElement) {
-            if (imgElement) imgElement.style.display = 'none';
-            spanElement.style.display = 'block';
-        }
-    }
-
-    // Mostrar modal
-    var modal = document.getElementById('fichaModal');
-    if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
+    document.getElementById('fichaModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
 }
 
-// ================= CERRAR MODAL =================
 function cerrarModal() {
-    var modal = document.getElementById('fichaModal');
-    if (modal) modal.style.display = 'none';
+    document.getElementById('fichaModal').style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
-// ================= IMPRIMIR FICHA =================
-function imprimirFicha() {
-    window.print();
-}
+function imprimirFicha() { window.print(); }
 
-// ================= LIMPIAR BÚSQUEDA =================
 function limpiarBusqueda() {
-    var searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    var filtroTipo = document.getElementById('filtroTipo');
-    if (filtroTipo) filtroTipo.value = 'todos';
-
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filtroTipo').value = 'todos';
     fichasEncontradas = [];
     fichasFiltradas = [];
     paginaActual = 1;
-
-    var alertDiv = document.getElementById('searchAlert');
-    if (alertDiv) alertDiv.style.display = 'none';
-
     renderizarTabla();
     actualizarPaginacion();
-
-    mostrarAlerta('🔄 Búsqueda limpiada', 'info');
+    document.getElementById('searchAlert').style.display = 'none';
 }
 
-// ================= CARGAR USUARIO =================
 async function cargarUsuario() {
     try {
-        var res = await supabaseClient.auth.getSession();
-        var email = res.data?.session?.user?.email;
-        var userEmailEl = document.getElementById('userEmail');
-        if (userEmailEl) userEmailEl.textContent = email || 'Invitado';
-    } catch (error) {
-        console.error('Error al cargar usuario:', error);
-    }
+        const { data } = await supabaseClient.auth.getSession();
+        document.getElementById('userEmail').textContent = data?.session?.user?.email || 'Invitado';
+    } catch (e) {}
 }
 
-// ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', function() {
     if (!inicializarSupabase()) return;
 
-    // Búsqueda con Enter
-    var searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                buscarVehiculo();
-            }
-        });
-    }
-
-    // Cerrar sesión
-    var logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            if (confirm('¿Cerrar sesión?')) {
-                window.location.href = '../index.html';
-            }
-        });
-    }
-
-    // Cerrar modal al hacer clic fuera
-    window.onclick = function(event) {
-        var modal = document.getElementById('fichaModal');
-        if (event.target === modal) {
-            cerrarModal();
-        }
-    };
-
-    // Cargar usuario
-    cargarUsuario();
-
-    // Estado inicial
+    document.getElementById('searchInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') buscarVehiculo(); });
+    document.getElementById('logoutBtn')?.addEventListener('click', () => confirm('¿Cerrar sesión?') && window.location.replace('../index.html'));
+    
+    window.onclick = function(e) { if (e.target.id === 'fichaModal') cerrarModal(); };
+    
     renderizarTabla();
     actualizarPaginacion();
-
-    console.log('✅ Consulta de fichas inicializada');
+    cargarUsuario();
 });
