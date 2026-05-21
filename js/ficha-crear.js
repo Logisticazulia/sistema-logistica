@@ -151,15 +151,31 @@ function previewImage(input, previewId) {
     }
 }
 
-// ================= BUSCAR VEHÍCULO =================
+// ================= BUSCAR VEHÍCULO (CON BLOQUEO ANTE DUPLICADOS) =================
 async function buscarVehiculo() {
     var searchInput = document.getElementById('searchInput');
     if (!searchInput) return mostrarAlerta('❌ Campo de búsqueda no encontrado', 'error');
+    
     var searchTerm = limpiarTexto(searchInput.value);
     if (!searchTerm) return mostrarAlerta('⚠️ Ingrese un término de búsqueda', 'error');
-    mostrarAlerta('⏳ Buscando en base de datos...', 'info');
+
+    mostrarAlerta('⏳ Verificando si ya existe ficha...', 'info');
     try {
-        // ✅ Busca por Placa, Facsimil, Seriales y N° Identificación
+        // ✅ PASO 1: VERIFICAR PRIMERO en fichas_tecnicas
+        // Si encuentra coincidencia en placa, facsimil, chasis o motor, BLOQUEA inmediatamente.
+        var checkFicha = await supabaseClient
+            .from('fichas_tecnicas')
+            .select('id')
+            .or('placa.eq."' + searchTerm + '",facsimil.eq."' + searchTerm + '",s_carroceria.eq."' + searchTerm + '",s_motor.eq."' + searchTerm + '"')
+            .limit(1);
+
+        if (checkFicha.error) throw checkFicha.error;
+        if (checkFicha.data && checkFicha.data.length > 0) {
+            return mostrarAlerta('⛔ ¡YA TIENE FICHA REGISTRADA! No se permite volver a buscar este vehículo.', 'error');
+        }
+
+        // ✅ PASO 2: Si NO tiene ficha, buscar en la base de datos de vehículos
+        mostrarAlerta('⏳ Buscando vehículo en inventario...', 'info');
         var result = await supabaseClient
             .from('vehiculos')
             .select('*')
@@ -170,12 +186,14 @@ async function buscarVehiculo() {
         if (!result.data || result.data.length === 0) return mostrarAlerta('❌ No se encontró vehículo con: ' + searchTerm, 'error');
         
         var vehiculo = result.data[0];
-        // Verificar si ya tiene ficha
+        
+        // ✅ PASO 3: Doble verificación cruzada (por si buscó por N° Identificación pero su placa ya tiene ficha)
         var ids = [limpiarTexto(vehiculo.placa), limpiarTexto(vehiculo.facsimil), limpiarTexto(vehiculo.s_carroceria), limpiarTexto(vehiculo.s_motor)].filter(Boolean);
         if (ids.length > 0) {
-            var check = await supabaseClient.from('fichas_tecnicas').select('id').or(ids.map(id => 'placa.eq."' + id + '"').join(',')).limit(1);
-            if (check.data.length > 0) return mostrarAlerta('⚠️ Este vehículo ya tiene ficha registrada', 'error');
+            var doubleCheck = await supabaseClient.from('fichas_tecnicas').select('id').or(ids.map(id => 'placa.eq."' + id + '"').join(',')).limit(1);
+            if (doubleCheck.data.length > 0) return mostrarAlerta('⚠️ Este vehículo ya tiene ficha registrada por otro identificador.', 'error');
         }
+        
         llenarFormulario(vehiculo);
         mostrarAlerta('✅ Vehículo cargado. Complete la información técnica.', 'success');
     } catch (error) {
@@ -183,7 +201,6 @@ async function buscarVehiculo() {
         mostrarAlerta('❌ Error: ' + error.message, 'error');
     }
 }
-
 function llenarFormulario(vehiculo) {
     var map = { 
         'marca': 'marca', 'modelo': 'modelo', 'tipo': 'tipo', 'clase': 'clase', 
