@@ -15,7 +15,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .container { max-width: 1600px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
-
 /* ===== BÚSQUEDA ===== */
 .search-section { background: linear-gradient(135deg, #003366 0%, #004080 100%); padding: 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,51,102,0.2); }
 .search-section h3 { color: white; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
@@ -27,7 +26,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-search:hover { background: #218838; transform: translateY(-2px); }
 .btn-clear { padding: 12px 28px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
 .btn-clear:hover { background: #e0a800; transform: translateY(-2px); }
-
 /* ===== RESULTADOS Y FILTROS ===== */
 .results-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; }
 .results-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 3px solid #003366; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
@@ -45,7 +43,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-view:hover { background: #004080; }
 .btn-print { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; }
 .btn-print:hover { background: #218838; }
-
 /* ===== PAGINACIÓN ===== */
 .pagination-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
 #paginationInfo { color: #666; font-size: 14px; font-weight: 500; }
@@ -57,13 +54,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .page-btn { min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 500; }
 .page-btn:hover:not(.active) { background: #f0f0f0; border-color: #003366; }
 .page-btn.active { background: #003366; color: white; border-color: #003366; }
-
 /* ===== MODAL ===== */
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 40px 20px; }
 .modal-content { background: white; margin: 0 auto; padding: 35px; border-radius: 8px; max-width: 1500px; width: 95%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
 .modal-close { position: absolute; right: 25px; top: 20px; font-size: 32px; cursor: pointer; background: #f5f5f5; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
 .modal-close:hover { background: #e0e0e0; color: #003366; transform: rotate(90deg); }
-
 /* ===== FICHA TÉCNICA ===== */
 .ficha-tecnica { border: 2px solid #003366; padding: 30px; background: white; width: 100%; }
 .ficha-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 3px solid #003366; }
@@ -72,146 +67,105 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .ficha-title h1 { font-size: 16px; color: #003366; font-weight: 700; }
 .ficha-title h2 { font-size: 19px; color: #003366; font-weight: 700; margin: 6px 0; }
 .ficha-title h3 { font-size: 17px; color: #003366; font-weight: 700; }
-
-/* ✅ TABLA - 7 COLUMNAS: 6 datos + 1 observaciones */
+/* ✅ TABLA CORREGIDA - Estructura limpia */
 .ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
 .ficha-table th { background: #4a7c9b; color: white; padding: 12px 10px; text-align: left; font-size: 13px; border: 2px solid #003366; font-weight: 700; }
 .ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: middle; line-height: 1.4; }
 .ficha-table .label { background: #f0f0f0; font-weight: 700; }
-
-/* Anchos: 6 columnas de datos (12%+15% x3 = 81%) + observaciones (19%) */
-.ficha-table col.col-label { width: 12%; }
-.ficha-table col.col-value { width: 15%; }
-.ficha-table col.col-obs { width: 19%; }
-
-.observaciones-cell { vertical-align: top; padding: 10px; font-size: 12px; line-height: 1.4; background: white; }
-
+/* Anchos de columnas: 6 columnas iguales */
+.ficha-table col.col-label { width: 13%; }
+.ficha-table col.col-value { width: 16%; }
+.observaciones-box { min-height: 250px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; word-wrap: break-word; }
 .fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
 .foto-box { border: 2px solid #4a7c9b; height: 160px; background: #4a7c9b; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; overflow: hidden; }
 .foto-box img { width: 100%; height: 100%; object-fit: cover; }
-
 .modal-actions { margin-top: 10px; display: flex; gap: 12px; justify-content: flex-end; padding-top: 15px; border-top: 2px solid #e0e0e0; }
 .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin: 0; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - CORREGIDA DEFINITIVAMENTE ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL GRANDE ===== */
 @media print {
   @page { 
-    size: letter landscape; 
-    margin: 8mm;
+    size: landscape letter; 
+    margin: 5mm;
   }
   
-  /* Ocultar elementos de navegación y búsqueda */
-  .navbar, 
-  .module-header, 
-  .search-section, 
-  .results-section,
-  .modal-close, 
-  .btn, 
-  .pagination-container, 
-  .module-title-section,
-  .container > *:not(#fichaModal) {
-    display: none !important;
+  /* Ocultar elementos de interfaz */
+  .navbar, .module-header, .search-section, .results-section,
+  .modal-close, .modal-actions, .pagination-container, .module-title-section,
+  .container > *:not(#fichaModal) { 
+    display: none !important; 
   }
   
-  /* Mostrar el modal ocupando toda la página */
+  /* Resetear body para impresión */
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Ajustar modal a pantalla completa */
   #fichaModal {
     display: block !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    width: 100% !important; height: 100% !important;
     background: white !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0 !important; margin: 0 !important;
     overflow: visible !important;
     z-index: 99999 !important;
   }
   
   .modal-content {
-    margin: 0 !important;
-    padding: 6mm !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-shadow: none !important;
-    background: white !important;
+    margin: 0 !important; padding: 0 !important;
+    width: 100% !important; max-width: 100% !important;
+    box-shadow: none !important; background: white !important;
   }
   
-  /* Ajustar ficha para impresión */
+  /* Ficha ajustada a toda la hoja */
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 10px !important;
+    padding: 15px !important;
     width: 100% !important;
-    page-break-inside: avoid !important;
+    box-sizing: border-box;
   }
   
-  .ficha-header {
-    margin-bottom: 10px !important;
-    padding-bottom: 8px !important;
-    page-break-inside: avoid !important;
-  }
+  /* Encabezados más grandes */
+  .ficha-logo { width: 120px !important; }
+  .ficha-title h1 { font-size: 16pt !important; line-height: 1.1; }
+  .ficha-title h2 { font-size: 20pt !important; margin: 4px 0; }
+  .ficha-title h3 { font-size: 14pt !important; }
   
-  .ficha-logo {
-    width: 80px !important;
-  }
-  
-  .ficha-title h1 {
-    font-size: 10pt !important;
-    line-height: 1.1 !important;
-  }
-  
-  .ficha-title h2 {
-    font-size: 12pt !important;
-    margin: 2px 0 !important;
-  }
-  
-  .ficha-title h3 {
-    font-size: 10pt !important;
-  }
-  
-  /* Tabla optimizada para impresión */
+  /* Tabla grande */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
-    page-break-inside: avoid !important;
-    margin: 6px 0 !important;
-    font-size: 8pt !important;
-    display: table !important;
-  }
-  
-  .ficha-table colgroup {
-    display: table-column-group !important;
-  }
-  
-  .ficha-table col.col-label {
-    width: 11% !important;
-  }
-  
-  .ficha-table col.col-value {
-    width: 14% !important;
-  }
-  
-  .ficha-table th, 
-  .ficha-table td {
-    border: 1px solid #003366 !important;
-    padding: 3px 4px !important;
-    font-size: 8pt !important;
-    line-height: 1.1 !important;
-    vertical-align: middle !important;
-    word-wrap: break-word !important;
-    display: table-cell !important;
+    font-size: 12pt !important;
+    margin-top: 15px !important;
   }
   
   .ficha-table th {
     background: #4a7c9b !important;
     color: white !important;
-    font-weight: 700 !important;
+    font-size: 14pt !important;
+    padding: 8px 5px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+  }
+  
+  .ficha-table td {
+    border: 2px solid #003366 !important;
+    padding: 6px 5px !important;
+    font-size: 12pt !important;
+    vertical-align: middle !important;
   }
   
   .ficha-table .label {
@@ -223,26 +177,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   }
   
   .observaciones-box {
-    min-height: 100px !important;
-    font-size: 8pt !important;
-    line-height: 1.1 !important;
-    border: 1px solid #003366 !important;
-    padding: 4px !important;
+    min-height: 180px !important;
+    font-size: 12pt !important;
+    border: 2px solid #003366 !important;
   }
   
-  /* Fotos */
+  /* Fotos más grandes */
   .fotos-container {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 4px !important;
-    page-break-inside: avoid !important;
-    margin-top: 6px !important;
+    gap: 10px !important;
+    margin-top: 15px !important;
+    height: 220px !important;
   }
   
   .foto-box {
-    height: 70px !important;
-    border: 1px solid #4a7c9b !important;
-    page-break-inside: avoid !important;
+    height: 100% !important;
+    border: 2px solid #4a7c9b !important;
   }
   
   .foto-box img {
@@ -251,11 +202,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     object-fit: cover !important;
   }
   
-  .modal-actions {
-    display: none !important;
-  }
-  
-  /* Forzar colores en todos los navegadores */
+  /* Forzar colores */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -285,7 +232,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
   </div>
 </nav>
-
 <!-- ================= CONTENIDO ================= -->
 <main class="dashboard-main" role="main">
   <header class="module-header">
@@ -298,7 +244,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     <h1 class="module-title">🔍 Consultar Ficha Técnica de Vehículo</h1>
     <p class="module-subtitle">Busque y visualice las fichas técnicas registradas en el sistema</p>
   </section>
-  
   <div class="container">
     <!-- Búsqueda -->
     <div class="search-section">
@@ -313,7 +258,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
         <span>💡 Busque por:</span><span>🚗 Placa</span><span>📄 Facsimilar</span><span>🔢 Serial Carrocería</span><span>⚙️ Serial Motor</span><span>🏷️ Marca/Modelo</span>
       </div>
     </div>
-    
     <!-- Resultados -->
     <div class="results-section">
       <div class="results-header">
@@ -348,7 +292,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       </div>
     </div>
   </div>
-  
   <!-- ================= MODAL ================= -->
   <div id="fichaModal" class="modal">
     <div class="modal-content">
@@ -363,93 +306,109 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           </div>
           <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo" onerror="this.style.display='none'">
         </div>
-        
-        <!-- ✅ TABLA 7 COLUMNAS: 6 datos + 1 observaciones a la derecha -->
+        <!-- ✅ TABLA CORREGIDA: 6 columnas definidas, estructura limpia fila por fila -->
         <table class="ficha-table" id="fichaTable">
           <colgroup>
-            <col class="col-label"><col class="col-value">
-            <col class="col-label"><col class="col-value">
-            <col class="col-label"><col class="col-value">
-            <col class="col-obs">
+            <col class="col-label">
+            <col class="col-value">
+            <col class="col-label">
+            <col class="col-value">
+            <col class="col-label">
+            <col class="col-value">
           </colgroup>
-          
-          <!-- Fila 1: TÍTULOS -->
+          <!-- Fila 1: TÍTULO DATOS + OBSERVACIONES (span 6 cols para título, obs en celda separada) -->
           <tr>
-            <th colspan="6">DATOS DEL VEHICULO</th>
-            <th>OBSERVACIONES</th>
+            <th colspan="5" style="text-align:left;">DATOS DEL VEHICULO</th>
+            <td rowspan="8" style="width:22%;vertical-align:top;text-align:center;border:2px solid #003366;">
+              <strong style="font-size:12px;">OBSERVACIONES</strong><br><br>
+              <div class="observaciones-box" id="modalObservaciones">-</div>
+            </td>
           </tr>
-          
-          <!-- Fila 2: MARCA | valor | MODELO | valor | TIPO | valor | OBS (rowspan) -->
+          <!-- Fila 2: MARCA | valor | MODELO | valor | TIPO | valor -->
           <tr>
-            <td class="label">MARCA</td><td class="value" id="modalMarca"></td>
-            <td class="label">MODELO</td><td class="value" id="modalModelo"></td>
-            <td class="label">TIPO</td><td class="value" id="modalTipo"></td>
-            <td rowspan="6" class="observaciones-cell" id="modalObservaciones"></td>
+            <td class="label">MARCA</td>
+            <td class="value" id="modalMarca"></td>
+            <td class="label">MODELO</td>
+            <td class="value" id="modalModelo"></td>
+            <td class="label">TIPO</td>
+            <td class="value" id="modalTipo"></td>
           </tr>
-          
-          <!-- Fila 3: SERIAL | CLASE | COLOR -->
+          <!-- Fila 3: SERIAL CARROCERÍA | valor | CLASE | valor | COLOR | valor -->
           <tr>
-            <td class="label">SERIAL CARROCERÍA</td><td class="value" id="modalSerialCarroceria"></td>
-            <td class="label">CLASE</td><td class="value" id="modalClase"></td>
-            <td class="label">COLOR</td><td class="value" id="modalColor"></td>
+            <td class="label">SERIAL CARROCERÍA</td>
+            <td class="value" id="modalSerialCarroceria"></td>
+            <td class="label">CLASE</td>
+            <td class="value" id="modalClase"></td>
+            <td class="label">COLOR</td>
+            <td class="value" id="modalColor"></td>
           </tr>
-          
-          <!-- Fila 4: PLACA | FACSIMIL | DEPENDENCIA -->
+          <!-- Fila 4: PLACA | valor | FACSIMIL | valor | DEPENDENCIA | valor -->
           <tr>
-            <td class="label">PLACA</td><td class="value" id="modalPlaca"></td>
-            <td class="label">FACSIMIL</td><td class="value" id="modalFacsimilar"></td>
-            <td class="label">DEPENDENCIA</td><td class="value" id="modalDependencia"></td>
+            <td class="label">PLACA</td>
+            <td class="value" id="modalPlaca"></td>
+            <td class="label">FACSIMIL</td>
+            <td class="value" id="modalFacsimilar"></td>
+            <td class="label">DEPENDENCIA</td>
+            <td class="value" id="modalDependencia"></td>
           </tr>
-          
-          <!-- Fila 5: SERIAL MOTOR -->
+          <!-- Fila 5: SERIAL MOTOR | valor | (vacío) | (vacío) | (vacío) | (vacío) -->
           <tr>
-            <td class="label">SERIAL MOTOR</td><td class="value" id="modalSerialMotor"></td>
-            <td colspan="4"></td>
+            <td class="label">SERIAL MOTOR</td>
+            <td class="value" id="modalSerialMotor"></td>
+            <td class="label" colspan="4"></td>
           </tr>
-          
-          <!-- Fila 6: ESTATUS -->
+          <!-- Fila 6: ESTATUS DEL VEHÍCULO | colspan 4 | (obs ocupa col 6) -->
           <tr>
-            <td class="label">ESTATUS</td>
-            <td colspan="5" style="text-align:center;font-weight:bold;" id="modalEstatus"></td>
+            <td class="label">ESTATUS DEL VEHÍCULO</td>
+            <td colspan="4" style="text-align:center;font-weight:bold;font-size:13px;" id="modalEstatus"></td>
           </tr>
-          
-          <!-- Fila 7: INFO TÉCNICA -->
+          <!-- Fila 7: TÍTULO INFO TÉCNICA -->
           <tr>
-            <th colspan="7">INFORMACIÓN TÉCNICO MECÁNICA POR INOPERATIVIDAD</th>
+            <th colspan="5">INFORMACIÓN TÉCNICO MECÁNICA POR INOPERATIVIDAD</th>
           </tr>
-          
-          <!-- Fila 8: CAUSA | DIAGNÓSTICO -->
+          <!-- Fila 8: CAUSA | colspan 2 | DIAGNÓSTICO | colspan 2 -->
           <tr>
-            <td class="label">CAUSA</td><td colspan="2" id="modalCausa"></td>
-            <td class="label">DIAGNÓSTICO</td><td colspan="3" id="modalDiagnostico"></td>
+            <td class="label">CAUSA</td>
+            <td colspan="2" id="modalCausa"></td>
+            <td class="label">DIAGNÓSTICO</td>
+            <td colspan="2" id="modalDiagnostico"></td>
           </tr>
-          
-          <!-- Fila 9: MECÁNICA | UBICACIÓN -->
+          <!-- Fila 9: MECÁNICA | colspan 2 | UBICACIÓN | colspan 2 -->
           <tr>
-            <td class="label">MECÁNICA</td><td colspan="2" id="modalMecanica"></td>
-            <td class="label">UBICACIÓN</td><td colspan="3" id="modalUbicacion"></td>
+            <td class="label">MECÁNICA</td>
+            <td colspan="2" id="modalMecanica"></td>
+            <td class="label">UBICACIÓN</td>
+            <td colspan="2" id="modalUbicacion"></td>
           </tr>
-          
-          <!-- Fila 10: TAPICERÍA | CAUCHOS | LUCES -->
+          <!-- Fila 10: TAPICERÍA | valor | CAUCHOS | valor | LUCES | valor -->
           <tr>
-            <td class="label">TAPICERÍA</td><td class="value" id="modalTapiceria"></td>
-            <td class="label">CAUCHOS</td><td class="value" id="modalCauchos"></td>
-            <td class="label">LUCES</td><td class="value" id="modalLuces"></td>
-            <td></td>
+            <td class="label">TAPICERÍA</td>
+            <td class="value" id="modalTapiceria"></td>
+            <td class="label">CAUCHOS</td>
+            <td class="value" id="modalCauchos"></td>
+            <td class="label">LUCES</td>
+            <td class="value" id="modalLuces"></td>
           </tr>
-          
-          <!-- Fila 11: FOTOS -->
+          <!-- Fila 11: TÍTULO REGISTRO FOTOGRÁFICO -->
           <tr>
-            <th colspan="7">REGISTRO FOTOGRÁFICO</th>
+            <th colspan="5">REGISTRO FOTOGRÁFICO</th>
           </tr>
+          <!-- Fila 12: Fotos (colspan 5) -->
           <tr>
-            <td colspan="7" style="padding:10px;">
+            <td colspan="5" style="padding:15px;">
               <div class="fotos-container">
                 <div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1" alt="Foto 1"></div>
                 <div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2" alt="Foto 2"></div>
                 <div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3" alt="Foto 3"></div>
                 <div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4" alt="Foto 4"></div>
               </div>
+            </td>
+          </tr>
+          <!-- Fila 13: Fecha y creado por -->
+          <tr>
+            <td colspan="5" style="text-align:right;font-size:12px;padding-top:15px;color:#666;">
+              <strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp;
+              <strong>Creado por:</strong> <span id="modalCreadoPor"></span>
             </td>
           </tr>
         </table>
@@ -461,7 +420,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
   </div>
 </main>
-
 <!-- ================= SCRIPTS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
