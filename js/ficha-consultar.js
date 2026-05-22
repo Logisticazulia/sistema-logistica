@@ -2,7 +2,7 @@
 // CONSULTAR FICHAS TÉCNICAS - LÓGICA CORREGIDA
 // ============================================
 
-// Verificación de seguridad (evita error si config.js no cargó)
+// Verificación segura (evita errores si config.js no cargó a tiempo)
 if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
     console.error('❌ Error crítico: Supabase o config.js no cargaron correctamente.');
 }
@@ -46,21 +46,20 @@ async function buscarFichas() {
         if (error) throw error;
 
         fichasEncontradas = data || [];
+        renderizarListaFichas();
 
         if (fichasEncontradas.length === 0) {
             mostrarAlerta('😕 No se encontraron resultados para: ' + term, 'info');
         } else {
             mostrarAlerta(`✅ Se encontraron ${fichasEncontradas.length} ficha(s)`, 'success');
         }
-
-        renderizarListaFichas();
     } catch (err) {
         console.error('❌ Error en buscarFichas:', err);
         mostrarAlerta('❌ Error de conexión: ' + err.message, 'error');
     }
 }
 
-// Alias para compatibilidad con HTML (si usas onclick="buscarVehiculo()")
+// Alias para compatibilidad con tu HTML: onclick="buscarVehiculo()"
 window.buscarVehiculo = buscarFichas;
 
 // ============================================
