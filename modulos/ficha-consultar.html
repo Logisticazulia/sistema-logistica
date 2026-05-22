@@ -424,6 +424,44 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     margin-right: 0 !important;
   }
 }
+ /* Agrupa estadísticas y filtro a la derecha */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre estadísticas y filtro */
+  flex-wrap: wrap;
+}
+
+/* Ajuste del contenedor de estadísticas */
+.stats-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #003366;
+  background: #f8f9fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Responsive: en móviles se apilan correctamente */
+@media (max-width: 768px) {
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .stats-group {
+    font-size: 12px;
+    padding: 5px 8px;
+    gap: 5px;
+  }
+} 
 </style>
 </head>
 <body class="dashboard-page">
@@ -470,29 +508,30 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       </div>
     </div>
     
-<!-- ================= RESULTADOS ================= -->
 <div class="results-section">
   <div class="results-header">
     <h2>📋 Resultados de Búsqueda</h2>
     
- <!-- ✅ ESTADÍSTICAS EN TIEMPO REAL CON TEXTO "Partes:" -->
-<div class="stats-group" id="statsContainer">
-  <span style="font-weight: 700; color: #003366; margin-right: 8px;">Partes:</span>
-  <span>📊 <strong id="totalFichas">0</strong> Total</span>
-  <span>🚗 <strong id="totalVehiculos">0</strong> Vehículos</span>
-  <span>🏍️ <strong id="totalMotos">0</strong> Motos</span>
-</div>
-
-    <!-- 🔽 FILTROS (Ahora al lado derecho) -->
-    <div class="filter-group">
-      <label for="filtroTipo">Filtro:</label>
-      <select id="filtroTipo" class="filter-select">
-        <option value="todos">Todos</option>
-        <option value="vehiculo">Vehículos</option>
-        <option value="moto">Motos</option>
-      </select>
+    <!-- ✅ GRUPO UNIFICADO: Estadísticas + Filtro -->
+    <div class="header-controls">
+      <div class="stats-group" id="statsContainer">
+        <span style="font-weight: 700; color: #003366; margin-right: 5px;">Partes:</span>
+        <span>📊 <strong id="totalFichas">0</strong> Total</span>
+        <span>🚗 <strong id="totalVehiculos">0</strong> Vehículos</span>
+        <span>🏍️ <strong id="totalMotos">0</strong> Motos</span>
+      </div>
+      
+      <div class="filter-group">
+        <label for="filtroTipo">🔽 Filtro:</label>
+        <select id="filtroTipo" class="filter-select">
+          <option value="todos">Todos</option>
+          <option value="vehiculo">Vehículos</option>
+          <option value="moto">Motos</option>
+        </select>
+      </div>
     </div>
   </div>
+  <!-- ... resto de tu tabla y paginación ... -->
   <!-- Resto de la tabla... -->
       <div class="table-container">
         <table class="results-table" id="resultsTable">
