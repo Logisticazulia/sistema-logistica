@@ -84,56 +84,69 @@ function limpiarBusqueda() {
 // RENDERIZAR LISTA DE FICHAS
 // ============================================
 
+// ============================================
+// RENDERIZAR LISTA DE FICHAS (VERSIÓN CORREGIDA)
+// ============================================
 function renderizarListaFichas() {
-    const container = document.getElementById('fichasList');
-    
-    if (fichasEncontradas.length === 0) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: #666;">
-                <p>No hay fichas para mostrar</p>
-            </div>
-        `;
-        return;
-    }
-    
-    const html = fichasEncontradas.map(ficha => {
-        const fecha = ficha.created_at ? new Date(ficha.created_at).toLocaleString() : 'N/A';
-        return `
-            <div class="ficha-item" onclick="seleccionarFicha('${ficha.id}')" data-id="${ficha.id}">
-                <div class="ficha-field">
-                    <span class="ficha-field-label">Placa</span>
-                    <span class="ficha-field-value">${ficha.placa || 'N/A'}</span>
-                </div>
-                <div class="ficha-field">
-                    <span class="ficha-field-label">Facsímil</span>
-                    <span class="ficha-field-value">${ficha.facsimil || 'N/A'}</span>
-                </div>
-                <div class="ficha-field">
-                    <span class="ficha-field-label">Marca</span>
-                    <span class="ficha-field-value">${ficha.marca || 'N/A'}</span>
-                </div>
-                <div class="ficha-field">
-                    <span class="ficha-field-label">Modelo</span>
-                    <span class="ficha-field-value">${ficha.modelo || 'N/A'}</span>
-                </div>
-                <div class="ficha-field">
-                    <span class="ficha-field-label">Serial Carrocería</span>
-                    <span class="ficha-field-value">${ficha.s_carroceria || 'N/A'}</span>
-                </div>
-                <div class="ficha-field">
-                    <span class="ficha-field-label">Serial Motor</span>
-                    <span class="ficha-field-value">${ficha.s_motor || 'N/A'}</span>
-                </div>
-                <div class="ficha-date">
-                    📅 Creada: ${fecha}
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    container.innerHTML = html;
+  const tbody = document.getElementById('resultsBody');  // ← Usar resultsBody
+  if (!tbody) {
+    console.error('❌ No se encontró el elemento #resultsBody');
+    return;
+  }
+
+  if (fichasEncontradas.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
+          😕 No se encontraron resultados para esta búsqueda
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const html = fichasEncontradas.map(ficha => {
+    return `
+      <tr>
+        <td><strong>${ficha.placa || 'N/A'}</strong></td>
+        <td>${ficha.marca || 'N/A'}</td>
+        <td>${ficha.modelo || 'N/A'}</td>
+        <td>${ficha.tipo || 'N/A'}</td>
+        <td>${ficha.color || 'N/A'}</td>
+        <td>
+          <span style="padding: 4px 8px; border-radius: 4px; background: ${
+            ficha.estatus_ficha === 'OPERATIVO' ? '#d4edda' : 
+            ficha.estatus_ficha === 'INOPERATIVO' ? '#f8d7da' : '#fff3cd'
+          }; color: ${
+            ficha.estatus_ficha === 'OPERATIVO' ? '#155724' : 
+            ficha.estatus_ficha === 'INOPERATIVO' ? '#721c24' : '#856404'
+          }; font-weight: 500;">
+            ${ficha.estatus_ficha || 'N/A'}
+          </span>
+        </td>
+        <td>${ficha.dependencia || 'N/A'}</td>
+        <td>
+          <button class="btn-view" onclick="verFicha('${ficha.id}')">
+            👁️ Ver
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  tbody.innerHTML = html;
 }
 
+// Función para ver ficha (nueva)
+function verFicha(id) {
+  const ficha = fichasEncontradas.find(f => f.id == id);
+  if (ficha) {
+    mostrarFichaDetalle(ficha);
+    // Abrir modal si usas uno
+    const modal = document.getElementById('fichaModal');
+    if (modal) modal.style.display = 'block';
+  }
+}
 // ============================================
 // SELECCIONAR Y MOSTRAR FICHA
 // ============================================
