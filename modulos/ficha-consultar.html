@@ -811,7 +811,13 @@ body {
 </main>
 
 <!-- ================= SCRIPTS ================= -->
+<!-- 1. Librería de Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+<!-- 2. Configuración con credenciales (¡NUEVO!) -->
+<script src="../js/config.js" defer></script>
+
+<!-- 3. Lógica de la página (debe cargarse DESPUÉS de config.js) -->
 <script src="../js/ficha-consultar.js" defer></script>
 </body>
 </html>
