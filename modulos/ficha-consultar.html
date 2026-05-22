@@ -107,11 +107,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   font-weight: 500;
 }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - TABLAS MÁS GRANDES ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 6mm;
+    margin: 8mm;
     margin-top: 0 !important;
   }
   
@@ -164,31 +164,30 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 12px !important;
+    padding: 10px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-header {
-    margin-bottom: 10px !important;
-    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 6px !important;
     page-break-inside: avoid !important;
   }
   
-  .ficha-logo { width: 90px !important; }
-  .ficha-title h1 { font-size: 10pt !important; line-height: 1.2 !important; }
-  .ficha-title h2 { font-size: 12pt !important; margin: 3px 0 !important; }
-  .ficha-title h3 { font-size: 10pt !important; }
+  .ficha-logo { width: 85px !important; }
+  .ficha-title h1 { font-size: 9pt !important; line-height: 1.1 !important; }
+  .ficha-title h2 { font-size: 11pt !important; margin: 2px 0 !important; }
+  .ficha-title h3 { font-size: 9pt !important; }
   
-  /* ✅ TABLA MÁS GRANDE - LETRAS Y ESPACIOS AUMENTADOS */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
     page-break-inside: avoid !important;
-    margin: 8px 0 !important;
-    font-size: 10.5pt !important; /* ✅ Aumentado de 9pt a 10.5pt */
+    margin: 6px 0 !important;
+    font-size: 9pt !important;
     display: table !important;
   }
   
@@ -198,10 +197,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   .ficha-table col.col-obs { width: 28% !important; }
   
   .ficha-table th, .ficha-table td {
-    border: 2px solid #003366 !important; /* ✅ Borde más grueso */
-    padding: 6px 5px !important; /* ✅ Aumentado de 3px a 6px vertical */
-    font-size: 10.5pt !important; /* ✅ Aumentado */
-    line-height: 1.3 !important; /* ✅ Mejor espaciado entre líneas */
+    border: 1px solid #003366 !important;
+    padding: 3px 3px !important;
+    font-size: 9pt !important;
+    line-height: 1.1 !important;
     vertical-align: middle !important;
     word-wrap: break-word !important;
     display: table-cell !important;
@@ -211,7 +210,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     background: #4a7c9b !important;
     color: white !important;
     font-weight: 700 !important;
-    font-size: 10.5pt !important;
+    font-size: 9pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
@@ -225,51 +224,28 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     color-adjust: exact !important;
   }
   
-  .observaciones-cell { 
-    font-size: 10.5pt !important; 
-    line-height: 1.3 !important; 
-    padding: 6px !important; 
-  }
+  .observaciones-cell { font-size: 9pt !important; line-height: 1.1 !important; padding: 3px !important; }
+  .observaciones-box { min-height: 120px !important; font-size: 9pt !important; line-height: 1.1 !important; border: 1px solid #003366 !important; padding: 3px !important; }
   
-  .observaciones-box { 
-    min-height: 150px !important; /* ✅ Aumentado de 120px a 150px */
-    font-size: 10.5pt !important; 
-    line-height: 1.3 !important; 
-    border: 2px solid #003366 !important;
-    padding: 6px !important; 
-  }
-  
-  /* ✅ FOTOS MÁS GRANDES */
   .fotos-container {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 8px !important; /* ✅ Aumentado de 5px a 8px */
+    gap: 5px !important;
     page-break-inside: avoid !important;
-    margin-top: 10px !important; /* ✅ Aumentado */
-    height: 200px !important; /* ✅ Aumentado de 180px a 200px */
+    margin-top: 6px !important;
+    height: 180px !important;
   }
+  .foto-box { height: 100% !important; border: 1px solid #4a7c9b !important; page-break-inside: avoid !important; }
+  .foto-box img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
   
-  .foto-box { 
-    height: 100% !important; 
-    border: 2px solid #4a7c9b !important; 
-    page-break-inside: avoid !important; 
-  }
-  
-  .foto-box img { 
-    width: 100% !important; 
-    height: 100% !important; 
-    object-fit: cover !important; 
-  }
-  
-  /* ✅ FOOTER DE IMPRESIÓN */
+  /* ✅ MOSTRAR FOOTER SOLO EN IMPRESIÓN */
   #printFooter {
     display: block !important;
     margin-top: 15px !important;
     padding-top: 10px !important;
     border-top: 2px solid #003366 !important;
-    font-size: 10.5pt !important;
+    font-size: 10pt !important;
     color: #222 !important;
-    text-align: center !important;
   }
   
   * {
