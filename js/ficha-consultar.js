@@ -1,162 +1,187 @@
 /**
  * ========================================
- * FICHA-CONSULTAR.JS - Versión Estable
+ * FICHA-CONSULTAR.JS - Versión Estable v2
+ * Carga automática + Diagnóstico de RLS
  * ========================================
  */
 
+// ================= VARIABLES GLOBALES =================
 let fichasData = [];
 let fichasFiltradas = [];
 let paginaActual = 1;
 const POR_PAGINA = 15;
 let supabaseClient = null;
 
+// ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    // 1. Validar credenciales
     if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
-      throw new Error('Configuración de Supabase no disponible');
+      throw new Error('Falta configuración de Supabase');
     }
 
+    // 2. Conectar a Supabase
     supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+
+    // 3. Cargar usuario en la barra
     await cargarUsuarioLogueado();
+
+    // 4. Configurar eventos (botones, filtros, etc.)
     configurarEventos();
+
+    // 5. 🚀 CARGAR DATOS AUTOMÁTICAMENTE AL INICIAR
+    await buscarFichas();
+
   } catch (error) {
     console.error('❌ Error de inicialización:', error);
-    mostrarAlerta('Error al conectar con el sistema. Verifica tu conexión.', 'error');
+    mostrarAlerta('Error al conectar con el sistema.', 'error');
   }
 });
 
+// ================= USUARIO LOGUEADO =================
 async function cargarUsuarioLogueado() {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const email = session?.user?.email || 'usuario@institucion.com';
-    const userEmailEl = document.getElementById('userEmail');
-    if (userEmailEl) userEmailEl.textContent = email;
-  } catch (error) {
-    console.warn('⚠️ No se pudo cargar el usuario:', error);
-  }
+    const el = document.getElementById('userEmail');
+    if (el) el.textContent = email;
+  } catch (e) { console.warn('⚠️ Usuario no detectado:', e); }
 }
 
+// ================= EVENTOS =================
 function configurarEventos() {
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') buscarFichas();
-    });
-  }
+  // Búsqueda con Enter
+  document.getElementById('searchInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscarFichas(); });
 
-  const filtroTipo = document.getElementById('filtroTipo');
-  if (filtroTipo) {
-    filtroTipo.addEventListener('change', () => {
-      paginaActual = 1;
-      aplicarFiltros();
-    });
-  }
+  // Filtro de tipo
+  document.getElementById('filtroTipo')?.addEventListener('change', () => {
+    paginaActual = 1;
+    aplicarFiltros();
+  });
 
-  const prevBtn = document.getElementById('prevPage');
-  const nextBtn = document.getElementById('nextPage');
-  if (prevBtn) prevBtn.addEventListener('click', () => cambiarPagina(paginaActual - 1));
-  if (nextBtn) nextBtn.addEventListener('click', () => cambiarPagina(paginaActual + 1));
+  // Paginación
+  document.getElementById('prevPage')?.addEventListener('click', () => cambiarPagina(paginaActual - 1));
+  document.getElementById('nextPage')?.addEventListener('click', () => cambiarPagina(paginaActual + 1));
 
-  const modalClose = document.querySelector('.modal-close');
-  const modal = document.getElementById('fichaModal');
-  if (modalClose) modalClose.addEventListener('click', cerrarModal);
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) cerrarModal();
-    });
-  }
+  // Cerrar Modal
+  document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
+  document.getElementById('fichaModal')?.addEventListener('click', e => { if (e.target.id === 'fichaModal') cerrarModal(); });
 
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      await supabaseClient.auth.signOut();
-      window.location.href = '../login.html';
-    });
-  }
+  // Logout
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = '../login.html';
+  });
 }
 
-// ================= FUNCIONES GLOBALES (para onclick en HTML) =================
-window.buscarVehiculo = async function() {
+// ================= BÚSQUEDA / CARGA =================
+window.buscarVehiculo = async () => {
   await buscarFichas();
-};
-
-window.limpiarBusqueda = function() {
-  const searchInput = document.getElementById('searchInput');
-  const filtroTipo = document.getElementById('filtroTipo');
-  if (searchInput) searchInput.value = '';
-  if (filtroTipo) filtroTipo.value = 'todos';
-  fichasData = [];
-  fichasFiltradas = [];
-  paginaActual = 1;
-  renderizarTabla();
-  renderizarPaginacion();
-  ocultarAlerta();
 };
 
 async function buscarFichas() {
   const termino = document.getElementById('searchInput')?.value.trim() || '';
   const btn = document.getElementById('btnSearch');
-
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<span>⏳</span><span>Buscando...</span>';
-  }
+  
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span><span>Cargando...</span>'; }
   mostrarTablaCargando(true);
 
   try {
+    // Consulta base
     let query = supabaseClient
       .from('fichas_tecnicas')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(2000);
 
+    // Si hay texto, filtramos en la DB (más rápido)
     if (termino) {
       query = query.or(
-        `placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,s_carroceria.ilike.%${termino}%,s_motor.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%`
+        `placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%,s_carroceria.ilike.%${termino}%`
       );
     }
 
     const { data, error } = await query;
-    if (error) throw error;
+    
+    // 🐛 DIAGNÓSTICO EN CONSOLA
+    if (error) {
+      console.error('❌ Error de Supabase:', error);
+      throw error;
+    } else {
+      console.log(`✅ Supabase respondió con ${data?.length || 0} registros.`);
+      if (data?.length === 0) {
+        console.warn('⚠️ Si esperabas datos pero devuelve 0, revisa las Políticas RLS en Supabase.');
+      }
+    }
 
     fichasData = data || [];
     paginaActual = 1;
-    aplicarFiltros();
-    mostrarAlerta(`✅ ${fichasData.length} registro(s) encontrado(s)`, 'success');
+    aplicarFiltros(); // Esto también llama a renderizarTabla()
+
+    if (fichasData.length > 0) {
+      mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s) correctamente.`, 'success');
+    } else {
+      mostrarAlerta('ℹ️ No se encontraron registros en la base de datos.', 'info');
+    }
+
   } catch (err) {
-    console.error('❌ Error en búsqueda:', err);
-    mostrarAlerta('Error al consultar la base de datos. Intente nuevamente.', 'error');
+    console.error('❌ Fallo en buscarFichas:', err);
+    mostrarAlerta('Error al consultar la base de datos. Verifica RLS o conexión.', 'error');
     fichasData = [];
     fichasFiltradas = [];
     renderizarTabla();
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '<span>🔍</span><span>Buscar</span>';
-    }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔍</span><span>Buscar</span>'; }
   }
 }
 
+window.limpiarBusqueda = () => {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filtroTipo').value = 'todos';
+  fichasData = [];
+  fichasFiltradas = [];
+  paginaActual = 1;
+  buscarFichas(); // Recargar todo
+};
+
+// ================= FILTROS =================
 function aplicarFiltros() {
   const filtroValor = document.getElementById('filtroTipo')?.value || 'todos';
+  const termino = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
+
   fichasFiltradas = fichasData.filter(ficha => {
+    // 1. Filtro por Tipo (Moto vs Vehículo)
     const tipo = (ficha.tipo || '').toUpperCase();
     const clase = (ficha.clase || '').toUpperCase();
-    const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO';
+    // Lógica mejorada: Detecta moto si contiene "MOTO", "ENDURO", o si la clase es moto
+    const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO' || clase === 'ENDURO';
+    
     if (filtroValor === 'moto' && !esMoto) return false;
     if (filtroValor === 'vehiculo' && esMoto) return false;
+
+    // 2. Filtro por texto (si no se usó el filtro de DB)
+    if (termino) {
+      const texto = `${ficha.placa} ${ficha.facsimil} ${ficha.marca} ${ficha.modelo}`.toLowerCase();
+      if (!texto.includes(termino)) return false;
+    }
     return true;
   });
+
   renderizarTabla();
   renderizarPaginacion();
 }
 
+// ================= RENDERIZAR TABLA =================
 function renderizarTabla() {
   const tbody = document.getElementById('resultsBody');
   if (!tbody) return;
 
   if (fichasFiltradas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666;font-size:15px">📭 No se encontraron registros. Ajuste los filtros o realice una nueva búsqueda.</td></tr>`;
+    tbody.innerHTML = `
+      <tr><td colspan="8" style="text-align:center;padding:40px;color:#666">
+        📭 No se encontraron resultados. 
+        ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}
+      </td></tr>`;
     return;
   }
 
@@ -164,26 +189,28 @@ function renderizarTabla() {
   const fin = inicio + POR_PAGINA;
   const paginaData = fichasFiltradas.slice(inicio, fin);
 
-  tbody.innerHTML = paginaData.map(ficha => `
+  tbody.innerHTML = paginaData.map(f => `
     <tr>
-      <td><strong>${escapeHtml(ficha.placa || '-')}</strong></td>
-      <td>${escapeHtml(ficha.marca || '-')}</td>
-      <td>${escapeHtml(ficha.modelo || '-')}</td>
-      <td>${escapeHtml(ficha.tipo || '-')}</td>
-      <td>${escapeHtml(ficha.color || '-')}</td>
-      <td><span class="status-badge ${getEstatusClass(ficha.estatus_ficha)}">${escapeHtml(ficha.estatus_ficha || 'N/A')}</span></td>
-      <td>${escapeHtml(ficha.dependencia || '-')}</td>
+      <td><strong>${escapeHtml(f.placa || '-')}</strong></td>
+      <td>${escapeHtml(f.marca || '-')}</td>
+      <td>${escapeHtml(f.modelo || '-')}</td>
+      <td>${escapeHtml(f.tipo || '-')}</td>
+      <td>${escapeHtml(f.color || '-')}</td>
+      <td><span class="status-badge ${getEstatusClass(f.estatus_ficha)}">${escapeHtml(f.estatus_ficha || 'N/A')}</span></td>
+      <td>${escapeHtml(f.dependencia || '-')}</td>
       <td>
-        <button class="btn-view" onclick="verDetalle('${ficha.id}')">👁️ Ver Ficha</button>
-        <button class="btn-print" onclick="imprimirDesdeTabla('${ficha.id}')">🖨️</button>
+        <button class="btn-view" onclick="verDetalle('${f.id}')">👁️ Ver</button>
+        <button class="btn-print" onclick="imprimirDesdeTabla('${f.id}')">🖨️</button>
       </td>
     </tr>
   `).join('');
 }
 
+// ================= PAGINACIÓN =================
 function renderizarPaginacion() {
   const total = fichasFiltradas.length;
   const totalPages = Math.max(1, Math.ceil(total / POR_PAGINA));
+  
   const inicio = total === 0 ? 0 : (paginaActual - 1) * POR_PAGINA + 1;
   const fin = Math.min(paginaActual * POR_PAGINA, total);
   const infoEl = document.getElementById('paginationInfo');
@@ -212,117 +239,89 @@ function renderizarPaginacion() {
   }
 }
 
-function cambiarPagina(nuevaPagina) {
+function cambiarPagina(nueva) {
   const totalPages = Math.ceil(fichasFiltradas.length / POR_PAGINA) || 1;
-  if (nuevaPagina < 1 || nuevaPagina > totalPages) return;
-  paginaActual = nuevaPagina;
+  if (nueva < 1 || nueva > totalPages) return;
+  paginaActual = nueva;
   renderizarTabla();
   renderizarPaginacion();
   document.querySelector('.results-section')?.scrollIntoView({ behavior: 'smooth' });
 }
 
-window.verDetalle = function(id) {
-  const ficha = fichasData.find(f => f.id == id);
-  if (!ficha) return;
+// ================= MODAL =================
+window.verDetalle = (id) => {
+  const f = fichasData.find(x => x.id == id);
+  if (!f) return;
 
-  const set = (selector, value) => {
-    const el = document.getElementById(selector);
-    if (el) el.textContent = value || '-';
-  };
+  const set = (sel, val) => { const el = document.getElementById(sel); if (el) el.textContent = val || '-'; };
+  set('modalMarca', f.marca); set('modalModelo', f.modelo); set('modalTipo', f.tipo);
+  set('modalClase', f.clase); set('modalColor', f.color); set('modalPlaca', f.placa);
+  set('modalFacsimilar', f.facsimil); set('modalSerialCarroceria', f.s_carroceria);
+  set('modalSerialMotor', f.s_motor); set('modalEstatus', f.estatus_ficha);
+  set('modalDependencia', f.dependencia); set('modalCausa', f.causa);
+  set('modalMecanica', f.mecanica); set('modalDiagnostico', f.diagnostico);
+  set('modalUbicacion', f.ubicacion); set('modalTapiceria', f.tapiceria);
+  set('modalCauchos', f.cauchos); set('modalLuces', f.luces);
+  set('modalObservaciones', f.observaciones); set('modalCreadoPor', f.creado_por);
 
-  set('modalMarca', ficha.marca);
-  set('modalModelo', ficha.modelo);
-  set('modalTipo', ficha.tipo);
-  set('modalClase', ficha.clase);
-  set('modalColor', ficha.color);
-  set('modalPlaca', ficha.placa);
-  set('modalFacsimilar', ficha.facsimil);
-  set('modalSerialCarroceria', ficha.s_carroceria);
-  set('modalSerialMotor', ficha.s_motor);
-  set('modalEstatus', ficha.estatus_ficha);
-  set('modalDependencia', ficha.dependencia);
-  set('modalCausa', ficha.causa);
-  set('modalMecanica', ficha.mecanica);
-  set('modalDiagnostico', ficha.diagnostico);
-  set('modalUbicacion', ficha.ubicacion);
-  set('modalTapiceria', ficha.tapiceria);
-  set('modalCauchos', ficha.cauchos);
-  set('modalLuces', ficha.luces);
-  set('modalObservaciones', ficha.observaciones);
-  set('modalCreadoPor', ficha.creado_por);
-
-  if (ficha.fecha_creacion) {
-    const f = new Date(ficha.fecha_creacion);
-    set('modalFechaCreacion', `${f.toLocaleDateString('es-VE')} ${f.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`);
+  if (f.fecha_creacion) {
+    const date = new Date(f.fecha_creacion);
+    set('modalFechaCreacion', `${date.toLocaleDateString('es-VE')} ${date.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`);
   }
 
+  // Imágenes
   for (let i = 1; i <= 4; i++) {
-    const url = ficha[`foto${i}_url`] || ficha[`foto${i}`] || '';
+    const url = f[`foto${i}_url`] || f[`foto${i}`] || '';
     const img = document.getElementById(`modalImg${i}`);
     const box = document.getElementById(`modalBox${i}`);
-    const placeholder = box?.querySelector('span');
-    if (img && box && placeholder) {
-      if (url && url.trim() !== '' && url.startsWith('http')) {
-        img.src = url;
-        img.style.display = 'block';
-        placeholder.style.display = 'none';
+    const span = box?.querySelector('span');
+    if (img && box && span) {
+      if (url && url.startsWith('http')) {
+        img.src = url; img.style.display = 'block'; span.style.display = 'none';
       } else {
-        img.style.display = 'none';
-        placeholder.style.display = 'block';
+        img.style.display = 'none'; span.style.display = 'block';
       }
     }
   }
 
-  const modal = document.getElementById('fichaModal');
-  if (modal) {
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
+  document.getElementById('fichaModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 };
 
-window.cerrarModal = function() {
-  const modal = document.getElementById('fichaModal');
-  if (modal) modal.style.display = 'none';
+window.cerrarModal = () => {
+  document.getElementById('fichaModal').style.display = 'none';
   document.body.style.overflow = 'auto';
 };
 
-window.imprimirDesdeTabla = function(id) {
+window.imprimirDesdeTabla = (id) => {
   verDetalle(id);
-  setTimeout(() => window.imprimirFicha(), 400);
+  setTimeout(() => window.print(), 300);
 };
 
-window.imprimirFicha = function() {
-  window.print();
-};
+window.imprimirFicha = () => window.print();
 
 // ================= UTILIDADES =================
 function mostrarTablaCargando(mostrar) {
   const tbody = document.getElementById('resultsBody');
-  if (!tbody) return;
-  if (mostrar) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366;font-size:15px">⏳ Cargando datos de la base de datos...</td></tr>`;
+  if (tbody && mostrar) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`;
   }
 }
 
-function mostrarAlerta(mensaje, tipo) {
-  const alert = document.getElementById('searchAlert');
-  if (!alert) return;
-  alert.className = `alert alert-${tipo}`;
-  alert.textContent = mensaje;
-  alert.style.display = 'block';
-  setTimeout(() => { alert.style.display = 'none'; }, 5000);
+function mostrarAlerta(msg, tipo) {
+  const el = document.getElementById('searchAlert');
+  if (!el) return;
+  el.className = `alert alert-${tipo}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
 }
 
-function ocultarAlerta() {
-  const alert = document.getElementById('searchAlert');
-  if (alert) alert.style.display = 'none';
-}
-
-function getEstatusClass(estatus) {
-  const e = (estatus || '').toUpperCase();
+function getEstatusClass(est) {
+  const e = (est || '').toUpperCase();
   if (e.includes('OPERATIVO')) return 'status-ok';
-  if (e.includes('REPARACION') || e.includes('TALLER') || e.includes('PROCESO')) return 'status-warn';
-  if (e.includes('INOPERATIVO') || e.includes('DESINCORPORADO') || e.includes('DENUNCIADA')) return 'status-bad';
+  if (e.includes('REPARACION') || e.includes('TALLER')) return 'status-warn';
+  if (e.includes('INOPERATIVO') || e.includes('DESINCORPORADO')) return 'status-bad';
   return '';
 }
 
@@ -333,6 +332,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Inyectar estilos para badges
 if (!document.getElementById('estatus-styles')) {
   const style = document.createElement('style');
   style.id = 'estatus-styles';
