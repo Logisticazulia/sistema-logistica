@@ -1,274 +1,245 @@
-// ============================================
-// CONSULTAR FICHAS TÉCNICAS - LÓGICA
-// ============================================
-// Configuración de Supabase
-const supabaseClient = window.supabase.createClient(
-  window.SUPABASE_URL,
-  window.SUPABASE_KEY
-);
+/**
+ * ============================================
+ * FICHA TÉCNICA - CONSULTAR / LISTAR / DETALLE
+ * ============================================
+ */
+let supabaseClient = null;
+let currentPage = 1;
+const pageSize = 15;
+let totalRecords = 0;
+let isLoading = false;
 
-let fichasEncontradas = [];
-let fichaSeleccionada = null;
-
-// ============================================
-// FUNCIONES DE BÚSQUEDA
-// ============================================
-async function buscarFichas() {
-  const searchInput = document.getElementById('searchInput');
-  const searchTerm = searchInput.value.trim();
-  
-  if (!searchTerm) {
-    mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
-    return;
+// ================= CONFIGURACIÓN & INIT =================
+async function initSupabase() {
+  if (typeof window.supabase === 'undefined') {
+    console.error('❌ Librería Supabase no cargada');
+    return false;
   }
+  const url = window.SUPABASE_URL;
+  const key = window.SUPABASE_KEY;
+  if (!url || !key) {
+    console.error('❌ Configuración de Supabase no encontrada');
+    return false;
+  }
+  try {
+    supabaseClient = window.supabase.createClient(url, key);
+    return true;
+  } catch (error) {
+    console.error('❌ Error al inicializar Supabase:', error);
+    return false;
+  }
+}
 
-  console.log('🔍 Buscando fichas técnicas:', searchTerm);
-  mostrarAlerta('⏳ Buscando en base de datos...', 'info');
-
-  const btnSearch = document.querySelector('.btn-search');
-  if(btnSearch) btnSearch.disabled = true;
+// ================= CARGAR FICHAS =================
+async function cargarFichas() {
+  if (isLoading) return;
+  isLoading = true;
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('fichasTableBody').innerHTML = '';
+  document.getElementById('paginationControls').innerHTML = '';
 
   try {
-    // Búsqueda case-insensitive con ilike en todos los campos relevantes del CSV
-    const { data, error } = await supabaseClient
-      .from('fichas_tecnicas')
-      .select('*')
-      .or(`placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%,modelo.ilike.%${searchTerm}%`)
-      .order('created_at', { ascending: false });
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    const tipoFilter = document.getElementById('tipoFilter').value;
+    const estatusFilter = document.getElementById('estatusFilter').value;
 
-    if (error) {
-      console.error('❌ Error en la búsqueda:', error);
-      mostrarAlerta('❌ Error al buscar: ' + error.message, 'error');
+    // Construir query base
+    let query = supabaseClient.from('fichas_tecnicas').select('*', { count: 'exact' });
+
+    // Filtro por texto
+    if (searchTerm) {
+      const term = `%${searchTerm}%`;
+      query = query.or(`placa.ilike.${term},marca.ilike.${term},modelo.ilike.${term},dependencia.ilike.${term}`);
+    }
+
+    // Filtro por Tipo (Motos vs Vehículos)
+    if (tipoFilter === 'motos') {
+      query = query.ilike('tipo', '%MOTO%'); // Cubre ENDURO, PASEO, MOTO, TRIMOVIL
+    } else if (tipoFilter === 'vehiculos') {
+      query = query.not('tipo', 'ilike', '%MOTO%');
+    }
+
+    // Filtro por Estatus
+    if (estatusFilter !== 'todos') {
+      query = query.eq('estatus_ficha', estatusFilter);
+    }
+
+    // Conteo total para paginación
+    const { count, error: countError } = await query;
+    if (countError) throw countError;
+    totalRecords = count || 0;
+
+    if (totalRecords === 0) {
+      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('loadingState').style.display = 'none';
+      isLoading = false;
       return;
     }
 
-    if (!data || data.length === 0) {
-      mostrarAlerta('❌ No se encontró ninguna ficha técnica con: ' + searchTerm, 'error');
-      fichasEncontradas = [];
-      document.getElementById('resultsBody').innerHTML = `
-        <tr>
-          <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-            😕 No se encontraron resultados para "${searchTerm}"
-          </td>
-        </tr>
-      `;
-      return;
-    }
+    // Aplicar paginación y orden (más recientes primero)
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize - 1;
 
-    fichasEncontradas = data;
-    console.log('✅ Fichas encontradas:', fichasEncontradas.length);
-    mostrarAlerta(`✅ Se encontraron ${fichasEncontradas.length} ficha(s) técnica(s)`, 'success');
-    renderizarTablaResultados();
+    const { data, error } = await query
+      .order('created_at', { ascending: false })
+      .range(start, end);
+
+    if (error) throw error;
+
+    renderTable(data);
+    renderPagination(totalRecords);
+    document.getElementById('loadingState').style.display = 'none';
   } catch (error) {
-    console.error('❌ Error en buscarFichas:', error);
-    mostrarAlerta('❌ Error de conexión: ' + error.message, 'error');
+    console.error('❌ Error al cargar fichas:', error);
+    document.getElementById('loadingState').innerHTML = '❌ Error al cargar datos. Recargue la página.';
   } finally {
-    if(btnSearch) btnSearch.disabled = false;
+    isLoading = false;
   }
 }
 
-function limpiarBusqueda() {
-  const searchInput = document.getElementById('searchInput');
-  if(searchInput) searchInput.value = '';
-  
-  document.getElementById('searchAlert').style.display = 'none';
-  fichasEncontradas = [];
-  fichaSeleccionada = null;
-  
-  document.getElementById('resultsBody').innerHTML = `
-    <tr>
-      <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-        🔍 Realice una búsqueda para ver las fichas disponibles
-      </td>
-    </tr>
+// ================= RENDERIZAR TABLA =================
+function renderTable(data) {
+  const tbody = document.getElementById('fichasTableBody');
+  tbody.innerHTML = '';
+
+  data.forEach(ficha => {
+    const estatusClass = `badge-${ficha.estatus_ficha?.toLowerCase().replace(' ', '') || 'default'}`;
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><strong>${ficha.placa || 'S/P'}</strong></td>
+      <td>${ficha.marca || '-'}</td>
+      <td>${ficha.modelo || '-'}</td>
+      <td>${ficha.tipo || '-'}</td>
+      <td>${ficha.color || '-'}</td>
+      <td><span class="badge ${estatusClass}">${ficha.estatus_ficha || 'S/E'}</span></td>
+      <td>${ficha.dependencia || '-'}</td>
+      <td><button class="btn-detail" onclick="verDetalle('${ficha.id}')">👁️ Ver Detalle</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// ================= RENDERIZAR PAGINACIÓN =================
+function renderPagination(total) {
+  const container = document.getElementById('paginationControls');
+  container.innerHTML = '';
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return;
+
+  const createBtn = (text, page, disabled = false, active = false) => {
+    const btn = document.createElement('button');
+    btn.className = `page-btn ${active ? 'active' : ''}`;
+    btn.textContent = text;
+    btn.disabled = disabled;
+    if (!disabled) btn.onclick = () => { currentPage = page; cargarFichas(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    return btn;
+  };
+
+  container.appendChild(createBtn('Anterior', currentPage - 1, currentPage === 1));
+  container.appendChild(createBtn(`<span class="page-info">Pág ${currentPage} de ${totalPages}</span>`, currentPage, false, true));
+  container.appendChild(createBtn('Siguiente', currentPage + 1, currentPage === totalPages));
+}
+
+// ================= VER DETALLE (MODAL) =================
+async function verDetalle(id) {
+  const modal = document.getElementById('fichaModal');
+  const body = document.getElementById('fichaDetailBody');
+  body.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando detalle...</div>';
+  modal.classList.add('active');
+
+  try {
+    const { data, error } = await supabaseClient.from('fichas_tecnicas').select('*').eq('id', id).single();
+    if (error) throw error;
+
+    body.innerHTML = `
+      <h4 style="color:#003366; margin-bottom:15px; border-bottom:2px solid #eee; padding-bottom:5px;">🔍 Información General</h4>
+      <div class="ficha-grid">
+        <div class="ficha-item"><label>Placa</label><span>${data.placa || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Facsímil</label><span>${data.facsimil || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Marca / Modelo</label><span>${data.marca || '-'} ${data.modelo || ''}</span></div>
+        <div class="ficha-item"><label>Tipo / Clase</label><span>${data.tipo || '-'} / ${data.clase || '-'}</span></div>
+        <div class="ficha-item"><label>Color</label><span>${data.color || '-'}</span></div>
+        <div class="ficha-item"><label>Estatus</label><span>${data.estatus_ficha || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Dependencia</label><span>${data.dependencia || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Causa</label><span>${data.causa || 'N/A'}</span></div>
+      </div>
+
+      <h4 style="color:#003366; margin:20px 0 15px; border-bottom:2px solid #eee; padding-bottom:5px;">🔧 Inspección Técnico Mecánica</h4>
+      <div class="ficha-grid">
+        <div class="ficha-item"><label>Mecánica</label><span>${data.mecanica || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Diagnóstico</label><span>${data.diagnostico || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Ubicación</label><span>${data.ubicacion || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Tapicería</label><span>${data.tapiceria || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Cauchos</label><span>${data.cauchos || 'N/A'}</span></div>
+        <div class="ficha-item"><label>Luces</label><span>${data.luces || 'N/A'}</span></div>
+      </div>
+      <div class="ficha-item" style="margin-top:10px;"><label>Observaciones</label><span>${data.observaciones || 'Sin observaciones'}</span></div>
+
+      <h4 style="color:#003366; margin:20px 0 15px; border-bottom:2px solid #eee; padding-bottom:5px;">📸 Evidencia Fotográfica</h4>
+      <div class="photos-grid">
+        ${renderPhotoBox(data.foto1_url, 'Foto 1 - General')}
+        ${renderPhotoBox(data.foto2_url, 'Foto 2 - Detalle')}
+        ${renderPhotoBox(data.foto3_url, 'Foto 3 - Interior/Mecánica')}
+        ${renderPhotoBox(data.foto4_url, 'Foto 4 - Documentación/Placa')}
+      </div>
+      <p style="margin-top:15px; font-size:12px; color:#666; text-align:center;">
+        📅 Creado: ${formatDate(data.created_at)} | 👤 Por: ${data.creado_por || 'N/A'}
+      </p>
+    `;
+  } catch (error) {
+    console.error('❌ Error al cargar detalle:', error);
+    body.innerHTML = `<div class="empty-state">❌ No se pudo cargar el detalle: ${error.message}</div>`;
+  }
+}
+
+function renderPhotoBox(url, label) {
+  if (!url) return `<div class="photo-box"><span>${label} (No cargada)</span></div>`;
+  return `
+    <div class="photo-box">
+      <img src="${url}" alt="${label}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; this.nextElementSibling.textContent='⚠️ Error al cargar imagen';">
+      <span>${label}</span>
+    </div>
   `;
-  cerrarModal();
-}
-
-// ============================================
-// RENDERIZAR TABLA DE RESULTADOS (sincronizado con HTML)
-// ============================================
-function renderizarTablaResultados() {
-  const tbody = document.getElementById('resultsBody');
-  if (!tbody) return;
-
-  if (fichasEncontradas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#666;">No hay registros para mostrar</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = fichasEncontradas.map(ficha => `
-    <tr>
-      <td><strong>${ficha.placa || 'N/A'}</strong></td>
-      <td>${ficha.marca || 'N/A'}</td>
-      <td>${ficha.modelo || 'N/A'}</td>
-      <td>${ficha.tipo || 'N/A'}</td>
-      <td>${ficha.color || 'N/A'}</td>
-      <td>
-        <span style="
-          padding: 4px 10px; 
-          border-radius: 12px; 
-          font-size: 12px; 
-          font-weight: 600;
-          background: ${ficha.estatus_ficha === 'OPERATIVO' ? '#d4edda' : ficha.estatus_ficha === 'INOPERATIVO' ? '#f8d7da' : ficha.estatus_ficha === 'DESINCORPORADO' ? '#6c757d' : '#fff3cd'};
-          color: ${ficha.estatus_ficha === 'OPERATIVO' ? '#155724' : ficha.estatus_ficha === 'INOPERATIVO' ? '#721c24' : ficha.estatus_ficha === 'DESINCORPORADO' ? '#fff' : '#856404'};
-        ">
-          ${ficha.estatus_ficha || 'N/A'}
-        </span>
-      </td>
-      <td>${ficha.dependencia || 'N/A'}</td>
-      <td>
-        <button class="btn-view" onclick="seleccionarFicha('${ficha.id}')">👁️ Ver</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ============================================
-// SELECCIONAR Y MOSTRAR MODAL
-// ============================================
-function seleccionarFicha(id) {
-  const ficha = fichasEncontradas.find(f => String(f.id) === String(id));
-  if (!ficha) {
-    mostrarAlerta('❌ Ficha no encontrada', 'error');
-    return;
-  }
-  fichaSeleccionada = ficha;
-  mostrarFichaDetalle(ficha);
-}
-
-function mostrarFichaDetalle(ficha) {
-  // Rellenar cada campo del modal usando los IDs exactos del HTML
-  document.getElementById('modalMarca').textContent = ficha.marca || 'N/A';
-  document.getElementById('modalModelo').textContent = ficha.modelo || 'N/A';
-  document.getElementById('modalTipo').textContent = ficha.tipo || 'N/A';
-  document.getElementById('modalClase').textContent = ficha.clase || 'N/A';
-  document.getElementById('modalColor').textContent = ficha.color || 'N/A';
-  document.getElementById('modalSerialCarroceria').textContent = ficha.s_carroceria || 'N/A';
-  document.getElementById('modalPlaca').textContent = ficha.placa || 'N/A';
-  document.getElementById('modalFacsimilar').textContent = ficha.facsimil || 'N/A';
-  document.getElementById('modalDependencia').textContent = ficha.dependencia || 'N/A';
-  document.getElementById('modalSerialMotor').textContent = ficha.s_motor || 'N/A';
-  document.getElementById('modalEstatus').textContent = ficha.estatus_ficha || 'N/A';
-  document.getElementById('modalCausa').textContent = ficha.causa || 'N/A';
-  document.getElementById('modalDiagnostico').textContent = ficha.diagnostico || 'N/A';
-  document.getElementById('modalMecanica').textContent = ficha.mecanica || 'N/A';
-  document.getElementById('modalUbicacion').textContent = ficha.ubicacion || 'N/A';
-  document.getElementById('modalTapiceria').textContent = ficha.tapiceria || 'N/A';
-  document.getElementById('modalCauchos').textContent = ficha.cauchos || 'N/A';
-  document.getElementById('modalLuces').textContent = ficha.luces || 'N/A';
-  document.getElementById('modalObservaciones').textContent = ficha.observaciones || 'Sin observaciones';
-
-  // Fecha formateada
-  const fechaCreacion = ficha.created_at ? new Date(ficha.created_at).toLocaleString('es-VE') : 'N/A';
-  document.getElementById('modalFechaCreacion').textContent = fechaCreacion;
-  document.getElementById('modalCreadoPor').textContent = ficha.creado_por || 'N/A';
-
-  // Carga segura de fotos con fallback
-  for (let i = 1; i <= 4; i++) {
-    const imgUrl = ficha[`foto${i}_url`];
-    const imgEl = document.getElementById(`modalImg${i}`);
-    const boxEl = document.getElementById(`modalBox${i}`);
-    const placeholder = boxEl?.querySelector('span');
-    
-    if (imgUrl && imgUrl.trim() !== '' && placeholder) {
-      imgEl.src = imgUrl;
-      imgEl.style.display = 'block';
-      imgEl.onerror = function() {
-        this.style.display = 'none';
-        if(placeholder) {
-          placeholder.style.display = 'block';
-          placeholder.textContent = `Foto ${i} (no disponible)`;
-        }
-      };
-      if(placeholder) placeholder.style.display = 'none';
-    } else if(placeholder) {
-      if(imgEl) {
-        imgEl.src = '';
-        imgEl.style.display = 'none';
-      }
-      placeholder.style.display = 'block';
-      placeholder.textContent = `Foto ${i}`;
-    }
-  }
-
-  // Mostrar modal
-  document.getElementById('fichaModal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
 }
 
 function cerrarModal() {
-  document.getElementById('fichaModal').style.display = 'none';
-  document.body.style.overflow = '';
-  fichaSeleccionada = null;
+  document.getElementById('fichaModal').classList.remove('active');
 }
 
 function imprimirFicha() {
   window.print();
 }
 
-function mostrarAlerta(mensaje, tipo) {
-  const alertDiv = document.getElementById('searchAlert');
-  if (!alertDiv) return;
-  alertDiv.textContent = mensaje;
-  alertDiv.className = `alert alert-${tipo}`;
-  alertDiv.style.display = 'block';
-  document.querySelector('.search-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(() => { alertDiv.style.display = 'none'; }, 6000);
+function formatDate(isoString) {
+  if (!isoString) return 'N/A';
+  const d = new Date(isoString);
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-// ============================================
-// INICIALIZACIÓN Y EVENTOS
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 Inicializando consulta de fichas técnicas...');
+// ================= EVENT LISTENERS =================
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!await initSupabase()) return;
 
-  // Permitir buscar con Enter
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') buscarFichas();
-    });
-  }
-
-  // Cerrar sesión
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      if (confirm('¿Está seguro de cerrar sesión?')) {
-        try {
-          await supabaseClient.auth.signOut();
-          window.location.href = '../index.html';
-        } catch (err) {
-          console.error('Error al cerrar sesión:', err);
-        }
-      }
-    });
-  }
-
-  // Cerrar modal con tecla Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') cerrarModal();
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    if (confirm('¿Cerrar sesión?')) window.location.href = '../index.html';
   });
 
-  // Cerrar modal al hacer clic fuera
-  window.addEventListener('click', (e) => {
-    const modal = document.getElementById('fichaModal');
-    if (e.target === modal) cerrarModal();
+  // Debounce para búsqueda
+  let searchTimer;
+  document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { currentPage = 1; cargarFichas(); }, 500);
   });
 
-  cargarUsuario();
-  console.log('✅ Consulta de fichas inicializada');
+  document.getElementById('tipoFilter').addEventListener('change', () => { currentPage = 1; cargarFichas(); });
+  document.getElementById('estatusFilter').addEventListener('change', () => { currentPage = 1; cargarFichas(); });
+
+  // Cerrar modal con ESC o click fuera
+  document.getElementById('fichaModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('fichaModal')) cerrarModal();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
+
+  cargarFichas();
 });
-
-async function cargarUsuario() {
-  try {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session?.user?.email) {
-      const el = document.getElementById('userEmail');
-      if(el) el.textContent = session.user.email;
-    }
-  } catch (error) {
-    console.error('Error al cargar usuario:', error);
-  }
-}
