@@ -390,59 +390,51 @@ window.onclick = function(event) {
 }
 
 // Exportar ficha a PDF
-// Exportar ficha a PDF - VERSIÓN OPTIMIZADA 1 HOJA
+// Exportar ficha a PDF - OPTIMIZADO PARA 1 HOJA
 function exportarPDF() {
     if (!currentVehicle) return;
-    
+
+    // 1. Generar número único (asegúrate de tener la función generarNumeroExportacion definida)
     const exportNum = generarNumeroExportacion();
-    const element = document.getElementById('fichaContent');
     
-    // 1. Ocultar botones antes de exportar
+    // Elementos del DOM
+    const element = document.getElementById('fichaContent');
+    const modalBody = element.querySelector('.modal-body');
+
+    // 2. Inyectar número de exportación temporalmente
+    const exportLabel = document.createElement('div');
+    exportLabel.id = 'tempExportNum';
+    exportLabel.style.cssText = 'text-align:center; font-size:0.8rem; font-weight:bold; color:#005b96; margin-bottom:5px; border-bottom:2px solid #005b96; padding-bottom:3px;';
+    exportLabel.textContent = `N° EXP: ${exportNum} | ${new Date().toLocaleDateString()}`;
+    modalBody.insertBefore(exportLabel, modalBody.firstChild);
+
+    // 3. ACTIVAR MODO COMPACTO (2 COLUMNAS Y LETRA PEQUEÑA)
+    element.classList.add('pdf-compact');
+
+    // 4. Ocultar botones durante la captura
     const footer = element.querySelector('.modal-footer');
     if (footer) footer.style.display = 'none';
 
-    // 2. Agregar clase que activa el CSS de 2 columnas
-    const dataContainer = document.getElementById('fichaData');
-    dataContainer.classList.add('pdf-export-mode');
-
-    // 3. Inyectar Header Temporal con logos (asegúrate de que las rutas de las imágenes sean correctas)
-    // Si tus logos ya están en el HTML visible, puedes saltar este paso, 
-    // pero esto asegura que salgan en el PDF.
-    const headerHTML = `
-        <div class="pdf-header" id="tempPdfHeader">
-            <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 5px;">
-                REPÚBLICA BOLIVARIANA DE VENEZUELA<br>
-                MINISTERIO DEL PODER POPULAR PARA RELACIONES INTERIORES, JUSTICIA Y PAZ<br>
-                POLICÍA NACIONAL BOLIVARIANA - ESTADO ZULIA
-            </div>
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
-                <!-- Reemplaza src con la ruta real de tus logos si no se ven -->
-                <img src="ruta/a/tu/logo_pnb.png" alt="PNB" style="height: 60px;" onerror="this.style.display='none'">
-                <div style="text-align: center;">
-                    <h2 style="margin: 0; font-size: 18px; color: #003366;">FICHA TÉCNICA DEL VEHÍCULO</h2>
-                    <span style="font-size: 10px; color: #666;">N° Exportación: ${exportNum}</span>
-                </div>
-                <img src="ruta/a/tu/logo_zulia.png" alt="Zulia" style="height: 60px;" onerror="this.style.display='none'">
-            </div>
-        </div>
-    `;
-    dataContainer.insertAdjacentHTML('afterbegin', headerHTML);
-
-    // 4. Configuración de html2pdf
+    // 5. Configuración html2pdf
     const opt = {
-        margin:       [5, 5, 5, 5], // Márgenes muy reducidos (5mm)
-        filename:     `Ficha_${currentVehicle.placa || currentVehicle.id}_${exportNum}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false }, // Scale 2 mejora nitidez sin romper layout
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        margin: [5, 5, 5, 5], // Márgenes de 5mm
+        filename: `Ficha_${currentVehicle.placa || currentVehicle.id}_${exportNum}.pdf`,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 1.5, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // 5. Generar y Limpiar
+    // 6. Generar PDF y Restaurar
     html2pdf().set(opt).from(element).save().then(() => {
-        // Restaurar vista original
+        // Limpiar
         if (footer) footer.style.display = 'flex';
-        dataContainer.classList.remove('pdf-export-mode');
-        document.getElementById('tempPdfHeader')?.remove();
+        if (exportLabel) exportLabel.remove();
+        element.classList.remove('pdf-compact'); // Quitar modo compacto
+    }).catch(err => {
+        console.error('Error PDF:', err);
+        if (footer) footer.style.display = 'flex';
+        if (exportLabel) exportLabel.remove();
+        element.classList.remove('pdf-compact');
     });
 }
 /**
