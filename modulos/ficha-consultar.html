@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Consultar Ficha Técnica de Vehículos">
-<title>Consultar Ficha Técnica</title>
+<meta name="description" content="Consultar Ficha Técnica de Vehículos - Sistema de Logística">
+<meta name="theme-color" content="#003366">
+<title>Consultar Ficha Técnica | Transporte</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +15,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
-/* ALERTAS */
+/* ===== ALERTAS ESTILO FICHA-CREAR ===== */
 .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; display: none; font-size: 14px; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid transparent; animation: fadeIn 0.3s ease; }
 .alert-success { background-color: #d1e7dd; color: #0f5132; border-color: #198754; }
 .alert-error { background-color: #f8d7da; color: #842029; border-color: #dc3545; }
@@ -70,17 +71,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .ficha-title h1 { font-size: 16px; color: #003366; font-weight: 700; }
 .ficha-title h2 { font-size: 19px; color: #003366; font-weight: 700; margin: 6px 0; }
 .ficha-title h3 { font-size: 17px; color: #003366; font-weight: 700; }
-
-/* ✅ TABLA CORREGIDA: Grilla fija de 6 columnas */
+/* ✅ TABLA CORREGIDA: Estructura fija de 6 columnas */
 .ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
 .ficha-table th { background: #4a7c9b; color: white; padding: 12px 10px; text-align: left; font-size: 13px; border: 2px solid #003366; font-weight: 700; }
 .ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: middle; line-height: 1.4; }
 .ficha-table .label { background: #f0f0f0; font-weight: 700; }
-/* Definición de anchos para evitar desbordamientos */
 .ficha-table col.col-label { width: 12%; }
-.ficha-table col.col-value { width: 16%; }
-.ficha-table col.col-obs { width: 32%; } /* Ancho suficiente para observaciones */
-.observaciones-box { min-height: 250px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; word-wrap: break-word; width: 100%; }
+.ficha-table col.col-value { width: 14%; }
 .fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
 .foto-box { border: 2px solid #4a7c9b; height: 160px; background: #4a7c9b; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; overflow: hidden; }
 .foto-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -115,7 +112,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
     <div class="nav-user">
       <span class="user-email" id="userEmail">usuario@institucion.com</span>
-      <button class="btn-logout" id="logoutBtn"><span></span><span>Cerrar Sesión</span></button>
+      <button class="btn-logout" id="logoutBtn"><span>🚪</span><span>Cerrar Sesión</span></button>
     </div>
   </div>
 </nav>
@@ -137,13 +134,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
         <button class="btn-search" id="btnSearch" onclick="buscarVehiculo()"><span>🔍</span><span>Buscar</span></button>
         <button class="btn-clear" onclick="limpiarBusqueda()"><span>🔄</span><span>Limpiar</span></button>
       </div>
-      <div class="search-hint"><span>💡 Busque por:</span><span>🚗 Placa</span><span>📄 Facsimilar</span><span>🔢 Serial Carrocería</span><span>⚙️ Serial Motor</span><span>🏷️ Marca/Modelo</span></div>
+      <div class="search-hint"><span> Busque por:</span><span> Placa</span><span>📄 Facsimilar</span><span>🔢 Serial Carrocería</span><span>⚙️ Serial Motor</span><span>🏷️ Marca/Modelo</span></div>
     </div>
     <div class="results-section">
       <div class="results-header">
         <h2>📋 Resultados de Búsqueda</h2>
         <div class="filter-group">
-          <label for="filtroTipo"> Filtro:</label>
+          <label for="filtroTipo">🔽 Filtro:</label>
           <select id="filtroTipo" class="filter-select">
             <option value="todos">Todos</option>
             <option value="vehiculo">Vehículos</option>
@@ -181,7 +178,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo" onerror="this.style.display='none'">
         </div>
         
-        <!-- ✅ TABLA REESTRUCTURADA PARA MANTENER TODO DENTRO DEL CUADRO -->
+        <!-- ✅ TABLA REESTRUCTURADA: Observaciones integradas directamente en la celda, sin recuadro interno -->
         <table class="ficha-table" id="fichaTable">
           <colgroup>
             <col class="col-label">
@@ -190,13 +187,12 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <col class="col-value">
             <col class="col-label">
             <col class="col-value">
-            <col class="col-obs">
           </colgroup>
           
           <!-- Fila 1: TÍTULOS -->
           <tr>
-            <th colspan="6">DATOS DEL VEHICULO</th>
-            <th>OBSERVACIONES</th>
+            <th colspan="5" style="text-align:left;">DATOS DEL VEHICULO</th>
+            <th style="background: #4a7c9b; color: white;">OBSERVACIONES</th>
           </tr>
 
           <!-- Fila 2: MARCA, MODELO, TIPO -->
@@ -204,9 +200,8 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <td class="label">MARCA</td><td class="value" id="modalMarca"></td>
             <td class="label">MODELO</td><td class="value" id="modalModelo"></td>
             <td class="label">TIPO</td><td class="value" id="modalTipo"></td>
-            <td rowspan="9" style="padding: 10px; border: 2px solid #003366; background: #fafafa; vertical-align: top;">
-              <div class="observaciones-box" id="modalObservaciones">-</div>
-            </td>
+            <!-- ✅ OBSERVACIONES: Sin recuadro interno, altura natural -->
+            <td rowspan="9" id="modalObservaciones" style="padding: 15px; border: 2px solid #003366; background: white; vertical-align: top; font-size: 13px; word-wrap: break-word;">-</td>
           </tr>
 
           <!-- Fila 3: CHASIS, CLASE, COLOR -->
@@ -261,12 +256,12 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
           <!-- Fila 11: TÍTULO FOTOS -->
           <tr>
-            <th colspan="7">REGISTRO FOTOGRÁFICO</th>
+            <th colspan="6">REGISTRO FOTOGRÁFICO</th>
           </tr>
 
           <!-- Fila 12: FOTOS -->
           <tr>
-            <td colspan="7" style="padding:15px; border: 2px solid #003366;">
+            <td colspan="6" style="padding:15px; border: 2px solid #003366;">
               <div class="fotos-container">
                 <div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1" alt="Foto 1"></div>
                 <div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2" alt="Foto 2"></div>
@@ -278,7 +273,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
           <!-- Fila 13: FECHA Y CREADOR -->
           <tr>
-            <td colspan="7" style="text-align:right;font-size:12px;padding-top:15px;color:#666; border: 2px solid #003366;">
+            <td colspan="6" style="text-align:right;font-size:12px;padding-top:15px;color:#666; border: 2px solid #003366;">
               <strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp;
               <strong>Creado por:</strong> <span id="modalCreadoPor"></span>
             </td>
