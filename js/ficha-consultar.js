@@ -62,11 +62,11 @@ async function buscarFichas() {
     if (fichasData.length > 0) mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s) correctamente.`, 'success');
     else mostrarAlerta('ℹ️ No se encontraron registros en la base de datos.', 'info');
   } catch (err) {
-    console.error(' Fallo en buscarFichas:', err);
+    console.error('❌ Fallo en buscarFichas:', err);
     mostrarAlerta('Error al consultar la base de datos. Verifica RLS o conexión.', 'error');
     fichasData = []; fichasFiltradas = []; renderizarTabla();
   } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔍</span><span>Buscar</span>'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span></span><span>Buscar</span>'; }
   }
 }
 window.limpiarBusqueda = () => {
@@ -98,7 +98,7 @@ function renderizarTabla() {
   const tbody = document.getElementById('resultsBody');
   if (!tbody) return;
   if (fichasFiltradas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados. ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666"> No se encontraron resultados. ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}</td></tr>`;
     return;
   }
   const inicio = (paginaActual - 1) * POR_PAGINA;
@@ -177,7 +177,6 @@ window.imprimirFicha = () => window.print();
 // ================= UTILIDADES =================
 function mostrarTablaCargando(mostrar) { const tbody = document.getElementById('resultsBody'); if (tbody && mostrar) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`; }
 
-// ✅ CORREGIDO: Auto-scroll + Temporizador 5s (Igual que ficha-crear)
 function mostrarAlerta(msg, tipo) {
   const el = document.getElementById('searchAlert'); if (!el) return;
   el.className = `alert alert-${tipo}`; el.textContent = msg; el.style.display = 'block';
@@ -198,7 +197,6 @@ function getEstatusClass(est) {
 
 function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-// ✅ CORREGIDO: Estilos inyectados con colores exactos solicitados
 if (!document.getElementById('estatus-styles')) {
   const style = document.createElement('style');
   style.id = 'estatus-styles';
