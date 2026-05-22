@@ -14,7 +14,7 @@ const ITEMS_POR_PAGINA = 15;
 async function buscarFichas() {
     const searchInput = document.getElementById('searchInput');
     const searchTerm = searchInput.value.trim().toUpperCase();
-    const btnSearch = document.querySelector('.btn-search');
+    const btnSearch = document.getElementById('btnSearch');
 
     if (!searchTerm) {
         mostrarAlerta('⚠️ Por favor ingrese un término de búsqueda', 'error');
@@ -25,7 +25,7 @@ async function buscarFichas() {
     mostrarAlerta('⏳ Buscando en base de datos...', 'info');
 
     try {
-        // Búsqueda parcial en múltiples campos
+        // Búsqueda parcial (case-insensitive) en múltiples campos
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
@@ -72,6 +72,7 @@ function aplicarFiltroYPaginacion() {
         fichasFiltradas = fichasEncontradas.filter(f => f.tipo && !f.tipo.toLowerCase().includes('moto'));
     }
 
+    paginaActual = 1; // Reset a página 1 al cambiar filtro
     renderizarTabla();
     renderizarPaginacion();
 }
@@ -145,7 +146,7 @@ function verFicha(id) {
         'SerialMotor': ficha.s_motor, 'Estatus': ficha.estatus_ficha,
         'Causa': ficha.causa, 'Diagnostico': ficha.diagnostico, 'Mecanica': ficha.mecanica,
         'Ubicacion': ficha.ubicacion, 'Tapiceria': ficha.tapiceria, 'Cauchos': ficha.cauchos,
-        'Luces': ficha.luces, 'Observaciones': ficha.observaciones,
+        'Luces': ficha.luces, 'Observaciones': ficha.observaciones || 'Sin observaciones',
         'FechaCreacion': ficha.created_at ? new Date(ficha.created_at).toLocaleString() : 'N/A',
         'CreadoPor': ficha.creado_por || 'Sistema'
     };
