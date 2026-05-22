@@ -71,14 +71,15 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .ficha-title h1 { font-size: 16px; color: #003366; font-weight: 700; }
 .ficha-title h2 { font-size: 19px; color: #003366; font-weight: 700; margin: 6px 0; }
 .ficha-title h3 { font-size: 17px; color: #003366; font-weight: 700; }
-/* ✅ TABLA CORREGIDA: Estructura fija de 6 columnas, sin rowspan conflictivo */
+/* ✅ TABLA CORREGIDA: Estructura fija de 6 columnas */
 .ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
 .ficha-table th { background: #4a7c9b; color: white; padding: 12px 10px; text-align: left; font-size: 13px; border: 2px solid #003366; font-weight: 700; }
 .ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: middle; line-height: 1.4; }
 .ficha-table .label { background: #f0f0f0; font-weight: 700; }
-.ficha-table col.col-label { width: 13%; }
-.ficha-table col.col-value { width: 16%; }
-.observaciones-box { min-height: 120px; border: 2px solid #003366; padding: 10px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; word-wrap: break-word; width: 100%; }
+.ficha-table col.col-label { width: 12%; }
+.ficha-table col.col-value { width: 14%; }
+.ficha-table col.col-obs { width: 24%; } /* Columna Observaciones */
+.observaciones-box { min-height: 250px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; word-wrap: break-word; width: 100%; }
 .fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
 .foto-box { border: 2px solid #4a7c9b; height: 160px; background: #4a7c9b; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; overflow: hidden; }
 .foto-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -113,7 +114,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
     <div class="nav-user">
       <span class="user-email" id="userEmail">usuario@institucion.com</span>
-      <button class="btn-logout" id="logoutBtn"><span>🚪</span><span>Cerrar Sesión</span></button>
+      <button class="btn-logout" id="logoutBtn"><span></span><span>Cerrar Sesión</span></button>
     </div>
   </div>
 </nav>
@@ -123,7 +124,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     <button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">← Volver a Ficha Técnica</button>
   </header>
   <section class="module-title-section">
-    <h1 class="module-title">🔍 Consultar Ficha Técnica de Vehículo</h1>
+    <h1 class="module-title"> Consultar Ficha Técnica de Vehículo</h1>
     <p class="module-subtitle">Busque y visualice las fichas técnicas registradas en el sistema</p>
   </section>
   <div class="container">
@@ -141,7 +142,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <div class="results-header">
         <h2>📋 Resultados de Búsqueda</h2>
         <div class="filter-group">
-          <label for="filtroTipo">🔽 Filtro:</label>
+          <label for="filtroTipo"> Filtro:</label>
           <select id="filtroTipo" class="filter-select">
             <option value="todos">Todos</option>
             <option value="vehiculo">Vehículos</option>
@@ -178,54 +179,109 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           </div>
           <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo" onerror="this.style.display='none'">
         </div>
-        <!-- ✅ TABLA REESTRUCTURADA: Grilla fija de 6 cols. Observaciones en fila propia para evitar desbordes -->
+        
+        <!-- ✅ TABLA REESTRUCTURADA: Observaciones fijas a la derecha sin desplazar datos -->
         <table class="ficha-table" id="fichaTable">
-          <colgroup><col class="col-label"><col class="col-value"><col class="col-label"><col class="col-value"><col class="col-label"><col class="col-value"></colgroup>
-          <tr><th colspan="6">DATOS DEL VEHICULO</th></tr>
+          <colgroup>
+            <col class="col-label"> <!-- 12% -->
+            <col class="col-value"> <!-- 14% -->
+            <col class="col-label"> <!-- 12% -->
+            <col class="col-value"> <!-- 14% -->
+            <col class="col-label"> <!-- 12% -->
+            <col class="col-value"> <!-- 14% -->
+            <col class="col-obs">  <!-- 24% (Observaciones) -->
+          </colgroup>
+          
+          <!-- Fila 1: TÍTULO DATOS | OBSERVACIONES -->
           <tr>
-            <td class="label">MARCA</td><td class="value" id="modalMarca"></td>
-            <td class="label">MODELO</td><td class="value" id="modalModelo"></td>
-            <td class="label">TIPO</td><td class="value" id="modalTipo"></td>
+            <th colspan="6" style="text-align:left; background: #4a7c9b; color: white;">DATOS DEL VEHICULO</th>
+            <th style="background: #4a7c9b; color: white;">OBSERVACIONES</th>
           </tr>
+
+          <!-- Fila 2: MARCA, MODELO, TIPO -->
           <tr>
-            <td class="label">SERIAL CARROCERÍA</td><td class="value" id="modalSerialCarroceria"></td>
-            <td class="label">CLASE</td><td class="value" id="modalClase"></td>
-            <td class="label">COLOR</td><td class="value" id="modalColor"></td>
+            <td class="label">MARCA</td><td id="modalMarca"></td>
+            <td class="label">MODELO</td><td id="modalModelo"></td>
+            <td class="label">TIPO</td><td id="modalTipo"></td>
+            <td rowspan="9" style="padding: 10px; border: 2px solid #003366; background: #fafafa;">
+              <div class="observaciones-box" id="modalObservaciones">-</div>
+            </td>
           </tr>
+
+          <!-- Fila 3: CHASIS, CLASE, COLOR -->
           <tr>
-            <td class="label">PLACA</td><td class="value" id="modalPlaca"></td>
-            <td class="label">FACSIMIL</td><td class="value" id="modalFacsimilar"></td>
-            <td class="label">DEPENDENCIA</td><td class="value" id="modalDependencia"></td>
+            <td class="label">SERIAL CARROCERÍA</td><td id="modalSerialCarroceria"></td>
+            <td class="label">CLASE</td><td id="modalClase"></td>
+            <td class="label">COLOR</td><td id="modalColor"></td>
           </tr>
+
+          <!-- Fila 4: PLACA, FACSIMIL, DEPENDENCIA -->
           <tr>
-            <td class="label">SERIAL MOTOR</td><td class="value" id="modalSerialMotor"></td>
-            <td class="label" colspan="4"></td>
+            <td class="label">PLACA</td><td id="modalPlaca"></td>
+            <td class="label">FACSIMIL</td><td id="modalFacsimilar"></td>
+            <td class="label">DEPENDENCIA</td><td id="modalDependencia"></td>
           </tr>
+
+          <!-- Fila 5: MOTOR -->
+          <tr>
+            <td class="label">SERIAL MOTOR</td><td id="modalSerialMotor"></td>
+            <td colspan="4"></td>
+          </tr>
+
+          <!-- Fila 6: ESTATUS -->
           <tr>
             <td class="label">ESTATUS DEL VEHÍCULO</td>
             <td colspan="5" style="text-align:center;font-weight:bold;font-size:13px;" id="modalEstatus"></td>
           </tr>
-          <tr><th colspan="6">INFORMACIÓN TÉCNICO MECÁNICA POR INOPERATIVIDAD</th></tr>
+
+          <!-- Fila 7: TÍTULO TÉCNICA -->
+          <tr>
+            <th colspan="6" style="background: #4a7c9b; color: white;">INFORMACIÓN TÉCNICO MECÁNICA POR INOPERATIVIDAD</th>
+          </tr>
+
+          <!-- Fila 8: CAUSA, DIAGNÓSTICO -->
           <tr>
             <td class="label">CAUSA</td><td colspan="2" id="modalCausa"></td>
             <td class="label">DIAGNÓSTICO</td><td colspan="2" id="modalDiagnostico"></td>
           </tr>
+
+          <!-- Fila 9: MECÁNICA, UBICACIÓN -->
           <tr>
             <td class="label">MECÁNICA</td><td colspan="2" id="modalMecanica"></td>
             <td class="label">UBICACIÓN</td><td colspan="2" id="modalUbicacion"></td>
           </tr>
+
+          <!-- Fila 10: TAPICERÍA, CAUCHOS, LUCES -->
           <tr>
-            <td class="label">TAPICERÍA</td><td class="value" id="modalTapiceria"></td>
-            <td class="label">CAUCHOS</td><td class="value" id="modalCauchos"></td>
-            <td class="label">LUCES</td><td class="value" id="modalLuces"></td>
+            <td class="label">TAPICERÍA</td><td id="modalTapiceria"></td>
+            <td class="label">CAUCHOS</td><td id="modalCauchos"></td>
+            <td class="label">LUCES</td><td id="modalLuces"></td>
           </tr>
+
+          <!-- Fila 11: TÍTULO FOTOS -->
           <tr>
-            <td class="label">OBSERVACIONES</td>
-            <td colspan="5" style="padding:10px;"><div class="observaciones-box" id="modalObservaciones">-</div></td>
+            <th colspan="6" style="background: #4a7c9b; color: white;">REGISTRO FOTOGRÁFICO</th>
           </tr>
-          <tr><th colspan="6">REGISTRO FOTOGRÁFICO</th></tr>
-          <tr><td colspan="6" style="padding:15px;"><div class="fotos-container"><div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1" alt="Foto 1"></div><div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2" alt="Foto 2"></div><div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3" alt="Foto 3"></div><div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4" alt="Foto 4"></div></div></td></tr>
-          <tr><td colspan="6" style="text-align:right;font-size:12px;padding-top:15px;color:#666;"><strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp; <strong>Creado por:</strong> <span id="modalCreadoPor"></span></td></tr>
+
+          <!-- Fila 12: FOTOS -->
+          <tr>
+            <td colspan="6" style="padding:15px; border: 2px solid #003366;">
+              <div class="fotos-container">
+                <div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1" alt="Foto 1"></div>
+                <div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2" alt="Foto 2"></div>
+                <div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3" alt="Foto 3"></div>
+                <div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4" alt="Foto 4"></div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Fila 13: FECHA Y CREADOR -->
+          <tr>
+            <td colspan="6" style="text-align:right;font-size:12px;padding-top:15px;color:#666; border: 2px solid #003366;">
+              <strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp;
+              <strong>Creado por:</strong> <span id="modalCreadoPor"></span>
+            </td>
+          </tr>
         </table>
       </div>
       <div class="modal-actions">
