@@ -144,12 +144,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   color: #664d03;
   border-color: #ffecb5;
 }
-/* ===== IMPRESIÓN: CARTA HORIZONTAL ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL - MÁS ESPACIO PARA DATOS LARGOS ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 8mm;
-    margin-top: 0 !important;
+    margin: 5mm; /* Márgenes mínimos para aprovechar espacio */
   }
   
   html, body {
@@ -189,9 +188,9 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .modal-content {
     margin: 0 auto !important;
-    padding: 4mm !important;
-    width: 96% !important;
-    max-width: 1100px !important;
+    padding: 3mm !important;
+    width: 98% !important;
+    max-width: 1120px !important;
     box-shadow: none !important;
     background: white !important;
     page-break-inside: avoid !important;
@@ -201,45 +200,49 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 10px !important;
+    padding: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-header {
-    margin-bottom: 8px !important;
-    padding-bottom: 6px !important;
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
     page-break-inside: avoid !important;
   }
   
-  .ficha-logo { width: 85px !important; }
+  .ficha-logo { width: 80px !important; }
   .ficha-title h1 { font-size: 9pt !important; line-height: 1.1 !important; }
-  .ficha-title h2 { font-size: 11pt !important; margin: 2px 0 !important; }
+  .ficha-title h2 { font-size: 11pt !important; margin: 1px 0 !important; }
   .ficha-title h3 { font-size: 9pt !important; }
   
+  /* ✅ TABLA CON MÁS ESPACIO PARA SERIALES LARGOS */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
     page-break-inside: avoid !important;
-    margin: 6px 0 !important;
-    font-size: 9pt !important;
+    margin: 4px 0 !important;
+    font-size: 9.5pt !important; /* ✅ Ligeramente más grande */
     display: table !important;
   }
   
   .ficha-table colgroup { display: table-column-group !important; }
-  .ficha-table col.col-label { width: 11% !important; }
-  .ficha-table col.col-value { width: 14% !important; }
-  .ficha-table col.col-obs { width: 28% !important; }
+  
+  /* ✅ Anchos optimizados: más espacio para valores largos */
+  .ficha-table col.col-label { width: 13% !important; }   /* Etiquetas un poco más anchas */
+  .ficha-table col.col-value { width: 16% !important; }   /* ✅ Valores más anchos para seriales */
+  .ficha-table col.col-obs { width: 24% !important; }     /* Observaciones */
   
   .ficha-table th, .ficha-table td {
     border: 1px solid #003366 !important;
-    padding: 3px 3px !important;
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-    vertical-align: middle !important;
+    padding: 4px 5px !important; /* ✅ Más padding vertical para evitar cortes */
+    font-size: 9.5pt !important;
+    line-height: 1.2 !important; /* ✅ Mejor espaciado entre líneas */
+    vertical-align: top !important; /* ✅ Alineación arriba para textos largos */
     word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
     display: table-cell !important;
   }
   
@@ -247,7 +250,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     background: #4a7c9b !important;
     color: white !important;
     font-weight: 700 !important;
-    font-size: 9pt !important;
+    font-size: 9.5pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
@@ -261,37 +264,61 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     color-adjust: exact !important;
   }
   
-  .observaciones-cell { font-size: 9pt !important; line-height: 1.1 !important; padding: 3px !important; }
-  .observaciones-box { min-height: 120px !important; font-size: 9pt !important; line-height: 1.1 !important; border: 1px solid #003366 !important; padding: 3px !important; }
+  .observaciones-cell { 
+    font-size: 9.5pt !important; 
+    line-height: 1.2 !important; 
+    padding: 5px !important; 
+    vertical-align: top !important;
+  }
   
+  .observaciones-box { 
+    min-height: 130px !important; 
+    font-size: 9.5pt !important; 
+    line-height: 1.2 !important; 
+    border: 1px solid #003366 !important;
+    padding: 5px !important; 
+  }
+  
+  /* ✅ FOTOS */
   .fotos-container {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 5px !important;
+    gap: 4px !important;
     page-break-inside: avoid !important;
-    margin-top: 6px !important;
-    height: 180px !important;
+    margin-top: 4px !important;
+    height: 160px !important;
   }
-  .foto-box { height: 100% !important; border: 1px solid #4a7c9b !important; page-break-inside: avoid !important; }
-  .foto-box img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
   
-  /* ✅ MOSTRAR FOOTER SOLO EN IMPRESIÓN */
+  .foto-box { 
+    height: 100% !important; 
+    border: 1px solid #4a7c9b !important; 
+    page-break-inside: avoid !important; 
+  }
+  
+  .foto-box img { 
+    width: 100% !important; 
+    height: 100% !important; 
+    object-fit: cover !important; 
+  }
+  
+  /* ✅ FOOTER DE IMPRESIÓN */
   #printFooter {
     display: block !important;
-    margin-top: 15px !important;
-    padding-top: 10px !important;
-    border-top: 2px solid #003366 !important;
-    font-size: 10pt !important;
+    margin-top: 10px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #999 !important;
+    font-size: 9.5pt !important;
     color: #222 !important;
+    text-align: center !important;
   }
   
+  /* Forzar colores */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
 }
-
 @media (max-width: 768px) {
   .results-header { flex-direction: column; align-items: flex-start; }
   .ficha-table { table-layout: auto; }
