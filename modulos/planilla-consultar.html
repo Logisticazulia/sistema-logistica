@@ -114,6 +114,44 @@
 .pdf-compact .ficha-observacion span {
     font-size: 0.7rem !important;
 }
+  /* Estilos específicos para exportación PDF en 1 hoja */
+.pdf-compact {
+    font-size: 9pt !important;
+    line-height: 1.15 !important;
+    padding: 4px !important;
+    box-sizing: border-box;
+}
+.pdf-compact .ficha-field {
+    margin-bottom: 2px !important;
+    padding: 2px 4px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+.pdf-compact .ficha-field label {
+    font-size: 8pt !important;
+    font-weight: 600;
+    color: #333;
+    min-width: 140px;
+}
+.pdf-compact .ficha-field span {
+    font-size: 8pt !important;
+    color: #000;
+    flex: 1;
+}
+.pdf-compact #tempExportNum {
+    font-size: 8pt !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 3px !important;
+}
+.pdf-compact #fichaObservacion {
+    max-height: 50px !important;
+    overflow: hidden;
+    margin-top: 4px !important;
+    font-size: 8pt !important;
+    line-height: 1.2 !important;
+}
 </style>
 </head>
 <body class="dashboard-page">
