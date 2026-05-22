@@ -394,3 +394,5 @@ if (searchInput) {
         }
     });
 }
+// Alias para compatibilidad con el HTML
+window.buscarVehiculo = buscarFichas;
