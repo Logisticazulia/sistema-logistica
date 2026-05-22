@@ -29,11 +29,11 @@ async function buscarFichas() {
   if(btnSearch) btnSearch.disabled = true;
 
   try {
-    // Uso de ilike para búsqueda case-insensitive y alineado a columnas del CSV
+    // Búsqueda case-insensitive con ilike y alineada a columnas del CSV
     const { data, error } = await supabaseClient
       .from('fichas_tecnicas')
       .select('*')
-      .or(`placa.ilike.${searchTerm},facsimil.ilike.${searchTerm},s_carroceria.ilike.${searchTerm},s_motor.ilike.${searchTerm},marca.ilike.${searchTerm}`)
+      .or(`placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%`)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -48,7 +48,7 @@ async function buscarFichas() {
       document.getElementById('resultsBody').innerHTML = `
         <tr>
           <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-            😕 No se encontraron resultados
+            😕 No se encontraron resultados para "${searchTerm}"
           </td>
         </tr>
       `;
@@ -99,12 +99,23 @@ function renderizarTablaResultados() {
 
   tbody.innerHTML = fichasEncontradas.map(ficha => `
     <tr>
-      <td>${ficha.placa || 'N/A'}</td>
+      <td><strong>${ficha.placa || 'N/A'}</strong></td>
       <td>${ficha.marca || 'N/A'}</td>
       <td>${ficha.modelo || 'N/A'}</td>
       <td>${ficha.tipo || 'N/A'}</td>
       <td>${ficha.color || 'N/A'}</td>
-      <td><span style="font-weight:600; color: ${ficha.estatus_ficha === 'OPERATIVO' ? '#28a745' : '#dc3545'}">${ficha.estatus_ficha || 'N/A'}</span></td>
+      <td>
+        <span style="
+          padding: 4px 10px; 
+          border-radius: 12px; 
+          font-size: 12px; 
+          font-weight: 600;
+          background: ${ficha.estatus_ficha === 'OPERATIVO' ? '#d4edda' : ficha.estatus_ficha === 'INOPERATIVO' ? '#f8d7da' : '#fff3cd'};
+          color: ${ficha.estatus_ficha === 'OPERATIVO' ? '#155724' : ficha.estatus_ficha === 'INOPERATIVO' ? '#721c24' : '#856404'};
+        ">
+          ${ficha.estatus_ficha || 'N/A'}
+        </span>
+      </td>
       <td>${ficha.dependencia || 'N/A'}</td>
       <td>
         <button class="btn-view" onclick="seleccionarFicha('${ficha.id}')">👁️ Ver</button>
@@ -127,7 +138,7 @@ function seleccionarFicha(id) {
 }
 
 function mostrarFichaDetalle(ficha) {
-  // Mapeo exacto a los IDs del HTML
+  // Mapeo exacto a los IDs del HTML del modal
   document.getElementById('modalMarca').textContent = ficha.marca || 'N/A';
   document.getElementById('modalModelo').textContent = ficha.modelo || 'N/A';
   document.getElementById('modalTipo').textContent = ficha.tipo || 'N/A';
@@ -148,34 +159,43 @@ function mostrarFichaDetalle(ficha) {
   document.getElementById('modalLuces').textContent = ficha.luces || 'N/A';
   document.getElementById('modalObservaciones').textContent = ficha.observaciones || 'Sin observaciones';
 
-  const fechaCreacion = ficha.created_at ? new Date(ficha.created_at).toLocaleString() : 'N/A';
+  // Fecha formateada
+  const fechaCreacion = ficha.created_at ? new Date(ficha.created_at).toLocaleString('es-VE') : 'N/A';
   document.getElementById('modalFechaCreacion').textContent = fechaCreacion;
   document.getElementById('modalCreadoPor').textContent = ficha.creado_por || 'N/A';
 
-  // Carga de fotos dinámicas
+  // Carga segura de fotos con fallback
   for (let i = 1; i <= 4; i++) {
     const imgUrl = ficha[`foto${i}_url`];
     const imgEl = document.getElementById(`modalImg${i}`);
     const boxEl = document.getElementById(`modalBox${i}`);
     const placeholder = boxEl.querySelector('span');
     
-    if (imgUrl) {
+    if (imgUrl && imgUrl.trim() !== '') {
       imgEl.src = imgUrl;
       imgEl.style.display = 'block';
+      imgEl.onerror = function() {
+        this.style.display = 'none';
+        placeholder.style.display = 'block';
+        placeholder.textContent = `Foto ${i} (no disponible)`;
+      };
       placeholder.style.display = 'none';
     } else {
       imgEl.src = '';
       imgEl.style.display = 'none';
       placeholder.style.display = 'block';
+      placeholder.textContent = `Foto ${i}`;
     }
   }
 
   // Mostrar modal
   document.getElementById('fichaModal').style.display = 'block';
+  document.body.style.overflow = 'hidden'; // Evitar scroll del body
 }
 
 function cerrarModal() {
   document.getElementById('fichaModal').style.display = 'none';
+  document.body.style.overflow = ''; // Restaurar scroll
   fichaSeleccionada = null;
 }
 
@@ -189,8 +209,8 @@ function mostrarAlerta(mensaje, tipo) {
   alertDiv.textContent = mensaje;
   alertDiv.className = `alert alert-${tipo}`;
   alertDiv.style.display = 'block';
-  document.querySelector('.search-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(() => { alertDiv.style.display = 'none'; }, 5000);
+  document.querySelector('.search-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => { alertDiv.style.display = 'none'; }, 6000);
 }
 
 // ============================================
@@ -199,6 +219,7 @@ function mostrarAlerta(mensaje, tipo) {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 Inicializando consulta de fichas técnicas...');
 
+  // Permitir buscar con Enter
   const searchInput = document.getElementById('searchInput');
   if (searchInput) {
     searchInput.addEventListener('keypress', (e) => {
@@ -206,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Cerrar sesión
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
@@ -219,6 +241,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Cerrar modal con tecla Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarModal();
+  });
 
   cargarUsuario();
   console.log('✅ Consulta de fichas inicializada');
