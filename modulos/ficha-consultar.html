@@ -106,7 +106,44 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   color: #333;
   font-weight: 500;
 }
+/* ===== BADGES DE ESTATUS ===== */
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  border: 1px solid transparent;
+}
 
+/* ✅ Verde para Operativo */
+.status-ok {
+  background: #d1e7dd;
+  color: #0f5132;
+  border-color: #badbcc;
+}
+
+/* ✅ Rojo para Inoperativo/Reparación/Taller */
+.status-danger {
+  background: #f8d7da;
+  color: #842029;
+  border-color: #f5c2c7;
+}
+
+/* ✅ Gris para Desincorporado */
+.status-gray {
+  background: #e2e3e5;
+  color: #41464b;
+  border-color: #d3d6d8;
+}
+
+/* Default para otros casos */
+.status-default {
+  background: #fff3cd;
+  color: #664d03;
+  border-color: #ffecb5;
+}
 /* ===== IMPRESIÓN: CARTA HORIZONTAL ===== */
 @media print {
   @page { 
