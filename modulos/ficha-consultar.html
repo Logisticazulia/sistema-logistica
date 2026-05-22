@@ -470,24 +470,29 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       </div>
     </div>
     
-    <!-- Resultados -->
-   <div class="results-header">
-  <h2>📋 Resultados de Búsqueda</h2>
-  <div class="filter-group">
-    <label for="filtroTipo">Filtro:</label>
-    <select id="filtroTipo" class="filter-select">
-      <option value="todos">Todos</option>
-      <option value="vehiculo">Vehículos</option>
-      <option value="moto">Motos</option>
-    </select>
+<!-- ================= RESULTADOS ================= -->
+<div class="results-section">
+  <div class="results-header">
+    <h2>📋 Resultados de Búsqueda</h2>
+    
+    <!-- ✅ ESTADÍSTICAS (Ahora al lado izquierdo) -->
+    <div class="stats-group" id="statsContainer">
+      <span>📊 <strong id="totalFichas">0</strong> Total</span>
+      <span>🚗 <strong id="totalVehiculos">0</strong> Vehículos</span>
+      <span>🏍️ <strong id="totalMotos">0</strong> Motos</span>
+    </div>
+
+    <!-- 🔽 FILTROS (Ahora al lado derecho) -->
+    <div class="filter-group">
+      <label for="filtroTipo">🔽 Filtro:</label>
+      <select id="filtroTipo" class="filter-select">
+        <option value="todos">Todos</option>
+        <option value="vehiculo">Vehículos</option>
+        <option value="moto">Motos</option>
+      </select>
+    </div>
   </div>
-  <!-- ✅ ESTADÍSTICAS EN TIEMPO REAL -->
-  <div class="stats-group" id="statsContainer" style="display:flex;align-items:center;gap:15px;font-size:13px;color:#003366;font-weight:500;">
-    <span>📊 <strong id="totalFichas">0</strong> Total</span>
-    <span>🚗 <strong id="totalVehiculos">0</strong> Vehículos</span>
-    <span>🏍️ <strong id="totalMotos">0</strong> Motos</span>
-  </div>
-</div>
+  <!-- Resto de la tabla... -->
       <div class="table-container">
         <table class="results-table" id="resultsTable">
           <thead>
