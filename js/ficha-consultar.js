@@ -1,17 +1,15 @@
 /**
- * ========================================
- * FICHA-CONSULTAR.JS - Versión Estable v2
- * Carga automática + Diagnóstico de RLS
- * ========================================
- */
-
+* ========================================
+* FICHA-CONSULTAR.JS - Versión Estable v2
+* Carga automática + Diagnóstico de RLS
+* ========================================
+*/
 // ================= VARIABLES GLOBALES =================
 let fichasData = [];
 let fichasFiltradas = [];
 let paginaActual = 1;
 const POR_PAGINA = 15;
 let supabaseClient = null;
-
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -19,25 +17,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
       throw new Error('Falta configuración de Supabase');
     }
-
     // 2. Conectar a Supabase
     supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-
     // 3. Cargar usuario en la barra
     await cargarUsuarioLogueado();
-
     // 4. Configurar eventos (botones, filtros, etc.)
     configurarEventos();
-
     // 5. 🚀 CARGAR DATOS AUTOMÁTICAMENTE AL INICIAR
     await buscarFichas();
-
   } catch (error) {
     console.error('❌ Error de inicialización:', error);
     mostrarAlerta('Error al conectar con el sistema.', 'error');
   }
 });
-
 // ================= USUARIO LOGUEADO =================
 async function cargarUsuarioLogueado() {
   try {
@@ -47,45 +39,36 @@ async function cargarUsuarioLogueado() {
     if (el) el.textContent = email;
   } catch (e) { console.warn('⚠️ Usuario no detectado:', e); }
 }
-
 // ================= EVENTOS =================
 function configurarEventos() {
   // Búsqueda con Enter
   document.getElementById('searchInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscarFichas(); });
-
   // Filtro de tipo
   document.getElementById('filtroTipo')?.addEventListener('change', () => {
     paginaActual = 1;
     aplicarFiltros();
   });
-
   // Paginación
   document.getElementById('prevPage')?.addEventListener('click', () => cambiarPagina(paginaActual - 1));
   document.getElementById('nextPage')?.addEventListener('click', () => cambiarPagina(paginaActual + 1));
-
   // Cerrar Modal
   document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
   document.getElementById('fichaModal')?.addEventListener('click', e => { if (e.target.id === 'fichaModal') cerrarModal(); });
-
   // Logout
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
     await supabaseClient.auth.signOut();
     window.location.href = '../login.html';
   });
 }
-
 // ================= BÚSQUEDA / CARGA =================
 window.buscarVehiculo = async () => {
   await buscarFichas();
 };
-
 async function buscarFichas() {
   const termino = document.getElementById('searchInput')?.value.trim() || '';
   const btn = document.getElementById('btnSearch');
-  
   if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span><span>Cargando...</span>'; }
   mostrarTablaCargando(true);
-
   try {
     // Consulta base
     let query = supabaseClient
@@ -93,16 +76,13 @@ async function buscarFichas() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(2000);
-
     // Si hay texto, filtramos en la DB (más rápido)
     if (termino) {
       query = query.or(
         `placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%,s_carroceria.ilike.%${termino}%`
       );
     }
-
     const { data, error } = await query;
-    
     // 🐛 DIAGNÓSTICO EN CONSOLA
     if (error) {
       console.error('❌ Error de Supabase:', error);
@@ -113,17 +93,14 @@ async function buscarFichas() {
         console.warn('⚠️ Si esperabas datos pero devuelve 0, revisa las Políticas RLS en Supabase.');
       }
     }
-
     fichasData = data || [];
     paginaActual = 1;
     aplicarFiltros(); // Esto también llama a renderizarTabla()
-
     if (fichasData.length > 0) {
       mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s) correctamente.`, 'success');
     } else {
       mostrarAlerta('ℹ️ No se encontraron registros en la base de datos.', 'info');
     }
-
   } catch (err) {
     console.error('❌ Fallo en buscarFichas:', err);
     mostrarAlerta('Error al consultar la base de datos. Verifica RLS o conexión.', 'error');
@@ -134,7 +111,6 @@ async function buscarFichas() {
     if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔍</span><span>Buscar</span>'; }
   }
 }
-
 window.limpiarBusqueda = () => {
   document.getElementById('searchInput').value = '';
   document.getElementById('filtroTipo').value = 'todos';
@@ -143,22 +119,18 @@ window.limpiarBusqueda = () => {
   paginaActual = 1;
   buscarFichas(); // Recargar todo
 };
-
 // ================= FILTROS =================
 function aplicarFiltros() {
   const filtroValor = document.getElementById('filtroTipo')?.value || 'todos';
   const termino = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
-
   fichasFiltradas = fichasData.filter(ficha => {
     // 1. Filtro por Tipo (Moto vs Vehículo)
     const tipo = (ficha.tipo || '').toUpperCase();
     const clase = (ficha.clase || '').toUpperCase();
     // Lógica mejorada: Detecta moto si contiene "MOTO", "ENDURO", o si la clase es moto
     const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO' || clase === 'ENDURO';
-    
     if (filtroValor === 'moto' && !esMoto) return false;
     if (filtroValor === 'vehiculo' && esMoto) return false;
-
     // 2. Filtro por texto (si no se usó el filtro de DB)
     if (termino) {
       const texto = `${ficha.placa} ${ficha.facsimil} ${ficha.marca} ${ficha.modelo}`.toLowerCase();
@@ -166,29 +138,24 @@ function aplicarFiltros() {
     }
     return true;
   });
-
   renderizarTabla();
   renderizarPaginacion();
 }
-
 // ================= RENDERIZAR TABLA =================
 function renderizarTabla() {
   const tbody = document.getElementById('resultsBody');
   if (!tbody) return;
-
   if (fichasFiltradas.length === 0) {
     tbody.innerHTML = `
       <tr><td colspan="8" style="text-align:center;padding:40px;color:#666">
-        📭 No se encontraron resultados. 
-        ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}
+      📭 No se encontraron resultados.
+      ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}
       </td></tr>`;
     return;
   }
-
   const inicio = (paginaActual - 1) * POR_PAGINA;
   const fin = inicio + POR_PAGINA;
   const paginaData = fichasFiltradas.slice(inicio, fin);
-
   tbody.innerHTML = paginaData.map(f => `
     <tr>
       <td><strong>${escapeHtml(f.placa || '-')}</strong></td>
@@ -205,31 +172,25 @@ function renderizarTabla() {
     </tr>
   `).join('');
 }
-
 // ================= PAGINACIÓN =================
 function renderizarPaginacion() {
   const total = fichasFiltradas.length;
   const totalPages = Math.max(1, Math.ceil(total / POR_PAGINA));
-  
   const inicio = total === 0 ? 0 : (paginaActual - 1) * POR_PAGINA + 1;
   const fin = Math.min(paginaActual * POR_PAGINA, total);
   const infoEl = document.getElementById('paginationInfo');
   if (infoEl) infoEl.textContent = `Mostrando ${inicio} - ${fin} de ${total} registros`;
-
   const prevBtn = document.getElementById('prevPage');
   const nextBtn = document.getElementById('nextPage');
   if (prevBtn) prevBtn.disabled = paginaActual <= 1;
   if (nextBtn) nextBtn.disabled = paginaActual >= totalPages;
-
   const pageNumbers = document.getElementById('pageNumbers');
   if (!pageNumbers) return;
   pageNumbers.innerHTML = '';
-
   const maxVisible = 5;
   let start = Math.max(1, paginaActual - Math.floor(maxVisible / 2));
   let end = Math.min(totalPages, start + maxVisible - 1);
   if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-
   for (let i = start; i <= end; i++) {
     const btn = document.createElement('button');
     btn.className = `page-btn ${i === paginaActual ? 'active' : ''}`;
@@ -238,7 +199,6 @@ function renderizarPaginacion() {
     pageNumbers.appendChild(btn);
   }
 }
-
 function cambiarPagina(nueva) {
   const totalPages = Math.ceil(fichasFiltradas.length / POR_PAGINA) || 1;
   if (nueva < 1 || nueva > totalPages) return;
@@ -247,12 +207,10 @@ function cambiarPagina(nueva) {
   renderizarPaginacion();
   document.querySelector('.results-section')?.scrollIntoView({ behavior: 'smooth' });
 }
-
 // ================= MODAL =================
 window.verDetalle = (id) => {
   const f = fichasData.find(x => x.id == id);
   if (!f) return;
-
   const set = (sel, val) => { const el = document.getElementById(sel); if (el) el.textContent = val || '-'; };
   set('modalMarca', f.marca); set('modalModelo', f.modelo); set('modalTipo', f.tipo);
   set('modalClase', f.clase); set('modalColor', f.color); set('modalPlaca', f.placa);
@@ -263,12 +221,10 @@ window.verDetalle = (id) => {
   set('modalUbicacion', f.ubicacion); set('modalTapiceria', f.tapiceria);
   set('modalCauchos', f.cauchos); set('modalLuces', f.luces);
   set('modalObservaciones', f.observaciones); set('modalCreadoPor', f.creado_por);
-
   if (f.fecha_creacion) {
     const date = new Date(f.fecha_creacion);
     set('modalFechaCreacion', `${date.toLocaleDateString('es-VE')} ${date.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`);
   }
-
   // Imágenes
   for (let i = 1; i <= 4; i++) {
     const url = f[`foto${i}_url`] || f[`foto${i}`] || '';
@@ -283,23 +239,18 @@ window.verDetalle = (id) => {
       }
     }
   }
-
   document.getElementById('fichaModal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 };
-
 window.cerrarModal = () => {
   document.getElementById('fichaModal').style.display = 'none';
   document.body.style.overflow = 'auto';
 };
-
 window.imprimirDesdeTabla = (id) => {
   verDetalle(id);
   setTimeout(() => window.print(), 300);
 };
-
 window.imprimirFicha = () => window.print();
-
 // ================= UTILIDADES =================
 function mostrarTablaCargando(mostrar) {
   const tbody = document.getElementById('resultsBody');
@@ -308,20 +259,30 @@ function mostrarTablaCargando(mostrar) {
   }
 }
 
+// ✅ CORREGIDO: Coincide exactamente con el estilo de ficha-crear.js
 function mostrarAlerta(msg, tipo) {
   const el = document.getElementById('searchAlert');
   if (!el) return;
-  el.className = `alert alert-${tipo}`;
   el.textContent = msg;
+  el.className = 'alert alert-' + tipo;
   el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
+  // ✅ Auto-scroll garantizado
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+  setTimeout(() => {
+    el.style.display = 'none';
+  }, 5000);
 }
 
+// ✅ CORREGIDO: Lógica de colores actualizada
 function getEstatusClass(est) {
   const e = (est || '').toUpperCase();
   if (e.includes('OPERATIVO')) return 'status-ok';
-  if (e.includes('REPARACION') || e.includes('TALLER')) return 'status-warn';
-  if (e.includes('INOPERATIVO') || e.includes('DESINCORPORADO')) return 'status-bad';
+  if (e.includes('INOPERATIVO') || e.includes('REPARACION') || e.includes('TALLER')) return 'status-danger';
+  if (e.includes('DESINCORPORADO')) return 'status-gray';
   return '';
 }
 
@@ -332,15 +293,16 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Inyectar estilos para badges
+// ✅ CORREGIDO: Estilos inyectados actualizados
 if (!document.getElementById('estatus-styles')) {
   const style = document.createElement('style');
   style.id = 'estatus-styles';
   style.textContent = `
-    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
-    .status-ok { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .status-warn { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-    .status-bad { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; text-align: center; }
+    .status-ok { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+    .status-danger { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+    .status-gray { background: #e2e3e5; color: #41464b; border: 1px solid #d3d6d8; }
+    .status-default { background: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
     .page-numbers { display: flex; gap: 6px; }
     .page-btn { min-width: 36px; height: 36px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
     .page-btn:hover:not(.active) { background: #f0f0f0; border-color: #003366; }
