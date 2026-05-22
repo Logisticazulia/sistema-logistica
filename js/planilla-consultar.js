@@ -389,42 +389,41 @@ window.onclick = function(event) {
 }
 
 // Exportar ficha a PDF
+// Exportar ficha a PDF (FORZADO A 1 HOJA A4)
 function exportarPDF() {
     if (!currentVehicle) return;
     
-    // Generar número único
     const exportNum = generarNumeroExportacion();
-    
-    // Elementos del DOM
     const element = document.getElementById('fichaContent');
     const modalBody = element.querySelector('.modal-body');
     
-    // 1. Inyectar número de exportación temporalmente al inicio
+    // 1. Inyectar número de exportación
     const exportLabel = document.createElement('div');
     exportLabel.id = 'tempExportNum';
-    exportLabel.style.cssText = 'text-align:center; font-size:0.95rem; font-weight:bold; color:#005b96; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:5px;';
+    exportLabel.style.cssText = 'text-align:center; font-size:0.85rem; font-weight:bold; color:#005b96; margin-bottom:6px; border-bottom:1px solid #ccc; padding-bottom:4px;';
     exportLabel.textContent = `📄 N° de Exportación: ${exportNum}`;
     modalBody.insertBefore(exportLabel, modalBody.firstChild);
-
-    // 2. Aplicar clase compacta para ajuste en 1 hoja
+    
+    // 2. Activar modo compacto
     element.classList.add('pdf-compact');
-
-    // 3. Configuración para 1 sola hoja A4
-    const opt = {
-        margin: [5, 5, 5, 5], // Márgenes mínimos
-        filename: `Ficha_${currentVehicle.placa || currentVehicle.id}_${exportNum}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1.5, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    // 4. Ocultar botones durante la captura
+    
+    // 3. Ocultar botones temporalmente
     const footer = element.querySelector('.modal-footer');
     const closeBtn = element.querySelector('.modal-close');
     if (footer) footer.style.display = 'none';
     if (closeBtn) closeBtn.style.display = 'none';
-
-    // 5. Generar PDF y limpiar
+    
+    // 4. Configuración html2pdf optimizada para 1 sola hoja
+    const opt = {
+        margin: [4, 4, 4, 4], // mm (top, right, bottom, left)
+        filename: `Ficha_${currentVehicle.placa || currentVehicle.id}_${exportNum}.pdf`,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 1, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // ⛔ Evita saltos de página
+    };
+    
+    // 5. Generar y limpiar
     html2pdf().set(opt).from(element).save().then(() => {
         if (footer) footer.style.display = 'flex';
         if (closeBtn) closeBtn.style.display = 'block';
