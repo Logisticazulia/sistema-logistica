@@ -1,16 +1,15 @@
 /**
 * ========================================
-* FICHA-CONSULTAR.JS - Versión Corregida
-* Colores de estatus fijos y Alertas mejoradas
+* FICHA-CONSULTAR.JS - Versión Final
+* Vista previa tamaño carta + Colores correctos
 * ========================================
 */
-// ================= VARIABLES GLOBALES =================
 let fichasData = [];
 let fichasFiltradas = [];
 let paginaActual = 1;
 const POR_PAGINA = 15;
 let supabaseClient = null;
-// ================= INICIALIZACIÓN =================
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) throw new Error('Falta configuración de Supabase');
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     mostrarAlerta('Error al conectar con el sistema.', 'error');
   }
 });
-// ================= USUARIO LOGUEADO =================
+
 async function cargarUsuarioLogueado() {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -32,7 +31,7 @@ async function cargarUsuarioLogueado() {
     if (el) el.textContent = email;
   } catch (e) { console.warn('⚠️ Usuario no detectado:', e); }
 }
-// ================= EVENTOS =================
+
 function configurarEventos() {
   document.getElementById('searchInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscarFichas(); });
   document.getElementById('filtroTipo')?.addEventListener('change', () => { paginaActual = 1; aplicarFiltros(); });
@@ -40,14 +39,18 @@ function configurarEventos() {
   document.getElementById('nextPage')?.addEventListener('click', () => cambiarPagina(paginaActual + 1));
   document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
   document.getElementById('fichaModal')?.addEventListener('click', e => { if (e.target.id === 'fichaModal') cerrarModal(); });
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = '../login.html'; });
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = '../login.html';
+  });
 }
-// ================= BÚSQUEDA / CARGA =================
+
 window.buscarVehiculo = async () => { await buscarFichas(); };
+
 async function buscarFichas() {
   const termino = document.getElementById('searchInput')?.value.trim() || '';
   const btn = document.getElementById('btnSearch');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span><span>Cargando...</span>'; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span></span><span>Cargando...</span>'; }
   mostrarTablaCargando(true);
   try {
     let query = supabaseClient.from('fichas_tecnicas').select('*').order('created_at', { ascending: false }).limit(2000);
@@ -55,27 +58,28 @@ async function buscarFichas() {
       query = query.or(`placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%,s_carroceria.ilike.%${termino}%`);
     }
     const { data, error } = await query;
-    if (error) { console.error('❌ Error de Supabase:', error); throw error; }
+    if (error) throw error;
     fichasData = data || [];
     paginaActual = 1;
     aplicarFiltros();
-    if (fichasData.length > 0) mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s) correctamente.`, 'success');
-    else mostrarAlerta('ℹ️ No se encontraron registros en la base de datos.', 'info');
+    if (fichasData.length > 0) mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s).`, 'success');
+    else mostrarAlerta('ℹ️ No se encontraron registros.', 'info');
   } catch (err) {
     console.error('❌ Fallo en buscarFichas:', err);
-    mostrarAlerta('Error al consultar la base de datos. Verifica RLS o conexión.', 'error');
+    mostrarAlerta('Error al consultar la base de datos.', 'error');
     fichasData = []; fichasFiltradas = []; renderizarTabla();
   } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<span></span><span>Buscar</span>'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔍</span><span>Buscar</span>'; }
   }
 }
+
 window.limpiarBusqueda = () => {
   document.getElementById('searchInput').value = '';
   document.getElementById('filtroTipo').value = 'todos';
   fichasData = []; fichasFiltradas = []; paginaActual = 1;
   buscarFichas();
 };
-// ================= FILTROS =================
+
 function aplicarFiltros() {
   const filtroValor = document.getElementById('filtroTipo')?.value || 'todos';
   const termino = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
@@ -93,12 +97,12 @@ function aplicarFiltros() {
   });
   renderizarTabla(); renderizarPaginacion();
 }
-// ================= RENDERIZAR TABLA =================
+
 function renderizarTabla() {
   const tbody = document.getElementById('resultsBody');
   if (!tbody) return;
   if (fichasFiltradas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666"> No se encontraron resultados. ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados.</td></tr>`;
     return;
   }
   const inicio = (paginaActual - 1) * POR_PAGINA;
@@ -120,7 +124,7 @@ function renderizarTabla() {
     </tr>
   `).join('');
 }
-// ================= PAGINACIÓN =================
+
 function renderizarPaginacion() {
   const total = fichasFiltradas.length;
   const totalPages = Math.max(1, Math.ceil(total / POR_PAGINA));
@@ -145,13 +149,14 @@ function renderizarPaginacion() {
     pageNumbers.appendChild(btn);
   }
 }
+
 function cambiarPagina(nueva) {
   const totalPages = Math.ceil(fichasFiltradas.length / POR_PAGINA) || 1;
   if (nueva < 1 || nueva > totalPages) return;
   paginaActual = nueva; renderizarTabla(); renderizarPaginacion();
   document.querySelector('.results-section')?.scrollIntoView({ behavior: 'smooth' });
 }
-// ================= MODAL =================
+
 window.verDetalle = (id) => {
   const f = fichasData.find(x => x.id == id); if (!f) return;
   const set = (sel, val) => { const el = document.getElementById(sel); if (el) el.textContent = val || '-'; };
@@ -169,12 +174,14 @@ window.verDetalle = (id) => {
     const url = f[`foto${i}_url`] || f[`foto${i}`] || ''; const img = document.getElementById(`modalImg${i}`); const box = document.getElementById(`modalBox${i}`); const span = box?.querySelector('span');
     if (img && box && span) { if (url && url.startsWith('http')) { img.src = url; img.style.display = 'block'; span.style.display = 'none'; } else { img.style.display = 'none'; span.style.display = 'block'; } }
   }
-  document.getElementById('fichaModal').style.display = 'flex'; document.body.style.overflow = 'hidden';
+  document.getElementById('fichaModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 };
+
 window.cerrarModal = () => { document.getElementById('fichaModal').style.display = 'none'; document.body.style.overflow = 'auto'; };
 window.imprimirDesdeTabla = (id) => { verDetalle(id); setTimeout(() => window.print(), 300); };
 window.imprimirFicha = () => window.print();
-// ================= UTILIDADES =================
+
 function mostrarTablaCargando(mostrar) { const tbody = document.getElementById('resultsBody'); if (tbody && mostrar) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`; }
 
 function mostrarAlerta(msg, tipo) {
@@ -186,7 +193,6 @@ function mostrarAlerta(msg, tipo) {
   setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
 
-// ✅ CORREGIDO: Orden de validación para que INOPERATIVO/DESINCORPORADO no sean tomados como OPERATIVO
 function getEstatusClass(est) {
   const e = (est || '').toUpperCase().trim();
   if (e.includes('DESINCORPORADO')) return 'status-gray';
