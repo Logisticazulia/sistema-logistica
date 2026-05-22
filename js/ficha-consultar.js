@@ -186,7 +186,7 @@ function renderizarTabla() {
       <td><span class="status-badge ${getEstatusClass(f.estatus_ficha)}">${escapeHtml(f.estatus_ficha || 'N/A')}</span></td>
       <td>${escapeHtml(f.dependencia || '-')}</td>
       <td>
-        <button class="btn-view" onclick="verDetalle('${f.id}')">👁️ Ver</button>
+        <button class="btn-view" onclick="verDetalle('${f.id}')">Ver</button>
         <button class="btn-print" onclick="imprimirDesdeTabla('${f.id}')">🖨️</button>
       </td>
     </tr>
