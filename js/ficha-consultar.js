@@ -86,49 +86,60 @@ window.buscarVehiculo = buscarFichas;
 // ============================================
 // RENDERIZAR TABLA DE RESULTADOS
 // ============================================
+// ============================================
+// RENDERIZAR TABLA DE RESULTADOS (CON FILTRO)
+// ============================================
 function renderizarListaFichas() {
-  const tbody = document.getElementById('resultsBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
+    const tbody = document.getElementById('resultsBody');
+    const filterValue = document.getElementById('filterType')?.value || 'all';
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-  if (fichasEncontradas.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-          📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
-        </td>
-      </tr>
-    `;
-    return;
-  }
+    // ✅ Filtrar datos según selección
+    let datosAMostrar = fichasEncontradas;
+    if (filterValue === 'MOTO') {
+        datosAMostrar = fichasEncontradas.filter(f => String(f.clase || '').toUpperCase() === 'MOTO');
+    } else if (filterValue === 'VEHICULO') {
+        datosAMostrar = fichasEncontradas.filter(f => String(f.clase || '').toUpperCase() !== 'MOTO');
+    }
 
-  tbody.innerHTML = fichasEncontradas.map(f => {
-    let estatusBg = '#fff3cd', estatusColor = '#856404';
-    if (f.estatus_ficha === 'OPERATIVO') { estatusBg = '#d4edda'; estatusColor = '#155724'; }
-    else if (f.estatus_ficha === 'INOPERATIVO') { estatusBg = '#f8d7da'; estatusColor = '#721c24'; }
-    else if (f.estatus_ficha === 'DESINCORPORADO') { estatusBg = '#d6d8db'; estatusColor = '#383d41'; }
-    
-    return `
-      <tr>
-        <td><strong>${f.placa || 'N/A'}</strong></td>
-        <td>${f.marca || 'N/A'}</td>
-        <td>${f.modelo || 'N/A'}</td>
-        <td>${f.tipo || 'N/A'}</td>
-        <td>${f.color || 'N/A'}</td>
-        <td>
-          <span style="padding: 4px 8px; border-radius: 4px; background: ${estatusBg}; color: ${estatusColor}; font-weight: 500;">
-            ${f.estatus_ficha || 'N/A'}
-          </span>
-        </td>
-        <td>${f.dependencia || 'N/A'}</td>
-        <td>
-          <button class="btn-view" onclick="verFicha('${f.id}')">👁️ Ver</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+    if (datosAMostrar.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
+                    📭 No hay resultados para el filtro seleccionado.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = datosAMostrar.map(f => {
+        let estatusBg = '#fff3cd', estatusColor = '#856404';
+        if (f.estatus_ficha === 'OPERATIVO') { estatusBg = '#d4edda'; estatusColor = '#155724'; }
+        else if (f.estatus_ficha === 'INOPERATIVO') { estatusBg = '#f8d7da'; estatusColor = '#721c24'; }
+        else if (f.estatus_ficha === 'DESINCORPORADO') { estatusBg = '#d6d8db'; estatusColor = '#383d41'; }
+        
+        return `
+            <tr>
+                <td><strong>${f.placa || 'N/A'}</strong></td>
+                <td>${f.marca || 'N/A'}</td>
+                <td>${f.modelo || 'N/A'}</td>
+                <td>${f.tipo || 'N/A'}</td>
+                <td>${f.color || 'N/A'}</td>
+                <td>
+                    <span style="padding: 4px 8px; border-radius: 4px; background: ${estatusBg}; color: ${estatusColor}; font-weight: 500;">
+                        ${f.estatus_ficha || 'N/A'}
+                    </span>
+                </td>
+                <td>${f.dependencia || 'N/A'}</td>
+                <td>
+                    <button class="btn-view" onclick="verFicha('${f.id}')">👁️ Ver</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
-
 // ============================================
 // VER Y POBLAR MODAL (SIN ROMPER ESTRUCTURA)
 // ============================================
@@ -220,15 +231,18 @@ window.onclick = function(event) {
 // UTILIDADES
 // ============================================
 window.limpiarBusqueda = function() {
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) searchInput.value = '';
-  const alertDiv = document.getElementById('searchAlert');
-  if (alertDiv) alertDiv.style.display = 'none';
-  
-  // Al limpiar, volvemos a cargar todas las fichas para mejor UX
-  cargarTodasLasFichas();
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    const alertDiv = document.getElementById('searchAlert');
+    if (alertDiv) alertDiv.style.display = 'none';
+    
+    // ✅ Reiniciar filtro a "Todos"
+    const filterSelect = document.getElementById('filterType');
+    if (filterSelect) filterSelect.value = 'all';
+    
+    fichasEncontradas = [];
+    cargarTodasLasFichas(); // Vuelve a cargar todo y aplica el filtro automáticamente
 };
-
 window.imprimirFicha = function() {
   window.print();
 };
@@ -277,5 +291,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  // ✅ Activar filtro de tipo de vehículo
+const filterSelect = document.getElementById('filterType');
+if (filterSelect) {
+    filterSelect.addEventListener('change', () => {
+        renderizarListaFichas();
+    });
+}
   console.log('✅ Consulta de fichas inicializada');
 });
