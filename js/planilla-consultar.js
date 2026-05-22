@@ -392,25 +392,51 @@ window.onclick = function(event) {
 function exportarPDF() {
     if (!currentVehicle) return;
     
+    // Generar número único
+    const exportNum = generarNumeroExportacion();
+    
+    // Elementos del DOM
     const element = document.getElementById('fichaContent');
+    const modalBody = element.querySelector('.modal-body');
+    
+    // 1. Inyectar número de exportación temporalmente al inicio
+    const exportLabel = document.createElement('div');
+    exportLabel.id = 'tempExportNum';
+    exportLabel.style.cssText = 'text-align:center; font-size:0.95rem; font-weight:bold; color:#005b96; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:5px;';
+    exportLabel.textContent = `📄 N° de Exportación: ${exportNum}`;
+    modalBody.insertBefore(exportLabel, modalBody.firstChild);
+
+    // 2. Aplicar clase compacta para ajuste en 1 hoja
+    element.classList.add('pdf-compact');
+
+    // 3. Configuración para 1 sola hoja A4
     const opt = {
-        margin: 10,
-        filename: `Ficha_Vehiculo_${currentVehicle.placa || currentVehicle.id}.pdf`,
+        margin: [5, 5, 5, 5], // Márgenes mínimos
+        filename: `Ficha_${currentVehicle.placa || currentVehicle.id}_${exportNum}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 1.5, useCORS: true, logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    
-    // Ocultar botones temporalmente
-    const footer = document.querySelector('.modal-footer');
-    const closeBtn = document.querySelector('.modal-close');
-    footer.style.display = 'none';
-    closeBtn.style.display = 'none';
-    
+
+    // 4. Ocultar botones durante la captura
+    const footer = element.querySelector('.modal-footer');
+    const closeBtn = element.querySelector('.modal-close');
+    if (footer) footer.style.display = 'none';
+    if (closeBtn) closeBtn.style.display = 'none';
+
+    // 5. Generar PDF y limpiar
     html2pdf().set(opt).from(element).save().then(() => {
-        // Restaurar botones
-        footer.style.display = 'flex';
-        closeBtn.style.display = 'block';
+        if (footer) footer.style.display = 'flex';
+        if (closeBtn) closeBtn.style.display = 'block';
+        if (exportLabel) exportLabel.remove();
+        element.classList.remove('pdf-compact');
+    }).catch(err => {
+        console.error('Error PDF:', err);
+        alert('Error al generar el PDF.');
+        if (footer) footer.style.display = 'flex';
+        if (closeBtn) closeBtn.style.display = 'block';
+        if (exportLabel) exportLabel.remove();
+        element.classList.remove('pdf-compact');
     });
 }
 
