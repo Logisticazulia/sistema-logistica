@@ -1,6 +1,6 @@
 /**
 * ========================================
-* FICHA-CONSULTAR.JS - Versión Corregida
+* FICHA-CONSULTAR.JS - BÚSQUEDA EXACTA CORREGIDA
 * ========================================
 */
 // ================= VARIABLES GLOBALES =================
@@ -60,15 +60,18 @@ async function buscarFichas() {
   mostrarTablaCargando(true);
   
   try {
+    // Consulta base
     let query = supabaseClient
       .from('fichas_tecnicas')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(2000);
     
+    // ✅ BÚSQUEDA EXACTA en múltiples campos (incluye s_motor)
     if (termino) {
+      const t = termino.toUpperCase(); // Normalizar a mayúsculas para comparación exacta
       query = query.or(
-        `placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%,s_carroceria.ilike.%${termino}%`
+        `placa.eq.${t},facsimil.eq.${t},marca.eq.${t},modelo.eq.${t},s_carroceria.eq.${t},s_motor.eq.${t}`
       );
     }
     
@@ -81,9 +84,9 @@ async function buscarFichas() {
     aplicarFiltros();
     
     if (fichasData.length > 0) {
-      mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s).`, 'success');
+      mostrarAlerta(`✅ ${fichasData.length} registro(s) encontrado(s).`, 'success');
     } else {
-      mostrarAlerta('ℹ️ No se encontraron registros.', 'info');
+      mostrarAlerta('ℹ️ No se encontraron registros con esa búsqueda exacta.', 'info');
     }
   } catch (err) {
     console.error('❌ Fallo en buscarFichas:', err);
@@ -108,9 +111,10 @@ window.limpiarBusqueda = () => {
 // ================= FILTROS =================
 function aplicarFiltros() {
   const filtroValor = document.getElementById('filtroTipo')?.value || 'todos';
-  const termino = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
+  const termino = document.getElementById('searchInput')?.value.trim().toUpperCase() || ''; // ✅ Normalizar a mayúsculas
   
-  fichasFiltradas = fichasData.filter(function(ficha) {
+  fichasFiltradas = fichasData.filter(ficha => {
+    // Filtro por Tipo (Moto vs Vehículo)
     const tipo = (ficha.tipo || '').toUpperCase();
     const clase = (ficha.clase || '').toUpperCase();
     const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO' || clase === 'ENDURO';
@@ -118,9 +122,17 @@ function aplicarFiltros() {
     if (filtroValor === 'moto' && !esMoto) return false;
     if (filtroValor === 'vehiculo' && esMoto) return false;
     
+    // ✅ FILTRO EXACTO por texto (comparación exacta en mayúsculas)
     if (termino) {
-      const texto = `${ficha.placa} ${ficha.facsimil} ${ficha.marca} ${ficha.modelo}`.toLowerCase();
-      if (!texto.includes(termino)) return false;
+      const coincide = 
+        (ficha.placa || '').toUpperCase() === termino ||
+        (ficha.facsimil || '').toUpperCase() === termino ||
+        (ficha.marca || '').toUpperCase() === termino ||
+        (ficha.modelo || '').toUpperCase() === termino ||
+        (ficha.s_carroceria || '').toUpperCase() === termino ||
+        (ficha.s_motor || '').toUpperCase() === termino;
+      
+      if (!coincide) return false;
     }
     return true;
   });
@@ -135,7 +147,7 @@ function renderizarTabla() {
   if (!tbody) return;
   
   if (fichasFiltradas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados con búsqueda exacta.</td></tr>`;
     return;
   }
   
@@ -143,7 +155,6 @@ function renderizarTabla() {
   const fin = inicio + POR_PAGINA;
   const paginaData = fichasFiltradas.slice(inicio, fin);
   
-  // ✅ CORREGIDO: Usar función tradicional para evitar problemas de scope
   tbody.innerHTML = paginaData.map(function(f) {
     return `
     <tr>
@@ -235,7 +246,7 @@ window.verDetalle = function(id) {
   set('modalLuces', f.luces);
   set('modalObservaciones', f.observaciones); 
   
-  // ✅ Footer de impresión
+  // Footer de impresión
   const printFecha = document.getElementById('printFechaCreacion');
   const printCreador = document.getElementById('printCreadoPor');
   if (f.fecha_creacion && printFecha) {
@@ -302,7 +313,7 @@ function mostrarAlerta(msg, tipo) {
   setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
 
-// ✅ CORREGIDO: Nombres de clases que coinciden con el CSS
+// ✅ CORREGIDO: Nombres de clases que coinciden con el CSS del HTML
 function getEstatusClass(est) {
   const e = (est || '').toUpperCase().trim();
   if (e.includes('DESINCORPORADO')) return 'status-gray';
