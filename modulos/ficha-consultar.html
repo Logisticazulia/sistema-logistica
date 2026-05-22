@@ -3,776 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Consultar Ficha Técnica de Vehículos - Sistema de Logística">
-<meta name="theme-color" content="#003366">
+<meta name="description" content="Consultar Ficha Técnica de Vehículos">
 <title>Consultar Ficha Técnica | Transporte</title>
 <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}
-body {
-font-family: 'Roboto', sans-serif;
-background: #f5f5f5;
-}
-/* Container - mismo tamaño que ficha-crear */
-.container {
-max-width: 1600px;
-margin: 0 auto;
-padding: 20px;
-display: flex;
-flex-direction: column;
-gap: 30px;
-}
-/* Sección de búsqueda - igual que ficha-crear */
-.search-section {
-background: linear-gradient(135deg, #003366 0%, #004080 100%);
-padding: 25px;
-border-radius: 8px;
-margin-bottom: 25px;
-box-shadow: 0 4px 12px rgba(0,51,102,0.2);
-}
-.search-section h3 {
-color: white;
-margin-bottom: 15px;
-font-size: 16px;
-display: flex;
-align-items: center;
-gap: 10px;
-}
-.search-container {
-display: flex;
-gap: 12px;
-flex-wrap: wrap;
-}
-.search-input {
-flex: 1;
-min-width: 300px;
-padding: 12px 16px;
-border: 2px solid rgba(255,255,255,0.3);
-border-radius: 6px;
-font-size: 15px;
-background: rgba(255,255,255,0.95);
-transition: all 0.3s ease;
-}
-.search-input:focus {
-outline: none;
-border-color: #fff;
-box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
-}
-.search-input::placeholder {
-color: #666;
-}
-.btn-search {
-padding: 12px 28px;
-background: #28a745;
-color: white;
-border: none;
-border-radius: 6px;
-font-size: 15px;
-font-weight: 600;
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 8px;
-transition: all 0.3s ease;
-white-space: nowrap;
-}
-.btn-search:hover {
-background: #218838;
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-}
-.btn-clear {
-padding: 12px 28px;
-background: #ffc107;
-color: #000;
-border: none;
-border-radius: 6px;
-font-size: 15px;
-font-weight: 600;
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 8px;
-transition: all 0.3s ease;
-white-space: nowrap;
-}
-.btn-clear:hover {
-background: #e0a800;
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(255,193,7,0.3);
-}
-.search-hint {
-color: rgba(255,255,255,0.9);
-font-size: 13px;
-margin-top: 10px;
-display: flex;
-gap: 20px;
-flex-wrap: wrap;
-}
-.search-hint span {
-display: flex;
-align-items: center;
-gap: 5px;
-}
-/* Alertas */
-.alert {
-padding: 12px 16px;
-border-radius: 6px;
-margin: 15px 0;
-display: none;
-font-weight: 500;
-}
-.alert-success {
-background: #d4edda;
-color: #155724;
-border: 1px solid #c3e6cb;
-}
-.alert-error {
-background: #f8d7da;
-color: #721c24;
-border: 1px solid #f5c6cb;
-}
-.alert-info {
-background: #d1ecf1;
-color: #0c5460;
-border: 1px solid #bee5eb;
-}
-/* Sección de resultados - igual que form-section */
-.results-section {
-background: white;
-padding: 30px;
-border-radius: 8px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-width: 100%;
-}
-.results-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 20px;
-padding-bottom: 10px;
-border-bottom: 3px solid #003366;
-}
-.results-section h2 {
-color: #003366;
-margin-bottom: 0;
-padding-bottom: 0;
-border-bottom: none;
-}
-/* FILTRO COMPACTO */
-.filter-select {
-padding: 6px 12px;
-border: 2px solid #003366;
-border-radius: 6px;
-font-size: 13px;
-background: #fff;
-color: #003366;
-font-weight: 500;
-cursor: pointer;
-transition: all 0.3s ease;
-width: auto;
-min-width: 140px;
-flex-shrink: 0;
-}
-.filter-select:hover, .filter-select:focus {
-border-color: #004080;
-box-shadow: 0 0 0 3px rgba(0,51,102,0.15);
-outline: none;
-}
-.table-container {
-overflow-x: auto;
-border-radius: 4px;
-border: 1px solid #e0e0e0;
-}
-.results-table {
-width: 100%;
-border-collapse: collapse;
-font-size: 14px;
-min-width: 1000px;
-}
-.results-table th {
-background: #003366;
-color: white;
-padding: 14px 12px;
-text-align: left;
-font-weight: 600;
-border: 1px solid #002244;
-white-space: nowrap;
-}
-.results-table td {
-padding: 12px;
-border: 1px solid #ddd;
-vertical-align: middle;
-}
-.results-table tr:nth-child(even) {
-background: #f8f9fa;
-}
-.results-table tr:hover {
-background: #e3f2fd;
-transition: background 0.2s ease;
-}
-.btn-view {
-padding: 8px 16px;
-background: #003366;
-color: white;
-border: none;
-border-radius: 4px;
-font-size: 13px;
-font-weight: 500;
-cursor: pointer;
-transition: all 0.3s ease;
-margin-right: 6px;
-display: inline-flex;
-align-items: center;
-gap: 5px;
-}
-.btn-view:hover {
-background: #004080;
-transform: translateY(-2px);
-box-shadow: 0 3px 8px rgba(0,51,102,0.3);
-}
-.btn-print {
-padding: 8px 16px;
-background: #28a745;
-color: white;
-border: none;
-border-radius: 4px;
-font-size: 13px;
-font-weight: 500;
-cursor: pointer;
-transition: all 0.3s ease;
-display: inline-flex;
-align-items: center;
-gap: 5px;
-}
-.btn-print:hover {
-background: #218838;
-transform: translateY(-2px);
-box-shadow: 0 3px 8px rgba(40,167,69,0.3);
-}
-/* Botones - igual que ficha-crear */
-.btn {
-padding: 12px 24px;
-border: none;
-border-radius: 4px;
-cursor: pointer;
-font-size: 14px;
-font-weight: 500;
-margin-top: 20px;
-margin-right: 10px;
-display: inline-flex;
-align-items: center;
-gap: 8px;
-transition: all 0.3s ease;
-}
-.btn-primary {
-background: #003366;
-color: white;
-}
-.btn-primary:hover {
-background: #002244;
-transform: translateY(-2px);
-box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-.btn-secondary {
-background: #6c757d;
-color: white;
-}
-.btn-secondary:hover {
-background: #5a6268;
-transform: translateY(-2px);
-box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-.btn-success {
-background: #28a745;
-color: white;
-}
-.btn-success:hover {
-background: #218838;
-transform: translateY(-2px);
-box-shadow: 0 4px 8px rgba(40,167,69,0.2);
-}
-/* Modal - optimizado para desktop */
-.modal {
-display: none;
-position: fixed;
-z-index: 1000;
-left: 0;
-top: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.6);
-overflow-y: auto;
-padding: 40px 20px;
-}
-.modal-content {
-background: white;
-margin: 0 auto;
-padding: 35px;
-border-radius: 8px;
-max-width: 1500px;
-width: 95%;
-position: relative;
-box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-}
-.modal-close {
-position: absolute;
-right: 25px;
-top: 20px;
-font-size: 32px;
-font-weight: bold;
-color: #666;
-cursor: pointer;
-transition: all 0.3s;
-width: 40px;
-height: 40px;
-display: flex;
-align-items: center;
-justify-content: center;
-border-radius: 50%;
-background: #f5f5f5;
-}
-.modal-close:hover {
-color: #003366;
-background: #e0e0e0;
-transform: rotate(90deg);
-}
-/* Ficha técnica - igual que ficha-crear */
-.ficha-tecnica {
-border: 2px solid #003366;
-padding: 25px;
-background: white;
-width: 100%;
-display: inline-block;
-text-align: left;
-}
-.ficha-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 20px;
-padding-bottom: 15px;
-border-bottom: 2px solid #003366;
-}
-.ficha-logo-left {
-width: 230px;
-height: auto;
-}
-.ficha-logo-right {
-width: 180px;
-height: auto;
-}
-.ficha-title {
-text-align: center;
-flex: 1;
-padding: 0 20px;
-}
-.ficha-title h1 {
-font-size: 15px;
-color: #003366;
-font-weight: 700;
-line-height: 1.4;
-}
-.ficha-title h2 {
-font-size: 15px;
-color: #003366;
-margin: 6px 0;
-font-weight: 700;
-}
-.ficha-title h3 {
-font-size: 15px;
-color: #003366;
-margin-top: 6px;
-font-weight: 700;
-}
-.ficha-title h4 {
-font-size: 15px;
-color: #003366;
-margin-top: 6px;
-font-weight: 700;
-}
-.ficha-table {
-width: 100%;
-border-collapse: collapse;
-margin-bottom: 15px;
-table-layout: fixed;
-}
-.ficha-table th {
-background: #4a7c9b;
-color: white;
-padding: 12px 10px;
-text-align: left;
-font-size: 13px;
-border: 2px solid #003366;
-}
-.ficha-table td {
-padding: 10px 8px;
-border: 2px solid #003366;
-font-size: 12px;
-vertical-align: top;
-}
-.ficha-table .label {
-font-weight: 700;
-background: #f0f0f0;
-width: 18%;
-}
-.ficha-table .value {
-width: 32%;
-}
-.fotos-container {
-display: grid;
-grid-template-columns: repeat(4, 1fr);
-gap: 12px;
-margin-top: 15px;
-}
-.foto-box {
-border: 2px solid #4a7c9b;
-height: 140px;
-background: #4a7c9b;
-color: white;
-display: flex;
-align-items: center;
-justify-content: center;
-overflow: hidden;
-}
-.foto-box img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-display: none;
-}
-.observaciones-box {
-min-height: 260px;
-border: 2px solid #003366;
-padding: 12px;
-background: #fafafa;
-font-size: 12px;
-line-height: 1.5;
-}
-.modal-actions {
-margin-top: 25px;
-display: flex;
-gap: 12px;
-justify-content: flex-end;
-padding-top: 20px;
-border-top: 2px solid #e0e0e0;
-}
-/* Responsive - Desktop primero */
-@media (max-width: 1200px) {
-.fotos-container {
-grid-template-columns: repeat(2, 1fr);
-}
-.modal-content {
-width: 98%;
-padding: 30px;
-}
-}
-@media (max-width: 768px) {
-.results-header {
-flex-direction: column;
-align-items: flex-start;
-gap: 10px;
-}
-.filter-select {
-width: 100%;
-min-width: 100%;
-}
-.container {
-padding: 15px;
-}
-.search-container {
-flex-direction: column;
-}
-.search-input {
-min-width: 100%;
-}
-.btn-search,
-.btn-clear {
-width: 100%;
-justify-content: center;
-}
-.ficha-header {
-flex-direction: column;
-gap: 15px;
-}
-.ficha-logo-left, .ficha-logo-right {
-width: 150px;
-}
-.ficha-title {
-padding: 0;
-}
-.fotos-container {
-grid-template-columns: 1fr;
-}
-.results-table {
-font-size: 13px;
-}
-.results-table th,
-.results-table td {
-padding: 10px 8px;
-}
-}
-/* Estilos de impresión */
+/* ESTILOS BASE */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
+.container { max-width: 1600px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
+.form-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; }
+.form-section h2 { color: #003366; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #003366; }
+/* ALERTAS */
+.alert { padding: 12px 16px; border-radius: 6px; margin: 15px 0; display: none; font-weight: 500; }
+.alert-success { background: #d4edda; color: #155724; } 
+.alert-error { background: #f8d7da; color: #721c24; } 
+.alert-info { background: #d1ecf1; color: #0c5460; }
+/* BÚSQUEDA */
+.search-section { background: linear-gradient(135deg, #003366 0%, #004080 100%); padding: 25px; border-radius: 8px; margin-bottom: 25px; }
+.search-section h3 { color: white; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+.search-container { display: flex; gap: 12px; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 250px; padding: 12px 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 15px; background: rgba(255,255,255,0.95); }
+.search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+.btn-search { padding: 12px 28px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.btn-search:hover { background: #218838; }
+.btn-clear { padding: 12px 28px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.btn-clear:hover { background: #e0a800; }
+.search-hint { color: rgba(255,255,255,0.9); font-size: 13px; margin-top: 10px; display: flex; gap: 20px; flex-wrap: wrap; }
+/* RESULTADOS */
+.results-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; }
+.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #003366; }
+.results-section h2 { color: #003366; margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.filter-select { padding: 6px 12px; border: 2px solid #003366; border-radius: 6px; font-size: 13px; background: #fff; color: #003366; font-weight: 500; cursor: pointer; transition: all 0.3s ease; width: auto; min-width: 140px; flex-shrink: 0; }
+.filter-select:hover, .filter-select:focus { border-color: #004080; box-shadow: 0 0 0 3px rgba(0,51,102,0.15); outline: none; }
+.table-container { overflow-x: auto; border-radius: 4px; border: 1px solid #e0e0e0; }
+.results-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px; }
+.results-table th { background: #003366; color: white; padding: 14px 12px; text-align: left; font-weight: 600; border: 1px solid #002244; white-space: nowrap; }
+.results-table td { padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
+.results-table tr:nth-child(even) { background: #f8f9fa; }
+.results-table tr:hover { background: #e3f2fd; transition: background 0.2s ease; }
+.btn-view { padding: 8px 16px; background: #003366; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; margin-right: 6px; display: inline-flex; align-items: center; gap: 5px; }
+.btn-view:hover { background: #004080; transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,51,102,0.3); }
+/* BOTONES */
+.btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin-top: 20px; margin-right: 10px; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+.btn-primary { background: #003366; color: white; } .btn-primary:hover { background: #002244; }
+.btn-secondary { background: #6c757d; color: white; } .btn-secondary:hover { background: #5a6268; }
+.btn-success { background: #28a745; color: white; } .btn-success:hover { background: #218838; }
+/* VISTA PREVIA / MODAL */
+.preview-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; text-align: center; }
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 40px 20px; }
+.modal-content { background: white; margin: 0 auto; padding: 35px; border-radius: 8px; max-width: 1500px; width: 95%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+.modal-close { position: absolute; right: 25px; top: 20px; font-size: 32px; font-weight: bold; color: #666; cursor: pointer; transition: all 0.3s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f5f5f5; }
+.modal-close:hover { color: #003366; background: #e0e0e0; transform: rotate(90deg); }
+.ficha-tecnica { border: 2px solid #003366; padding: 25px; background: white; width: 100%; display: inline-block; text-align: left; }
+.ficha-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #003366; }
+.ficha-logo { width: 230px; height: auto; }
+.ficha-title { text-align: center; flex: 1; padding: 0 20px; } 
+.ficha-title h1 { font-size: 15px; color: #003366; font-weight: 700; line-height: 1.4; }
+.ficha-title h2 { font-size: 15px; color: #003366; margin: 6px 0; font-weight: 700; }
+.ficha-title h3 { font-size: 15px; color: #003366; margin-top: 6px; font-weight: 700; }
+.ficha-title h4 { font-size: 15px; color: #003366; margin-top: 6px; font-weight: 700; }
+.ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
+.ficha-table th { background: #4a7c9b; color: white; padding: 12px 10px; text-align: left; font-size: 13px; border: 2px solid #003366; }
+.ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; vertical-align: top; }
+.ficha-table .label { font-weight: 700; background: #f0f0f0; width: 18%; } 
+.ficha-table .value { width: 32%; }
+.fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 15px; }
+.foto-box { border: 2px solid #4a7c9b; height: 140px; background: #4a7c9b; color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.foto-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.observaciones-box { min-height: 260px; border: 2px solid #003366; padding: 12px; background: #fafafa; font-size: 12px; }
+.modal-actions { margin-top: 25px; display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 2px solid #e0e0e0; }
+/* RESPONSIVE */
+@media (max-width: 1200px) { .fotos-container { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { 
+  .results-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .filter-select { width: 100%; min-width: 100%; }
+  .form-row-4, .form-row-3, .form-row-2 { grid-template-columns: 1fr; } 
+  .search-container { flex-direction: column; }
+  .search-input { min-width: 100%; }
+  .btn-search, .btn-clear { width: 100%; justify-content: center; }
+  .ficha-header { flex-direction: column; gap: 15px; }
+  .ficha-title { padding: 0; }
+  .fotos-container { grid-template-columns: 1fr; }
+}
+/* IMPRESIÓN */
 @media print {
-.navbar,
-.module-header,
-.btn,
-.search-section,
-.results-section,
-.modal-actions,
-.modal-close {
-display: none !important;
-}
-.modal {
-position: absolute;
-background: white;
-padding: 0;
-}
-.modal-content {
-margin: 0;
-padding: 0;
-box-shadow: none;
-width: 100%;
-max-width: 100%;
-}
-.ficha-tecnica {
-border: 2px solid #003366;
-padding: 20px;
-}
+  .navbar, .module-header, .btn, .search-section, .results-section, .modal-actions, .modal-close { display: none !important; }
+  .modal { position: absolute; background: white; padding: 0; }
+  .modal-content { margin: 0; padding: 0; box-shadow: none; width: 100%; max-width: 100%; }
+  .ficha-tecnica { border: 2px solid #003366; padding: 20px; }
 }
 </style>
 </head>
 <body class="dashboard-page">
-<!-- ================= BARRA DE NAVEGACIÓN ================= -->
 <nav class="navbar" role="navigation">
-<div class="nav-container">
-<div class="nav-brand">
-<img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-<img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
-</div>
-<div class="nav-user">
-<span class="user-email" id="userEmail">usuario@institucion.com</span>
-<button class="btn-logout" id="logoutBtn">
-<span class="logout-icon">🚪</span>
-<span class="logout-text">Cerrar Sesión</span>
-</button>
-</div>
-</div>
-</nav>
-<!-- ================= CONTENIDO PRINCIPAL ================= -->
-<main class="dashboard-main" role="main">
-<!-- Header con Navegación de Migas -->
-<header class="module-header">
-<div class="breadcrumb">
-<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-<span class="breadcrumb-separator">/</span>
-<a href="ficha.html" class="breadcrumb-link">Ficha Técnica</a>
-<span class="breadcrumb-separator">/</span>
-<span class="breadcrumb-current">Consultar Ficha</span>
-</div>
-<button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">
-← Volver a Ficha Técnica
-</button>
-</header>
-<!-- Título del Módulo -->
-<section class="module-title-section">
-<h1 class="module-title">🔍 Consultar Ficha Técnica de Vehículo</h1>
-<p class="module-subtitle">Busque y visualice las fichas técnicas registradas en el sistema</p>
-</section>
-<div class="container">
-<!-- Sección de Búsqueda -->
-<div class="search-section">
-<h3>🔎 Buscar Vehículo</h3>
-<div id="searchAlert" class="alert"></div>
-<div class="search-container">
-<input
-type="text"
-id="searchInput"
-class="search-input"
-placeholder="Ingrese placa, facsimilar, serial de carrocería, serial de motor o marca..."
-autocomplete="off"
->
-<button class="btn-search" id="btnSearch" onclick="buscarVehiculo()">
-<span>🔍</span><span>Buscar</span>
-</button>
-<button class="btn-clear" onclick="limpiarBusqueda()">
-<span>🔄</span>
-<span>Limpiar</span>
-</button>
-</div>
-<div class="search-hint">
-<span>💡 Busque por:</span>
-<span>🚗 Placa</span>
-<span>📄 Facsimilar</span>
-<span>🔢 Serial Carrocería</span>
-<span>⚙️ Serial Motor</span>
-<span>🏷️ Marca/Modelo</span>
-</div>
-</div>
-<!-- Tabla de Resultados -->
-<div class="results-section">
-<div class="results-header">
-<h2>📋 Resultados de Búsqueda</h2>
-<select id="filterType" class="filter-select" onchange="renderizarListaFichas()">
-<option value="all">📋 Todos</option>
-<option value="MOTO">🏍️ Motos</option>
-<option value="VEHICULO">🚗 Vehículos</option>
-</select>
-</div>
-<div class="table-container">
-<table class="results-table" id="resultsTable">
-<thead>
-<tr>
-<th>Placa</th>
-<th>Marca</th>
-<th>Modelo</th>
-<th>Tipo</th>
-<th>Color</th>
-<th>Estatus</th>
-<th>Dependencia</th>
-<th>Acciones</th>
-</tr>
-</thead>
-<tbody id="resultsBody">
-<tr>
-<td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<!-- Modal de Vista Detallada -->
-<!-- Modal de Vista Detallada -->
-<div id="fichaModal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close" onclick="cerrarModal()">&times;</span>
-    <div class="ficha-tecnica" id="fichaDetalle">
-      <div class="ficha-header">
-        <img src="../img/logo_izquierdo.png" alt="Venezuela" class="ficha-logo" style="width: 230px;" onerror="this.style.display='none'">
-        <div class="ficha-title">
-          <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
-          <h2>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h2>
-          <h3>REDIP OCCIDENTAL</h3>
-          <h4>CCPE ZULIA</h4>
-        </div>
-        <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" style="width: 180px;" onerror="this.style.display='none'">
-      </div>
-      <table class="ficha-table">
-        <tr>
-          <th colspan="5">DATOS DEL VEHICULO</th>
-          <th rowspan="7" style="width: 22%; vertical-align: top; text-align: center;">
-            OBSERVACIONES<br><br>
-            <div class="observaciones-box" id="modalObservaciones"></div>
-          </th>
-        </tr>
-        <tr>
-          <td class="label">MARCA</td>
-          <td id="modalMarca"></td>
-          <td class="label">MODELO</td>
-          <td id="modalModelo"></td>
-          <td class="label">TIPO</td>
-          <td id="modalTipo"></td>
-        </tr>
-        <tr>
-          <td class="label">SERIAL CARROCERIA</td>
-          <td id="modalSerialCarroceria"></td>
-          <td class="label">CLASE</td>
-          <td id="modalClase"></td>
-          <td class="label">COLOR</td>
-          <td id="modalColor"></td>
-        </tr>
-        <tr>
-          <td class="label">PLACA</td>
-          <td id="modalPlaca"></td>
-          <td class="label">FACSIMIL</td>
-          <td id="modalFacsimilar"></td>
-          <td class="label">DEPENDENCIA</td>
-          <td id="modalDependencia"></td>
-        </tr>
-        <tr>
-          <td class="label">SERIAL MOTOR</td>
-          <td id="modalSerialMotor"></td>
-          <td class="label" colspan="3"></td>
-        </tr>
-        <tr>
-          <td class="label">ESTATUS DEL VEHICULO</td>
-          <td colspan="4" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
-        </tr>
-        <tr>
-          <th colspan="5">INFORMACIÓN TECNICO MECANICA</th>
-        </tr>
-        <tr>
-          <td class="label">CAUSA</td>
-          <td colspan="2" id="modalCausa"></td>
-          <td class="label">DIAGNÓSTICO</td>
-          <td colspan="2" id="modalDiagnostico"></td>
-        </tr>
-        <tr>
-          <td class="label">MECANICA</td>
-          <td colspan="2" id="modalMecanica"></td>
-          <td class="label">UBICACIÓN</td>
-          <td colspan="2" id="modalUbicacion"></td>
-        </tr>
-        <tr>
-          <td class="label">TAPICERIA</td>
-          <td id="modalTapiceria"></td>
-          <td class="label">CAUCHOS</td>
-          <td id="modalCauchos"></td>
-          <td class="label">LUCES</td>
-          <td id="modalLuces"></td>
-        </tr>
-        <tr>
-          <th colspan="6">REGISTRO FOTOGRÁFICO</th>
-        </tr>
-        <tr>
-          <td colspan="6">
-            <div class="fotos-container">
-              <div class="foto-box" id="modalBox1">
-                <span>Foto 1</span>
-                <img id="modalImg1" alt="Foto 1">
-              </div>
-              <div class="foto-box" id="modalBox2">
-                <span>Foto 2</span>
-                <img id="modalImg2" alt="Foto 2">
-              </div>
-              <div class="foto-box" id="modalBox3">
-                <span>Foto 3</span>
-                <img id="modalImg3" alt="Foto 3">
-              </div>
-              <div class="foto-box" id="modalBox4">
-                <span>Foto 4</span>
-                <img id="modalImg4" alt="Foto 4">
-              </div>
-            </div>
-          </td>
-        </tr>
-      </table>
+  <div class="nav-container">
+    <div class="nav-brand">
+      <img src="../img/logo.png" alt="Logo" width="35" height="35">
+      <img src="../img/logo_derecho.png" alt="Logo" width="35" height="35">
+      <span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cerrar</button>
-      <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir Ficha</button>
+    <div class="nav-user">
+      <span class="user-email" id="userEmail">Cargando...</span>
+      <button class="btn-logout" id="logoutBtn"> Cerrar Sesión</button>
     </div>
   </div>
-</div>
+</nav>
+
+<main class="dashboard-main">
+  <header class="module-header">
+    <div class="breadcrumb">
+      <a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a> /
+      <a href="ficha.html" class="breadcrumb-link">Ficha Técnica</a> /
+      <span class="breadcrumb-current">Consultar</span>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">← Volver</button>
+  </header>
+  <section class="module-title-section">
+    <h1 class="module-title"> Consultar Ficha Técnica</h1>
+    <p class="module-subtitle">Busque, visualice e imprima las fichas técnicas registradas</p>
+  </section>
+
+  <div class="container">
+    <!-- BÚSQUEDA -->
+    <div class="search-section">
+      <h3>🔎 Buscar Vehículo</h3>
+      <div id="searchAlert" class="alert"></div>
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsimil, serial o marca..." autocomplete="off">
+        <button class="btn-search" id="btnSearch" onclick="buscarVehiculo()"> Buscar</button>
+        <button class="btn-clear" onclick="limpiarBusqueda()">🔄 Limpiar</button>
+      </div>
+      <div class="search-hint">
+        <span>💡 Busque por:</span> <span>🚗 Placa</span> <span> Facsimil</span>
+        <span>🔢 Serial Carrocería</span> <span>⚙️ Serial Motor</span> <span>🏷️ Marca</span>
+      </div>
+    </div>
+
+    <!-- RESULTADOS CON FILTRO -->
+    <div class="results-section">
+      <div class="results-header">
+        <h2>📋 Resultados de Búsqueda</h2>
+        <select id="filterType" class="filter-select" onchange="renderizarListaFichas()">
+          <option value="all">📋 Todos</option>
+          <option value="MOTO">🏍️ Motos</option>
+          <option value="VEHICULO">🚗 Vehículos</option>
+        </select>
+      </div>
+      <div class="table-container">
+        <table class="results-table" id="resultsTable">
+          <thead>
+            <tr>
+              <th>Placa</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Color</th><th>Estatus</th><th>Dependencia</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
+                📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE FICHA TÉCNICA -->
+  <div id="fichaModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="cerrarModal()">&times;</span>
+      <div class="ficha-tecnica" id="fichaDetalle">
+        <div class="ficha-header">
+          <img src="../img/logo_izquierdo.png" alt="Logo" class="ficha-logo">
+          <div class="ficha-title">
+            <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
+            <h2>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h2>
+            <h3>REDIP OCCIDENTAL</h3>
+            <h4>CCPE ZULIA</h4>
+          </div>
+          <img src="../img/logo-juntos.png" alt="Logo" class="ficha-logo" style="width:180px;">
+        </div>
+        <table class="ficha-table">
+          <tr>
+            <th colspan="5">DATOS DEL VEHICULO</th>
+            <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+              OBSERVACIONES<br><br>
+              <div class="observaciones-box" id="modalObservaciones"></div>
+            </th>
+          </tr>
+          <tr>
+            <td class="label">MARCA</td>
+            <td class="value" id="modalMarca"></td>
+            <td class="label">MODELO</td>
+            <td class="value" id="modalModelo"></td>
+            <td class="label">TIPO: <span id="modalTipo"></span></td>
+          </tr>
+          <tr>
+            <td class="label">SERIAL CARROCERIA</td>
+            <td class="value" id="modalSerialCarroceria"></td>
+            <td class="label">CLASE</td>
+            <td class="value" id="modalClase"></td>
+            <td class="label">COLOR: <span id="modalColor"></span></td>
+          </tr>
+          <tr>
+            <td class="label">PLACA</td>
+            <td class="value" id="modalPlaca"></td>
+            <td class="label">FACSIMIL</td>
+            <td class="value" id="modalFacsimilar"></td>
+            <td class="label">DEPENDENCIA:<br><span id="modalDependencia"></span></td>
+          </tr>
+          <tr>
+            <td class="label">SERIAL MOTOR</td>
+            <td class="value" id="modalSerialMotor"></td>
+            <td class="label" colspan="3"></td>
+          </tr>
+          <tr>
+            <td class="label">ESTATUS</td>
+            <td colspan="4" style="text-align:center;font-weight:bold;" id="modalEstatus"></td>
+          </tr>
+          <tr>
+            <th colspan="6">INFORMACIÓN TECNICO MECANICA</th>
+          </tr>
+          <tr>
+            <td class="label">CAUSA</td>
+            <td colspan="2" id="modalCausa"></td>
+            <td class="label">DIAGNÓSTICO</td>
+            <td colspan="2" id="modalDiagnostico"></td>
+          </tr>
+          <tr>
+            <td class="label">MECANICA</td>
+            <td colspan="2" id="modalMecanica"></td>
+            <td class="label">UBICACIÓN</td>
+            <td colspan="2" id="modalUbicacion"></td>
+          </tr>
+          <tr>
+            <td class="label">TAPICERIA</td>
+            <td id="modalTapiceria"></td>
+            <td class="label">CAUCHOS</td>
+            <td id="modalCauchos"></td>
+            <td class="label">LUCES</td>
+            <td id="modalLuces"></td>
+          </tr>
+          <tr>
+            <th colspan="6">REGISTRO FOTOGRÁFICO</th>
+          </tr>
+          <tr>
+            <td colspan="6">
+              <div class="fotos-container">
+                <div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1" alt="Foto 1"></div>
+                <div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2" alt="Foto 2"></div>
+                <div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3" alt="Foto 3"></div>
+                <div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4" alt="Foto 4"></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cerrar</button>
+        <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir Ficha</button>
+      </div>
+    </div>
+  </div>
 </main>
-<!-- ================= SCRIPTS ================= -->
-<!-- 1. Librería de Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<!-- 2. Configuración con credenciales -->
-<script src="../js/config.js" defer></script>
-<!-- 3. Lógica de la página -->
-<script src="../js/ficha-consultar.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/ficha-consultar.js"></script>
 </body>
 </html>
