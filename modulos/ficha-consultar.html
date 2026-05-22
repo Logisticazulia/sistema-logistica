@@ -386,6 +386,50 @@ body {
   .modal-content { margin: 0; padding: 0; box-shadow: none; width: 100%; max-width: 100%; }
   .ficha-tecnica { border: 2px solid #003366; padding: 20px; }
 }
+  /* ================= AJUSTES DE FICHA Y MODAL ================= */
+
+/* 1. Ajuste de anchos de columnas para evitar desborde */
+.ficha-table {
+  table-layout: fixed; /* Mantiene la estructura fija */
+  width: 100%;
+}
+
+/* Etiquetas (Labels) más estrechas */
+.ficha-table td:nth-child(1),
+.ficha-table td:nth-child(3),
+.ficha-table td:nth-child(5),
+.ficha-table th {
+  width: 14%;
+}
+
+/* Valores (Values) más anchos para que quepan los datos */
+.ficha-table td:nth-child(2),
+.ficha-table td:nth-child(4),
+.ficha-table td:nth-child(6) {
+  width: 19.33%;
+}
+
+/* Asegurar que el texto se adapte al espacio */
+.ficha-table td, 
+.ficha-table th {
+  padding: 10px 8px; /* Un poco menos de padding para ganar espacio */
+  font-size: 12px;    /* Fuente ligeramente más compacta */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+/* 2. Acercar los botones a la ficha */
+.ficha-tecnica {
+  margin-bottom: 5px; /* Reducido */
+}
+
+.modal-actions {
+  margin-top: 10px; /* Reducido de 25px a 10px */
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+}
 </style>
 </head>
 <body class="dashboard-page">
