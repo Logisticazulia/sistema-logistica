@@ -185,6 +185,22 @@ set('modalCreadoPor', f.creado_por || 'Sistema');
 window.cerrarModal = () => { document.getElementById('fichaModal').style.display = 'none'; document.body.style.overflow = 'auto'; };
 window.imprimirDesdeTabla = (id) => { verDetalle(id); setTimeout(() => window.print(), 300); };
 window.imprimirFicha = () => window.print();
+// ✅ Llenar footer de impresión
+const printFecha = document.getElementById('printFechaCreacion');
+const printCreador = document.getElementById('printCreadoPor');
+
+if (f.fecha_creacion && printFecha) {
+  const fecha = new Date(f.fecha_creacion);
+  printFecha.textContent = `${fecha.toLocaleDateString('es-VE')} ${fecha.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })}`;
+} else if (printFecha) {
+  printFecha.textContent = '-';
+}
+
+if (f.creado_por && printCreador) {
+  printCreador.textContent = f.creado_por;
+} else if (printCreador) {
+  printCreador.textContent = '-';
+}
 
 function mostrarTablaCargando(mostrar) { const tbody = document.getElementById('resultsBody'); if (tbody && mostrar) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`; }
 
