@@ -84,18 +84,18 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   .fotos-container { grid-template-columns: 1fr; }
 }
 /* =========================================
-   IMPRESIÓN EXACTA (CARTA HORIZONTAL)
+   IMPRESIÓN OPTIMIZADA (1 HOJA CARTA)
    ========================================= */
 @page {
-  size: letter landscape;
+  size: letter portrait;
   margin: 10mm;
 }
 @media print {
-  /* Ocultar toda la interfaz excepto la ficha */
-  .navbar, .module-header, .search-section, .results-section, .modal-close, .modal-actions, .breadcrumb, .btn {
+  /* Ocultar interfaz no necesaria */
+  .navbar, .module-header, .search-section, .results-section, .modal-close, .modal-actions, .module-title-section, .breadcrumb, .btn {
     display: none !important;
   }
-  /* Forzar visualización del modal sin fondos ni sombras */
+  /* Forzar visualización del modal */
   .modal {
     position: static !important;
     background: transparent !important;
@@ -110,22 +110,53 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     max-width: 100% !important;
     background: white !important;
   }
-  /* Asegurar que la ficha técnica se vea idéntica */
+  /* Ficha técnica compacta */
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 15px !important;
+    padding: 12px !important;
     page-break-inside: avoid;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* Forzar colores de tabla y fondos en impresión */
-  .ficha-table th { background: #4a7c9b !important; color: #fff !important; }
-  .ficha-table .label { background: #f0f0f0 !important; }
-  .foto-box { background: #4a7c9b !important; border-color: #4a7c9b !important; }
-  .observaciones-box { background: #fafafa !important; border-color: #003366 !important; }
-  /* Ajustar tamaño de fuente para papel */
-  .ficha-title h1, .ficha-title h2, .ficha-title h3 { font-size: 13px; }
-  .ficha-table td, .ficha-table .label { font-size: 11px; }
+  /* Logos lado a lado obligatorios */
+  .ficha-header {
+    flex-wrap: nowrap !important;
+    gap: 15px !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 10px !important;
+  }
+  .ficha-logo, .ficha-logo-right {
+    width: 100px !important;
+    height: auto !important;
+  }
+  .ficha-title { padding: 0 15px !important; }
+  .ficha-title h1, .ficha-title h2, .ficha-title h3, .ficha-title h4 {
+    font-size: 10px !important;
+    margin: 2px 0 !important;
+    line-height: 1.2 !important;
+  }
+  /* Tabla compacta */
+  .ficha-table th, .ficha-table td {
+    font-size: 10px !important;
+    padding: 5px 4px !important;
+  }
+  .ficha-table .label { width: 18% !important; }
+  .observaciones-box {
+    min-height: 110px !important;
+    font-size: 10px !important;
+  }
+  /* Imágenes más pequeñas para caber en 1 hoja */
+  .fotos-container {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    margin-top: 8px !important;
+  }
+  .foto-box {
+    height: 70px !important;
+    font-size: 10px !important;
+  }
+  /* Ocultar fila de fecha/usuario si causa desborde */
+  .ficha-table tr:last-child { display: none; }
 }
 </style>
 </head>
@@ -139,7 +170,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
     <div class="nav-user">
       <span class="user-email" id="userEmail">Cargando...</span>
-      <button class="btn-logout" id="logoutBtn"> Cerrar Sesión</button>
+      <button class="btn-logout" id="logoutBtn">🚪 Cerrar Sesión</button>
     </div>
   </div>
 </nav>
@@ -161,7 +192,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   <div class="container">
     <!-- BÚSQUEDA -->
     <div class="search-section">
-      <h3> Buscar Vehículo</h3>
+      <h3>🔎 Buscar Vehículo</h3>
       <div id="searchAlert" class="alert"></div>
       <div class="search-container">
         <input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsimil, serial o marca..." autocomplete="off">
@@ -174,10 +205,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       </div>
     </div>
 
-    <!-- RESULTADOS CON FILTRO COMPACTO -->
+    <!-- RESULTADOS CON FILTRO -->
     <div class="results-section">
       <div class="results-header">
-        <h2>📋 Resultados de Búsqueda</h2>
+        <h2> Resultados de Búsqueda</h2>
         <select id="filterType" class="filter-select" onchange="renderizarListaFichas()">
           <option value="all">📋 Todos</option>
           <option value="MOTO">🏍️ Motos</option>
@@ -194,7 +225,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           <tbody id="resultsBody">
             <tr>
               <td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">
-                 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
+                📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.
               </td>
             </tr>
           </tbody>
@@ -203,7 +234,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     </div>
   </div>
 
-  <!-- MODAL DE FICHA TÉCNICA (Estructura idéntica a ficha-crear) -->
+  <!-- MODAL DE FICHA TÉCNICA -->
   <div id="fichaModal" class="modal">
     <div class="modal-content">
       <span class="modal-close" onclick="cerrarModal()">&times;</span>
