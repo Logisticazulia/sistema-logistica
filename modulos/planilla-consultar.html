@@ -88,6 +88,32 @@
 .nav-logo { object-fit: contain; }
 .nav-logo-large { width: 50px !important; height: 50px !important; object-fit: contain; }
 .filter-select:disabled { background-color: #e9ecef; cursor: not-allowed; opacity: 0.7; border-color: #ced4da; }
+  /* 🔹 Ajustes para PDF en 1 hoja */
+.pdf-compact .modal-header h2 { font-size: 1.1rem !important; }
+.pdf-compact .ficha-logo img { max-width: 90px !important; }
+.pdf-compact .ficha-grid {
+    gap: 6px !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+.pdf-compact .ficha-field {
+    padding: 5px 8px !important;
+    border-left-width: 3px !important;
+}
+.pdf-compact .ficha-field label {
+    font-size: 0.6rem !important;
+    margin-bottom: 2px !important;
+}
+.pdf-compact .ficha-field span {
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+}
+.pdf-compact .ficha-observacion {
+    padding: 6px 8px !important;
+}
+.pdf-compact .ficha-observacion label,
+.pdf-compact .ficha-observacion span {
+    font-size: 0.7rem !important;
+}
 </style>
 </head>
 <body class="dashboard-page">
