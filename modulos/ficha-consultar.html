@@ -95,11 +95,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - LETRAS TAMAÑO 12 ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL - LETRAS MÁS PEQUEÑAS ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 3mm;
+    margin: 4mm;
   }
   
   /* Ocultar elementos de interfaz */
@@ -157,44 +157,44 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   /* Ficha ocupando toda la hoja */
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 10px !important;
+    padding: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-header {
-    margin-bottom: 8px !important;
-    padding-bottom: 6px !important;
+    margin-bottom: 6px !important;
+    padding-bottom: 5px !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-logo {
-    width: 90px !important;
+    width: 80px !important;
   }
   
   .ficha-title h1 {
-    font-size: 12pt !important;
+    font-size: 9pt !important;
     line-height: 1.1 !important;
   }
   
   .ficha-title h2 {
-    font-size: 14pt !important;
+    font-size: 11pt !important;
     margin: 2px 0 !important;
   }
   
   .ficha-title h3 {
-    font-size: 12pt !important;
+    font-size: 9pt !important;
   }
   
-  /* Tabla con letras tamaño 12 */
+  /* Tabla con letras más pequeñas */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
     page-break-inside: avoid !important;
-    margin: 6px 0 !important;
-    font-size: 12pt !important;
+    margin: 5px 0 !important;
+    font-size: 9pt !important;
     display: table !important;
   }
   
@@ -216,10 +216,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .ficha-table th, 
   .ficha-table td {
-    border: 2px solid #003366 !important;
-    padding: 4px 4px !important;
-    font-size: 12pt !important;
-    line-height: 1.2 !important;
+    border: 1px solid #003366 !important;
+    padding: 3px 3px !important;
+    font-size: 9pt !important;
+    line-height: 1.1 !important;
     vertical-align: middle !important;
     word-wrap: break-word !important;
     display: table-cell !important;
@@ -229,7 +229,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     background: #4a7c9b !important;
     color: white !important;
     font-weight: 700 !important;
-    font-size: 12pt !important;
+    font-size: 9pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
@@ -244,32 +244,32 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   }
   
   .observaciones-cell {
-    font-size: 12pt !important;
-    line-height: 1.2 !important;
-    padding: 4px !important;
+    font-size: 9pt !important;
+    line-height: 1.1 !important;
+    padding: 3px !important;
   }
   
   .observaciones-box {
-    min-height: 140px !important;
-    font-size: 12pt !important;
-    line-height: 1.2 !important;
-    border: 2px solid #003366 !important;
-    padding: 4px !important;
+    min-height: 120px !important;
+    font-size: 9pt !important;
+    line-height: 1.1 !important;
+    border: 1px solid #003366 !important;
+    padding: 3px !important;
   }
   
-  /* Fotos - MANTENER TAMAÑO ACTUAL (180px) */
+  /* Fotos - MANTENER TAMAÑO (180px) */
   .fotos-container {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 6px !important;
+    gap: 5px !important;
     page-break-inside: avoid !important;
-    margin-top: 8px !important;
+    margin-top: 6px !important;
     height: 180px !important;
   }
   
   .foto-box {
     height: 100% !important;
-    border: 2px solid #4a7c9b !important;
+    border: 1px solid #4a7c9b !important;
     page-break-inside: avoid !important;
   }
   
