@@ -81,6 +81,34 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 @media (max-width: 1200px) { .fotos-container { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) { .container { padding: 15px; } .search-container { flex-direction: column; } .search-input { min-width: 100%; } .btn-search, .btn-clear { width: 100%; justify-content: center; } .ficha-header { flex-direction: column; gap: 15px; } .ficha-title { padding: 0; } .fotos-container { grid-template-columns: 1fr; } }
 @media print { .navbar, .module-header, .btn, .search-section, .results-section, .modal-actions, .modal-close { display: none !important; } .modal { position: absolute; background: white; padding: 0; } .modal-content { margin: 0; padding: 0; box-shadow: none; width: 100%; max-width: 100%; } .ficha-tecnica { border: 2px solid #003366; padding: 20px; } }
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #003366;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.results-header h2 {
+  color: #003366;
+  margin: 0;
+  padding: 0; /* Quita el borde original del h2 */
+}
+.filter-select-compact {
+  padding: 5px 10px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #f8f9fa;
+  cursor: pointer;
+  min-width: 145px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.filter-select-compact:hover { border-color: #003366; background: #fff; }
+.filter-select-compact:focus { outline: none; border-color: #003366; box-shadow: 0 0 0 2px rgba(0,51,102,0.15); }
 </style>
 </head>
 <body class="dashboard-page">
@@ -108,14 +136,27 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 <div class="search-hint"><span>💡 Busque por:</span><span>🚗 Placa</span><span>📄 Facsimilar</span><span>🔢 Serial Carrocería</span><span>⚙️ Serial Motor</span><span>🏷️ Marca/Modelo</span></div>
 </div>
 <div class="results-section">
-<h2>📋 Resultados de Búsqueda</h2>
-<div class="filter-controls">
-<label for="tipoFilter">Filtrar por tipo:</label>
-<select id="tipoFilter" class="filter-select" onchange="aplicarFiltroYPaginacion()">
-<option value="todos">🌐 Todos</option>
-<option value="motos">🏍️ Motos</option>
-<option value="vehiculos">🚗 Vehículos</option>
-</select>
+  <div class="results-header">
+    <h2>📋 Resultados de Búsqueda</h2>
+    <select id="tipoFilter" class="filter-select-compact" onchange="aplicarFiltroYPaginacion()">
+      <option value="todos">🌐 Todos</option>
+      <option value="motos">🏍️ Motos</option>
+      <option value="vehiculos">🚗 Vehículos</option>
+    </select>
+  </div>
+  <div class="table-container">
+    <table class="results-table" id="resultsTable">
+      <thead>
+        <tr>
+          <th>Placa</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Color</th><th>Estatus</th><th>Dependencia</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody">
+        <tr><td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">📭 Realice una búsqueda para ver los resultados</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="paginationControls" class="pagination-controls"></div>
 </div>
 <div class="table-container">
 <table class="results-table" id="resultsTable">
