@@ -228,78 +228,117 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 </main>
 
 <!-- MODAL DE FICHA TÉCNICA -->
+<!-- Modal de Vista Detallada -->
 <div id="fichaModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="cerrarModal()">&times;</span>
-        <!-- ✅ ESTRUCTURA IDÉNTICA A FICHA-CREAR -->
-        <div class="ficha-tecnica" id="fichaDetalle">
-            <div class="ficha-header">
-                <img src="../img/logo_izquierdo.png" alt="Logo" class="ficha-logo-left">
-                <div class="ficha-title">
-                    <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
-                    <h2>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h2>
-                    <h3>REDIP OCCIDENTAL</h3>
-                    <h4>CCPE ZULIA</h4>
-                </div>
-                <img src="../img/logo-juntos.png" alt="Logo" class="ficha-logo-right">
+  <div class="modal-content">
+    <span class="modal-close" onclick="cerrarModal()">&times;</span>
+    <div class="ficha-tecnica" id="fichaDetalle">
+      <div class="ficha-header">
+        <img src="../img/logo_izquierdo.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
+        <div class="ficha-title">
+          <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
+          <h2>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h2>
+          <h3>REDIP OCCIDENTAL</h3>
+          <h4>CCPE ZULIA</h4>
+        </div>
+        <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
+      </div>
+      <table class="ficha-table">
+        <tr>
+          <th colspan="5">DATOS DEL VEHICULO</th>
+          <th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+            OBSERVACIONES<br><br>
+            <div class="observaciones-box" id="modalObservaciones"></div>
+          </th>
+        </tr>
+        <tr>
+          <td class="label">MARCA</td>
+          <td class="value" id="modalMarca"></td>
+          <td class="label">MODELO</td>
+          <td class="value" id="modalModelo"></td>
+          <td class="label">TIPO</td>
+          <td class="value" id="modalTipo"></td>
+        </tr>
+        <tr>
+          <td class="label">SERIAL CARROCERIA</td>
+          <td class="value" id="modalSerialCarroceria"></td>
+          <td class="label">CLASE</td>
+          <td class="value" id="modalClase"></td>
+          <td class="label">COLOR</td>
+          <td class="value" id="modalColor"></td>
+        </tr>
+        <tr>
+          <td class="label">PLACA</td>
+          <td class="value" id="modalPlaca"></td>
+          <td class="label">FACSIMIL</td>
+          <td class="value" id="modalFacsimilar"></td>
+          <td class="label">DEPENDENCIA</td>
+          <td class="value" id="modalDependencia"></td>
+        </tr>
+        <tr>
+          <td class="label">SERIAL MOTOR</td>
+          <td class="value" id="modalSerialMotor"></td>
+          <td class="label" colspan="3"></td>
+        </tr>
+        <tr>
+          <td class="label">ESTATUS DEL VEHICULO</td>
+          <td colspan="4" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
+        </tr>
+        <tr>
+          <th colspan="6">INFORMACIÓN TECNICO MECANICA</th>
+        </tr>
+        <tr>
+          <td class="label">CAUSA</td>
+          <td colspan="2" id="modalCausa"></td>
+          <td class="label">DIAGNÓSTICO</td>
+          <td colspan="2" id="modalDiagnostico"></td>
+        </tr>
+        <tr>
+          <td class="label">MECANICA</td>
+          <td colspan="2" id="modalMecanica"></td>
+          <td class="label">UBICACIÓN</td>
+          <td colspan="2" id="modalUbicacion"></td>
+        </tr>
+        <tr>
+          <td class="label">TAPICERIA</td>
+          <td id="modalTapiceria"></td>
+          <td class="label">CAUCHOS</td>
+          <td id="modalCauchos"></td>
+          <td class="label">LUCES</td>
+          <td id="modalLuces"></td>
+        </tr>
+        <tr>
+          <th colspan="6">REGISTRO FOTOGRÁFICO</th>
+        </tr>
+        <tr>
+          <td colspan="6">
+            <div class="fotos-container">
+              <div class="foto-box" id="modalBox1">
+                <span>Foto 1</span>
+                <img id="modalImg1" alt="Foto 1">
+              </div>
+              <div class="foto-box" id="modalBox2">
+                <span>Foto 2</span>
+                <img id="modalImg2" alt="Foto 2">
+              </div>
+              <div class="foto-box" id="modalBox3">
+                <span>Foto 3</span>
+                <img id="modalImg3" alt="Foto 3">
+              </div>
+              <div class="foto-box" id="modalBox4">
+                <span>Foto 4</span>
+                <img id="modalImg4" alt="Foto 4">
+              </div>
             </div>
-            <table class="ficha-table">
-                <tr><th colspan="5">DATOS DEL VEHICULO</th><th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">OBSERVACIONES<br><br><div class="observaciones-box" id="modalObservaciones"></div></th></tr>
-                <tr>
-                    <td class="label">MARCA</td><td class="value" id="modalMarca"></td>
-                    <td class="label">MODELO</td><td class="value" id="modalModelo"></td>
-                    <td class="label">TIPO</td><td class="value" id="modalTipo"></td>
-                </tr>
-                <tr>
-                    <td class="label">SERIAL CARROCERIA</td><td class="value" id="modalSerialCarroceria"></td>
-                    <td class="label">CLASE</td><td class="value" id="modalClase"></td>
-                    <td class="label">COLOR</td><td class="value" id="modalColor"></td>
-                </tr>
-                <tr>
-                    <td class="label">PLACA</td><td class="value" id="modalPlaca"></td>
-                    <td class="label">FACSIMIL</td><td class="value" id="modalFacsimilar"></td>
-                    <td class="label">DEPENDENCIA</td><td class="value" id="modalDependencia"></td>
-                </tr>
-                <tr>
-                    <td class="label">SERIAL MOTOR</td><td class="value" id="modalSerialMotor"></td>
-                    <td class="label" colspan="3"></td>
-                </tr>
-                <tr>
-                    <td class="label">ESTATUS DEL VEHICULO</td><td colspan="4" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td>
-                </tr>
-                <tr><th colspan="6">INFORMACIÓN TECNICO MECANICA</th></tr>
-                <tr>
-                    <td class="label">CAUSA</td><td colspan="2" id="modalCausa"></td>
-                    <td class="label">DIAGNÓSTICO</td><td colspan="2" id="modalDiagnostico"></td>
-                </tr>
-                <tr>
-                    <td class="label">MECANICA</td><td colspan="2" id="modalMecanica"></td>
-                    <td class="label">UBICACIÓN</td><td colspan="2" id="modalUbicacion"></td>
-                </tr>
-                <tr>
-                    <td class="label">TAPICERIA</td><td id="modalTapiceria"></td>
-                    <td class="label">CAUCHOS</td><td id="modalCauchos"></td>
-                    <td class="label">LUCES</td><td id="modalLuces"></td>
-                </tr>
-                <tr><th colspan="6">REGISTRO FOTOGRÁFICO</th></tr>
-                <tr><td colspan="6">
-                    <div class="fotos-container">
-                        <div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1"></div>
-                        <div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2"></div>
-                        <div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3"></div>
-                        <div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4"></div>
-                    </div>
-                </td></tr>
-                <tr><td colspan="6" style="text-align: right; font-size: 12px; padding-top: 15px; color: #666;">
-                    <strong>Fecha:</strong> <span id="modalFechaCreacion"></span> | <strong>Usuario:</strong> <span id="modalCreadoPor"></span>
-                </td></tr>
-            </table>
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cerrar</button>
-            <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir Ficha</button>
-        </div>
+          </td>
+        </tr>
+      </table>
     </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cerrar</button>
+      <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir Ficha</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
