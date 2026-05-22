@@ -172,7 +172,11 @@ window.verDetalle = (id) => {
   if (f.fecha_creacion) { const d = new Date(f.fecha_creacion); set('modalFechaCreacion', `${d.toLocaleDateString('es-VE')} ${d.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`); }
   for (let i = 1; i <= 4; i++) {
     const url = f[`foto${i}_url`] || f[`foto${i}`] || ''; const img = document.getElementById(`modalImg${i}`); const box = document.getElementById(`modalBox${i}`); const span = box?.querySelector('span');
-    if (img && box && span) { if (url && url.startsWith('http')) { img.src = url; img.style.display = 'block'; span.style.display = 'none'; } else { img.style.display = 'none'; span.style.display = 'block'; } }
+    if (img && box && span) { if (url && url.startsWith('http')) { img.src = url; img.style.display = 'block'; span.style.display = 'none'; } else { img.style.display = 'none'; span.style.display = 'block'; } }if (f.fecha_creacion) {
+  const date = new Date(f.fecha_creacion);
+  set('modalFechaCreacion', `${date.toLocaleDateString('es-VE')} ${date.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`);
+}
+set('modalCreadoPor', f.creado_por || 'Sistema');
   }
   document.getElementById('fichaModal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
