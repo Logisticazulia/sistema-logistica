@@ -152,6 +152,64 @@
     font-size: 8pt !important;
     line-height: 1.2 !important;
 }
+  /*  Estilos para el PDF (Diseño de 2 columnas compacto) */
+.pdf-export-mode {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 8px 15px; /* Espacio vertical 8px, horizontal 15px */
+    font-size: 10px !important; /* Letra pequeña para que quepa */
+    color: #333;
+}
+
+.pdf-export-mode .ficha-field {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 3px 0;
+    background: #fff; /* Fondo blanco para que no se vea gris en el PDF */
+}
+
+.pdf-export-mode .ficha-field label {
+    font-weight: bold;
+    color: #003366;
+    flex: 0 0 40%; /* La etiqueta ocupa el 40% */
+}
+
+.pdf-export-mode .ficha-field span {
+    text-align: right;
+    flex: 1;
+    color: #000;
+}
+
+/* El campo de Observación ocupa todo el ancho */
+.pdf-export-mode .ficha-field.full-width {
+    grid-column: span 2;
+    flex-direction: column;
+    border: none;
+    background: #f9f9f9;
+    padding: 5px;
+}
+.pdf-export-mode .ficha-field.full-width label {
+    width: 100%;
+    margin-bottom: 2px;
+}
+.pdf-export-mode .ficha-field.full-width span {
+    text-align: left;
+    font-style: italic;
+}
+
+/* Header del PDF (Logos y Título) */
+.pdf-header {
+    grid-column: span 2;
+    text-align: center;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #003366;
+    padding-bottom: 5px;
+}
+.pdf-header img {
+    height: 50px; /* Controla el tamaño de los logos */
+    margin: 0 10px;
+}
 </style>
 </head>
 <body class="dashboard-page">
