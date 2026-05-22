@@ -86,6 +86,7 @@ function populateFilters() {
 }
 
 // Buscar por Placa o Facsímil
+// Buscar por Placa, Facsímil, Seriales o Número de Identificación
 function buscarPorPlacaFacsímil() {
     if (!searchInput) getDOMElements();
     const searchTerm = searchInput ? searchInput.value.trim().toUpperCase() : '';
@@ -93,22 +94,22 @@ function buscarPorPlacaFacsímil() {
         aplicarFiltros();
         return;
     }
-    console.log('Búsqueda por placa/facsímil/seriales:', searchTerm);
+    console.log('Búsqueda por placa/facsímil/seriales/identificación:', searchTerm);
     filteredVehicles = allVehicles.filter(v => {
-        const placaMatch = v.placa && v.placa.trim().toUpperCase().includes(searchTerm);
-        const facsimilMatch = v.facsimil && v.facsimil.trim().toUpperCase().includes(searchTerm);
-        // 🔹 NUEVO: Búsqueda por serial de carrocería
-        const carroceriaMatch = v.s_carroceria && v.s_carroceria.trim().toUpperCase().includes(searchTerm);
-        // 🔹 NUEVO: Búsqueda por serial de motor
-        const motorMatch = v.s_motor && v.s_motor.trim().toUpperCase().includes(searchTerm);
-        return placaMatch || facsimilMatch || carroceriaMatch || motorMatch;
+        const placaMatch = v.placa && v.placa.toString().trim().toUpperCase().includes(searchTerm);
+        const facsimilMatch = v.facsimil && v.facsimil.toString().trim().toUpperCase().includes(searchTerm);
+        const carroceriaMatch = v.s_carroceria && v.s_carroceria.toString().trim().toUpperCase().includes(searchTerm);
+        const motorMatch = v.s_motor && v.s_motor.toString().trim().toUpperCase().includes(searchTerm);
+        // 🔹 NUEVO: Búsqueda por número de identificación
+        const nIdentificacionMatch = v.n_identificacion && v.n_identificacion.toString().trim().toUpperCase().includes(searchTerm);
+
+        return placaMatch || facsimilMatch || carroceriaMatch || motorMatch || nIdentificacionMatch;
     });
     console.log(`Vehículos encontrados: ${filteredVehicles.length}`);
     currentPage = 1;
     renderTable();
     renderPagination();
 }
-
 // Permitir buscar con Enter
 function setupSearchEnter() {
     if (searchInput) {
