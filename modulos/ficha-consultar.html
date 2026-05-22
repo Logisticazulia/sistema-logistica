@@ -95,191 +95,125 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - LETRAS MÁS PEQUEÑAS ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL - CENTRADA Y AJUSTADA ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 4mm;
+    margin: 10mm;
   }
   
-  /* Ocultar elementos de interfaz */
-  .navbar, 
-  .module-header, 
-  .search-section, 
-  .results-section,
-  .modal-close, 
-  .btn, 
-  .pagination-container, 
-  .module-title-section,
-  .container > *:not(#fichaModal) {
-    display: none !important;
-  }
+  /* Ocultar toda la interfaz */
+  .navbar, .module-header, .search-section, .results-section,
+  .pagination-container, .module-title-section, .modal-close, .modal-actions,
+  .btn { display: none !important; }
   
-  /* Reset body para impresión */
-  html, body {
-    width: 100% !important;
-    height: auto !important;
+  /* Resetear body para impresión */
+  body {
     margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
     background: white !important;
-    zoom: 1 !important;
+    overflow: visible !important;
   }
   
-  /* Modal a pantalla completa */
+  /* Mostrar y CENTRAR el modal */
   #fichaModal {
     display: block !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
+    position: relative !important;
     width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
     background: white !important;
     padding: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
-    z-index: 99999 !important;
   }
   
   .modal-content {
-    margin: 0 !important;
-    padding: 3mm !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    margin: 0 auto !important; /* CENTRADO */
+    padding: 0 !important;
+    width: 95% !important;
+    max-width: 1050px !important; /* Ancho óptimo para carta horizontal */
     box-shadow: none !important;
     background: white !important;
   }
   
-  .modal-close, .modal-actions {
-    display: none !important;
-  }
-  
-  /* Ficha ocupando toda la hoja */
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 8px !important;
+    padding: 12px !important;
     width: 100% !important;
-    box-sizing: border-box !important;
-    page-break-inside: avoid !important;
+    box-sizing: border-box;
   }
   
   .ficha-header {
-    margin-bottom: 6px !important;
-    padding-bottom: 5px !important;
-    page-break-inside: avoid !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 3px solid #003366 !important;
   }
   
-  .ficha-logo {
-    width: 80px !important;
-  }
+  .ficha-logo { width: 85px !important; }
+  .ficha-title h1 { font-size: 11pt !important; line-height: 1.2; }
+  .ficha-title h2 { font-size: 13pt !important; margin: 2px 0; }
+  .ficha-title h3 { font-size: 11pt !important; }
   
-  .ficha-title h1 {
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-  }
-  
-  .ficha-title h2 {
-    font-size: 11pt !important;
-    margin: 2px 0 !important;
-  }
-  
-  .ficha-title h3 {
-    font-size: 9pt !important;
-  }
-  
-  /* Tabla con letras más pequeñas */
+  /* Tabla ligeramente más grande pero controlada */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
-    page-break-inside: avoid !important;
-    margin: 5px 0 !important;
-    font-size: 9pt !important;
-    display: table !important;
+    margin: 8px 0 !important;
+    font-size: 10pt !important;
   }
   
-  .ficha-table colgroup {
-    display: table-column-group !important;
-  }
-  
-  .ficha-table col.col-label {
-    width: 11% !important;
-  }
-  
-  .ficha-table col.col-value {
-    width: 14% !important;
-  }
-  
-  .ficha-table col.col-obs {
-    width: 28% !important;
-  }
-  
-  .ficha-table th, 
-  .ficha-table td {
-    border: 1px solid #003366 !important;
-    padding: 3px 3px !important;
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
+  .ficha-table th, .ficha-table td {
+    border: 2px solid #003366 !important;
+    padding: 5px 4px !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
     vertical-align: middle !important;
     word-wrap: break-word !important;
-    display: table-cell !important;
   }
   
   .ficha-table th {
     background: #4a7c9b !important;
     color: white !important;
     font-weight: 700 !important;
-    font-size: 9pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
   
   .ficha-table .label {
     background: #f0f0f0 !important;
-    font-weight: 700 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
   
-  .observaciones-cell {
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-    padding: 3px !important;
-  }
+  .observaciones-cell { font-size: 10pt !important; padding: 5px !important; }
   
-  .observaciones-box {
-    min-height: 120px !important;
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-    border: 1px solid #003366 !important;
-    padding: 3px !important;
-  }
-  
-  /* Fotos - MANTENER TAMAÑO (180px) */
   .fotos-container {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 5px !important;
-    page-break-inside: avoid !important;
-    margin-top: 6px !important;
-    height: 180px !important;
+    gap: 6px !important;
+    margin-top: 8px !important;
+    height: 150px !important;
   }
   
-  .foto-box {
-    height: 100% !important;
-    border: 1px solid #4a7c9b !important;
-    page-break-inside: avoid !important;
+  .foto-box { height: 100% !important; border: 2px solid #4a7c9b !important; }
+  .foto-box img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+  
+  /* ✅ FOOTER DE IMPRESIÓN (FECHA Y CREADOR) */
+  .print-footer {
+    display: block !important;
+    text-align: center !important;
+    font-size: 10pt !important;
+    color: #222 !important;
+    margin-top: 12px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #aaa !important;
+    font-weight: 500 !important;
   }
   
-  .foto-box img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-  }
+  /* Ocultar fila original de fecha/creador en la tabla al imprimir */
+  #fichaTable tr:last-child { display: none !important; }
   
-  /* Forzar colores en todos los navegadores */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -372,7 +306,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       </div>
     </div>
   </div>
-  
+  <!-- ✅ FOOTER SOLO PARA IMPRESIÓN -->
+<div class="print-footer" id="printFooter" style="display:none;">
+  <strong>Fecha de Creación:</strong> <span id="printFechaCreacion"></span> &nbsp;|&nbsp;
+  <strong>Creado por:</strong> <span id="printCreadoPor"></span>
+</div>
   <!-- ================= MODAL ================= -->
   <div id="fichaModal" class="modal">
     <div class="modal-content">
