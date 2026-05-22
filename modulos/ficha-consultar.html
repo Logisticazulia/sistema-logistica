@@ -95,11 +95,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - LETRAS MÁS PEQUEÑAS ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL - CENTRADO Y AJUSTADO ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 4mm;
+    margin: 5mm;
   }
   
   /* Ocultar elementos de interfaz */
@@ -126,26 +126,24 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     zoom: 1 !important;
   }
   
-  /* Modal a pantalla completa */
+  /* Modal centrado en la página */
   #fichaModal {
     display: block !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
+    position: relative !important;
     width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
     background: white !important;
-    padding: 0 !important;
+    padding: 10mm 0 !important; /* Espacio vertical para centrar */
     margin: 0 !important;
     overflow: visible !important;
     z-index: 99999 !important;
   }
   
   .modal-content {
-    margin: 0 !important;
-    padding: 3mm !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    margin: 0 auto !important; /* ✅ CENTRADO HORIZONTAL */
+    padding: 4mm !important;
+    width: 95% !important;
+    max-width: 1050px !important; /* ✅ Ancho óptimo para carta horizontal */
     box-shadow: none !important;
     background: white !important;
   }
@@ -154,23 +152,23 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     display: none !important;
   }
   
-  /* Ficha ocupando toda la hoja */
+  /* Ficha ajustada */
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 8px !important;
+    padding: 10px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-header {
-    margin-bottom: 6px !important;
-    padding-bottom: 5px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 6px !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-logo {
-    width: 80px !important;
+    width: 85px !important;
   }
   
   .ficha-title h1 {
@@ -187,13 +185,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     font-size: 9pt !important;
   }
   
-  /* Tabla con letras más pequeñas */
+  /* Tabla con letras pequeñas */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
     page-break-inside: avoid !important;
-    margin: 5px 0 !important;
+    margin: 6px 0 !important;
     font-size: 9pt !important;
     display: table !important;
   }
