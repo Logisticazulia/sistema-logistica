@@ -25,15 +25,15 @@ async function buscarFichas() {
   console.log('🔍 Buscando fichas técnicas:', searchTerm);
   mostrarAlerta('⏳ Buscando en base de datos...', 'info');
 
-  const btnSearch = document.getElementById('btnSearch');
+  const btnSearch = document.querySelector('.btn-search');
   if(btnSearch) btnSearch.disabled = true;
 
   try {
-    // Búsqueda case-insensitive con ilike y alineada a columnas del CSV
+    // Búsqueda case-insensitive con ilike en todos los campos relevantes del CSV
     const { data, error } = await supabaseClient
       .from('fichas_tecnicas')
       .select('*')
-      .or(`placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%`)
+      .or(`placa.ilike.%${searchTerm}%,facsimil.ilike.%${searchTerm}%,s_carroceria.ilike.%${searchTerm}%,s_motor.ilike.%${searchTerm}%,marca.ilike.%${searchTerm}%,modelo.ilike.%${searchTerm}%`)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -86,7 +86,7 @@ function limpiarBusqueda() {
 }
 
 // ============================================
-// RENDERIZAR TABLA DE RESULTADOS
+// RENDERIZAR TABLA DE RESULTADOS (sincronizado con HTML)
 // ============================================
 function renderizarTablaResultados() {
   const tbody = document.getElementById('resultsBody');
@@ -110,8 +110,8 @@ function renderizarTablaResultados() {
           border-radius: 12px; 
           font-size: 12px; 
           font-weight: 600;
-          background: ${ficha.estatus_ficha === 'OPERATIVO' ? '#d4edda' : ficha.estatus_ficha === 'INOPERATIVO' ? '#f8d7da' : '#fff3cd'};
-          color: ${ficha.estatus_ficha === 'OPERATIVO' ? '#155724' : ficha.estatus_ficha === 'INOPERATIVO' ? '#721c24' : '#856404'};
+          background: ${ficha.estatus_ficha === 'OPERATIVO' ? '#d4edda' : ficha.estatus_ficha === 'INOPERATIVO' ? '#f8d7da' : ficha.estatus_ficha === 'DESINCORPORADO' ? '#6c757d' : '#fff3cd'};
+          color: ${ficha.estatus_ficha === 'OPERATIVO' ? '#155724' : ficha.estatus_ficha === 'INOPERATIVO' ? '#721c24' : ficha.estatus_ficha === 'DESINCORPORADO' ? '#fff' : '#856404'};
         ">
           ${ficha.estatus_ficha || 'N/A'}
         </span>
@@ -138,7 +138,7 @@ function seleccionarFicha(id) {
 }
 
 function mostrarFichaDetalle(ficha) {
-  // Mapeo exacto a los IDs del HTML del modal
+  // Rellenar cada campo del modal usando los IDs exactos del HTML
   document.getElementById('modalMarca').textContent = ficha.marca || 'N/A';
   document.getElementById('modalModelo').textContent = ficha.modelo || 'N/A';
   document.getElementById('modalTipo').textContent = ficha.tipo || 'N/A';
@@ -169,20 +169,24 @@ function mostrarFichaDetalle(ficha) {
     const imgUrl = ficha[`foto${i}_url`];
     const imgEl = document.getElementById(`modalImg${i}`);
     const boxEl = document.getElementById(`modalBox${i}`);
-    const placeholder = boxEl.querySelector('span');
+    const placeholder = boxEl?.querySelector('span');
     
-    if (imgUrl && imgUrl.trim() !== '') {
+    if (imgUrl && imgUrl.trim() !== '' && placeholder) {
       imgEl.src = imgUrl;
       imgEl.style.display = 'block';
       imgEl.onerror = function() {
         this.style.display = 'none';
-        placeholder.style.display = 'block';
-        placeholder.textContent = `Foto ${i} (no disponible)`;
+        if(placeholder) {
+          placeholder.style.display = 'block';
+          placeholder.textContent = `Foto ${i} (no disponible)`;
+        }
       };
-      placeholder.style.display = 'none';
-    } else {
-      imgEl.src = '';
-      imgEl.style.display = 'none';
+      if(placeholder) placeholder.style.display = 'none';
+    } else if(placeholder) {
+      if(imgEl) {
+        imgEl.src = '';
+        imgEl.style.display = 'none';
+      }
       placeholder.style.display = 'block';
       placeholder.textContent = `Foto ${i}`;
     }
@@ -190,12 +194,12 @@ function mostrarFichaDetalle(ficha) {
 
   // Mostrar modal
   document.getElementById('fichaModal').style.display = 'block';
-  document.body.style.overflow = 'hidden'; // Evitar scroll del body
+  document.body.style.overflow = 'hidden';
 }
 
 function cerrarModal() {
   document.getElementById('fichaModal').style.display = 'none';
-  document.body.style.overflow = ''; // Restaurar scroll
+  document.body.style.overflow = '';
   fichaSeleccionada = null;
 }
 
@@ -247,6 +251,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Escape') cerrarModal();
   });
 
+  // Cerrar modal al hacer clic fuera
+  window.addEventListener('click', (e) => {
+    const modal = document.getElementById('fichaModal');
+    if (e.target === modal) cerrarModal();
+  });
+
   cargarUsuario();
   console.log('✅ Consulta de fichas inicializada');
 });
@@ -262,9 +272,3 @@ async function cargarUsuario() {
     console.error('Error al cargar usuario:', error);
   }
 }
-
-// Cerrar modal al hacer clic fuera del contenido
-window.addEventListener('click', (e) => {
-  const modal = document.getElementById('fichaModal');
-  if (e.target === modal) cerrarModal();
-});
