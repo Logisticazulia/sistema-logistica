@@ -12,480 +12,165 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  font-family: 'Roboto', sans-serif;
-  background: #f5f5f5;
-}
-/* Container - mismo tamaño que ficha-crear */
+/* ================= ESTILOS GENERALES ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
+
 .container {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+  max-width: 1600px; margin: 0 auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 30px;
 }
-/* Sección de búsqueda - igual que ficha-crear */
+
+/* ================= SECCIÓN BÚSQUEDA ================= */
 .search-section {
   background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  padding: 25px;
-  border-radius: 8px;
-  margin-bottom: 25px;
+  padding: 25px; border-radius: 8px; margin-bottom: 25px;
   box-shadow: 0 4px 12px rgba(0,51,102,0.2);
 }
-.search-section h3 {
-  color: white;
-  margin-bottom: 15px;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.search-container {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.search-input {
-  flex: 1;
-  min-width: 300px;
-  padding: 12px 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 6px;
-  font-size: 15px;
-  background: rgba(255,255,255,0.95);
-  transition: all 0.3s ease;
-}
-.search-input:focus {
-  outline: none;
-  border-color: #fff;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
-}
-.search-input::placeholder {
-  color: #666;
-}
-.btn-search {
-  padding: 12px 28px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-.btn-search:hover {
-  background: #218838;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-}
-.btn-clear {
-  padding: 12px 28px;
-  background: #ffc107;
-  color: #000;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-.btn-clear:hover {
-  background: #e0a800;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255,193,7,0.3);
-}
-.search-hint {
-  color: rgba(255,255,255,0.9);
-  font-size: 13px;
-  margin-top: 10px;
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.search-hint span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-/* Alertas */
-.alert {
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin: 15px 0;
-  display: none;
-  font-weight: 500;
-}
-.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-.alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-/* Sección de resultados */
-.results-section {
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  width: 100%;
-}
+.search-section h3 { color: white; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+.search-container { display: flex; gap: 12px; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 300px; padding: 12px 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 15px; background: rgba(255,255,255,0.95); transition: all 0.3s ease; }
+.search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+.search-hint { color: rgba(255,255,255,0.9); font-size: 13px; margin-top: 10px; display: flex; gap: 20px; flex-wrap: wrap; }
+
+/* Botones de búsqueda */
+.btn-search { padding: 12px 28px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+.btn-search:hover { background: #218838; transform: translateY(-2px); }
+.btn-clear { padding: 12px 28px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+.btn-clear:hover { background: #e0a800; transform: translateY(-2px); }
+
+/* ================= SECCIÓN RESULTADOS Y FILTROS ================= */
+.results-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; }
+
 .results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #003366;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 15px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 12px; border-bottom: 3px solid #003366; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
 }
-.results-header h2 {
-  color: #003366;
-  margin: 0;
-}
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.filter-group label {
-  font-weight: 500;
-  color: #003366;
-  font-size: 14px;
-}
-.filter-select {
-  padding: 8px 12px;
-  border: 2px solid #003366;
-  border-radius: 6px;
-  font-size: 14px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.filter-select:focus {
-  outline: none;
-  border-color: #004080;
-  box-shadow: 0 0 0 3px rgba(0,51,102,0.2);
-}
-.table-container {
-  overflow-x: auto;
-  border-radius: 4px;
-  border: 1px solid #e0e0e0;
-}
-.results-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  min-width: 1000px;
-}
-.results-table th {
-  background: #003366;
-  color: white;
-  padding: 14px 12px;
-  text-align: left;
-  font-weight: 600;
-  border: 1px solid #002244;
-  white-space: nowrap;
-}
-.results-table td {
-  padding: 12px;
-  border: 1px solid #ddd;
-  vertical-align: middle;
-}
+.results-header h2 { color: #003366; margin: 0; font-size: 22px; }
+
+/* Filtro de Tipo */
+.filter-group { display: flex; align-items: center; gap: 10px; }
+.filter-group label { font-weight: 500; color: #003366; font-size: 14px; }
+.filter-select { padding: 8px 12px; border: 2px solid #003366; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; }
+
+/* Tabla */
+.table-container { overflow-x: auto; border-radius: 4px; border: 1px solid #e0e0e0; }
+.results-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px; }
+.results-table th { background: #003366; color: white; padding: 14px 12px; text-align: left; font-weight: 600; border: 1px solid #002244; white-space: nowrap; }
+.results-table td { padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
 .results-table tr:nth-child(even) { background: #f8f9fa; }
-.results-table tr:hover { background: #e3f2fd; transition: background 0.2s ease; }
-.btn-view {
-  padding: 8px 16px;
-  background: #003366;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-right: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.btn-view:hover {
-  background: #004080;
-  transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0,51,102,0.3);
-}
-.btn-print {
-  padding: 8px 16px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.btn-print:hover {
-  background: #218838;
-  transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(40,167,69,0.3);
-}
-/* Paginación */
-.pagination-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
-}
-#paginationInfo {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-}
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.btn-page {
-  padding: 8px 14px;
-  border: 1px solid #003366;
-  background: white;
-  color: #003366;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-.btn-page:hover:not(:disabled) {
-  background: #003366;
-  color: white;
-}
-.btn-page:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.page-numbers {
-  display: flex;
-  gap: 6px;
-}
-.page-btn {
-  min-width: 36px;
-  height: 36px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ddd;
-  background: white;
-  color: #333;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-.page-btn:hover:not(.active) {
-  background: #f0f0f0;
-  border-color: #003366;
-}
-.page-btn.active {
-  background: #003366;
-  color: white;
-  border-color: #003366;
-  cursor: default;
-}
-/* Botones generales */
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 20px;
-  margin-right: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-}
-.btn-primary { background: #003366; color: white; }
-.btn-primary:hover { background: #002244; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-.btn-secondary { background: #6c757d; color: white; }
-.btn-secondary:hover { background: #5a6268; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-.btn-success { background: #28a745; color: white; }
-.btn-success:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40,167,69,0.2); }
-/* Modal */
-.modal {
-  display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 40px 20px;
-}
-.modal-content {
-  background: white; margin: 0 auto; padding: 35px; border-radius: 8px; max-width: 1500px; width: 95%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-}
-.modal-close {
-  position: absolute; right: 25px; top: 20px; font-size: 32px; font-weight: bold; color: #666; cursor: pointer; transition: all 0.3s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f5f5f5;
-}
-.modal-close:hover { color: #003366; background: #e0e0e0; transform: rotate(90deg); }
-.ficha-tecnica { border: 2px solid #003366; padding: 30px; background: white; width: 100%; text-align: left; border-radius: 4px; }
+.results-table tr:hover { background: #e3f2fd; }
+
+/* Botones en tabla */
+.btn-view { padding: 8px 16px; background: #003366; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; margin-right: 6px; }
+.btn-view:hover { background: #004080; }
+.btn-print { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-print:hover { background: #218838; }
+
+/* ================= PAGINACIÓN ================= */
+.pagination-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+#paginationInfo { color: #666; font-size: 14px; font-weight: 500; }
+.pagination-controls { display: flex; align-items: center; gap: 8px; }
+.btn-page { padding: 8px 14px; border: 1px solid #003366; background: white; color: #003366; border-radius: 6px; cursor: pointer; font-weight: 500; }
+.btn-page:hover:not(:disabled) { background: #003366; color: white; }
+.btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
+.page-numbers { display: flex; gap: 6px; }
+.page-btn { min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 500; }
+.page-btn:hover:not(.active) { background: #f0f0f0; border-color: #003366; }
+.page-btn.active { background: #003366; color: white; border-color: #003366; }
+
+/* ================= MODAL Y FICHA TÉCNICA ================= */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 40px 20px; }
+.modal-content { background: white; margin: 0 auto; padding: 35px; border-radius: 8px; max-width: 1500px; width: 95%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+.modal-close { position: absolute; right: 25px; top: 20px; font-size: 32px; cursor: pointer; background: #f5f5f5; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.modal-close:hover { background: #e0e0e0; color: #003366; transform: rotate(90deg); }
+
+.ficha-tecnica { border: 2px solid #003366; padding: 30px; background: white; width: 100%; }
 .ficha-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 3px solid #003366; }
-.ficha-logo, .ficha-logo-right { width: 110px; height: auto; }
+.ficha-logo { width: 110px; }
 .ficha-title { text-align: center; flex: 1; padding: 0 30px; }
-.ficha-title h1 { font-size: 16px; color: #003366; margin-bottom: 6px; line-height: 1.4; font-weight: 700; }
-.ficha-title h2 { font-size: 19px; color: #003366; margin: 6px 0; font-weight: 700; }
-.ficha-title h3 { font-size: 17px; color: #003366; margin-top: 6px; font-weight: 700; }
+.ficha-title h1 { font-size: 16px; color: #003366; font-weight: 700; }
+.ficha-title h2 { font-size: 19px; color: #003366; font-weight: 700; margin: 6px 0; }
+.ficha-title h3 { font-size: 17px; color: #003366; font-weight: 700; }
+
+/* TABLA DE LA FICHA (Corregida para desborde) */
 .ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
 .ficha-table th { background: #4a7c9b; color: white; padding: 14px 12px; text-align: left; font-size: 13px; border: 2px solid #003366; font-weight: 700; }
-.ficha-table td { padding: 12px 10px; border: 2px solid #003366; font-size: 13px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: top; line-height: 1.5; }
-.ficha-table .label { font-weight: 700; background: #f0f0f0; width: 20%; }
-.fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; width: 100%; }
-.foto-box { border: 2px solid #4a7c9b; height: 160px; display: flex; align-items: center; justify-content: center; background: #4a7c9b; color: white; font-weight: 700; font-size: 15px; border-radius: 4px; overflow: hidden; transition: transform 0.3s ease; }
-.foto-box:hover { transform: scale(1.03); }
-.foto-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
-.observaciones-box { min-height: 280px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; line-height: 1.6; border-radius: 4px; overflow-y: auto; }
-.modal-actions { margin-top: 25px; display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 2px solid #e0e0e0; }
-/* Responsive */
-@media (max-width: 1200px) { .fotos-container { grid-template-columns: repeat(2, 1fr); } .modal-content { width: 98%; padding: 30px; } }
-@media (max-width: 768px) {
-  .container { padding: 15px; }
-  .search-container { flex-direction: column; }
-  .search-input { min-width: 100%; }
-  .btn-search, .btn-clear { width: 100%; justify-content: center; }
-  .ficha-header { flex-direction: column; gap: 15px; }
-  .ficha-title { padding: 0; }
-  .fotos-container { grid-template-columns: 1fr; }
-  .results-table { font-size: 13px; }
-  .results-table th, .results-table td { padding: 10px 8px; }
-  .results-header { flex-direction: column; align-items: flex-start; }
-}
-/* Estilos de impresión */
-@media print {
-  .navbar, .module-header, .btn, .search-section, .results-section, .modal-actions, .modal-close { display: none !important; }
-  .modal { position: absolute; background: white; padding: 0; }
-  .modal-content { margin: 0; padding: 0; box-shadow: none; width: 100%; max-width: 100%; }
-  .ficha-tecnica { border: 2px solid #003366; padding: 20px; }
-}
-  /* ================= AJUSTES DE FICHA Y MODAL ================= */
+.ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; word-wrap: break-word; vertical-align: middle; line-height: 1.4; }
+.ficha-table .label { background: #f0f0f0; font-weight: 700; }
 
-/* 1. Ajuste de anchos de columnas para evitar desborde */
-.ficha-table {
-  table-layout: fixed; /* Mantiene la estructura fija */
-  width: 100%;
-}
+/* Anchos específicos para evitar desborde en Tipo/Color/Dependencia */
+.ficha-table td:nth-child(1), .ficha-table td:nth-child(3), .ficha-table td:nth-child(5) { width: 14%; }
+.ficha-table td:nth-child(2), .ficha-table td:nth-child(4), .ficha-table td:nth-child(6) { width: 19.33%; }
 
-/* Etiquetas (Labels) más estrechas */
-.ficha-table td:nth-child(1),
-.ficha-table td:nth-child(3),
-.ficha-table td:nth-child(5),
-.ficha-table th {
-  width: 14%;
-}
+/* Observaciones e Imágenes */
+.observaciones-box { min-height: 250px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; }
+.fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+.foto-box { border: 2px solid #4a7c9b; height: 160px; background: #4a7c9b; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; overflow: hidden; }
+.foto-box img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Valores (Values) más anchos para que quepan los datos */
-.ficha-table td:nth-child(2),
-.ficha-table td:nth-child(4),
-.ficha-table td:nth-child(6) {
-  width: 19.33%;
-}
-
-/* Asegurar que el texto se adapte al espacio */
-.ficha-table td, 
-.ficha-table th {
-  padding: 10px 8px; /* Un poco menos de padding para ganar espacio */
-  font-size: 12px;    /* Fuente ligeramente más compacta */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  line-height: 1.4;
-  vertical-align: middle;
-}
-
-/* 2. Acercar los botones a la ficha */
-.ficha-tecnica {
-  margin-bottom: 5px; /* Reducido */
-}
-
+/* Botones del Modal (Acercados) */
 .modal-actions {
   margin-top: 10px; /* Reducido de 25px a 10px */
-  padding-top: 10px;
-  border-top: 1px solid #e0e0e0;
+  display: flex; gap: 12px; justify-content: flex-end;
+  padding-top: 15px; border-top: 2px solid #e0e0e0;
+}
+.btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin: 0; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-success { background: #28a745; color: white; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .results-header { flex-direction: column; align-items: flex-start; }
+  .ficha-table td:nth-child(1), .ficha-table td:nth-child(3), .ficha-table td:nth-child(5) { width: auto; }
+  .ficha-table td:nth-child(2), .ficha-table td:nth-child(4), .ficha-table td:nth-child(6) { width: auto; }
+  .ficha-table { table-layout: auto; }
+  .ficha-table td { display: block; width: 100%; border-bottom: none; }
+  .ficha-table tr { display: flex; flex-direction: column; border-bottom: 1px solid #ccc; padding: 10px 0; }
 }
 </style>
 </head>
 <body class="dashboard-page">
-<!-- ================= BARRA DE NAVEGACIÓN ================= -->
+
+<!-- ================= NAVBAR ================= -->
 <nav class="navbar" role="navigation">
 <div class="nav-container">
 <div class="nav-brand">
 <img src="../img/logo.png" alt="Logo" class="nav-logo" width="35" height="35">
-<img src="../img/logo_derecho.png" alt="Logo Secundario" class="nav-logo" width="35" height="35">
-<span class="nav-title">Sistema Automatizado || Gestión Administrativa del CCPE ZULIA</span>
+<span class="nav-title">Sistema de Gestión Administrativa del CCPE ZULIA</span>
 </div>
 <div class="nav-user">
 <span class="user-email" id="userEmail">usuario@institucion.com</span>
-<button class="btn-logout" id="logoutBtn">
-<span class="logout-icon">🚪</span>
-<span class="logout-text">Cerrar Sesión</span>
-</button>
+<button class="btn-logout" id="logoutBtn"><span>🚪</span><span>Cerrar Sesión</span></button>
 </div>
 </div>
 </nav>
-<!-- ================= CONTENIDO PRINCIPAL ================= -->
+
+<!-- ================= CONTENIDO ================= -->
 <main class="dashboard-main" role="main">
 <header class="module-header">
 <div class="breadcrumb">
-<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a>
-<span class="breadcrumb-separator">/</span>
-<a href="ficha.html" class="breadcrumb-link">Ficha Técnica</a>
-<span class="breadcrumb-separator">/</span>
-<span class="breadcrumb-current">Consultar Ficha</span>
+<a href="../dashboard.html" class="breadcrumb-link">🏠 Dashboard</a> / <a href="ficha.html" class="breadcrumb-link">Ficha Técnica</a> / <span class="breadcrumb-current">Consultar Ficha</span>
 </div>
-<button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">← Volver a Ficha Técnica</button>
+<button class="btn btn-secondary btn-sm" onclick="window.location.href='ficha.html'">← Volver</button>
 </header>
-<section class="module-title-section">
-<h1 class="module-title">🔍 Consultar Ficha Técnica de Vehículo</h1>
-<p class="module-subtitle">Busque y visualice las fichas técnicas registradas en el sistema</p>
-</section>
+
 <div class="container">
-<!-- Sección de Búsqueda -->
+<!-- Búsqueda -->
 <div class="search-section">
 <h3>🔎 Buscar Vehículo</h3>
-<div id="searchAlert" class="alert"></div>
+<div id="searchAlert" class="alert" style="display:none;"></div>
 <div class="search-container">
-<input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsimilar, serial de carrocería, serial de motor o marca..." autocomplete="off">
+<input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsimilar, serial o marca..." autocomplete="off">
 <button class="btn-search" id="btnSearch" onclick="buscarVehiculo()"><span>🔍</span><span>Buscar</span></button>
 <button class="btn-clear" onclick="limpiarBusqueda()"><span>🔄</span><span>Limpiar</span></button>
 </div>
 <div class="search-hint">
-<span>💡 Busque por:</span>
-<span>🚗 Placa</span>
-<span>📄 Facsimilar</span>
-<span>🔢 Serial Carrocería</span>
-<span>⚙️ Serial Motor</span>
-<span>🏷️ Marca/Modelo</span>
+<span>💡 Busque por:</span><span>🚗 Placa</span><span>📄 Facsimilar</span><span>🔢 Serial</span><span>🏷️ Marca</span>
 </div>
 </div>
-<!-- Tabla de Resultados con Filtro y Paginación -->
+
+<!-- Resultados -->
 <div class="results-section">
 <div class="results-header">
 <h2>📋 Resultados de Búsqueda</h2>
@@ -498,28 +183,21 @@ body {
 </select>
 </div>
 </div>
+
 <div class="table-container">
 <table class="results-table" id="resultsTable">
 <thead>
 <tr>
-<th>Placa</th>
-<th>Marca</th>
-<th>Modelo</th>
-<th>Tipo</th>
-<th>Color</th>
-<th>Estatus</th>
-<th>Dependencia</th>
-<th>Acciones</th>
+<th>Placa</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Color</th><th>Estatus</th><th>Dependencia</th><th>Acciones</th>
 </tr>
 </thead>
 <tbody id="resultsBody">
-<tr>
-<td colspan="8" style="text-align: center; padding: 50px; color: #666; font-size: 15px;">📭 No hay vehículos registrados. Realice una búsqueda o cargue la base de datos.</td>
-</tr>
+<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 Realice una búsqueda para ver resultados.</td></tr>
 </tbody>
 </table>
 </div>
-<!-- Controles de Paginación -->
+
+<!-- Paginación -->
 <div class="pagination-container" id="paginationContainer">
 <span id="paginationInfo">Mostrando 0 de 0 registros</span>
 <div class="pagination-controls">
@@ -530,43 +208,90 @@ body {
 </div>
 </div>
 </div>
-<!-- Modal de Vista Detallada -->
+
+<!-- ================= MODAL ================= -->
 <div id="fichaModal" class="modal">
 <div class="modal-content">
 <span class="modal-close" onclick="cerrarModal()">&times;</span>
-<div class="ficha-tecnica" id="fichaDetalle">
+<div class="ficha-tecnica">
 <div class="ficha-header">
-<img src="../img/logo.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
+<img src="../img/logo.png" alt="Logo Izq" class="ficha-logo">
 <div class="ficha-title">
 <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
 <h2>REDIP: OCCIDENTAL</h2>
 <h3>CCPE ZULIA</h3>
 </div>
-<img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo-right" onerror="this.style.display='none'">
+<img src="../img/logo-juntos.png" alt="Logo Der" class="ficha-logo">
 </div>
+
 <table class="ficha-table">
-<tr><th colspan="5">DATOS DEL VEHICULO</th><th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">OBSERVACIONES<br><br><div class="observaciones-box" id="modalObservaciones"></div></th></tr>
-<tr><td class="label">MARCA</td><td class="value" id="modalMarca"></td><td class="label">MODELO</td><td class="value" id="modalModelo"></td><td class="label">TIPO</td><td class="value" id="modalTipo"></td></tr>
-<tr><td class="label">SERIAL CARROCERIA</td><td class="value" id="modalSerialCarroceria"></td><td class="label">CLASE</td><td class="value" id="modalClase"></td><td class="label">COLOR</td><td class="value" id="modalColor"></td></tr>
-<tr><td class="label">PLACA</td><td class="value" id="modalPlaca"></td><td class="label">FACSIMIL</td><td class="value" id="modalFacsimilar"></td><td class="label">DEPENDENCIA</td><td class="value" id="modalDependencia"></td></tr>
-<tr><td class="label">SERIAL MOTOR</td><td class="value" id="modalSerialMotor"></td><td class="label" colspan="3"></td></tr>
-<tr><td class="label">ESTATUS DEL VEHICULO</td><td colspan="4" style="text-align: center; font-weight: bold; font-size: 14px;" id="modalEstatus"></td></tr>
-<tr><th colspan="6">INFORMACIÓN TECNICO MECANICA POR INOPERATIVIDAD</th></tr>
-<tr><td class="label">CAUSA</td><td colspan="2" id="modalCausa"></td><td class="label">DIAGNÓSTICO</td><td colspan="2" id="modalDiagnostico"></td></tr>
-<tr><td class="label">MECANICA</td><td colspan="2" id="modalMecanica"></td><td class="label">UBICACIÓN</td><td colspan="2" id="modalUbicacion"></td></tr>
-<tr><td class="label">TAPICERIA</td><td id="modalTapiceria"></td><td class="label">CAUCHOS</td><td id="modalCauchos"></td><td class="label">LUCES</td><td id="modalLuces"></td></tr>
-<tr><th colspan="6">REGISTRO FOTOGRÁFICO</th></tr>
-<tr><td colspan="6">
+<tr>
+<th colspan="5">DATOS DEL VEHICULO</th>
+<th rowspan="6" style="width: 22%; vertical-align: top; text-align: center;">
+OBSERVACIONES<br><br>
+<div class="observaciones-box" id="modalObservaciones">-</div>
+</th>
+</tr>
+<tr>
+<td class="label">MARCA</td><td class="value" id="modalMarca"></td>
+<td class="label">MODELO</td><td class="value" id="modalModelo"></td>
+<td class="label">TIPO</td><td class="value" id="modalTipo"></td>
+</tr>
+<tr>
+<td class="label">SERIAL CARROCERÍA</td><td class="value" id="modalSerialCarroceria"></td>
+<td class="label">CLASE</td><td class="value" id="modalClase"></td>
+<td class="label">COLOR</td><td class="value" id="modalColor"></td>
+</tr>
+<tr>
+<td class="label">PLACA</td><td class="value" id="modalPlaca"></td>
+<td class="label">FACSIMIL</td><td class="value" id="modalFacsimilar"></td>
+<td class="label">DEPENDENCIA</td><td class="value" id="modalDependencia"></td>
+</tr>
+<tr>
+<td class="label">SERIAL MOTOR</td><td class="value" id="modalSerialMotor"></td>
+<td class="label" colspan="3"></td>
+</tr>
+<tr>
+<td class="label">ESTATUS</td><td colspan="4" style="text-align:center; font-weight:bold;" id="modalEstatus"></td>
+</tr>
+<tr>
+<th colspan="6">INFORMACIÓN TÉCNICO MECÁNICA</th>
+</tr>
+<tr>
+<td class="label">CAUSA</td><td colspan="2" id="modalCausa"></td>
+<td class="label">DIAGNÓSTICO</td><td colspan="2" id="modalDiagnostico"></td>
+</tr>
+<tr>
+<td class="label">MECÁNICA</td><td colspan="2" id="modalMecanica"></td>
+<td class="label">UBICACIÓN</td><td colspan="2" id="modalUbicacion"></td>
+</tr>
+<tr>
+<td class="label">TAPICERÍA</td><td id="modalTapiceria"></td>
+<td class="label">CAUCHOS</td><td id="modalCauchos"></td>
+<td class="label">LUCES</td><td id="modalLuces"></td>
+</tr>
+<tr>
+<th colspan="6">REGISTRO FOTOGRÁFICO</th>
+</tr>
+<tr>
+<td colspan="6">
 <div class="fotos-container">
-<div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1" alt="Foto 1"></div>
-<div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2" alt="Foto 2"></div>
-<div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3" alt="Foto 3"></div>
-<div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4" alt="Foto 4"></div>
+<div class="foto-box" id="modalBox1"><span>Foto 1</span><img id="modalImg1"></div>
+<div class="foto-box" id="modalBox2"><span>Foto 2</span><img id="modalImg2"></div>
+<div class="foto-box" id="modalBox3"><span>Foto 3</span><img id="modalImg3"></div>
+<div class="foto-box" id="modalBox4"><span>Foto 4</span><img id="modalImg4"></div>
 </div>
-</td></tr>
-<tr><td colspan="6" style="text-align: right; font-size: 12px; padding-top: 15px; color: #666;"><strong>Fecha de Creación:</strong> <span id="modalFechaCreacion"></span> &nbsp;|&nbsp; <strong>Creado por:</strong> <span id="modalCreadoPor"></span></td></tr>
+</td>
+</tr>
+<tr>
+<td colspan="6" style="text-align:right; padding-top:15px; font-size:12px; color:#666;">
+<strong>Fecha:</strong> <span id="modalFechaCreacion"></span> | <strong>Creado por:</strong> <span id="modalCreadoPor"></span>
+</td>
+</tr>
 </table>
 </div>
+
+<!-- Botones acércados al final de la ficha -->
 <div class="modal-actions">
 <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cerrar</button>
 <button class="btn btn-success" onclick="imprimirFicha()">🖨️ Imprimir Ficha</button>
@@ -574,6 +299,7 @@ body {
 </div>
 </div>
 </main>
+
 <!-- ================= SCRIPTS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/config.js" defer></script>
