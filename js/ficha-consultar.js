@@ -1,7 +1,7 @@
 /**
 * ========================================
-* FICHA-CONSULTAR.JS - Versión Estable v2
-* Carga automática + Diagnóstico de RLS
+* FICHA-CONSULTAR.JS - Versión Corregida
+* Colores de estatus fijos y Alertas mejoradas
 * ========================================
 */
 // ================= VARIABLES GLOBALES =================
@@ -56,7 +56,6 @@ async function buscarFichas() {
     }
     const { data, error } = await query;
     if (error) { console.error('❌ Error de Supabase:', error); throw error; }
-    else { console.log(`✅ Supabase respondió con ${data?.length || 0} registros.`); if (data?.length === 0) console.warn('⚠️ Si esperabas datos pero devuelve 0, revisa las Políticas RLS.'); }
     fichasData = data || [];
     paginaActual = 1;
     aplicarFiltros();
@@ -178,7 +177,7 @@ window.imprimirFicha = () => window.print();
 // ================= UTILIDADES =================
 function mostrarTablaCargando(mostrar) { const tbody = document.getElementById('resultsBody'); if (tbody && mostrar) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`; }
 
-// ✅ CORREGIDO: Auto-scroll + Temporizador 5s (Igual que ficha-crear)
+// ✅ CORREGIDO: Auto-scroll + Temporizador 5s
 function mostrarAlerta(msg, tipo) {
   const el = document.getElementById('searchAlert'); if (!el) return;
   el.className = `alert alert-${tipo}`; el.textContent = msg; el.style.display = 'block';
