@@ -86,7 +86,7 @@ async function buscarFichas() {
     if (fichasData.length > 0) {
       mostrarAlerta(`✅ ${fichasData.length} registro(s) encontrado(s).`, 'success');
     } else {
-      mostrarAlerta('ℹ️ No se encontraron registros con esa búsqueda exacta.', 'info');
+      mostrarAlerta('ℹ️ No se encontraron registros debe colocar seriales validos.', 'info');
     }
   } catch (err) {
     console.error('❌ Fallo en buscarFichas:', err);
