@@ -118,7 +118,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 <div id="searchAlert" class="alert"></div>
 <div class="search-container">
 <input type="text" id="searchInput" class="search-input" placeholder="Ingrese placa, facsimilar, serial de carrocería, serial de motor o marca..." autocomplete="off">
-<button class="btn-search" id="btnSearch" onclick="buscarFichas()">
+<button class="btn-search" onclick="buscarFichas()">
+  <span>🔍</span>
+  <span>Buscar</span>
+</button>
 <span>🔍</span>
 <span>Buscar</span>
 </button>
@@ -271,7 +274,8 @@ OBSERVACIONES<br><br>
 </div>
 </main>
 
+<!-- En los scripts, verificar que el nombre coincida con el archivo JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="../js/ficha-consulta.js" defer></script>
+<script src="../js/ficha-consultar.js" defer></script>
 </body>
 </html>
