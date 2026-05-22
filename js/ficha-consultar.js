@@ -13,17 +13,10 @@ let supabaseClient = null;
 // ================= INICIALIZACIÓN =================
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    // 1. Validar credenciales
-    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
-      throw new Error('Falta configuración de Supabase');
-    }
-    // 2. Conectar a Supabase
+    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) throw new Error('Falta configuración de Supabase');
     supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-    // 3. Cargar usuario en la barra
     await cargarUsuarioLogueado();
-    // 4. Configurar eventos (botones, filtros, etc.)
     configurarEventos();
-    // 5. 🚀 CARGAR DATOS AUTOMÁTICAMENTE AL INICIAR
     await buscarFichas();
   } catch (error) {
     console.error('❌ Error de inicialización:', error);
@@ -41,72 +34,38 @@ async function cargarUsuarioLogueado() {
 }
 // ================= EVENTOS =================
 function configurarEventos() {
-  // Búsqueda con Enter
   document.getElementById('searchInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscarFichas(); });
-  // Filtro de tipo
-  document.getElementById('filtroTipo')?.addEventListener('change', () => {
-    paginaActual = 1;
-    aplicarFiltros();
-  });
-  // Paginación
+  document.getElementById('filtroTipo')?.addEventListener('change', () => { paginaActual = 1; aplicarFiltros(); });
   document.getElementById('prevPage')?.addEventListener('click', () => cambiarPagina(paginaActual - 1));
   document.getElementById('nextPage')?.addEventListener('click', () => cambiarPagina(paginaActual + 1));
-  // Cerrar Modal
   document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
   document.getElementById('fichaModal')?.addEventListener('click', e => { if (e.target.id === 'fichaModal') cerrarModal(); });
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = '../login.html';
-  });
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = '../login.html'; });
 }
 // ================= BÚSQUEDA / CARGA =================
-window.buscarVehiculo = async () => {
-  await buscarFichas();
-};
+window.buscarVehiculo = async () => { await buscarFichas(); };
 async function buscarFichas() {
   const termino = document.getElementById('searchInput')?.value.trim() || '';
   const btn = document.getElementById('btnSearch');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span><span>Cargando...</span>'; }
   mostrarTablaCargando(true);
   try {
-    // Consulta base
-    let query = supabaseClient
-      .from('fichas_tecnicas')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(2000);
-    // Si hay texto, filtramos en la DB (más rápido)
+    let query = supabaseClient.from('fichas_tecnicas').select('*').order('created_at', { ascending: false }).limit(2000);
     if (termino) {
-      query = query.or(
-        `placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%,s_carroceria.ilike.%${termino}%`
-      );
+      query = query.or(`placa.ilike.%${termino}%,facsimil.ilike.%${termino}%,marca.ilike.%${termino}%,modelo.ilike.%${termino}%,s_carroceria.ilike.%${termino}%`);
     }
     const { data, error } = await query;
-    // 🐛 DIAGNÓSTICO EN CONSOLA
-    if (error) {
-      console.error('❌ Error de Supabase:', error);
-      throw error;
-    } else {
-      console.log(`✅ Supabase respondió con ${data?.length || 0} registros.`);
-      if (data?.length === 0) {
-        console.warn('⚠️ Si esperabas datos pero devuelve 0, revisa las Políticas RLS en Supabase.');
-      }
-    }
+    if (error) { console.error('❌ Error de Supabase:', error); throw error; }
+    else { console.log(`✅ Supabase respondió con ${data?.length || 0} registros.`); if (data?.length === 0) console.warn('⚠️ Si esperabas datos pero devuelve 0, revisa las Políticas RLS.'); }
     fichasData = data || [];
     paginaActual = 1;
-    aplicarFiltros(); // Esto también llama a renderizarTabla()
-    if (fichasData.length > 0) {
-      mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s) correctamente.`, 'success');
-    } else {
-      mostrarAlerta('ℹ️ No se encontraron registros en la base de datos.', 'info');
-    }
+    aplicarFiltros();
+    if (fichasData.length > 0) mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s) correctamente.`, 'success');
+    else mostrarAlerta('ℹ️ No se encontraron registros en la base de datos.', 'info');
   } catch (err) {
     console.error('❌ Fallo en buscarFichas:', err);
     mostrarAlerta('Error al consultar la base de datos. Verifica RLS o conexión.', 'error');
-    fichasData = [];
-    fichasFiltradas = [];
-    renderizarTabla();
+    fichasData = []; fichasFiltradas = []; renderizarTabla();
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔍</span><span>Buscar</span>'; }
   }
@@ -114,43 +73,33 @@ async function buscarFichas() {
 window.limpiarBusqueda = () => {
   document.getElementById('searchInput').value = '';
   document.getElementById('filtroTipo').value = 'todos';
-  fichasData = [];
-  fichasFiltradas = [];
-  paginaActual = 1;
-  buscarFichas(); // Recargar todo
+  fichasData = []; fichasFiltradas = []; paginaActual = 1;
+  buscarFichas();
 };
 // ================= FILTROS =================
 function aplicarFiltros() {
   const filtroValor = document.getElementById('filtroTipo')?.value || 'todos';
   const termino = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
   fichasFiltradas = fichasData.filter(ficha => {
-    // 1. Filtro por Tipo (Moto vs Vehículo)
     const tipo = (ficha.tipo || '').toUpperCase();
     const clase = (ficha.clase || '').toUpperCase();
-    // Lógica mejorada: Detecta moto si contiene "MOTO", "ENDURO", o si la clase es moto
     const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO' || clase === 'ENDURO';
     if (filtroValor === 'moto' && !esMoto) return false;
     if (filtroValor === 'vehiculo' && esMoto) return false;
-    // 2. Filtro por texto (si no se usó el filtro de DB)
     if (termino) {
       const texto = `${ficha.placa} ${ficha.facsimil} ${ficha.marca} ${ficha.modelo}`.toLowerCase();
       if (!texto.includes(termino)) return false;
     }
     return true;
   });
-  renderizarTabla();
-  renderizarPaginacion();
+  renderizarTabla(); renderizarPaginacion();
 }
 // ================= RENDERIZAR TABLA =================
 function renderizarTabla() {
   const tbody = document.getElementById('resultsBody');
   if (!tbody) return;
   if (fichasFiltradas.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="8" style="text-align:center;padding:40px;color:#666">
-      📭 No se encontraron resultados.
-      ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}
-      </td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados. ${fichasData.length === 0 ? 'Verifica las políticas RLS de Supabase o agrega registros.' : 'Intenta cambiar los filtros o el término de búsqueda.'}</td></tr>`;
     return;
   }
   const inicio = (paginaActual - 1) * POR_PAGINA;
@@ -180,8 +129,7 @@ function renderizarPaginacion() {
   const fin = Math.min(paginaActual * POR_PAGINA, total);
   const infoEl = document.getElementById('paginationInfo');
   if (infoEl) infoEl.textContent = `Mostrando ${inicio} - ${fin} de ${total} registros`;
-  const prevBtn = document.getElementById('prevPage');
-  const nextBtn = document.getElementById('nextPage');
+  const prevBtn = document.getElementById('prevPage'); const nextBtn = document.getElementById('nextPage');
   if (prevBtn) prevBtn.disabled = paginaActual <= 1;
   if (nextBtn) nextBtn.disabled = paginaActual >= totalPages;
   const pageNumbers = document.getElementById('pageNumbers');
@@ -194,23 +142,19 @@ function renderizarPaginacion() {
   for (let i = start; i <= end; i++) {
     const btn = document.createElement('button');
     btn.className = `page-btn ${i === paginaActual ? 'active' : ''}`;
-    btn.textContent = i;
-    btn.onclick = () => cambiarPagina(i);
+    btn.textContent = i; btn.onclick = () => cambiarPagina(i);
     pageNumbers.appendChild(btn);
   }
 }
 function cambiarPagina(nueva) {
   const totalPages = Math.ceil(fichasFiltradas.length / POR_PAGINA) || 1;
   if (nueva < 1 || nueva > totalPages) return;
-  paginaActual = nueva;
-  renderizarTabla();
-  renderizarPaginacion();
+  paginaActual = nueva; renderizarTabla(); renderizarPaginacion();
   document.querySelector('.results-section')?.scrollIntoView({ behavior: 'smooth' });
 }
 // ================= MODAL =================
 window.verDetalle = (id) => {
-  const f = fichasData.find(x => x.id == id);
-  if (!f) return;
+  const f = fichasData.find(x => x.id == id); if (!f) return;
   const set = (sel, val) => { const el = document.getElementById(sel); if (el) el.textContent = val || '-'; };
   set('modalMarca', f.marca); set('modalModelo', f.modelo); set('modalTipo', f.tipo);
   set('modalClase', f.clase); set('modalColor', f.color); set('modalPlaca', f.placa);
@@ -221,79 +165,41 @@ window.verDetalle = (id) => {
   set('modalUbicacion', f.ubicacion); set('modalTapiceria', f.tapiceria);
   set('modalCauchos', f.cauchos); set('modalLuces', f.luces);
   set('modalObservaciones', f.observaciones); set('modalCreadoPor', f.creado_por);
-  if (f.fecha_creacion) {
-    const date = new Date(f.fecha_creacion);
-    set('modalFechaCreacion', `${date.toLocaleDateString('es-VE')} ${date.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`);
-  }
-  // Imágenes
+  if (f.fecha_creacion) { const d = new Date(f.fecha_creacion); set('modalFechaCreacion', `${d.toLocaleDateString('es-VE')} ${d.toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`); }
   for (let i = 1; i <= 4; i++) {
-    const url = f[`foto${i}_url`] || f[`foto${i}`] || '';
-    const img = document.getElementById(`modalImg${i}`);
-    const box = document.getElementById(`modalBox${i}`);
-    const span = box?.querySelector('span');
-    if (img && box && span) {
-      if (url && url.startsWith('http')) {
-        img.src = url; img.style.display = 'block'; span.style.display = 'none';
-      } else {
-        img.style.display = 'none'; span.style.display = 'block';
-      }
-    }
+    const url = f[`foto${i}_url`] || f[`foto${i}`] || ''; const img = document.getElementById(`modalImg${i}`); const box = document.getElementById(`modalBox${i}`); const span = box?.querySelector('span');
+    if (img && box && span) { if (url && url.startsWith('http')) { img.src = url; img.style.display = 'block'; span.style.display = 'none'; } else { img.style.display = 'none'; span.style.display = 'block'; } }
   }
-  document.getElementById('fichaModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  document.getElementById('fichaModal').style.display = 'flex'; document.body.style.overflow = 'hidden';
 };
-window.cerrarModal = () => {
-  document.getElementById('fichaModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-};
-window.imprimirDesdeTabla = (id) => {
-  verDetalle(id);
-  setTimeout(() => window.print(), 300);
-};
+window.cerrarModal = () => { document.getElementById('fichaModal').style.display = 'none'; document.body.style.overflow = 'auto'; };
+window.imprimirDesdeTabla = (id) => { verDetalle(id); setTimeout(() => window.print(), 300); };
 window.imprimirFicha = () => window.print();
 // ================= UTILIDADES =================
-function mostrarTablaCargando(mostrar) {
-  const tbody = document.getElementById('resultsBody');
-  if (tbody && mostrar) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`;
-  }
-}
+function mostrarTablaCargando(mostrar) { const tbody = document.getElementById('resultsBody'); if (tbody && mostrar) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#003366">⏳ Conectando con Supabase...</td></tr>`; }
 
-// ✅ CORREGIDO: Coincide exactamente con el estilo de ficha-crear.js
+// ✅ CORREGIDO: Auto-scroll + Temporizador 5s (Igual que ficha-crear)
 function mostrarAlerta(msg, tipo) {
-  const el = document.getElementById('searchAlert');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = 'alert alert-' + tipo;
-  el.style.display = 'block';
-  // ✅ Auto-scroll garantizado
+  const el = document.getElementById('searchAlert'); if (!el) return;
+  el.className = `alert alert-${tipo}`; el.textContent = msg; el.style.display = 'block';
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+    requestAnimationFrame(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
   });
-  setTimeout(() => {
-    el.style.display = 'none';
-  }, 5000);
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
 
-// ✅ CORREGIDO: Lógica de colores actualizada
+// ✅ CORREGIDO: Orden de validación para que INOPERATIVO/DESINCORPORADO no sean tomados como OPERATIVO
 function getEstatusClass(est) {
-  const e = (est || '').toUpperCase();
-  if (e.includes('OPERATIVO')) return 'status-ok';
-  if (e.includes('INOPERATIVO') || e.includes('REPARACION') || e.includes('TALLER')) return 'status-danger';
+  const e = (est || '').toUpperCase().trim();
   if (e.includes('DESINCORPORADO')) return 'status-gray';
-  return '';
+  if (e.includes('INOPERATIVO') || e.includes('REPARACION') || e.includes('TALLER')) return 'status-danger';
+  if (e.includes('OPERATIVO')) return 'status-ok';
+  return 'status-default';
 }
 
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-// ✅ CORREGIDO: Estilos inyectados actualizados
+// ✅ CORREGIDO: Estilos inyectados con colores exactos solicitados
 if (!document.getElementById('estatus-styles')) {
   const style = document.createElement('style');
   style.id = 'estatus-styles';
