@@ -68,6 +68,31 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .ficha-tecnica { border: 2px solid #003366; padding: 30px; background: white; width: 100%; }
 .ficha-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 3px solid #003366; }
 .ficha-logo { width: 180px; }
+  /* ===== LOGOS INDIVIDUALES - VISTA NORMAL ===== */
+.ficha-header .logo-izq {
+  width: 200px; /* ✅ Ajusta el tamaño del logo izquierdo */
+  height: auto;
+  object-fit: contain;
+}
+
+.ficha-header .logo-der {
+  width: 150px; /* ✅ Ajusta el tamaño del logo derecho */
+  height: auto;
+  object-fit: contain;
+}
+
+/* ===== LOGOS INDIVIDUALES - SOLO IMPRESIÓN ===== */
+@media print {
+  .ficha-header .logo-izq {
+    width: 140px !important; /* ✅ Tamaño en impresión para el izquierdo */
+    height: auto !important;
+  }
+  
+  .ficha-header .logo-der {
+    width: 100px !important; /* ✅ Tamaño en impresión para el derecho */
+    height: auto !important;
+  }
+}
 .ficha-title { text-align: center; flex: 1; padding: 0 30px; }
 .ficha-title h1 { font-size: 16px; color: #003366; font-weight: 700; }
 .ficha-title h2 { font-size: 19px; color: #003366; font-weight: 700; margin: 6px 0; }
@@ -434,14 +459,14 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
       <span class="modal-close" onclick="cerrarModal()">&times;</span>
       <div class="ficha-tecnica" id="fichaDetalle">
         <div class="ficha-header">
-          <img src="../img/logo_izquierdo.png" alt="Venezuela" class="ficha-logo" onerror="this.style.display='none'">
+          <img src="../img/logo_izquierdo.png" alt="Venezuela" class="ficha-logo logo-izq" onerror="this.style.display='none'">
           <div class="ficha-title">
             <h1>Ministerio del Poder Popular para<br>Relaciones Interiores, Justicia y Paz</h1>
             <h2>CUERPO DE POLICIA NACIONAL BOLIVARIANA</h2>
             <h3>REDIP OCCIDENTAL</h3>
             <h4>CCPE ZULIA</h4>
           </div>
-          <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo" onerror="this.style.display='none'">
+         <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo logo-der" onerror="this.style.display='none'">
         </div>
         
         <!-- ✅ TABLA 7 COLUMNAS: 6 datos + 1 observaciones a la derecha -->
