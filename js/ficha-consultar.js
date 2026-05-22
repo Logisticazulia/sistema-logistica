@@ -10,9 +10,6 @@ const supabaseClient = window.supabase.createClient(
 
 let fichasEncontradas = [];
 let fichaSeleccionada = null;
-let fichasFiltradas = [];
-let paginaActual = 1;
-const ITEMS_POR_PAGINA = 15;
 
 // ============================================
 // FUNCIONES DE BÚSQUEDA
@@ -88,34 +85,55 @@ function limpiarBusqueda() {
 // ============================================
 
 function renderizarListaFichas() {
-    const tbody = document.getElementById('resultsBody');
-    const inicio = (paginaActual - 1) * ITEMS_POR_PAGINA;
-    const fin = inicio + ITEMS_POR_PAGINA;
-    const datosPagina = fichasFiltradas.slice(inicio, fin);
-
-    if (datosPagina.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666;">📭 No hay resultados</td></tr>`;
-        renderizarPaginacion();
+    const container = document.getElementById('fichasList');
+    
+    if (fichasEncontradas.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <p>No hay fichas para mostrar</p>
+            </div>
+        `;
         return;
     }
-
-    tbody.innerHTML = datosPagina.map(ficha => `
-        <tr>
-            <td>${ficha.placa || 'N/A'}</td>
-            <td>${ficha.marca || 'N/A'}</td>
-            <td>${ficha.modelo || 'N/A'}</td>
-            <td>${ficha.tipo || 'N/A'}</td>
-            <td>${ficha.color || 'N/A'}</td>
-            <td>${ficha.estatus_ficha || 'N/A'}</td>
-            <td>${ficha.dependencia || 'N/A'}</td>
-            <td>
-                <button class="btn-view" onclick="verFicha('${ficha.id}')">👁️ Ver</button>
-            </td>
-        </tr>
-    `).join('');
     
-    renderizarPaginacion();
+    const html = fichasEncontradas.map(ficha => {
+        const fecha = ficha.created_at ? new Date(ficha.created_at).toLocaleString() : 'N/A';
+        return `
+            <div class="ficha-item" onclick="seleccionarFicha('${ficha.id}')" data-id="${ficha.id}">
+                <div class="ficha-field">
+                    <span class="ficha-field-label">Placa</span>
+                    <span class="ficha-field-value">${ficha.placa || 'N/A'}</span>
+                </div>
+                <div class="ficha-field">
+                    <span class="ficha-field-label">Facsímil</span>
+                    <span class="ficha-field-value">${ficha.facsimil || 'N/A'}</span>
+                </div>
+                <div class="ficha-field">
+                    <span class="ficha-field-label">Marca</span>
+                    <span class="ficha-field-value">${ficha.marca || 'N/A'}</span>
+                </div>
+                <div class="ficha-field">
+                    <span class="ficha-field-label">Modelo</span>
+                    <span class="ficha-field-value">${ficha.modelo || 'N/A'}</span>
+                </div>
+                <div class="ficha-field">
+                    <span class="ficha-field-label">Serial Carrocería</span>
+                    <span class="ficha-field-value">${ficha.s_carroceria || 'N/A'}</span>
+                </div>
+                <div class="ficha-field">
+                    <span class="ficha-field-label">Serial Motor</span>
+                    <span class="ficha-field-value">${ficha.s_motor || 'N/A'}</span>
+                </div>
+                <div class="ficha-date">
+                    📅 Creada: ${fecha}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = html;
 }
+
 // ============================================
 // SELECCIONAR Y MOSTRAR FICHA
 // ============================================
@@ -356,44 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ Consulta de fichas inicializada');
 });
-function aplicarFiltroYPaginacion() {
-    const filtro = document.getElementById('tipoFilter').value;
-    
-    if (filtro === 'todos') {
-        fichasFiltradas = [...fichasEncontradas];
-    } else if (filtro === 'motos') {
-        fichasFiltradas = fichasEncontradas.filter(f => f.tipo && f.tipo.toLowerCase().includes('moto'));
-    } else if (filtro === 'vehiculos') {
-        fichasFiltradas = fichasEncontradas.filter(f => f.tipo && !f.tipo.toLowerCase().includes('moto'));
-    }
-    
-    paginaActual = 1;
-    renderizarListaFichas();
-}
 
-function renderizarPaginacion() {
-    const container = document.getElementById('paginationControls');
-    const totalPaginas = Math.ceil(fichasFiltradas.length / ITEMS_POR_PAGINA);
-    
-    if (totalPaginas <= 1) {
-        container.innerHTML = '';
-        return;
-    }
-    
-    container.innerHTML = `
-        <button onclick="cambiarPagina(${paginaActual - 1})" ${paginaActual===1?'disabled':''} style="padding:5px 12px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:${paginaActual===1?'not-allowed':'pointer'}">⬅️</button>
-        <span style="font-size:12px;color:#555;">Página ${paginaActual} de ${totalPaginas}</span>
-        <button onclick="cambiarPagina(${paginaActual + 1})" ${paginaActual===totalPaginas?'disabled':''} style="padding:5px 12px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:${paginaActual===totalPaginas?'not-allowed':'pointer'}">➡️</button>
-    `;
-}
-
-function cambiarPagina(nuevaPagina) {
-    const totalPaginas = Math.ceil(fichasFiltradas.length / ITEMS_POR_PAGINA);
-    if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
-    paginaActual = nuevaPagina;
-    renderizarListaFichas();
-    document.getElementById('resultsTable').scrollIntoView({behavior:'smooth', block:'start'});
-}
 async function cargarUsuario() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
