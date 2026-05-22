@@ -1,7 +1,8 @@
 /**
-* ========================================
-* FICHA-CONSULTAR.JS - BÚSQUEDA EXACTA CORREGIDA
-* ========================================
+* ============================================
+* FICHA-CONSULTAR.JS - VERSIÓN FINAL CORREGIDA
+* Búsqueda Exacta, Estadísticas y Diseño de Impresión
+* ============================================
 */
 // ================= VARIABLES GLOBALES =================
 let fichasData = [];
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
     await cargarUsuarioLogueado();
     configurarEventos();
-    await buscarFichas();
+    await buscarFichas(); // Carga automática al inicio
   } catch (error) {
     console.error('❌ Error de inicialización:', error);
     mostrarAlerta('Error al conectar con el sistema.', 'error');
@@ -50,28 +51,27 @@ function configurarEventos() {
   });
 }
 
-// ================= BÚSQUEDA / CARGA =================
+// ================= BÚSQUEDA (EXACTA) =================
 window.buscarVehiculo = async () => { await buscarFichas(); };
 
 async function buscarFichas() {
-  const termino = document.getElementById('searchInput')?.value.trim() || '';
+  const termino = document.getElementById('searchInput')?.value.trim().toUpperCase() || '';
   const btn = document.getElementById('btnSearch');
+  
   if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span><span>Cargando...</span>'; }
   mostrarTablaCargando(true);
   
   try {
-    // Consulta base
     let query = supabaseClient
       .from('fichas_tecnicas')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(2000);
     
-    // ✅ BÚSQUEDA EXACTA en múltiples campos (incluye s_motor)
+    // ✅ BÚSQUEDA EXACTA (.eq) en todos los campos importantes
     if (termino) {
-      const t = termino.toUpperCase(); // Normalizar a mayúsculas para comparación exacta
       query = query.or(
-        `placa.eq.${t},facsimil.eq.${t},marca.eq.${t},modelo.eq.${t},s_carroceria.eq.${t},s_motor.eq.${t}`
+        `placa.eq.${termino},facsimil.eq.${termino},marca.eq.${termino},modelo.eq.${termino},s_carroceria.eq.${termino},s_motor.eq.${termino}`
       );
     }
     
@@ -81,14 +81,14 @@ async function buscarFichas() {
     
     fichasData = data || [];
     paginaActual = 1;
-    aplicarFiltros();
-    
+    aplicarFiltros(); // Aplica filtros y renderiza
     
     if (fichasData.length > 0) {
-      mostrarAlerta(`✅ ${fichasData.length} registro(s) encontrado(s).`, 'success');
+      mostrarAlerta(`✅ ${fichasData.length} registro(s) cargado(s).`, 'success');
     } else {
-      mostrarAlerta('ℹ️ No se encontraron registros debe colocar seriales validos.', 'info');
+      mostrarAlerta('ℹ️ No se encontraron registros.', 'info');
     }
+    
   } catch (err) {
     console.error('❌ Fallo en buscarFichas:', err);
     mostrarAlerta('Error al consultar la base de datos.', 'error');
@@ -107,16 +107,14 @@ window.limpiarBusqueda = () => {
   fichasFiltradas = [];
   paginaActual = 1;
   buscarFichas();
-  // actualizarEstadisticas() se llama dentro de buscarFichas()
 };
 
-// ================= FILTROS =================
+// ================= FILTROS Y ESTADÍSTICAS =================
 function aplicarFiltros() {
   const filtroValor = document.getElementById('filtroTipo')?.value || 'todos';
-  const termino = document.getElementById('searchInput')?.value.trim().toUpperCase() || ''; // ✅ Normalizar a mayúsculas
+  const termino = document.getElementById('searchInput')?.value.trim().toUpperCase() || '';
   
   fichasFiltradas = fichasData.filter(ficha => {
-    // Filtro por Tipo (Moto vs Vehículo)
     const tipo = (ficha.tipo || '').toUpperCase();
     const clase = (ficha.clase || '').toUpperCase();
     const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO' || clase === 'ENDURO';
@@ -124,35 +122,36 @@ function aplicarFiltros() {
     if (filtroValor === 'moto' && !esMoto) return false;
     if (filtroValor === 'vehiculo' && esMoto) return false;
     
-    // ✅ FILTRO EXACTO por texto (comparación exacta en mayúsculas)
+    // Filtro frontend por texto (redundante si ya filtramos en DB, pero útil para filtros en memoria)
     if (termino) {
-      const coincide = 
-        (ficha.placa || '').toUpperCase() === termino ||
-        (ficha.facsimil || '').toUpperCase() === termino ||
-        (ficha.marca || '').toUpperCase() === termino ||
-        (ficha.modelo || '').toUpperCase() === termino ||
-        (ficha.s_carroceria || '').toUpperCase() === termino ||
-        (ficha.s_motor || '').toUpperCase() === termino;
-      
-      if (!coincide) return false;
+      const match = (ficha.placa || '').toUpperCase() === termino ||
+                    (ficha.facsimil || '').toUpperCase() === termino ||
+                    (ficha.marca || '').toUpperCase() === termino ||
+                    (ficha.modelo || '').toUpperCase() === termino ||
+                    (ficha.s_carroceria || '').toUpperCase() === termino ||
+                    (ficha.s_motor || '').toUpperCase() === termino;
+      if (!match) return false;
     }
     return true;
   });
   
+  actualizarEstadisticas();
   renderizarTabla();
   renderizarPaginacion();
 }
-// ================= ACTUALIZAR ESTADÍSTICAS =================
+
 function actualizarEstadisticas() {
   const total = fichasData.length;
-  const vehiculos = fichasData.filter(f => {
+  let vehiculos = 0;
+  let motos = 0;
+  
+  fichasData.forEach(f => {
     const tipo = (f.tipo || '').toUpperCase();
     const clase = (f.clase || '').toUpperCase();
-    return !tipo.includes('MOTO') && !clase.includes('MOTO') && tipo !== 'ENDURO' && clase !== 'ENDURO';
-  }).length;
-  const motos = total - vehiculos;
+    const esMoto = tipo.includes('MOTO') || clase.includes('MOTO') || tipo === 'ENDURO' || clase === 'ENDURO';
+    if (esMoto) motos++; else vehiculos++;
+  });
   
-  // Actualizar DOM
   const elTotal = document.getElementById('totalFichas');
   const elVeh = document.getElementById('totalVehiculos');
   const elMoto = document.getElementById('totalMotos');
@@ -168,7 +167,7 @@ function renderizarTabla() {
   if (!tbody) return;
   
   if (fichasFiltradas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados con búsqueda exacta.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 No se encontraron resultados.</td></tr>`;
     return;
   }
   
@@ -247,27 +246,18 @@ window.verDetalle = function(id) {
     if (el) el.textContent = val || '-'; 
   };
   
-  set('modalMarca', f.marca); 
-  set('modalModelo', f.modelo); 
-  set('modalTipo', f.tipo);
-  set('modalClase', f.clase); 
-  set('modalColor', f.color); 
-  set('modalPlaca', f.placa);
-  set('modalFacsimilar', f.facsimil); 
-  set('modalSerialCarroceria', f.s_carroceria);
-  set('modalSerialMotor', f.s_motor); 
-  set('modalEstatus', f.estatus_ficha);
-  set('modalDependencia', f.dependencia); 
-  set('modalCausa', f.causa);
-  set('modalMecanica', f.mecanica); 
-  set('modalDiagnostico', f.diagnostico);
-  set('modalUbicacion', f.ubicacion); 
-  set('modalTapiceria', f.tapiceria);
-  set('modalCauchos', f.cauchos); 
-  set('modalLuces', f.luces);
+  // Llenar campos
+  set('modalMarca', f.marca); set('modalModelo', f.modelo); set('modalTipo', f.tipo);
+  set('modalClase', f.clase); set('modalColor', f.color); set('modalPlaca', f.placa);
+  set('modalFacsimilar', f.facsimil); set('modalSerialCarroceria', f.s_carroceria);
+  set('modalSerialMotor', f.s_motor); set('modalEstatus', f.estatus_ficha);
+  set('modalDependencia', f.dependencia); set('modalCausa', f.causa);
+  set('modalMecanica', f.mecanica); set('modalDiagnostico', f.diagnostico);
+  set('modalUbicacion', f.ubicacion); set('modalTapiceria', f.tapiceria);
+  set('modalCauchos', f.cauchos); set('modalLuces', f.luces);
   set('modalObservaciones', f.observaciones); 
   
-  // Footer de impresión
+  // Llenar footer de impresión
   const printFecha = document.getElementById('printFechaCreacion');
   const printCreador = document.getElementById('printCreadoPor');
   if (f.fecha_creacion && printFecha) {
@@ -286,12 +276,9 @@ window.verDetalle = function(id) {
     const span = box?.querySelector('span');
     if (img && box && span) {
       if (url && url.startsWith('http')) {
-        img.src = url; 
-        img.style.display = 'block'; 
-        span.style.display = 'none';
+        img.src = url; img.style.display = 'block'; span.style.display = 'none';
       } else {
-        img.style.display = 'none'; 
-        span.style.display = 'block';
+        img.style.display = 'none'; span.style.display = 'block';
       }
     }
   }
@@ -320,21 +307,24 @@ function mostrarTablaCargando(mostrar) {
   }
 }
 
+// ✅ ALERTA ESTILO FICHA-CREAR
 function mostrarAlerta(msg, tipo) {
   const el = document.getElementById('searchAlert');
   if (!el) return;
   el.className = `alert alert-${tipo}`;
   el.textContent = msg;
   el.style.display = 'block';
+  // Auto-scroll suave
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   });
+  // Cerrar a los 5 segundos
   setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
 
-// ✅ CORREGIDO: Nombres de clases que coinciden con el CSS del HTML
+// ✅ LOGICA DE COLORES CORREGIDA
 function getEstatusClass(est) {
   const e = (est || '').toUpperCase().trim();
   if (e.includes('DESINCORPORADO')) return 'status-gray';
