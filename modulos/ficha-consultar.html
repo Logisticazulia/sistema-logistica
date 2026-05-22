@@ -144,11 +144,11 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   color: #664d03;
   border-color: #ffecb5;
 }
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - MÁS ESPACIO PARA DATOS LARGOS ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL - SIN CORTE DE SERIALES ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 5mm; /* Márgenes mínimos para aprovechar espacio */
+    margin: 4mm; /* ✅ Márgenes mínimos para más espacio horizontal */
   }
   
   html, body {
@@ -188,9 +188,9 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .modal-content {
     margin: 0 auto !important;
-    padding: 3mm !important;
-    width: 98% !important;
-    max-width: 1120px !important;
+    padding: 2mm !important;
+    width: 99% !important; /* ✅ Casi todo el ancho disponible */
+    max-width: 1150px !important;
     box-shadow: none !important;
     background: white !important;
     page-break-inside: avoid !important;
@@ -200,49 +200,50 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 8px !important;
+    padding: 6px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
   }
   
   .ficha-header {
-    margin-bottom: 6px !important;
-    padding-bottom: 4px !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 3px !important;
     page-break-inside: avoid !important;
   }
   
-  .ficha-logo { width: 80px !important; }
-  .ficha-title h1 { font-size: 9pt !important; line-height: 1.1 !important; }
-  .ficha-title h2 { font-size: 11pt !important; margin: 1px 0 !important; }
-  .ficha-title h3 { font-size: 9pt !important; }
+  .ficha-logo { width: 75px !important; }
+  .ficha-title h1 { font-size: 8.5pt !important; line-height: 1.1 !important; }
+  .ficha-title h2 { font-size: 10pt !important; margin: 1px 0 !important; }
+  .ficha-title h3 { font-size: 8.5pt !important; }
   
-  /* ✅ TABLA CON MÁS ESPACIO PARA SERIALES LARGOS */
+  /* ✅ TABLA OPTIMIZADA PARA SERIALES LARGOS */
   .ficha-table {
     width: 100% !important;
     table-layout: fixed !important;
     border-collapse: collapse !important;
     page-break-inside: avoid !important;
-    margin: 4px 0 !important;
-    font-size: 9.5pt !important; /* ✅ Ligeramente más grande */
+    margin: 3px 0 !important;
+    font-size: 9pt !important;
     display: table !important;
   }
   
   .ficha-table colgroup { display: table-column-group !important; }
   
-  /* ✅ Anchos optimizados: más espacio para valores largos */
-  .ficha-table col.col-label { width: 13% !important; }   /* Etiquetas un poco más anchas */
-  .ficha-table col.col-value { width: 16% !important; }   /* ✅ Valores más anchos para seriales */
-  .ficha-table col.col-obs { width: 24% !important; }     /* Observaciones */
+  /* ✅ Anchos optimizados: MÁS ESPACIO PARA VALORES (seriales) */
+  .ficha-table col.col-label { width: 12% !important; }   /* Etiquetas */
+  .ficha-table col.col-value { width: 18% !important; }   /* ✅ Valores más anchos para seriales */
+  .ficha-table col.col-obs { width: 22% !important; }     /* Observaciones */
   
   .ficha-table th, .ficha-table td {
     border: 1px solid #003366 !important;
-    padding: 4px 5px !important; /* ✅ Más padding vertical para evitar cortes */
-    font-size: 9.5pt !important;
-    line-height: 1.2 !important; /* ✅ Mejor espaciado entre líneas */
-    vertical-align: top !important; /* ✅ Alineación arriba para textos largos */
+    padding: 3px 4px !important;
+    font-size: 9pt !important;
+    line-height: 1.15 !important; /* ✅ Ligeramente más compacto */
+    vertical-align: middle !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
+    white-space: normal !important; /* Permitir wrap solo si es estrictamente necesario */
     display: table-cell !important;
   }
   
@@ -250,7 +251,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     background: #4a7c9b !important;
     color: white !important;
     font-weight: 700 !important;
-    font-size: 9.5pt !important;
+    font-size: 9pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
@@ -265,28 +266,28 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   }
   
   .observaciones-cell { 
-    font-size: 9.5pt !important; 
-    line-height: 1.2 !important; 
-    padding: 5px !important; 
+    font-size: 9pt !important; 
+    line-height: 1.15 !important; 
+    padding: 4px !important; 
     vertical-align: top !important;
   }
   
   .observaciones-box { 
-    min-height: 130px !important; 
-    font-size: 9.5pt !important; 
-    line-height: 1.2 !important; 
+    min-height: 120px !important; 
+    font-size: 9pt !important; 
+    line-height: 1.15 !important; 
     border: 1px solid #003366 !important;
-    padding: 5px !important; 
+    padding: 4px !important; 
   }
   
   /* ✅ FOTOS */
   .fotos-container {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 4px !important;
+    gap: 3px !important;
     page-break-inside: avoid !important;
-    margin-top: 4px !important;
-    height: 160px !important;
+    margin-top: 3px !important;
+    height: 150px !important;
   }
   
   .foto-box { 
@@ -304,10 +305,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   /* ✅ FOOTER DE IMPRESIÓN */
   #printFooter {
     display: block !important;
-    margin-top: 10px !important;
-    padding-top: 8px !important;
+    margin-top: 8px !important;
+    padding-top: 6px !important;
     border-top: 1px solid #999 !important;
-    font-size: 9.5pt !important;
+    font-size: 9pt !important;
     color: #222 !important;
     text-align: center !important;
   }
