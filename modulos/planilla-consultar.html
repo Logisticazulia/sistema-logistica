@@ -210,6 +210,48 @@
     height: 50px; /* Controla el tamaño de los logos */
     margin: 0 10px;
 }
+  /* --- ESTILOS PARA FORZAR UNA SOLA HOJA --- */
+
+/* Activa modo compacto */
+.pdf-compact {
+    transform: scale(0.9); /* Reduce un 10% el tamaño general para dar margen */
+    transform-origin: top center;
+}
+
+/* Convierte los datos en 2 columnas */
+.pdf-compact #fichaData {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 4px 10px; /* Espacio pequeño entre filas y columnas */
+    font-size: 10px; /* Letra pequeña pero legible */
+}
+
+/* Ajusta cada campo individual */
+.pdf-compact .ficha-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    border-bottom: 1px dotted #ccc;
+    margin: 0;
+}
+
+.pdf-compact .ficha-field label {
+    font-weight: bold;
+    color: #333;
+    width: 40%; /* La etiqueta ocupa el 40% */
+}
+
+.pdf-compact .ficha-field span {
+    text-align: right;
+    width: 60%; /* El valor ocupa el 60% */
+}
+
+/* El campo de observación ocupa todo el ancho al final */
+.pdf-compact #fichaObservacion {
+    grid-column: span 2;
+    margin-top: 5px;
+    font-size: 9px;
+}
 </style>
 </head>
 <body class="dashboard-page">
