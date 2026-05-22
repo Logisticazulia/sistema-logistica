@@ -643,7 +643,7 @@ body {
                     placeholder="Ingrese placa, facsimilar, serial de carrocería, serial de motor o marca..."
                     autocomplete="off"
                 >
-               <button class="btn-search" onclick="buscarFichas()">
+                <button class="btn-search" onclick="buscarVehiculo()">
                     <span>🔍</span>
                     <span>Buscar</span>
                 </button>
@@ -665,13 +665,6 @@ body {
         <!-- Tabla de Resultados -->
         <div class="results-section">
             <h2>📋 Resultados de Búsqueda</h2>
-          <div style="display:flex;justify-content:flex-end;margin:-10px 0 15px 0;">
-  <select id="tipoFilter" style="padding:5px 10px;font-size:12px;border:1px solid #ccc;border-radius:4px;" onchange="aplicarFiltroYPaginacion()">
-    <option value="todos">🌐 Todos</option>
-    <option value="motos">🏍️ Motos</option>
-    <option value="vehiculos">🚗 Vehículos</option>
-  </select>
-</div>
             <div class="table-container">
                 <table class="results-table" id="resultsTable">
                     <thead>
