@@ -83,6 +83,7 @@ async function buscarFichas() {
     paginaActual = 1;
     aplicarFiltros();
     
+    
     if (fichasData.length > 0) {
       mostrarAlerta(`✅ ${fichasData.length} registro(s) encontrado(s).`, 'success');
     } else {
@@ -106,6 +107,7 @@ window.limpiarBusqueda = () => {
   fichasFiltradas = [];
   paginaActual = 1;
   buscarFichas();
+  // actualizarEstadisticas() se llama dentro de buscarFichas()
 };
 
 // ================= FILTROS =================
@@ -139,6 +141,25 @@ function aplicarFiltros() {
   
   renderizarTabla();
   renderizarPaginacion();
+}
+// ================= ACTUALIZAR ESTADÍSTICAS =================
+function actualizarEstadisticas() {
+  const total = fichasData.length;
+  const vehiculos = fichasData.filter(f => {
+    const tipo = (f.tipo || '').toUpperCase();
+    const clase = (f.clase || '').toUpperCase();
+    return !tipo.includes('MOTO') && !clase.includes('MOTO') && tipo !== 'ENDURO' && clase !== 'ENDURO';
+  }).length;
+  const motos = total - vehiculos;
+  
+  // Actualizar DOM
+  const elTotal = document.getElementById('totalFichas');
+  const elVeh = document.getElementById('totalVehiculos');
+  const elMoto = document.getElementById('totalMotos');
+  
+  if (elTotal) elTotal.textContent = total;
+  if (elVeh) elVeh.textContent = vehiculos;
+  if (elMoto) elMoto.textContent = motos;
 }
 
 // ================= RENDERIZAR TABLA =================
