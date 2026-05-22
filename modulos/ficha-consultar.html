@@ -95,11 +95,26 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - CENTRADO PERFECTO ===== */
+/* ===== IMPRESIÓN: CARTA HORIZONTAL - SIN HOJA EN BLANCO ===== */
 @media print {
   @page { 
     size: letter landscape; 
-    margin: 8mm; /* Márgenes equilibrados para centrar */
+    margin: 8mm;
+    /* ✅ Evitar salto de página automático al inicio */
+    margin-top: 0 !important;
+  }
+  
+  /* Resetear body para evitar espacio inicial */
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+    /* ✅ Evitar saltos de página automáticos */
+    orphans: 0 !important;
+    widows: 0 !important;
   }
   
   /* Ocultar elementos de interfaz */
@@ -113,39 +128,39 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   .module-title-section,
   .container > *:not(#fichaModal) {
     display: none !important;
-  }
-  
-  /* Reset body para impresión */
-  html, body {
-    width: 100% !important;
-    height: auto !important;
+    visibility: hidden !important;
+    height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
-    background: white !important;
-    zoom: 1 !important;
   }
   
-  /* ✅ MODAL CENTRADO EN LA HOJA */
+  /* ✅ Modal: Posicionamiento seguro para impresión */
   #fichaModal {
     display: block !important;
-    position: relative !important; /* Cambiado de fixed a relative para mejor centrado */
+    position: relative !important; /* Cambiado de fixed/absolute a relative */
+    left: 0 !important;
+    top: 0 !important;
     width: 100% !important;
     height: auto !important;
     background: white !important;
-    padding: 8mm 0 !important; /* Espacio vertical para centrar visualmente */
+    padding: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
     z-index: 99999 !important;
+    /* ✅ Forzar inicio inmediato sin salto */
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
   }
   
   .modal-content {
-    margin: 0 auto !important; /* ✅ CENTRADO HORIZONTAL CLAVE */
+    margin: 0 auto !important;
     padding: 4mm !important;
-    width: 96% !important; /* ✅ No 100% para dejar márgenes visuales */
-    max-width: 1100px !important; /* ✅ Ancho óptimo para carta horizontal */
+    width: 96% !important;
+    max-width: 1100px !important;
     box-shadow: none !important;
     background: white !important;
+    /* ✅ Evitar que se corte entre páginas */
+    page-break-inside: avoid !important;
   }
   
   .modal-close, .modal-actions {
@@ -167,23 +182,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     page-break-inside: avoid !important;
   }
   
-  .ficha-logo {
-    width: 85px !important;
-  }
-  
-  .ficha-title h1 {
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-  }
-  
-  .ficha-title h2 {
-    font-size: 11pt !important;
-    margin: 2px 0 !important;
-  }
-  
-  .ficha-title h3 {
-    font-size: 9pt !important;
-  }
+  .ficha-logo { width: 85px !important; }
+  .ficha-title h1 { font-size: 9pt !important; line-height: 1.1 !important; }
+  .ficha-title h2 { font-size: 11pt !important; margin: 2px 0 !important; }
+  .ficha-title h3 { font-size: 9pt !important; }
   
   /* Tabla */
   .ficha-table {
@@ -196,24 +198,12 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     display: table !important;
   }
   
-  .ficha-table colgroup {
-    display: table-column-group !important;
-  }
+  .ficha-table colgroup { display: table-column-group !important; }
+  .ficha-table col.col-label { width: 11% !important; }
+  .ficha-table col.col-value { width: 14% !important; }
+  .ficha-table col.col-obs { width: 28% !important; }
   
-  .ficha-table col.col-label {
-    width: 11% !important;
-  }
-  
-  .ficha-table col.col-value {
-    width: 14% !important;
-  }
-  
-  .ficha-table col.col-obs {
-    width: 28% !important;
-  }
-  
-  .ficha-table th, 
-  .ficha-table td {
+  .ficha-table th, .ficha-table td {
     border: 1px solid #003366 !important;
     padding: 3px 3px !important;
     font-size: 9pt !important;
@@ -241,19 +231,8 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     color-adjust: exact !important;
   }
   
-  .observaciones-cell {
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-    padding: 3px !important;
-  }
-  
-  .observaciones-box {
-    min-height: 120px !important;
-    font-size: 9pt !important;
-    line-height: 1.1 !important;
-    border: 1px solid #003366 !important;
-    padding: 3px !important;
-  }
+  .observaciones-cell { font-size: 9pt !important; line-height: 1.1 !important; padding: 3px !important; }
+  .observaciones-box { min-height: 120px !important; font-size: 9pt !important; line-height: 1.1 !important; border: 1px solid #003366 !important; padding: 3px !important; }
   
   /* Fotos */
   .fotos-container {
@@ -264,20 +243,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     margin-top: 6px !important;
     height: 180px !important;
   }
+  .foto-box { height: 100% !important; border: 1px solid #4a7c9b !important; page-break-inside: avoid !important; }
+  .foto-box img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
   
-  .foto-box {
-    height: 100% !important;
-    border: 1px solid #4a7c9b !important;
-    page-break-inside: avoid !important;
-  }
-  
-  .foto-box img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-  }
-  
-  /* Forzar colores en todos los navegadores */
+  /* Forzar colores */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
