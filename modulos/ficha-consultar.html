@@ -16,24 +16,16 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 
-.container {
-  max-width: 1600px; margin: 0 auto; padding: 20px;
-  display: flex; flex-direction: column; gap: 30px;
-}
+.container { max-width: 1600px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
 
 /* ================= SECCIÓN BÚSQUEDA ================= */
-.search-section {
-  background: linear-gradient(135deg, #003366 0%, #004080 100%);
-  padding: 25px; border-radius: 8px; margin-bottom: 25px;
-  box-shadow: 0 4px 12px rgba(0,51,102,0.2);
-}
+.search-section { background: linear-gradient(135deg, #003366 0%, #004080 100%); padding: 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,51,102,0.2); }
 .search-section h3 { color: white; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
 .search-container { display: flex; gap: 12px; flex-wrap: wrap; }
 .search-input { flex: 1; min-width: 300px; padding: 12px 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 15px; background: rgba(255,255,255,0.95); transition: all 0.3s ease; }
 .search-input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
 .search-hint { color: rgba(255,255,255,0.9); font-size: 13px; margin-top: 10px; display: flex; gap: 20px; flex-wrap: wrap; }
 
-/* Botones de búsqueda */
 .btn-search { padding: 12px 28px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
 .btn-search:hover { background: #218838; transform: translateY(-2px); }
 .btn-clear { padding: 12px 28px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
@@ -42,18 +34,13 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 /* ================= SECCIÓN RESULTADOS Y FILTROS ================= */
 .results-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; }
 
-.results-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding-bottom: 12px; border-bottom: 3px solid #003366; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
-}
+.results-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 3px solid #003366; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
 .results-header h2 { color: #003366; margin: 0; font-size: 22px; }
 
-/* Filtro de Tipo */
 .filter-group { display: flex; align-items: center; gap: 10px; }
 .filter-group label { font-weight: 500; color: #003366; font-size: 14px; }
 .filter-select { padding: 8px 12px; border: 2px solid #003366; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; }
 
-/* Tabla */
 .table-container { overflow-x: auto; border-radius: 4px; border: 1px solid #e0e0e0; }
 .results-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px; }
 .results-table th { background: #003366; color: white; padding: 14px 12px; text-align: left; font-weight: 600; border: 1px solid #002244; white-space: nowrap; }
@@ -61,7 +48,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .results-table tr:nth-child(even) { background: #f8f9fa; }
 .results-table tr:hover { background: #e3f2fd; }
 
-/* Botones en tabla */
 .btn-view { padding: 8px 16px; background: #003366; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; margin-right: 6px; }
 .btn-view:hover { background: #004080; }
 .btn-print { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; }
@@ -93,40 +79,55 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .ficha-title h2 { font-size: 19px; color: #003366; font-weight: 700; margin: 6px 0; }
 .ficha-title h3 { font-size: 17px; color: #003366; font-weight: 700; }
 
-/* TABLA DE LA FICHA (Corregida para desborde) */
+/* ✅ TABLA CORREGIDA PARA EVITAR DESBORDES */
 .ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
 .ficha-table th { background: #4a7c9b; color: white; padding: 14px 12px; text-align: left; font-size: 13px; border: 2px solid #003366; font-weight: 700; }
-.ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; word-wrap: break-word; vertical-align: middle; line-height: 1.4; }
+.ficha-table td { padding: 10px 8px; border: 2px solid #003366; font-size: 12px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: middle; line-height: 1.4; }
 .ficha-table .label { background: #f0f0f0; font-weight: 700; }
 
-/* Anchos específicos para evitar desborde en Tipo/Color/Dependencia */
+/* ✅ ANCHOS FIJOS PARA EVITAR QUE TIPO, COLOR Y DEPENDENCIA SE SALGAN */
 .ficha-table td:nth-child(1), .ficha-table td:nth-child(3), .ficha-table td:nth-child(5) { width: 14%; }
 .ficha-table td:nth-child(2), .ficha-table td:nth-child(4), .ficha-table td:nth-child(6) { width: 19.33%; }
 
-/* Observaciones e Imágenes */
-.observaciones-box { min-height: 250px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; }
+.observaciones-box { min-height: 250px; border: 2px solid #003366; padding: 15px; background: #fafafa; font-size: 13px; overflow-y: auto; border-radius: 4px; word-wrap: break-word; }
 .fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
 .foto-box { border: 2px solid #4a7c9b; height: 160px; background: #4a7c9b; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; overflow: hidden; }
 .foto-box img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Botones del Modal (Acercados) */
-.modal-actions {
-  margin-top: 10px; /* Reducido de 25px a 10px */
-  display: flex; gap: 12px; justify-content: flex-end;
-  padding-top: 15px; border-top: 2px solid #e0e0e0;
-}
+.modal-actions { margin-top: 10px; display: flex; gap: 12px; justify-content: flex-end; padding-top: 15px; border-top: 2px solid #e0e0e0; }
 .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin: 0; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .results-header { flex-direction: column; align-items: flex-start; }
-  .ficha-table td:nth-child(1), .ficha-table td:nth-child(3), .ficha-table td:nth-child(5) { width: auto; }
-  .ficha-table td:nth-child(2), .ficha-table td:nth-child(4), .ficha-table td:nth-child(6) { width: auto; }
   .ficha-table { table-layout: auto; }
   .ficha-table td { display: block; width: 100%; border-bottom: none; }
-  .ficha-table tr { display: flex; flex-direction: column; border-bottom: 1px solid #ccc; padding: 10px 0; }
+}
+
+/* ✅ IMPRESIÓN: CARTA HORIZONTAL + MISMA VISTA PREVIA */
+@media print {
+  @page { size: letter landscape; margin: 8mm; }
+  
+  /* Ocultar todo lo que no es la ficha */
+  .navbar, .module-header, .search-section, .results-section, 
+  .modal-close, .btn, .pagination-container, .module-title-section { display: none !important; }
+  
+  /* Mostrar solo el modal y la ficha */
+  .modal { position: absolute !important; display: block !important; background: white !important; padding: 0 !important; overflow: visible !important; }
+  .modal-content { margin: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
+  
+  /* Mantener estilos de la ficha igual que en pantalla */
+  .ficha-tecnica { border: 2px solid #003366 !important; padding: 20px !important; width: 100% !important; background: white !important; }
+  .ficha-table { page-break-inside: auto; }
+  .ficha-table tr { page-break-inside: avoid; }
+  .ficha-table th, .ficha-table td { border: 2px solid #003366 !important; padding: 8px !important; }
+  .ficha-header { page-break-after: avoid; }
+  .modal-actions { display: none !important; }
+  
+  /* Asegurar colores de fondo */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 </style>
 </head>
@@ -187,9 +188,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 <div class="table-container">
 <table class="results-table" id="resultsTable">
 <thead>
-<tr>
-<th>Placa</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Color</th><th>Estatus</th><th>Dependencia</th><th>Acciones</th>
-</tr>
+<tr><th>Placa</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Color</th><th>Estatus</th><th>Dependencia</th><th>Acciones</th></tr>
 </thead>
 <tbody id="resultsBody">
 <tr><td colspan="8" style="text-align:center;padding:40px;color:#666">📭 Realice una búsqueda para ver resultados.</td></tr>
@@ -254,9 +253,7 @@ OBSERVACIONES<br><br>
 <tr>
 <td class="label">ESTATUS</td><td colspan="4" style="text-align:center; font-weight:bold;" id="modalEstatus"></td>
 </tr>
-<tr>
-<th colspan="6">INFORMACIÓN TÉCNICO MECÁNICA</th>
-</tr>
+<tr><th colspan="6">INFORMACIÓN TÉCNICO MECÁNICA</th></tr>
 <tr>
 <td class="label">CAUSA</td><td colspan="2" id="modalCausa"></td>
 <td class="label">DIAGNÓSTICO</td><td colspan="2" id="modalDiagnostico"></td>
@@ -270,9 +267,7 @@ OBSERVACIONES<br><br>
 <td class="label">CAUCHOS</td><td id="modalCauchos"></td>
 <td class="label">LUCES</td><td id="modalLuces"></td>
 </tr>
-<tr>
-<th colspan="6">REGISTRO FOTOGRÁFICO</th>
-</tr>
+<tr><th colspan="6">REGISTRO FOTOGRÁFICO</th></tr>
 <tr>
 <td colspan="6">
 <div class="fotos-container">
