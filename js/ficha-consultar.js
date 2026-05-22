@@ -1,6 +1,5 @@
 // ============================================
 // CONSULTAR FICHAS TÉCNICAS - LÓGICA COMPLETA
-// Archivo: ficha-consultar.js
 // ============================================
 
 let supabaseClient = null;
@@ -11,11 +10,8 @@ const REGISTROS_POR_PAGINA = 15;
 
 function inicializarSupabase() {
     if (typeof window.supabase === 'undefined') return false;
-    const url = window.SUPABASE_URL;
-    const key = window.SUPABASE_KEY;
-    if (!url || !key) return false;
     try {
-        supabaseClient = window.supabase.createClient(url, key);
+        supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
         return true;
     } catch (e) { return false; }
 }
@@ -38,16 +34,15 @@ async function buscarVehiculo() {
     if (!term) return mostrarAlerta('⚠️ Ingrese un término de búsqueda', 'error');
 
     mostrarAlerta('⏳ Buscando...', 'info');
-    const btn = document.getElementById('btnSearch');
+    const btn = document.getElementById('btnBuscar');
     btn.disabled = true;
 
     try {
+        // ✅ Consulta robusta con .ilike (ignora mayúsculas/minúsculas)
         const { data, error } = await supabaseClient
             .from('fichas_tecnicas')
             .select('*')
-            .or(
-                `placa.ilike.%${term}%,facsimil.ilike.%${term}%,s_carroceria.ilike.%${term}%,s_motor.ilike.%${term}%,marca.ilike.%${term}%,modelo.ilike.%${term}%`
-            )
+            .or(`placa.ilike.%${term}%,facsimil.ilike.%${term}%,s_carroceria.ilike.%${term}%,s_motor.ilike.%${term}%,marca.ilike.%${term}%,modelo.ilike.%${term}%`)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -55,7 +50,7 @@ async function buscarVehiculo() {
         fichasEncontradas = data || [];
         if (fichasEncontradas.length === 0) return mostrarAlerta('❌ No se encontraron resultados', 'error');
 
-        mostrarAlerta('✅ ' + fichasEncontradas.length + ' ficha(s) encontrada(s)', 'success');
+        mostrarAlerta(`✅ ${fichasEncontradas.length} ficha(s) encontrada(s)`, 'success');
         document.getElementById('filtroTipo').value = 'todos';
         aplicarFiltro();
     } catch (e) {
@@ -145,12 +140,21 @@ function verFicha(id) {
     const f = fichasEncontradas.find(x => x.id == id);
     if (!f) return mostrarAlerta('❌ Ficha no encontrada', 'error');
 
-    const map = ['marca','modelo','tipo','clase','color','placa','facsimil','dependencia','s_carroceria','s_motor','estatus_ficha','causa','diagnostico','mecanica','ubicacion','tapiceria','cauchos','luces','observaciones'];
-    map.forEach(k => {
-        const el = document.getElementById('modal' + k.charAt(0).toUpperCase() + k.slice(1));
+    // ✅ Mapeo exacto con tus columnas de Supabase
+    const map = {
+        marca: 'modalMarca', modelo: 'modalModelo', tipo: 'modalTipo', clase: 'modalClase', color: 'modalColor',
+        placa: 'modalPlaca', facsimil: 'modalFacsimilar', dependencia: 'modalDependencia',
+        s_carroceria: 'modalSerialCarroceria', s_motor: 'modalSerialMotor', estatus_ficha: 'modalEstatus',
+        causa: 'modalCausa', diagnostico: 'modalDiagnostico', mecanica: 'modalMecanica', ubicacion: 'modalUbicacion',
+        tapiceria: 'modalTapiceria', cauchos: 'modalCauchos', luces: 'modalLuces', observaciones: 'modalObservaciones'
+    };
+
+    Object.keys(map).forEach(k => {
+        const el = document.getElementById(map[k]);
         if (el) el.textContent = f[k] || 'N/A';
     });
 
+    // Fotos
     for (let i = 1; i <= 4; i++) {
         const img = document.getElementById('modalImg' + i);
         const box = document.getElementById('modalBox' + i);
@@ -159,6 +163,11 @@ function verFicha(id) {
         if (url && img && span) { img.src = url; img.style.display = 'block'; span.style.display = 'none'; }
         else if (span && img) { img.style.display = 'none'; span.style.display = 'block'; }
     }
+
+    const fecha = document.getElementById('modalFechaCreacion');
+    const creador = document.getElementById('modalCreadoPor');
+    if (fecha) fecha.textContent = f.created_at ? new Date(f.created_at).toLocaleString('es-VE') : 'N/A';
+    if (creador) creador.textContent = f.creado_por || 'N/A';
 
     document.getElementById('fichaModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -193,6 +202,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!inicializarSupabase()) return;
 
     document.getElementById('searchInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') buscarVehiculo(); });
+    document.getElementById('btnBuscar')?.addEventListener('click', buscarVehiculo);
+    document.getElementById('btnLimpiar')?.addEventListener('click', limpiarBusqueda);
     document.getElementById('logoutBtn')?.addEventListener('click', () => confirm('¿Cerrar sesión?') && window.location.replace('../index.html'));
     
     window.onclick = function(e) { if (e.target.id === 'fichaModal') cerrarModal(); };
