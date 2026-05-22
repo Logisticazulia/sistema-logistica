@@ -502,7 +502,47 @@ body {
     padding-top: 20px;
     border-top: 2px solid #e0e0e0;
 }
-
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #003366;
+}
+/* Quitamos el borde del h2 original para que no se duplique */
+.results-section h2 {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.filter-select {
+    padding: 8px 14px;
+    border: 2px solid #003366;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: #003366;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+.filter-select:hover, .filter-select:focus {
+    border-color: #004080;
+    box-shadow: 0 0 0 3px rgba(0,51,102,0.15);
+    outline: none;
+}
+@media (max-width: 768px) {
+    .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .filter-select {
+        width: 100%;
+    }
+}
 /* Responsive - Desktop primero */
 @media (max-width: 1200px) {
     .fotos-container {
@@ -664,7 +704,14 @@ body {
 
         <!-- Tabla de Resultados -->
         <div class="results-section">
-            <h2>📋 Resultados de Búsqueda</h2>
+          <div class="results-header">
+    <h2>📋 Resultados de Búsqueda</h2>
+    <select id="filterType" class="filter-select">
+        <option value="all">📋 Todos los registros</option>
+        <option value="MOTO">🏍️ Motos</option>
+        <option value="VEHICULO">🚗 Vehículos (Autos, Camionetas, Buses)</option>
+    </select>
+</div>
             <div class="table-container">
                 <table class="results-table" id="resultsTable">
                     <thead>
