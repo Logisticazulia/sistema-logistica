@@ -14,7 +14,17 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
+
+/* ===== ALERTAS ===== */
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; display: none; font-size: 14px; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid transparent; animation: fadeIn 0.3s ease; }
+.alert-success { background-color: #d1e7dd; color: #0f5132; border-color: #198754; }
+.alert-error { background-color: #f8d7da; color: #842029; border-color: #dc3545; }
+.alert-info { background-color: #cff4fc; color: #055160; border-color: #0dcaf0; }
+.alert-warning { background-color: #fff3cd; color: #664d03; border-color: #ffc107; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
 .container { max-width: 1600px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
+
 /* ===== BÚSQUEDA ===== */
 .search-section { background: linear-gradient(135deg, #003366 0%, #004080 100%); padding: 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,51,102,0.2); }
 .search-section h3 { color: white; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
@@ -26,7 +36,8 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-search:hover { background: #218838; transform: translateY(-2px); }
 .btn-clear { padding: 12px 28px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
 .btn-clear:hover { background: #e0a800; transform: translateY(-2px); }
-/* ===== RESULTADOS Y FILTROS ===== */
+
+/* ===== RESULTADOS ===== */
 .results-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; }
 .results-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 3px solid #003366; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
 .results-header h2 { color: #003366; margin: 0; font-size: 22px; }
@@ -43,6 +54,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .btn-view:hover { background: #004080; }
 .btn-print { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; }
 .btn-print:hover { background: #218838; }
+
 /* ===== PAGINACIÓN ===== */
 .pagination-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
 #paginationInfo { color: #666; font-size: 14px; font-weight: 500; }
@@ -54,12 +66,14 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .page-btn { min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 500; }
 .page-btn:hover:not(.active) { background: #f0f0f0; border-color: #003366; }
 .page-btn.active { background: #003366; color: white; border-color: #003366; }
+
 /* ===== MODAL ===== */
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; padding: 40px 20px; }
 .modal-content { background: white; margin: 0 auto; padding: 35px; border-radius: 8px; max-width: 1200px; width: 95%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
 .modal-close { position: absolute; right: 25px; top: 20px; font-size: 32px; cursor: pointer; background: #f5f5f5; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
 .modal-close:hover { background: #e0e0e0; color: #003366; transform: rotate(90deg); }
-/* ===== FICHA TÉCNICA ===== */
+
+/* ===== FICHA TÉCNICA - VISTA PREVIA ===== */
 .ficha-tecnica { border: 2px solid #003366; padding: 20px; background: white; width: 100%; }
 .ficha-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #003366; }
 .ficha-logo { width: 100px; }
@@ -67,48 +81,55 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
 .ficha-title h1 { font-size: 13px; color: #003366; font-weight: 700; margin: 2px 0; line-height: 1.2; }
 .ficha-title h2 { font-size: 15px; color: #003366; font-weight: 700; margin: 4px 0; }
 .ficha-title h3 { font-size: 13px; color: #003366; font-weight: 700; }
-/* ✅ TABLA CORREGIDA - Estructura limpia */
+
+/* Tabla */
 .ficha-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
 .ficha-table th { background: #4a7c9b; color: white; padding: 8px 10px; text-align: left; font-size: 11px; border: 2px solid #003366; font-weight: 700; }
 .ficha-table td { padding: 6px 8px; border: 2px solid #003366; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; vertical-align: middle; line-height: 1.3; }
 .ficha-table .label { background: #f0f0f0; font-weight: 700; width: 12%; }
 .ficha-table .value { width: 15%; background: white; }
-/* Anchos de columnas */
+
+/* Columnas */
 .ficha-table col.col-label { width: 12%; }
 .ficha-table col.col-value { width: 15%; }
 .ficha-table col.col-obs { width: 22%; }
-/* Observaciones sin recuadro interno */
+
+/* Observaciones */
 .observaciones-cell { vertical-align: top; padding: 8px; font-size: 11px; line-height: 1.4; background: white; }
+
+/* Fotos */
 .fotos-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
 .foto-box { border: 2px solid #4a7c9b; height: 130px; background: #4a7c9b; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 11px; overflow: hidden; }
 .foto-box img { width: 100%; height: 100%; object-fit: cover; }
+
 .modal-actions { margin-top: 15px; display: flex; gap: 12px; justify-content: flex-end; padding-top: 15px; border-top: 2px solid #e0e0e0; }
 .btn { padding: 10px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin: 0; }
 .btn-secondary { background: #6c757d; color: white; }
 .btn-success { background: #28a745; color: white; }
 
-/* ===== IMPRESIÓN: CARTA HORIZONTAL - AJUSTE PERFECTO ===== */
+/* ===== IMPRESIÓN PERFECTA - HOJA CARTA HORIZONTAL ===== */
 @media print {
-  @page { 
-    size: letter landscape; 
-    margin: 8mm;
+  @page {
+    size: letter landscape;
+    margin: 10mm;
   }
   
-  /* Ocultar TODO excepto el modal */
+  /* Ocultar TODO */
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
   
+  /* Mostrar solo el modal y su contenido */
   .modal, .modal * {
-    visibility: visible;
+    visibility: visible !important;
   }
   
   .modal {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     background: white !important;
     padding: 0 !important;
     overflow: visible !important;
@@ -117,7 +138,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .modal-content {
     margin: 0 !important;
-    padding: 10mm !important;
+    padding: 8mm !important;
     box-shadow: none !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -130,44 +151,46 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
   
   .ficha-tecnica {
     border: 2px solid #003366 !important;
-    padding: 15px !important;
+    padding: 12px !important;
     width: 100% !important;
     background: white !important;
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
   }
   
   .ficha-header {
-    margin-bottom: 15px !important;
-    padding-bottom: 10px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    page-break-inside: avoid !important;
   }
   
   .ficha-logo {
-    width: 90px !important;
+    width: 85px !important;
   }
   
   .ficha-title h1 {
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
   
   .ficha-title h2 {
-    font-size: 14px !important;
+    font-size: 13px !important;
   }
   
   .ficha-title h3 {
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
   
   .ficha-table {
     width: 100% !important;
-    margin-bottom: 10px !important;
-    page-break-inside: avoid;
+    margin-bottom: 8px !important;
+    page-break-inside: avoid !important;
   }
   
   .ficha-table th, 
   .ficha-table td {
     border: 2px solid #003366 !important;
-    padding: 5px !important;
-    font-size: 10px !important;
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
   }
   
   .ficha-table th {
@@ -175,30 +198,33 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
     color: white !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
   
   .ficha-table .label {
     background: #f0f0f0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
   
   .observaciones-cell {
-    font-size: 10px !important;
-    line-height: 1.3 !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
   }
   
   .fotos-container {
-    gap: 8px !important;
+    gap: 6px !important;
+    page-break-inside: avoid !important;
   }
   
   .foto-box {
-    height: 110px !important;
+    height: 100px !important;
     border: 2px solid #4a7c9b !important;
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
   }
   
-  /* Forzar colores de fondo */
+  /* Forzar impresión de colores de fondo */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -302,7 +328,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
           </div>
           <img src="../img/logo-juntos.png" alt="Juntos por la Vida" class="ficha-logo" onerror="this.style.display='none'">
         </div>
-        <!-- ✅ TABLA CORREGIDA: Sin recuadro interno en observaciones, sin fecha/creador -->
+        <!-- ✅ TABLA CORREGIDA -->
         <table class="ficha-table" id="fichaTable">
           <colgroup>
             <col class="col-label">
@@ -313,12 +339,12 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <col class="col-value">
             <col class="col-obs">
           </colgroup>
-          <!-- Fila 1: TÍTULO DATOS + OBSERVACIONES -->
+          <!-- Fila 1: TÍTULOS -->
           <tr>
             <th colspan="6">DATOS DEL VEHICULO</th>
             <th>OBSERVACIONES</th>
           </tr>
-          <!-- Fila 2: MARCA | valor | MODELO | valor | TIPO | valor | OBS (rowspan) -->
+          <!-- Fila 2: MARCA, MODELO, TIPO -->
           <tr>
             <td class="label">MARCA</td>
             <td class="value" id="modalMarca"></td>
@@ -328,7 +354,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <td class="value" id="modalTipo"></td>
             <td rowspan="6" class="observaciones-cell" id="modalObservaciones"></td>
           </tr>
-          <!-- Fila 3: SERIAL CARROCERÍA | valor | CLASE | valor | COLOR | valor -->
+          <!-- Fila 3: SERIAL, CLASE, COLOR -->
           <tr>
             <td class="label">SERIAL CARROCERÍA</td>
             <td class="value" id="modalSerialCarroceria"></td>
@@ -337,7 +363,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <td class="label">COLOR</td>
             <td class="value" id="modalColor"></td>
           </tr>
-          <!-- Fila 4: PLACA | valor | FACSIMIL | valor | DEPENDENCIA | valor -->
+          <!-- Fila 4: PLACA, FACSIMIL, DEPENDENCIA -->
           <tr>
             <td class="label">PLACA</td>
             <td class="value" id="modalPlaca"></td>
@@ -346,36 +372,36 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <td class="label">DEPENDENCIA</td>
             <td class="value" id="modalDependencia"></td>
           </tr>
-          <!-- Fila 5: SERIAL MOTOR | valor | (vacío) -->
+          <!-- Fila 5: SERIAL MOTOR -->
           <tr>
             <td class="label">SERIAL MOTOR</td>
             <td class="value" id="modalSerialMotor"></td>
             <td colspan="4"></td>
           </tr>
-          <!-- Fila 6: ESTATUS DEL VEHÍCULO | colspan 5 -->
+          <!-- Fila 6: ESTATUS -->
           <tr>
             <td class="label">ESTATUS DEL VEHÍCULO</td>
             <td colspan="5" style="text-align:center;font-weight:bold;font-size:11px;" id="modalEstatus"></td>
           </tr>
-          <!-- Fila 7: TÍTULO INFO TÉCNICA -->
+          <!-- Fila 7: INFO TÉCNICA -->
           <tr>
             <th colspan="7">INFORMACIÓN TÉCNICO MECÁNICA POR INOPERATIVIDAD</th>
           </tr>
-          <!-- Fila 8: CAUSA | colspan 2 | DIAGNÓSTICO | colspan 3 -->
+          <!-- Fila 8: CAUSA, DIAGNÓSTICO -->
           <tr>
             <td class="label">CAUSA</td>
             <td colspan="2" id="modalCausa"></td>
             <td class="label">DIAGNÓSTICO</td>
             <td colspan="3" id="modalDiagnostico"></td>
           </tr>
-          <!-- Fila 9: MECÁNICA | colspan 2 | UBICACIÓN | colspan 3 -->
+          <!-- Fila 9: MECÁNICA, UBICACIÓN -->
           <tr>
             <td class="label">MECÁNICA</td>
             <td colspan="2" id="modalMecanica"></td>
             <td class="label">UBICACIÓN</td>
             <td colspan="3" id="modalUbicacion"></td>
           </tr>
-          <!-- Fila 10: TAPICERÍA | valor | CAUCHOS | valor | LUCES | valor | (vacío) -->
+          <!-- Fila 10: TAPICERÍA, CAUCHOS, LUCES -->
           <tr>
             <td class="label">TAPICERÍA</td>
             <td class="value" id="modalTapiceria"></td>
@@ -385,11 +411,10 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
             <td class="value" id="modalLuces"></td>
             <td></td>
           </tr>
-          <!-- Fila 11: TÍTULO REGISTRO FOTOGRÁFICO -->
+          <!-- Fila 11: FOTOS -->
           <tr>
             <th colspan="7">REGISTRO FOTOGRÁFICO</th>
           </tr>
-          <!-- Fila 12: Fotos (colspan 7) -->
           <tr>
             <td colspan="7" style="padding:10px;">
               <div class="fotos-container">
