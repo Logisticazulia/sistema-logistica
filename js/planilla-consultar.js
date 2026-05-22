@@ -439,7 +439,22 @@ function exportarPDF() {
         element.classList.remove('pdf-compact');
     });
 }
-
+/**
+ * Genera un número único de exportación para el nombre del archivo PDF
+ * Formato: EXPORT-AAAAMMDD-HHMMSS-XXX
+ */
+function generarNumeroExportacion() {
+    const fecha = new Date();
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+    const hours = String(fecha.getHours()).padStart(2, '0');
+    const minutes = String(fecha.getMinutes()).padStart(2, '0');
+    const seconds = String(fecha.getSeconds()).padStart(2, '0');
+    const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    
+    return `EXPORT-${year}${month}${day}-${hours}${minutes}${seconds}-${random}`;
+}
 // Imprimir ficha
 function imprimirFicha() {
     window.print();
