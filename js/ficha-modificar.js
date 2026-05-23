@@ -210,27 +210,34 @@ function llenarFormulario(ficha) {
         const element = document.getElementById(formField);
         
         if (element && ficha[dbField]) {
-            if (element.tagName === 'SELECT') {
-                const options = Array.from(element.options);
-                const dbValue = ficha[dbField].toUpperCase().trim();
-                let matchingOption = options.find(function(opt) {
-                    const optValue = opt.value.toUpperCase().trim();
-                    return optValue === dbValue || optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '');
-                });
-                
-                if (matchingOption) {
-                    element.value = matchingOption.value;
-                } else {
-                    const newOption = document.createElement('option');
-                    newOption.value = dbValue;
-                    newOption.textContent = dbValue;
-                    newOption.selected = true;
-                    element.appendChild(newOption);
-                }
-            } else {
-                element.value = ficha[dbField];
-            }
-            
+           // La función existente ya detecta si es un SELECT y lo selecciona correctamente
+if (element.tagName === 'SELECT') {
+    const options = Array.from(element.options);
+    const dbValue = ficha[dbField].toUpperCase().trim();
+    
+    // Busca la opción que coincida con el valor de la base de datos
+    let matchingOption = options.find(function(opt) {
+        const optValue = opt.value.toUpperCase().trim();
+        if (optValue === dbValue) return true;
+        if (optValue.replace(/\s/g, '') === dbValue.replace(/\s/g, '')) return true;
+        return false;
+    });
+    
+    if (matchingOption) {
+        element.value = matchingOption.value;
+        console.log('✅ Select asignado:', formField, '=', matchingOption.value);
+    } else {
+        // Si no encuentra, agrega la opción dinámicamente
+        const newOption = document.createElement('option');
+        newOption.value = dbValue;
+        newOption.textContent = dbValue;
+        newOption.selected = true;
+        element.appendChild(newOption);
+        console.log('⚠️ Opción agregada dinámicamente:', formField, '=', dbValue);
+    }
+} else {
+    element.value = ficha[dbField];
+}
             // 🔒 MANTENER BLOQUEADO
             element.disabled = true;
             element.style.backgroundColor = '#f3f4f6';
