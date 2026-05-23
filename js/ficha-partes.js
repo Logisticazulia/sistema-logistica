@@ -125,38 +125,53 @@ function configurarCerrarSesion() {
 // FUNCIONES DE ESTADÍSTICAS
 // ========================================
 
+// ========================================
+// FUNCIONES DE ESTADÍSTICAS (CORREGIDA)
+// ========================================
 function calculateStats(fichas) {
     // === Estadísticas Principales ===
     safeUpdate('totalFichas', fichas.length);
     
-    const operativas = fichas.filter(f => 
-        f.estatus_ficha && f.estatus_ficha.toUpperCase() === 'OPERATIVA'
-    ).length;
-    const inoperativas = fichas.filter(f => 
-        f.estatus_ficha && f.estatus_ficha.toUpperCase() === 'INOPERATIVA'
-    ).length;
-    const desincorporadas = fichas.filter(f => 
-        f.estatus_ficha && f.estatus_ficha.toUpperCase() === 'DESINCORPORADA'
-    ).length;
+    // ✅ Conteo robusto para Operativas e Inoperativas
+    const operativas = fichas.filter(f => {
+        if (!f.estatus_ficha) return false;
+        const est = f.estatus_ficha.toString().trim().toUpperCase();
+        return est === 'OPERATIVA' || est === 'OPERATIVO';
+    }).length;
+    
+    const inoperativas = fichas.filter(f => {
+        if (!f.estatus_ficha) return false;
+        const est = f.estatus_ficha.toString().trim().toUpperCase();
+        return est === 'INOPERATIVA' || est === 'INOPERATIVO';
+    }).length;
     
     safeUpdate('fichasOperativas', operativas);
     safeUpdate('fichasInoperativas', inoperativas);
-    safeUpdate('fichasDesincorporadas', desincorporadas);
 
     // === Tarjetas Resumen ===
     safeUpdate('countMoto', fichas.filter(f => 
-        f.tipo && f.tipo.toUpperCase() === 'MOTO'
+        f.tipo && f.tipo.toString().trim().toUpperCase() === 'MOTO'
     ).length);
-    safeUpdate('countCamioneta', fichas.filter(f => 
-        f.tipo && f.tipo.toUpperCase() === 'CAMIONETA'
-    ).length);
-    safeUpdate('countAutomovil', fichas.filter(f => 
-        f.tipo && f.tipo.toUpperCase() === 'AUTOMOVIL'
-    ).length);
-    safeUpdate('countCamion', fichas.filter(f => 
-        f.tipo && f.tipo.toUpperCase() === 'CAMION'
-    ).length);
+    
+    // ✅ NUEVO: Tracción de Sangre
+    safeUpdate('countTraccion', fichas.filter(f => {
+        if (!f.tipo) return false;
+        const tipo = f.tipo.toString().trim().toUpperCase();
+        return tipo.includes('TRACCION') || tipo.includes('SANGRE');
+    }).length);
 
+    // ✅ NUEVO: Parque Automotor (Suma de Camioneta, Camión, Autobús, Automóvil)
+    const parqueAutomotor = fichas.filter(f => {
+        if (!f.tipo) return false;
+        const tipo = f.tipo.toString().trim().toUpperCase();
+        return tipo === 'CAMIONETA' || 
+               tipo === 'CAMION' || 
+               tipo === 'AUTOBUS' || 
+               tipo === 'AUTOMOVIL';
+    }).length;
+    safeUpdate('countParque', parqueAutomotor);
+
+    // Fotos
     const conFotos = fichas.filter(f => 
         f.foto1_url || f.foto2_url || f.foto3_url || f.foto4_url
     ).length;
@@ -168,7 +183,6 @@ function safeUpdate(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
 }
-
 // ========================================
 // FUNCIONES DE GRÁFICOS
 // ========================================
