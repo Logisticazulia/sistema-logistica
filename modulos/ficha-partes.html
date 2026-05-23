@@ -307,56 +307,47 @@
         </section>
 
         <!-- ESTADÍSTICAS PRINCIPALES -->
-        <section class="stats-inline">
-            <div class="stat-item">
-                <span class="stat-value" id="totalFichas">⏳</span>
-                <span class="stat-label">Total Fichas</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="fichasOperativas">⏳</span>
-                <span class="stat-label">Operativas</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="fichasInoperativas">⏳</span>
-                <span class="stat-label">Inoperativas</span>
-            </div>
-            <span class="stat-separator">|</span>
-            <div class="stat-item">
-                <span class="stat-value" id="fichasDesincorporadas">⏳</span>
-                <span class="stat-label">Desinc.</span>
-            </div>
-        </section>
+       <!-- ESTADÍSTICAS PRINCIPALES (Corregido: Sin Desincorporados) -->
+<section class="stats-inline">
+    <div class="stat-item">
+        <span class="stat-value" id="totalFichas">⏳</span>
+        <span class="stat-label">Total Fichas</span>
+    </div>
+    <span class="stat-separator">|</span>
+    <div class="stat-item">
+        <span class="stat-value" id="fichasOperativas">⏳</span>
+        <span class="stat-label">Operativas</span>
+    </div>
+    <span class="stat-separator">|</span>
+    <div class="stat-item">
+        <span class="stat-value" id="fichasInoperativas">⏳</span>
+        <span class="stat-label">Inoperativas</span>
+    </div>
+</section>
 
-        <!-- TARJETAS RESUMEN -->
-        <section class="summary-grid">
-            <div class="summary-card motos">
-                <div class="summary-value" id="countMoto">-</div>
-                <div class="summary-label">🏍️ Motos</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countCamioneta">-</div>
-                <div class="summary-label">🚙 Camionetas</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countAutomovil">-</div>
-                <div class="summary-label">🚗 Automóviles</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="countCamion">-</div>
-                <div class="summary-label">🚚 Camiones</div>
-            </div>
-            <div class="summary-card ubic">
-                <div class="summary-value" id="countConFotos">-</div>
-                <div class="summary-label">📸 Con Fotos</div>
-            </div>
-            <div class="summary-card desinc">
-                <div class="summary-value" id="countSinFotos">-</div>
-                <div class="summary-label">📷 Sin Fotos</div>
-            </div>
-        </section>
-
+<!-- TARJETAS RESUMEN (Corregido: Suma de Parque Automotor y Tracción de Sangre) -->
+<section class="summary-grid">
+    <div class="summary-card motos">
+        <div class="summary-value" id="countMoto">-</div>
+        <div class="summary-label">🏍️ Motos</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="countTraccion">-</div>
+        <div class="summary-label">🐴 Tracción Sangre</div>
+    </div>
+    <div class="summary-card ubic">
+        <div class="summary-value" id="countParque">-</div>
+        <div class="summary-label">🚗 Parque Automotor</div>
+    </div>
+    <div class="summary-card desinc">
+        <div class="summary-value" id="countConFotos">-</div>
+        <div class="summary-label">📸 Con Fotos</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="countSinFotos">-</div>
+        <div class="summary-label">📷 Sin Fotos</div>
+    </div>
+</section>
         <!-- BOTÓN DE IMPRIMIR -->
         <section class="print-section">
             <button class="btn-print" onclick="imprimirGraficos()">
