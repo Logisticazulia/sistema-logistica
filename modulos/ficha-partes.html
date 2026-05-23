@@ -101,12 +101,13 @@
         }
         
         /* Grid de gráficos - 3 por fila */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
+ /* Grid de gráficos - 2 POR FILA (2x2) */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas iguales */
+    gap: 20px;
+    margin-top: 20px;
+}
         .chart-card {
             background: white;
             border-radius: 12px;
@@ -352,7 +353,7 @@
             </button>
         </section>
 
-    <!-- GRÁFICOS - 4 GRÁFICOS PRINCIPALES -->
+<!-- GRÁFICOS - 2 ARRIBA Y 2 ABAJO -->
 <section class="charts-grid">
     <!-- Fila 1 -->
     <div class="chart-card">
@@ -363,14 +364,14 @@
         <h4>📅 Fichas por Mes</h4>
         <div class="chart-container"><canvas id="chartMes"></canvas></div>
     </div>
-    <div class="chart-card">
-        <h4>📊 Fichas por Año</h4>
-        <div class="chart-container"><canvas id="chartAnio"></canvas></div>
-    </div>
     <!-- Fila 2 -->
     <div class="chart-card">
-        <h4>📋 Estado Mecánico</h4>
-        <div class="chart-container"><canvas id="chartMecanico"></canvas></div>
+        <h4>🏍️ Motos vs Vehículos</h4>
+        <div class="chart-container"><canvas id="chartMotosVehiculos"></canvas></div>
+    </div>
+    <div class="chart-card">
+        <h4>📋 Con/Sin Causa</h4>
+        <div class="chart-container"><canvas id="chartCausas"></canvas></div>
     </div>
 </section>
     </main>
