@@ -60,26 +60,43 @@ async function cargarVehiculos() {
 }
 
 // Poblar filtros con valores únicos de la base de datos
+// Poblar filtros con valores únicos de la base de datos
 function populateFilters() {
-    // Poblar Unidad Administrativa
+    // 1. POBLAR UNIDAD ADMINISTRATIVA
     if (filterUnidad) {
-        const unidadValues = [...new Set(allVehicles.map(v => v.unidad_administrativa).filter(Boolean))].sort();
+        // ✅ CORRECCIÓN: Normalizamos (trim + toUpperCase) ANTES de aplicar el Set de unicidad
+        const unidadValues = [...new Set(allVehicles.map(v => {
+            const val = v.unidad_administrativa;
+            return val ? val.trim().toUpperCase() : null;
+        }).filter(Boolean))].sort();
+
         console.log('Unidades Administrativas encontradas:', unidadValues.length);
+        
+        // Limpiar el select manteniendo solo la primera opción ("Todas")
+        // Esto evita duplicados si la función se llama dos veces
+        while (filterUnidad.options.length > 1) {
+            filterUnidad.remove(1);
+        }
+
         unidadValues.forEach(value => {
             const option = document.createElement('option');
-            option.value = value.trim().toUpperCase();
-            option.textContent = value.trim();
+            option.value = value; // Ya viene en mayúsculas
+            option.textContent = value;
             filterUnidad.appendChild(option);
         });
     }
-    
-    // Poblar EPP si está vacío
+
+    // 2. POBLAR EPP (Mantiene la lógica de no duplicar si ya tiene opciones)
     if (filterEPP && filterEPP.options.length <= 1) {
-        const eppValues = [...new Set(allVehicles.map(v => v.epp).filter(Boolean))].sort();
+        const eppValues = [...new Set(allVehicles.map(v => {
+            const val = v.epp;
+            return val ? val.trim().toUpperCase() : null;
+        }).filter(Boolean))].sort();
+        
         eppValues.forEach(value => {
             const option = document.createElement('option');
-            option.value = value.trim().toUpperCase();
-            option.textContent = value.trim();
+            option.value = value;
+            option.textContent = value;
             filterEPP.appendChild(option);
         });
     }
