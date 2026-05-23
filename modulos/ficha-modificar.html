@@ -282,21 +282,41 @@ body { font-family: 'Roboto', sans-serif; background: #f5f5f5; }
                         <label>Ubicación</label>
                         <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación actual" disabled>
                     </div>
-                    <div class="form-group">
-                        <label>Tapicería</label>
-                        <input type="text" id="tapiceria" name="tapiceria" placeholder="Estado tapicería" disabled>
-                    </div>
-                </div>
-                <div class="form-row-2">
-                    <div class="form-group">
-                        <label>Cauchos</label>
-                        <input type="text" id="cauchos" name="cauchos" placeholder="Estado cauchos" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Luces</label>
-                        <input type="text" id="luces" name="luces" placeholder="Estado luces" disabled>
-                    </div>
-                </div>
+                    <!-- Reemplazar la sección de Tapicería, Cauchos y Luces -->
+<div class="form-row-2">
+    <div class="form-group">
+        <label>Tapicería</label>
+        <select id="tapiceria" name="tapiceria" disabled>
+            <option value="">Seleccione...</option>
+            <option value="BUENO">BUENO</option>
+            <option value="REGULAR">REGULAR</option>
+            <option value="MALO">MALO</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Cauchos</label>
+        <select id="cauchos" name="cauchos" disabled>
+            <option value="">Seleccione...</option>
+            <option value="BUENO">BUENO</option>
+            <option value="REGULAR">REGULAR</option>
+            <option value="MALO">MALO</option>
+        </select>
+    </div>
+</div>
+<div class="form-row-2">
+    <div class="form-group">
+        <label>Luces</label>
+        <select id="luces" name="luces" disabled>
+            <option value="">Seleccione...</option>
+            <option value="BUENO">BUENO</option>
+            <option value="REGULAR">REGULAR</option>
+            <option value="MALO">MALO</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <!-- Espacio vacío o otro campo si es necesario -->
+    </div>
+</div>
                 <!-- OBSERVACIONES -->
                 <div class="form-group">
                     <label>Observaciones</label>
